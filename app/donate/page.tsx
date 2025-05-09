@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,7 +8,14 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
-import { Coffee, Heart, Trophy, Star } from "lucide-react"
+import { Coffee, Heart, Trophy, Star, CreditCard } from "lucide-react"
+import { loadStripe } from "@stripe/stripe-js"
+import { Elements } from "@stripe/react-stripe-js"
+import { DonationForm } from "@/components/donation-form"
+import { VenmoOption } from "@/components/venmo-option"
+
+// Load Stripe outside of component to avoid recreating it
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 export default function DonatePage() {
   const [donationAmount, setDonationAmount] = useState<string>("10")
@@ -19,26 +24,62 @@ export default function DonatePage() {
   const [donorEmail, setDonorEmail] = useState<string>("")
   const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
   const [donationMessage, setDonationMessage] = useState<string>("")
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "venmo">("stripe")
+  const [clientSecret, setClientSecret] = useState<string>("")
+  const [isRecurring, setIsRecurring] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const { toast } = useToast()
 
-  const handleDonationSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+  const amount = customAmount || donationAmount
 
-    // In a real implementation, this would connect to a payment processor
-    toast({
-      title: "Thank you for your donation!",
-      description: `Your $${customAmount || donationAmount} donation to Protecting San Francisco is being processed.`,
-      duration: 5000,
-    })
+  const handlePreparePayment = async () => {
+    if (!amount || !donorEmail) {
+      toast({
+        title: "Missing information",
+        description: "Please provide your email and donation amount.",
+        variant: "destructive",
+      })
+      return
+    }
 
-    // Reset form
-    setDonationAmount("10")
-    setCustomAmount("")
-    setDonorName("")
-    setDonorEmail("")
-    setIsAnonymous(false)
-    setDonationMessage("")
+    if (paymentMethod === "stripe") {
+      setIsLoading(true)
+      try {
+        const response = await fetch("/api/donations/create-payment-intent", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount,
+            donorEmail,
+            donorName,
+            isRecurring,
+            donationMessage,
+            isAnonymous,
+          }),
+        })
+
+        const data = await response.json()
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
+        setClientSecret(data.clientSecret)
+      } catch (error) {
+        toast({
+          title: "Error preparing payment",
+          description: (error as Error).message,
+          variant: "destructive",
+        })
+      } finally {
+        setIsLoading(false)
+      }
+    }
   }
+
+  // Reset client secret when payment method changes
+  useEffect(() => {
+    setClientSecret("")
+  }, [paymentMethod])
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -185,8 +226,12 @@ export default function DonatePage() {
 
         <Tabs defaultValue="one-time" className="max-w-2xl mx-auto">
           <TabsList className="grid w-full grid-cols-2 mb-8">
-            <TabsTrigger value="one-time">One-Time Donation</TabsTrigger>
-            <TabsTrigger value="monthly">Monthly Support</TabsTrigger>
+            <TabsTrigger value="one-time" onClick={() => setIsRecurring(false)}>
+              One-Time Donation
+            </TabsTrigger>
+            <TabsTrigger value="monthly" onClick={() => setIsRecurring(true)}>
+              Monthly Support
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="one-time">
@@ -198,7 +243,7 @@ export default function DonatePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleDonationSubmit}>
+                {!clientSecret ? (
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="donation-amount">Donation Amount</Label>
@@ -317,19 +362,71 @@ export default function DonatePage() {
                         onChange={(e) => setDonationMessage(e.target.value)}
                       ></textarea>
                     </div>
-                  </div>
 
-                  <CardFooter className="flex justify-end pt-6 px-0">
-                    <Button
-                      type="submit"
-                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
-                      disabled={!donorEmail || (!donationAmount && !customAmount)}
-                    >
-                      Donate Now
-                    </Button>
-                  </CardFooter>
-                </form>
+                    <div className="space-y-2">
+                      <Label>Payment Method</Label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div
+                          className={`border-2 rounded-md p-4 flex flex-col items-center cursor-pointer transition-colors ${
+                            paymentMethod === "stripe"
+                              ? "border-[#0A3C1F] bg-[#0A3C1F]/5"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                          onClick={() => setPaymentMethod("stripe")}
+                        >
+                          <CreditCard className="h-8 w-8 mb-2 text-[#0A3C1F]" />
+                          <span className="text-sm font-medium">Credit Card</span>
+                          <span className="text-xs text-gray-500 mt-1">Powered by Stripe</span>
+                        </div>
+                        <div
+                          className={`border-2 rounded-md p-4 flex flex-col items-center cursor-pointer transition-colors ${
+                            paymentMethod === "venmo"
+                              ? "border-[#3D95CE] bg-[#3D95CE]/5"
+                              : "border-gray-200 hover:border-gray-300"
+                          }`}
+                          onClick={() => setPaymentMethod("venmo")}
+                        >
+                          <svg
+                            className="h-8 w-8 mb-2 text-[#3D95CE]"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path d="M19.5955 2C20.5 2 21.5 2.5 21.9352 3.77148C22.1 4.5 22.1 5.5 21.9 6.60156L17.8 21.5C17.6 22.2 16.9 22.8 16.1 22.8H7.30005C6.70005 22.8 6.20005 22.3 6.20005 21.7C6.20005 21.6 6.20005 21.5 6.20005 21.4L10.4 6.60156C10.7 5.40156 11.7 4.60156 12.9 4.60156H19.6V2H19.5955ZM12.9 6.60156C12.4 6.60156 12 6.90156 11.9 7.40156L7.70005 22.2C7.70005 22.3 7.70005 22.3 7.80005 22.3C7.90005 22.3 7.90005 22.3 8.00005 22.3H16.1C16.3 22.3 16.5 22.1 16.6 21.9L20.7 7.00001C20.8 6.40001 20.8 5.80001 20.7 5.40001C20.6 5.00001 20.2 4.70001 19.7 4.70001H13L12.9 6.60156ZM3.00005 7.60156C2.40005 7.60156 1.90005 8.10156 1.90005 8.70156C1.90005 8.80156 1.90005 8.90156 1.90005 9.00156L4.70005 21.4C4.80005 22.1 5.40005 22.6 6.10005 22.6C6.70005 22.6 7.20005 22.1 7.20005 21.5C7.20005 21.4 7.20005 21.3 7.20005 21.2L4.40005 8.80156C4.30005 8.10156 3.70005 7.60156 3.00005 7.60156Z" />
+                          </svg>
+                          <span className="text-sm font-medium">Venmo</span>
+                          <span className="text-xs text-gray-500 mt-1">Quick mobile payment</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <Elements stripe={stripePromise} options={{ clientSecret }}>
+                    <DonationForm
+                      amount={Number.parseFloat(amount)}
+                      isRecurring={isRecurring}
+                      onCancel={() => setClientSecret("")}
+                    />
+                  </Elements>
+                )}
               </CardContent>
+
+              {!clientSecret && (
+                <CardFooter className="flex justify-between pt-6 px-6">
+                  {paymentMethod === "stripe" ? (
+                    <Button
+                      type="button"
+                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white w-full"
+                      disabled={!donorEmail || (!donationAmount && !customAmount) || isLoading}
+                      onClick={handlePreparePayment}
+                    >
+                      {isLoading ? "Preparing..." : "Continue to Payment"}
+                    </Button>
+                  ) : (
+                    <VenmoOption amount={amount} donorName={donorName} donorEmail={donorEmail} />
+                  )}
+                </CardFooter>
+              )}
             </Card>
           </TabsContent>
 
@@ -342,7 +439,7 @@ export default function DonatePage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <form onSubmit={handleDonationSubmit}>
+                {!clientSecret ? (
                   <div className="space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="monthly-amount">Monthly Amount</Label>
@@ -461,19 +558,47 @@ export default function DonatePage() {
                         onChange={(e) => setDonationMessage(e.target.value)}
                       ></textarea>
                     </div>
-                  </div>
 
-                  <CardFooter className="flex justify-end pt-6 px-0">
-                    <Button
-                      type="submit"
-                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
-                      disabled={!donorEmail || (!donationAmount && !customAmount)}
-                    >
-                      Subscribe
-                    </Button>
-                  </CardFooter>
-                </form>
+                    <div className="space-y-2">
+                      <Label>Payment Method</Label>
+                      <div className="grid grid-cols-1 gap-4">
+                        <div
+                          className={`border-2 rounded-md p-4 flex flex-col items-center cursor-pointer transition-colors border-[#0A3C1F] bg-[#0A3C1F]/5`}
+                        >
+                          <CreditCard className="h-8 w-8 mb-2 text-[#0A3C1F]" />
+                          <span className="text-sm font-medium">Credit Card</span>
+                          <span className="text-xs text-gray-500 mt-1">Powered by Stripe</span>
+                        </div>
+                        <div className="text-center text-sm text-gray-500 mt-2">
+                          <p>Recurring donations are only available via credit card.</p>
+                          <p>Venmo does not currently support automatic recurring payments.</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <Elements stripe={stripePromise} options={{ clientSecret }}>
+                    <DonationForm
+                      amount={Number.parseFloat(amount)}
+                      isRecurring={isRecurring}
+                      onCancel={() => setClientSecret("")}
+                    />
+                  </Elements>
+                )}
               </CardContent>
+
+              {!clientSecret && (
+                <CardFooter className="flex justify-end pt-6 px-6">
+                  <Button
+                    type="button"
+                    className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white w-full"
+                    disabled={!donorEmail || (!donationAmount && !customAmount) || isLoading}
+                    onClick={handlePreparePayment}
+                  >
+                    {isLoading ? "Preparing..." : "Subscribe"}
+                  </Button>
+                </CardFooter>
+              )}
             </Card>
           </TabsContent>
         </Tabs>

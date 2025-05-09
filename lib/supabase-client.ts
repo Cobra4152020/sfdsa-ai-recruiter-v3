@@ -1,52 +1,24 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 
-// Create a single supabase client for interacting with your database
-export const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
-)
+// Re-export createClient from @supabase/supabase-js
+export { createClient as createSupabaseClient } from "@supabase/supabase-js"
 
-// Create a server-side Supabase client with service role key
-export function getServiceSupabase() {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+// Create a singleton instance for client-side usage
+let supabaseClient: ReturnType<typeof createSupabaseClient> | null = null
 
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error("Missing Supabase environment variables")
-  }
+export function createClient() {
+  if (supabaseClient) return supabaseClient
 
-  return createClient(supabaseUrl, supabaseServiceKey, {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  supabaseClient = createSupabaseClient(supabaseUrl, supabaseKey, {
     auth: {
-      autoRefreshToken: false,
       persistSession: false,
     },
   })
+
+  return supabaseClient
 }
 
-// Create a client-side Supabase client with anonymous key
-export function getClientSupabase() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Missing Supabase environment variables")
-  }
-
-  return createClient(supabaseUrl, supabaseAnonKey)
-}
-
-// Retry function for Supabase operations
-export async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, delay = 1000): Promise<T> {
-  let lastError: any
-
-  for (let i = 0; i < maxRetries; i++) {
-    try {
-      return await fn()
-    } catch (error) {
-      lastError = error
-      await new Promise((resolve) => setTimeout(resolve, delay * (i + 1)))
-    }
-  }
-
-  throw lastError
-}
+export const supabase = createClient()
