@@ -262,21 +262,26 @@ function CheckoutForm({ amount, isRecurring }: { amount: number; isRecurring: bo
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form id="payment-form" onSubmit={handleSubmit}>
+        <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
           <PaymentElement id="payment-element" />
 
           {message && <div className="text-sm text-red-500 mt-4">{message}</div>}
 
-          <Button type="submit" disabled={isLoading || !stripe || !elements} className="w-full mt-6">
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Processing...
-              </>
-            ) : (
-              "Complete Donation"
-            )}
-          </Button>
+          <div className="flex justify-between mt-6">
+            <Button type="button" variant="outline" onClick={() => router.back()}>
+              Back
+            </Button>
+            <Button type="submit" disabled={isLoading || !stripe || !elements}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Complete Donation"
+              )}
+            </Button>
+          </div>
         </form>
       </CardContent>
     </Card>

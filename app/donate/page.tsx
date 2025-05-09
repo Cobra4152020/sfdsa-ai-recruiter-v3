@@ -63,8 +63,11 @@ export default function DonatePage() {
           throw new Error(data.error)
         }
 
+        // Log the client secret to verify it's being received
+        console.log("Received client secret:", data.clientSecret)
         setClientSecret(data.clientSecret)
       } catch (error) {
+        console.error("Payment preparation error:", error)
         toast({
           title: "Error preparing payment",
           description: (error as Error).message,

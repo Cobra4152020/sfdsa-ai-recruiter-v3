@@ -8,7 +8,17 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(request: Request) {
   try {
-    const { amount, email, name, isRecurring, interval = "month" } = await request.json()
+    const {
+      amount,
+      donorEmail,
+      donorName,
+      isRecurring,
+      interval = "month",
+      donationMessage,
+      isAnonymous,
+    } = await request.json()
+
+    console.log("Payment intent request:", { amount, donorEmail, isRecurring })
 
     // Validate the amount
     if (!amount || amount < 1) {
@@ -26,20 +36,20 @@ export async function POST(request: Request) {
       const { data: existingCustomers } = await supabase
         .from("stripe_customers")
         .select("customer_id")
-        .eq("email", email)
+        .eq("email", donorEmail)
         .limit(1)
 
       if (existingCustomers && existingCustomers.length > 0) {
         customer = { id: existingCustomers[0].customer_id }
       } else {
         customer = await stripe.customers.create({
-          email,
-          name,
+          email: donorEmail,
+          name: donorName,
         })
 
         // Store customer in database
         await supabase.from("stripe_customers").insert({
-          email,
+          email: donorEmail,
           customer_id: customer.id,
           created_at: new Date().toISOString(),
         })
@@ -71,7 +81,7 @@ export async function POST(request: Request) {
       await supabase.from("subscriptions").insert({
         subscription_id: subscription.id,
         donor_id: customer.id,
-        donor_email: email,
+        donor_email: donorEmail,
         amount: amount,
         interval: interval,
         status: "incomplete",
@@ -81,6 +91,9 @@ export async function POST(request: Request) {
 
       const invoice = subscription.latest_invoice as Stripe.Invoice
       const paymentIntent = invoice.payment_intent as Stripe.PaymentIntent
+
+      // Add logging before returning the response
+      console.log("Payment intent created successfully")
 
       return NextResponse.json({
         subscriptionId: subscription.id,
@@ -92,17 +105,17 @@ export async function POST(request: Request) {
         amount: amountInCents,
         currency: "usd",
         payment_method_types: ["card"],
-        receipt_email: email,
+        receipt_email: donorEmail,
         metadata: {
-          name: name || "",
+          name: donorName || "",
         },
       })
 
       // Store donation in database
       await supabase.from("donations").insert({
         amount: amount,
-        donor_email: email,
-        donor_name: name || null,
+        donor_email: donorEmail,
+        donor_name: donorName || null,
         payment_processor: "stripe",
         payment_id: paymentIntent.id,
         status: "pending",
@@ -110,12 +123,15 @@ export async function POST(request: Request) {
         updated_at: new Date().toISOString(),
       })
 
+      // Add logging before returning the response
+      console.log("Payment intent created successfully")
+
       return NextResponse.json({
         clientSecret: paymentIntent.client_secret,
       })
     }
   } catch (error) {
     console.error("Error creating payment:", error)
-    return NextResponse.json({ error: "Error creating payment" }, { status: 500 })
+    return NextResponse.json({ error: "Error creating payment: " + (error as Error).message }, { status: 500 })
   }
 }
