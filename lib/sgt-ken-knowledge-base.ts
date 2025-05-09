@@ -35,7 +35,7 @@ const knowledgeBase: KnowledgeEntry[] = [
   {
     keywords: ["schedule", "hours", "shifts", "work schedule", "days off"],
     response:
-      "Deputy Sheriffs typically work a 4/10 schedule (four 10-hour days per week) with three consecutive days off. Various shift options are available, including day, swing, and night shifts. The department tries to accommodate preferences when possible, though new deputies may need to demonstrate flexibility initially.",
+      "The San Francisco Sheriff's Department offers several shift options to accommodate various lifestyles: 1) Traditional 8-hour shifts, 5 days a week with weekends off for many administrative positions, 2) 12-hour shifts with 3 days on/4 days off, which provides longer stretches of time off, and 3) 12-hour shifts with 4 days on/3 days off. New deputies typically start with one of the 12-hour shift patterns, with more schedule options becoming available with seniority.",
   },
   {
     keywords: ["career", "advancement", "promotion", "growth", "future"],
@@ -110,7 +110,7 @@ const knowledgeBase: KnowledgeEntry[] = [
   {
     keywords: ["family", "children", "work life", "balance", "time off"],
     response:
-      "The department recognizes the importance of work-life balance. The 4/10 schedule (four 10-hour days with three days off) helps many deputies maintain family time. Benefits include paid vacation, sick leave, family medical leave, and parental leave. Many deputies find the schedule and stability of the job conducive to raising a family.",
+      "The department recognizes the importance of work-life balance. The various shift options (8-hour shifts with weekends off, 12-hour shifts with 3 days on/4 days off, or 12-hour shifts with 4 days on/3 days off) help many deputies maintain family time. Benefits include paid vacation, sick leave, family medical leave, and parental leave. Many deputies find the schedule and stability of the job conducive to raising a family.",
   },
   // Default response if no keywords match
   {

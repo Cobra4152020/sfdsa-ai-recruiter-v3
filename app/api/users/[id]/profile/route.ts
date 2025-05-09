@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/lib/supabase-service"
 import { NFT_AWARD_TIERS } from "@/lib/nft-utils"
 import type { BadgeType } from "@/lib/badge-utils"
 

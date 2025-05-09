@@ -34,7 +34,9 @@ export function PageWrapper({ children }: PageWrapperProps) {
         </main>
         <ImprovedFooter />
 
-        {isOptInFormOpen && <OptInForm onClose={handleCloseOptInForm} />}
+        {isOptInFormOpen && (
+          <OptInForm onClose={handleCloseOptInForm} isApplying={isApplying} isOpen={isOptInFormOpen} />
+        )}
       </div>
     </UserProvider>
   )

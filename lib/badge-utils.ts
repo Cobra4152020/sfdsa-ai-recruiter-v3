@@ -1,4 +1,4 @@
-import { supabase } from "./supabase-client"
+import { supabase } from "./supabase-service"
 
 export type BadgeType =
   | "written"

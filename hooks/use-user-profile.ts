@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase-client"
+import { supabase } from "@/lib/supabase-service"
 
 export function useUserProfile(userId: string, enabled = true) {
   const [profile, setProfile] = useState<any>(null)
@@ -90,7 +90,7 @@ export function useUserProfile(userId: string, enabled = true) {
               id: userId,
               name: "Demo User",
               email: "demo@example.com",
-              avatar_url: "/placeholder.svg?height=64&width=64&query=user",
+              avatar_url: "/abstract-geometric-shapes.png",
               bio: "This is a demo user profile.",
               participation_count: 1500,
               has_applied: false,

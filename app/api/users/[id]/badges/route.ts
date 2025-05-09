@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/lib/supabase-service"
 import type { BadgeType } from "@/lib/badge-utils"
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {

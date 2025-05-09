@@ -74,6 +74,7 @@ export default function Home() {
             setIsApplying(false)
           }}
           isApplying={isApplying}
+          isOpen={isOptInFormOpen}
         />
       )}
 

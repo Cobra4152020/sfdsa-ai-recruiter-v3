@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { generateResponse } from "@/lib/sgt-ken-knowledge-base"
 import { v4 as uuidv4 } from "uuid"
 
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
 
       if (supabaseUrl && supabaseKey) {
         // Create Supabase client directly with the environment variables
-        const supabase = createClient(supabaseUrl, supabaseKey)
+        const supabase = createSupabaseClient(supabaseUrl, supabaseKey)
 
         // Log the interaction
         await supabase.from("chat_interactions").insert({

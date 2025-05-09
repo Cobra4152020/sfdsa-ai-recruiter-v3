@@ -1,6 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
+
+import { useState } from "react"
+
 import Link from "next/link"
 import { Menu, X, Shield, Facebook, Twitter, Youtube, Instagram, Linkedin, Moon, Sun, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -68,7 +71,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
           {/* Social Icons - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
             <a
-              href="https://facebook.com"
+              href="https://facebook.com/sfdsa"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow us on Facebook"
@@ -77,7 +80,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Facebook className="h-5 w-5" />
             </a>
             <a
-              href="https://twitter.com"
+              href="https://twitter.com/sfdsa"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow us on Twitter"
@@ -86,7 +89,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Twitter className="h-5 w-5" />
             </a>
             <a
-              href="https://youtube.com"
+              href="https://youtube.com/sfdsa"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Subscribe to our YouTube channel"
@@ -95,7 +98,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Youtube className="h-5 w-5" />
             </a>
             <a
-              href="https://instagram.com"
+              href="https://instagram.com/sfdsa"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow us on Instagram"
@@ -104,7 +107,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Instagram className="h-5 w-5" />
             </a>
             <a
-              href="https://linkedin.com"
+              href="https://linkedin.com/company/sfdsa"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Connect with us on LinkedIn"
@@ -158,7 +161,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   { label: "Top Recruits", href: "/awards" },
                   { label: "Leaderboard", href: "/awards#leaderboard" },
                   { label: "Badge Gallery", href: "/badges" },
-                  { label: "NFT Awards", href: "/nft-awards/coming-soon", isComingSoon: true },
+                  { label: "NFT Awards", href: "/nft-awards/coming-soon" },
                 ]}
               />
               <DropdownNav
@@ -176,6 +179,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <AskSgtKenButton
                 variant="ghost"
                 className="text-white hover:text-[#FFD700] transition-colors p-0 h-auto font-normal"
+                position="static"
               />
             </nav>
 
@@ -189,7 +193,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               </Button>
               <Link href="/login">
                 <Button className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-[#121212] font-medium">
-                  Login / Sign Up
+                  Login
                 </Button>
               </Link>
             </div>
@@ -304,10 +308,11 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <AskSgtKenButton
                 variant="ghost"
                 className="text-white hover:text-[#FFD700] transition-colors p-0 h-auto font-normal"
+                position="static"
               />
             </div>
             <Link href="/login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
-              Login / Sign Up
+              Login
             </Link>
           </div>
 
@@ -327,7 +332,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                 className="w-full bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
-                Login / Sign Up
+                Login
               </Button>
             </Link>
           </div>

@@ -41,7 +41,7 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
                 <span className="text-[#FFD700] mr-2" aria-hidden="true">
                   ✓
                 </span>{" "}
-                Starting Salary: $75,920
+                Starting Salary: $116,428
               </h2>
               <ul className="space-y-3">
                 <li className="flex items-start">

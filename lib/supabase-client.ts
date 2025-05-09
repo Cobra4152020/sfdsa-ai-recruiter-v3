@@ -6,9 +6,9 @@ export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
 )
 
-// Add the missing exports that are being imported in other files
+// Create a server-side Supabase client with service role key
 export function getServiceSupabase() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseServiceKey) {
@@ -23,7 +23,19 @@ export function getServiceSupabase() {
   })
 }
 
-// Completely rewritten without any backslashes
+// Create a client-side Supabase client with anonymous key
+export function getClientSupabase() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error("Missing Supabase environment variables")
+  }
+
+  return createClient(supabaseUrl, supabaseAnonKey)
+}
+
+// Retry function for Supabase operations
 export async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, delay = 1000): Promise<T> {
   let lastError: any
 

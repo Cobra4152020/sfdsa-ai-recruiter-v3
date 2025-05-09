@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/lib/supabase-service"
 
 export type BadgeType =
   | "written"

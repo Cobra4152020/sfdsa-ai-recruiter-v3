@@ -1,6 +1,7 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { cookies } from "next/headers"
 
+// This is the original function that parts of the codebase expect
 export function createClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -56,4 +57,10 @@ export function createClient() {
       }),
     } as any
   }
+}
+
+// This is the renamed function for better clarity
+export function createServerClient() {
+  // Simply call the original function to avoid code duplication
+  return createClient()
 }
