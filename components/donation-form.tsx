@@ -15,7 +15,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Loader2 } from "lucide-react"
 
 // Load Stripe outside of component to avoid recreating it on renders
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null
 
 export function DonationForm() {
   const [activeTab, setActiveTab] = useState("one-time")
@@ -210,10 +212,17 @@ export function DonationForm() {
             </Tabs>
           </CardContent>
         </Card>
-      ) : (
+      ) : stripePromise ? (
         <Elements stripe={stripePromise} options={options}>
           <CheckoutForm amount={amount} isRecurring={activeTab === "recurring"} />
         </Elements>
+      ) : (
+        <Card>
+          <CardHeader>
+            <CardTitle>Configuration Error</CardTitle>
+            <CardDescription>Stripe could not be initialized. Please check your configuration.</CardDescription>
+          </CardHeader>
+        </Card>
       )}
     </div>
   )

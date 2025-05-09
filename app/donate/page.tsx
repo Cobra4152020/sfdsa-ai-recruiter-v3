@@ -15,7 +15,12 @@ import { DonationForm } from "@/components/donation-form"
 import { VenmoOption } from "@/components/venmo-option"
 
 // Load Stripe outside of component to avoid recreating it
-const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
+const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+  ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+  : null
+
+// Add this console log to verify the key is available
+console.log("Stripe key available:", !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 export default function DonatePage() {
   const [donationAmount, setDonationAmount] = useState<string>("10")
@@ -403,7 +408,7 @@ export default function DonatePage() {
                       </div>
                     </div>
                   </div>
-                ) : (
+                ) : stripePromise ? (
                   <Elements stripe={stripePromise} options={{ clientSecret }}>
                     <DonationForm
                       amount={Number.parseFloat(amount)}
@@ -411,6 +416,10 @@ export default function DonatePage() {
                       onCancel={() => setClientSecret("")}
                     />
                   </Elements>
+                ) : (
+                  <div className="p-4 text-center">
+                    <p className="text-red-500">Stripe could not be initialized. Please check your configuration.</p>
+                  </div>
                 )}
               </CardContent>
 
@@ -579,7 +588,7 @@ export default function DonatePage() {
                       </div>
                     </div>
                   </div>
-                ) : (
+                ) : stripePromise ? (
                   <Elements stripe={stripePromise} options={{ clientSecret }}>
                     <DonationForm
                       amount={Number.parseFloat(amount)}
@@ -587,6 +596,10 @@ export default function DonatePage() {
                       onCancel={() => setClientSecret("")}
                     />
                   </Elements>
+                ) : (
+                  <div className="p-4 text-center">
+                    <p className="text-red-500">Stripe could not be initialized. Please check your configuration.</p>
+                  </div>
                 )}
               </CardContent>
 
