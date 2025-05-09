@@ -1,40 +1,63 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, Shield, Sun, Moon } from "lucide-react"
-import { useTheme } from "next-themes"
+import { Menu, X, Shield, Facebook, Twitter, Youtube, Instagram, Linkedin, Moon, Sun, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useUser } from "@/context/user-context"
-import { UserProfile } from "@/components/user-profile"
+import { useTheme } from "@/components/theme-provider"
+import { usePathname } from "next/navigation"
+import { DropdownNav } from "@/components/ui/dropdown-nav"
+import { cn } from "@/lib/utils"
+import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
 
 interface ImprovedHeaderProps {
-  showOptInForm: () => void
+  showOptInForm?: (isApplying?: boolean) => void
+  isScrolled?: boolean
 }
 
-export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
+export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: ImprovedHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(propIsScrolled || false)
   const { theme, setTheme } = useTheme()
-  const { isLoggedIn } = useUser()
+  const pathname = usePathname()
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [mobileDropdowns, setMobileDropdowns] = useState({
+    topRecruits: false,
+    playTheGame: false,
+    benefits: false,
+  })
+
+  // Handle scroll effect for header
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50)
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
-  }
-
-  const toggleTheme = () => {
-    setTheme(theme === "dark" ? "light" : "dark")
+    setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#0A3C1F] dark:bg-black py-1 shadow-lg`}
+      className={`bg-[#0A3C1F] dark:bg-[#121212] text-white sticky top-0 z-50 transition-all duration-300 ${
+        isScrolled ? "shadow-md py-2" : "py-4"
+      }`}
       role="banner"
     >
-      <div className="container mx-auto px-4">
-        {/* Top row with logo and theme toggle */}
-        <div className="flex items-center justify-between py-1 border-b border-white/10">
+      <div className="max-w-7xl mx-auto px-4">
+        {/* Top row with logo and social icons */}
+        <div className="flex items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center" aria-label="SF Deputy Sheriff AI Recruitment - Home">
+          <Link
+            href="/"
+            className="flex items-center hover:opacity-90 transition-opacity"
+            aria-label="SF Deputy Sheriff AI Recruitment - Home"
+          >
             <Shield className="h-8 w-8 text-[#FFD700] mr-2" aria-hidden="true" />
             <div>
               <span className="font-bold text-white text-lg">SF Deputy Sheriff</span>
@@ -42,152 +65,271 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
             </div>
           </Link>
 
-          {/* Theme toggle and mobile menu button */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+          {/* Social Icons - Desktop */}
+          <div className="hidden md:flex items-center space-x-4">
+            <a
+              href="https://facebook.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow us on Facebook"
+              className="text-white hover:text-[#FFD700] transition-colors"
             >
-              {theme === "dark" ? (
-                <Sun className="h-5 w-5" aria-hidden="true" />
+              <Facebook className="h-5 w-5" />
+            </a>
+            <a
+              href="https://twitter.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow us on Twitter"
+              className="text-white hover:text-[#FFD700] transition-colors"
+            >
+              <Twitter className="h-5 w-5" />
+            </a>
+            <a
+              href="https://youtube.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Subscribe to our YouTube channel"
+              className="text-white hover:text-[#FFD700] transition-colors"
+            >
+              <Youtube className="h-5 w-5" />
+            </a>
+            <a
+              href="https://instagram.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Follow us on Instagram"
+              className="text-white hover:text-[#FFD700] transition-colors"
+            >
+              <Instagram className="h-5 w-5" />
+            </a>
+            <a
+              href="https://linkedin.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="Connect with us on LinkedIn"
+              className="text-white hover:text-[#FFD700] transition-colors"
+            >
+              <Linkedin className="h-5 w-5" />
+            </a>
+            <button
+              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+              className="text-white hover:text-[#FFD700] transition-colors p-1 rounded-full hover:bg-white/10"
+            >
+              {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+            </button>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={toggleMenu}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={isMenuOpen}
+              aria-controls="mobile-menu"
+            >
+              {isMenuOpen ? (
+                <X className="h-6 w-6" aria-hidden="true" />
               ) : (
-                <Moon className="h-5 w-5" aria-hidden="true" />
+                <Menu className="h-6 w-6" aria-hidden="true" />
               )}
             </button>
-
-            {/* Mobile menu button */}
-            <div className="md:hidden">
-              <button
-                onClick={toggleMenu}
-                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-                aria-expanded={isMenuOpen}
-                aria-controls="mobile-menu"
-              >
-                {isMenuOpen ? (
-                  <X className="h-6 w-6" aria-hidden="true" />
-                ) : (
-                  <Menu className="h-6 w-6" aria-hidden="true" />
-                )}
-              </button>
-            </div>
           </div>
         </div>
 
         {/* Bottom row with navigation and buttons */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between py-1">
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-6" aria-label="Main Navigation">
-            <Link href="/" className="text-white hover:text-[#FFD700] transition-colors">
-              Home
-            </Link>
-            <Link href="/awards" className="text-white hover:text-[#FFD700] transition-colors">
-              Top Recruit Awards
-            </Link>
-            <Link href="/practice-tests" className="text-white hover:text-[#FFD700] transition-colors">
-              Practice Tests
-            </Link>
-            <Link href="/gi-bill" className="text-white hover:text-[#FFD700] transition-colors">
-              G.I. Bill
-            </Link>
-            <Link href="/discounted-housing" className="text-white hover:text-[#FFD700] transition-colors">
-              Discounted Housing
-            </Link>
-          </nav>
+        <div className="border-t border-white/10 pt-4 mt-4 hidden md:block">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center space-x-6" aria-label="Main Navigation">
+              <DropdownNav
+                label="Benefits"
+                items={[
+                  { label: "Overview", href: "/#benefits" },
+                  { label: "G.I. Bill", href: "/gi-bill" },
+                  { label: "Discounted Housing", href: "/discounted-housing" },
+                ]}
+              />
+              <DropdownNav
+                label="Top Recruits"
+                items={[
+                  { label: "Top Recruits", href: "/awards" },
+                  { label: "Leaderboard", href: "/awards#leaderboard" },
+                  { label: "Badge Gallery", href: "/badges" },
+                  { label: "NFT Awards", href: "/nft-awards/coming-soon", isComingSoon: true },
+                ]}
+              />
+              <DropdownNav
+                label="Play the Game"
+                items={[
+                  { label: "Explainer", href: "/gamification" },
+                  { label: "Play Trivia w/ Sgt. Ken", href: "/trivia" },
+                  { label: "Memory Match Deluxe", href: "/games/memory-match" },
+                  { label: "Spin to Win", href: "/games/spin-to-win" },
+                ]}
+              />
+              <Link href="/donate" className="text-white hover:text-[#FFD700] transition-colors">
+                Donate
+              </Link>
+              <AskSgtKenButton
+                variant="ghost"
+                className="text-white hover:text-[#FFD700] transition-colors p-0 h-auto font-normal"
+              />
+            </nav>
 
-          {/* Right side buttons */}
-          <div className="hidden md:flex items-center space-x-4 mt-1 md:mt-0">
-            {isLoggedIn ? (
-              <UserProfile />
-            ) : (
+            {/* Right side buttons */}
+            <div className="hidden md:flex items-center space-x-4 mt-4 md:mt-0">
               <Button
-                onClick={showOptInForm}
-                className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-black font-medium"
+                onClick={() => showOptInForm && showOptInForm(true)}
+                className="bg-white hover:bg-white/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
               >
-                Sign Up
+                Apply Now
               </Button>
-            )}
-
-            <Button
-              onClick={showOptInForm}
-              className="bg-white hover:bg-white/90 text-[#0A3C1F] font-medium"
-              aria-label="Apply now for Deputy Sheriff position"
-            >
-              Apply Now
-            </Button>
+              <Link href="/login">
+                <Button className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-[#121212] font-medium">
+                  Login / Sign Up
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div
-          id="mobile-menu"
-          className="md:hidden bg-[#0A3C1F] dark:bg-black border-t border-white/10"
-          aria-label="Mobile Navigation"
-        >
-          <div className="container mx-auto px-4 py-4">
-            <nav className="flex flex-col space-y-4">
-              <Link
-                href="/"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white hover:text-[#FFD700] py-2 transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                href="/awards"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white hover:text-[#FFD700] py-2 transition-colors"
-              >
-                Top Recruit Awards
-              </Link>
-              <Link
-                href="/practice-tests"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white hover:text-[#FFD700] py-2 transition-colors"
-              >
-                Practice Tests
-              </Link>
-              <Link
-                href="/gi-bill"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white hover:text-[#FFD700] py-2 transition-colors"
-              >
-                G.I. Bill
-              </Link>
-              <Link
-                href="/discounted-housing"
-                onClick={() => setIsMenuOpen(false)}
-                className="text-white hover:text-[#FFD700] py-2 transition-colors"
-              >
-                Discounted Housing
-              </Link>
+      {/* Mobile menu dropdown */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-[#0A3C1F] border-t border-white/10">
+            {/* Mobile navigation items */}
 
-              <div className="pt-4 border-t border-white/10 flex flex-col space-y-3">
-                {isLoggedIn ? (
-                  <div className="py-2">
-                    <UserProfile />
-                  </div>
-                ) : (
-                  <Button
-                    onClick={showOptInForm}
-                    className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-black font-medium w-full"
-                  >
-                    Sign Up
-                  </Button>
-                )}
+            {/* Mobile Benefits dropdown */}
+            <div className="block px-3 py-2">
+              <button
+                onClick={() => setMobileDropdowns((prev) => ({ ...prev, benefits: !prev.benefits }))}
+                className="flex items-center w-full text-white hover:text-[#FFD700]"
+              >
+                Benefits
+                <ChevronDown
+                  className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
+                    "transform rotate-180": mobileDropdowns.benefits,
+                  })}
+                />
+              </button>
 
-                <Button
-                  onClick={showOptInForm}
-                  className="bg-white hover:bg-white/90 text-[#0A3C1F] font-medium w-full"
-                  aria-label="Apply now for Deputy Sheriff position"
-                >
-                  Apply Now
-                </Button>
-              </div>
-            </nav>
+              {mobileDropdowns.benefits && (
+                <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <Link href="/#benefits" className="block text-white hover:text-[#FFD700]">
+                    Overview
+                  </Link>
+                  <Link href="/gi-bill" className="block text-white hover:text-[#FFD700]">
+                    G.I. Bill
+                  </Link>
+                  <Link href="/discounted-housing" className="block text-white hover:text-[#FFD700]">
+                    Discounted Housing
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Top Recruits dropdown */}
+            <div className="block px-3 py-2">
+              <button
+                onClick={() => setMobileDropdowns((prev) => ({ ...prev, topRecruits: !prev.topRecruits }))}
+                className="flex items-center w-full text-white hover:text-[#FFD700]"
+              >
+                Top Recruits
+                <ChevronDown
+                  className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
+                    "transform rotate-180": mobileDropdowns.topRecruits,
+                  })}
+                />
+              </button>
+
+              {mobileDropdowns.topRecruits && (
+                <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <Link href="/awards" className="block text-white hover:text-[#FFD700]">
+                    Top Recruits
+                  </Link>
+                  <Link href="/awards#leaderboard" className="block text-white hover:text-[#FFD700]">
+                    Leaderboard
+                  </Link>
+                  <Link href="/badges" className="block text-white hover:text-[#FFD700]">
+                    Badge Gallery
+                  </Link>
+                  <Link href="/nft-awards/coming-soon" className="block text-white hover:text-[#FFD700]">
+                    NFT Awards{" "}
+                    <span className="ml-1 px-1 py-0.5 text-xs bg-[#FFD700] text-[#0A3C1F] rounded-full">Soon</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Play the Game dropdown */}
+            <div className="block px-3 py-2">
+              <button
+                onClick={() => setMobileDropdowns((prev) => ({ ...prev, playTheGame: !prev.playTheGame }))}
+                className="flex items-center w-full text-white hover:text-[#FFD700]"
+              >
+                Play the Game
+                <ChevronDown
+                  className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
+                    "transform rotate-180": mobileDropdowns.playTheGame,
+                  })}
+                />
+              </button>
+
+              {mobileDropdowns.playTheGame && (
+                <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <Link href="/gamification" className="block text-white hover:text-[#FFD700]">
+                    Explainer
+                  </Link>
+                  <Link href="/trivia" className="block text-white hover:text-[#FFD700]">
+                    Play Trivia w/ Sgt. Ken
+                  </Link>
+                  <Link href="/games/memory-match" className="block text-white hover:text-[#FFD700]">
+                    Memory Match Deluxe
+                  </Link>
+                  <Link href="/games/spin-to-win" className="block text-white hover:text-[#FFD700]">
+                    Spin to Win
+                  </Link>
+                </div>
+              )}
+            </div>
+
+            <Link href="/donate" className="block px-3 py-2 text-white hover:text-[#FFD700]">
+              Donate
+            </Link>
+            <div className="block px-3 py-2 text-white hover:text-[#FFD700]">
+              <AskSgtKenButton
+                variant="ghost"
+                className="text-white hover:text-[#FFD700] transition-colors p-0 h-auto font-normal"
+              />
+            </div>
+            <Link href="/login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
+              Login / Sign Up
+            </Link>
+          </div>
+
+          {/* Mobile buttons */}
+          <div className="px-5 py-4 border-t border-white/10 flex space-x-3">
+            <Button
+              onClick={() => {
+                showOptInForm && showOptInForm(true)
+                setIsMobileMenuOpen(false)
+              }}
+              className="flex-1 bg-white hover:bg-white/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
+            >
+              Apply Now
+            </Button>
+            <Link href="/login" className="flex-1">
+              <Button
+                className="w-full bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                Login / Sign Up
+              </Button>
+            </Link>
           </div>
         </div>
       )}

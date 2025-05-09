@@ -8,7 +8,8 @@ import { AchievementBadge } from "./achievement-badge"
 import { RecruitmentBadge } from "./recruitment-badge"
 import { Copy, Check, Download } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
-import QRCode from "qrcode.react"
+// Fix QRCode import
+import { QRCodeSVG } from "qrcode.react"
 
 type BadgeType =
   | "written"
@@ -132,7 +133,7 @@ export function BadgeSharingDialog({ isOpen, onClose, badges, userName }: BadgeS
 
           <TabsContent value="qrcode" className="flex flex-col items-center justify-center py-4">
             <div ref={qrCodeRef} className="bg-white p-4 rounded-lg">
-              <QRCode value={shareUrl} size={200} />
+              <QRCodeSVG value={shareUrl} size={200} />
             </div>
             <p className="text-sm text-center text-muted-foreground mt-4">
               Scan this QR code to view {userName}'s recruitment badge

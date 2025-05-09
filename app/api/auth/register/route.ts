@@ -28,20 +28,37 @@ export async function POST(request: Request) {
 
     // Create user profile in the database
     // FIXED: Give new users initial points (50) to appear on the leaderboard
-    const { error: profileError } = await serviceClient.from("users").insert([
-      {
-        id: userId,
-        name: name || email.split("@")[0],
-        email,
-        created_at: new Date().toISOString(),
-        participation_count: 50, // Initial points for new users
-        has_applied: false,
-      },
-    ])
+    // Use RPC call instead of direct insert to handle materialized view permissions
+    const { error: profileError } = await serviceClient.rpc("create_new_user", {
+      user_id: userId,
+      user_name: name || email.split("@")[0],
+      user_email: email,
+      initial_points: 50,
+    })
 
     if (profileError) {
       console.error("Error creating user profile:", profileError)
-      return NextResponse.json({ success: false, message: profileError.message }, { status: 500 })
+
+      // Fallback to direct insert if RPC fails
+      try {
+        const { error: insertError } = await serviceClient.from("users").insert([
+          {
+            id: userId,
+            name: name || email.split("@")[0],
+            email,
+            created_at: new Date().toISOString(),
+            participation_count: 50, // Initial points for new users
+            has_applied: false,
+          },
+        ])
+
+        if (insertError) {
+          throw insertError
+        }
+      } catch (fallbackError) {
+        console.error("Fallback insert failed:", fallbackError)
+        return NextResponse.json({ success: false, message: "Failed to create user profile" }, { status: 500 })
+      }
     }
 
     // Log the initial points
@@ -61,7 +78,7 @@ export async function POST(request: Request) {
 
     // Send welcome email
     try {
-      await fetch("/api/send-welcome-email", {
+      await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000"}/api/send-welcome-email`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

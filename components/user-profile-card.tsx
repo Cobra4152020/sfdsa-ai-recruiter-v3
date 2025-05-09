@@ -11,7 +11,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { AchievementBadge } from "@/components/achievement-badge"
 import { NFTAwardCard } from "@/components/nft-award-card"
 import { Progress } from "@/components/ui/progress"
-import { Edit, Save, Trophy, Medal, Award, Share2, Calendar, User } from "lucide-react"
+import { Edit, Save, Trophy, Medal, Award, Share2, Calendar, User, Star } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { useUser } from "@/context/user-context"
 
@@ -19,9 +19,23 @@ interface UserProfileCardProps {
   userId: string
   isExpanded?: boolean
   className?: string
+  name?: string
+  rank?: number
+  points?: number
+  badgeCount?: number
+  avatarUrl?: string
 }
 
-export function UserProfileCard({ userId, isExpanded = false, className }: UserProfileCardProps) {
+export function UserProfileCard({
+  userId,
+  isExpanded = false,
+  className,
+  name,
+  rank,
+  points = 0,
+  badgeCount = 0,
+  avatarUrl = "/male-law-enforcement-headshot.png", // Default avatar
+}: UserProfileCardProps) {
   const { currentUser } = useUser()
   const [profile, setProfile] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -113,6 +127,21 @@ export function UserProfileCard({ userId, isExpanded = false, className }: UserP
     }
   }
 
+  const getRankIcon = (rank?: number) => {
+    if (!rank) return null
+
+    switch (rank) {
+      case 1:
+        return <Trophy className="h-5 w-5 text-yellow-500" />
+      case 2:
+        return <Medal className="h-5 w-5 text-gray-400" />
+      case 3:
+        return <Medal className="h-5 w-5 text-amber-700" />
+      default:
+        return <Star className="h-5 w-5 text-gray-300" />
+    }
+  }
+
   if (isLoading) {
     return (
       <Card className={className}>
@@ -141,7 +170,7 @@ export function UserProfileCard({ userId, isExpanded = false, className }: UserP
   }
 
   // Generate a placeholder avatar URL if avatar_url is missing
-  const avatarUrl = profile.avatar_url || `/placeholder.svg?height=64&width=64&query=user-${profile.id}`
+  const avatarUrlToUse = profile.avatar_url || `/placeholder.svg?height=64&width=64&query=user-${profile.id}`
 
   const joinDate = new Date(profile.created_at).toLocaleDateString("en-US", {
     year: "numeric",
@@ -156,7 +185,7 @@ export function UserProfileCard({ userId, isExpanded = false, className }: UserP
         <CardContent className="p-4">
           <div className="flex items-center space-x-4">
             <Avatar className="h-12 w-12 border-2 border-[#0A3C1F]">
-              <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={profile.name} />
+              <AvatarImage src={avatarUrlToUse || "/placeholder.svg"} alt={profile.name} />
               <AvatarFallback>{profile.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div className="flex-1 min-w-0">
@@ -203,7 +232,7 @@ export function UserProfileCard({ userId, isExpanded = false, className }: UserP
         <div className="flex justify-between items-start">
           <div className="flex items-center">
             <Avatar className="h-16 w-16 mr-4 border-2 border-[#0A3C1F]">
-              <AvatarImage src={avatarUrl || "/placeholder.svg"} alt={profile.name} />
+              <AvatarImage src={avatarUrlToUse || "/placeholder.svg"} alt={profile.name} />
               <AvatarFallback>{profile.name.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>

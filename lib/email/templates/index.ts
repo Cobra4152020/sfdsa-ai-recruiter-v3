@@ -1,13 +1,11 @@
-import { badgeEarnedTemplate } from "./badge-earned"
-import { nftAwardedTemplate } from "./nft-awarded"
-import { welcomeTemplate } from "./welcome"
-import { applicationStatusTemplate } from "./application-status"
+import { badgeEarned } from "./badge-earned"
+import { nftAwarded } from "./nft-awarded"
+import { welcome } from "./welcome"
+import { applicationStatus } from "./application-status"
 
 export const emailTemplates = {
-  badgeEarned: badgeEarnedTemplate,
-  nftAwarded: nftAwardedTemplate,
-  welcome: welcomeTemplate,
-  applicationStatus: applicationStatusTemplate,
+  badgeEarned,
+  nftAwarded,
+  welcome,
+  applicationStatus,
 }
-
-export type EmailTemplateType = keyof typeof emailTemplates

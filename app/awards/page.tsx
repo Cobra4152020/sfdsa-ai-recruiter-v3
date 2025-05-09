@@ -1,116 +1,69 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Trophy, Medal, Award } from "lucide-react"
+import { AdvancedLeaderboard } from "@/components/advanced-leaderboard"
+import { ShareToUnlock } from "@/components/share-to-unlock"
+import { ReferRecruiter } from "@/components/refer-recruiter"
 import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
-import { EnhancementTracker } from "@/components/engagement-tracker"
-import { BadgeDisplay } from "@/components/badge-display"
-import { PointSystemExplanation } from "@/components/point-system-explanation"
 import { useUser } from "@/context/user-context"
-import { OptInForm } from "@/components/opt-in-form"
-import { SkipToContent } from "@/components/skip-to-content"
-import { useToast } from "@/components/ui/use-toast"
-import { trackPageView } from "@/lib/analytics"
-import { useRouter, useSearchParams } from "next/navigation"
+import { TopRecruitsScroll } from "@/components/top-recruits-scroll"
 
 export default function AwardsPage() {
-  const [isOptInFormOpen, setIsOptInFormOpen] = useState(false)
-  const [isApplying, setIsApplying] = useState(false)
-  const { isLoggedIn, currentUser } = useUser()
-  const { toast } = useToast()
-  const router = useRouter()
-  const searchParams = useSearchParams()
+  const [mounted, setMounted] = useState(false)
+  const { currentUser } = useUser()
 
-  // Get active tab from URL or default to 'leaderboard'
-  const activeTab = searchParams.get("tab") || "leaderboard"
-
-  // Track page view for analytics
   useEffect(() => {
-    trackPageView("awards_page")
+    setMounted(true)
   }, [])
 
-  const showOptInForm = (applying = false) => {
-    setIsApplying(applying)
-    setIsOptInFormOpen(true)
-  }
-
-  // Handle tab change and update URL
-  const handleTabChange = (value) => {
-    const params = new URLSearchParams(searchParams)
-    params.set("tab", value)
-    router.push(`/awards?${params.toString()}`, { scroll: false })
+  if (!mounted) {
+    return null
   }
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <SkipToContent />
-      <ImprovedHeader showOptInForm={() => showOptInForm(true)} />
-      <main id="main-content" className="flex-1 pt-32 pb-16 bg-gray-50 dark:bg-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold mb-4 text-primary dark:text-primary-light">Top Recruit Awards</h1>
-            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-              Recognizing our most engaged candidates and top applicants. Engage with our AI assistant, learn about the
-              application process, and join the ranks of those making a difference in San Francisco.
-            </p>
+    <>
+      <ImprovedHeader showOptInForm={() => {}} />
+
+      <main className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">Top Recruit Awards</h1>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Recognize outstanding achievement in our recruitment program. Like, share, and refer to earn points and
+            unlock exclusive badges.
+          </p>
+        </div>
+
+        <TopRecruitsScroll />
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
+          <div className="lg:col-span-2">
+            <section id="leaderboard" className="py-12">
+              <AdvancedLeaderboard currentUserId={currentUser?.id} useMockData={true} className="mb-6" />
+            </section>
           </div>
 
-          <div className="max-w-4xl mx-auto space-y-8">
-            <Tabs defaultValue={activeTab} value={activeTab} onValueChange={handleTabChange}>
-              <TabsList className="grid grid-cols-3 w-full max-w-md mx-auto mb-6">
-                <TabsTrigger value="leaderboard" className="flex items-center">
-                  <Trophy className="h-4 w-4 mr-2" />
-                  Leaderboard
-                </TabsTrigger>
-                <TabsTrigger value="badges" className="flex items-center">
-                  <Medal className="h-4 w-4 mr-2" />
-                  Badges
-                </TabsTrigger>
-                <TabsTrigger value="points" className="flex items-center">
-                  <Award className="h-4 w-4 mr-2" />
-                  Points
-                </TabsTrigger>
-              </TabsList>
+          <div className="space-y-6">
+            <ShareToUnlock
+              badgeType="chat-participation"
+              badgeName="Community Advocate"
+              badgeDescription="Unlock this badge by sharing the SFDSA recruitment program with your network"
+              requiredShares={2}
+            />
 
-              <TabsContent value="leaderboard">
-                <EnhancementTracker
-                  currentUserId={currentUser?.id}
-                  showLoginPrompt={!isLoggedIn}
-                  onLoginClick={() => showOptInForm(false)}
-                />
-              </TabsContent>
+            <ReferRecruiter />
 
-              <TabsContent value="badges">
-                <div className="space-y-6">
-                  <BadgeDisplay
-                    userId={currentUser?.id}
-                    isLoggedIn={isLoggedIn}
-                    onLoginClick={() => showOptInForm(false)}
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="points">
-                <PointSystemExplanation userId={currentUser?.id} isLoggedIn={isLoggedIn} />
-              </TabsContent>
-            </Tabs>
+            <ShareToUnlock
+              badgeType="dedicated-applicant"
+              badgeName="Recruitment Champion"
+              badgeDescription="Elite badge earned by those who help grow our recruitment community"
+              requiredShares={3}
+            />
           </div>
         </div>
       </main>
-      <ImprovedFooter />
 
-      {/* Opt-in form dialog */}
-      <OptInForm
-        isOpen={isOptInFormOpen}
-        onClose={() => {
-          setIsOptInFormOpen(false)
-          setIsApplying(false)
-        }}
-        isApplying={isApplying}
-        returnUrl={`/awards?tab=${activeTab}`}
-      />
-    </div>
+      <ImprovedFooter />
+    </>
   )
 }

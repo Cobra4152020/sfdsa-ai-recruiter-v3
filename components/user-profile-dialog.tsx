@@ -1,24 +1,64 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { User, Trophy, Medal, Award, Calendar } from "lucide-react"
-import { useUserProfile } from "@/hooks/use-user-profile"
 
 interface UserProfileDialogProps {
   userId: string
+  isOpen?: boolean
+  onClose?: () => void
+  currentUserId?: string
 }
 
-export function UserProfileDialog({ userId }: UserProfileDialogProps) {
+export function UserProfileDialog({ userId, isOpen: externalIsOpen, onClose, currentUserId }: UserProfileDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const { profile, isLoading, error } = useUserProfile(userId, isOpen)
+  const [profile, setProfile] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // Sync with external open state if provided
+  useEffect(() => {
+    if (externalIsOpen !== undefined) {
+      setIsOpen(externalIsOpen)
+    }
+  }, [externalIsOpen])
+
+  // Handle dialog close
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
+    if (!open && onClose) {
+      onClose()
+    }
+  }
+
+  // Fetch user profile when dialog opens
+  useEffect(() => {
+    if (isOpen && userId) {
+      setIsLoading(true)
+      setError(null)
+
+      // Simulate API call with mock data
+      setTimeout(() => {
+        try {
+          const mockProfile = generateMockProfile(userId, currentUserId)
+          setProfile(mockProfile)
+          setIsLoading(false)
+        } catch (err) {
+          console.error("Error fetching profile:", err)
+          setError("Failed to load user profile")
+          setIsLoading(false)
+        }
+      }, 1000)
+    }
+  }, [isOpen, userId, currentUserId])
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="flex items-center gap-1">
           <User className="h-4 w-4" />
@@ -54,7 +94,7 @@ export function UserProfileDialog({ userId }: UserProfileDialogProps) {
               <div className="flex items-center">
                 <Avatar className="h-16 w-16 mr-4 border-2 border-[#0A3C1F]">
                   <AvatarImage
-                    src={profile.avatar_url || "/placeholder.svg?height=64&width=64&query=user"}
+                    src={profile.avatar_url || `/placeholder.svg?height=64&width=64&query=user-${profile.id}`}
                     alt={profile.name}
                   />
                   <AvatarFallback>{profile.name.charAt(0).toUpperCase()}</AvatarFallback>
@@ -174,4 +214,82 @@ export function UserProfileDialog({ userId }: UserProfileDialogProps) {
       </DialogContent>
     </Dialog>
   )
+}
+
+// Helper function to generate mock profile data
+function generateMockProfile(userId: string, currentUserId?: string) {
+  const isCurrentUser = userId === currentUserId
+  const id = userId
+  const name = `User ${id.split("-")[1] || id}`
+  const rank = Math.floor(Math.random() * 20) + 1
+  const participation_count = Math.floor(Math.random() * 1000) + 100
+  const badge_count = Math.floor(Math.random() * 8)
+  const nft_count = Math.floor(Math.random() * 3)
+  const has_applied = Math.random() > 0.7
+  const created_at = new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString()
+  const bio =
+    Math.random() > 0.3 ? `I'm ${name} and I'm interested in joining the San Francisco Sheriff's Department.` : ""
+
+  // Generate mock badges
+  const badges = Array.from({ length: badge_count }, (_, i) => ({
+    id: `badge-${i + 1}`,
+    name: [
+      "Participation",
+      "Quick Learner",
+      "Resource Explorer",
+      "Quiz Master",
+      "Application Started",
+      "Frequent Visitor",
+      "Deep Diver",
+      "Community Connector",
+    ][i % 8],
+    badge_type: [
+      "written",
+      "oral",
+      "physical",
+      "polygraph",
+      "psychological",
+      "full",
+      "chat-participation",
+      "application-started",
+    ][i % 8],
+    color: [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-yellow-500",
+      "bg-red-500",
+      "bg-indigo-500",
+      "bg-pink-500",
+      "bg-orange-500",
+    ][i % 8],
+    icon: `/placeholder.svg?height=32&width=32&query=badge ${i + 1}`,
+  }))
+
+  // Generate mock NFT awards
+  const nft_awards = Array.from({ length: nft_count }, (_, i) => ({
+    id: `nft-${i + 1}`,
+    name: ["Gold Recruit", "Silver Explorer", "Bronze Participant"][i % 3],
+    description: "Awarded for exceptional engagement with the recruitment platform.",
+    imageUrl: `/placeholder.svg?height=200&width=200&query=nft award ${i + 1}`,
+    token_id: `token-${i + 1}`,
+    contract_address: "0x1234567890abcdef",
+    awarded_at: new Date(Date.now() - Math.floor(Math.random() * 5000000000)).toISOString(),
+  }))
+
+  return {
+    id,
+    name,
+    rank,
+    participation_count,
+    badge_count,
+    nft_count,
+    has_applied,
+    created_at,
+    bio,
+    badges,
+    nft_awards,
+    avatar_url: `/placeholder.svg?height=64&width=64&query=user ${id}`,
+    is_current_user: isCurrentUser,
+  }
 }

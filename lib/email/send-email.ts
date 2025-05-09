@@ -1,4 +1,4 @@
-import { getResendClient, isEmailEnabled } from "./resend-client"
+import { Resend } from "resend"
 
 export interface EmailOptions {
   to: string | string[]
@@ -8,63 +8,52 @@ export interface EmailOptions {
   cc?: string | string[]
   bcc?: string | string[]
   replyTo?: string
-  attachments?: Array<{
-    filename: string
-    content: Buffer
-  }>
-  tags?: Array<{
-    name: string
-    value: string
-  }>
 }
 
-const DEFAULT_FROM_EMAIL = "SF Deputy Sheriff Recruitment <recruitment@sfdsa.org>"
+export interface EmailResult {
+  success: boolean
+  message?: string
+  data?: {
+    id: string
+  }
+}
 
-/**
- * Send an email using Resend
- * @param options Email options
- * @returns Object containing success status and message or data
- */
-export async function sendEmail(options: EmailOptions) {
+export async function sendEmail(options: EmailOptions): Promise<EmailResult> {
+  const { to, subject, html, from = "SF Deputy Sheriff Recruitment <noreply@sfdeputysheriff.com>", ...rest } = options
+
+  // Check if we have a Resend API key
+  const resendApiKey = process.env.RESEND_API_KEY
+
+  if (!resendApiKey) {
+    console.warn("RESEND_API_KEY is not set. Email will not be sent.")
+    return {
+      success: false,
+      message: "RESEND_API_KEY is not set",
+    }
+  }
+
   try {
-    // Check if email functionality is enabled
-    if (!isEmailEnabled()) {
-      console.log("Email sending skipped: Email functionality is disabled")
-      return {
-        success: false,
-        message: "Email functionality is disabled",
-      }
-    }
+    const resend = new Resend(resendApiKey)
 
-    const resend = getResendClient()
-    if (!resend) {
-      return {
-        success: false,
-        message: "Resend client is not available",
-      }
-    }
-
-    // Send email
-    const { from = DEFAULT_FROM_EMAIL, ...restOptions } = options
-    const result = await resend.emails.send({
+    const data = await resend.emails.send({
       from,
-      ...restOptions,
+      to,
+      subject,
+      html,
+      ...rest,
     })
 
-    if (!result || !result.id) {
-      throw new Error("Failed to send email: No ID returned")
-    }
-
-    console.log(`Email sent successfully: ${result.id}`)
     return {
       success: true,
-      data: result,
+      data: {
+        id: data.id,
+      },
     }
   } catch (error) {
     console.error("Error sending email:", error)
     return {
       success: false,
-      message: error instanceof Error ? error.message : "Unknown error occurred",
+      message: error instanceof Error ? error.message : "Unknown error",
     }
   }
 }

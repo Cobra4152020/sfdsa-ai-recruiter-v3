@@ -6,39 +6,96 @@ interface BadgeEarnedTemplateProps {
   badgeUrl: string
 }
 
-export function badgeEarnedTemplate({
+export function badgeEarned({
   recipientName,
   badgeName,
   badgeDescription,
   badgeShareMessage,
   badgeUrl,
 }: BadgeEarnedTemplateProps): string {
-  const currentYear = new Date().getFullYear()
-
   return `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-      <div style="background-color: #0A3C1F; color: white; padding: 20px; text-align: center;">
-        <h1 style="margin: 0;">Congratulations, ${recipientName || "Recruit"}!</h1>
-        <p style="margin-top: 10px;">You've earned a new badge</p>
-      </div>
-      
-      <div style="padding: 20px; text-align: center;">
-        <div style="background-color: #f5f5f5; border-radius: 10px; padding: 20px; margin-bottom: 20px;">
-          <h2 style="color: #0A3C1F; margin-top: 0;">${badgeName}</h2>
-          <p>${badgeDescription}</p>
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>You've Earned a Badge!</title>
+      <style>
+        body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          color: #333;
+          margin: 0;
+          padding: 0;
+        }
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        .header {
+          background-color: #0A3C1F;
+          color: white;
+          padding: 20px;
+          text-align: center;
+        }
+        .content {
+          padding: 20px;
+          background-color: #f9f9f9;
+        }
+        .badge-info {
+          background-color: white;
+          border-radius: 8px;
+          padding: 15px;
+          margin: 20px 0;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .button {
+          display: inline-block;
+          background-color: #FFD700;
+          color: #0A3C1F;
+          text-decoration: none;
+          padding: 10px 20px;
+          border-radius: 4px;
+          margin-top: 20px;
+          font-weight: bold;
+        }
+        .footer {
+          text-align: center;
+          padding: 20px;
+          font-size: 12px;
+          color: #666;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Congratulations, ${recipientName}!</h1>
         </div>
-        
-        <p>${badgeShareMessage || "Keep up the great work on your journey to joining the SF Sheriff's Office!"}</p>
-        
-        <div style="margin-top: 30px;">
-          <a href="${badgeUrl}" style="background-color: #FFD700; color: #0A3C1F; padding: 12px 24px; text-decoration: none; border-radius: 4px; font-weight: bold;">View Your Badge</a>
+        <div class="content">
+          <p>You've earned the <strong>${badgeName}</strong> badge in your journey to become a San Francisco Deputy Sheriff!</p>
+          
+          <div class="badge-info">
+            <h2>${badgeName}</h2>
+            <p>${badgeDescription}</p>
+            ${badgeShareMessage ? `<p><em>${badgeShareMessage}</em></p>` : ""}
+          </div>
+          
+          <p>This badge recognizes your progress and commitment to the recruitment process. Keep up the great work!</p>
+          
+          <p>
+            <a href="${badgeUrl}" class="button">View Your Badge</a>
+          </p>
+          
+          <p>If you have any questions about your recruitment journey, please don't hesitate to contact us.</p>
+        </div>
+        <div class="footer">
+          <p>&copy; ${new Date().getFullYear()} San Francisco Sheriff's Department. All rights reserved.</p>
+          <p>This is an automated message, please do not reply to this email.</p>
         </div>
       </div>
-      
-      <div style="background-color: #f5f5f5; padding: 20px; text-align: center; font-size: 12px; color: #666;">
-        <p>This email was sent by the San Francisco Deputy Sheriff's Association Recruitment Team.</p>
-        <p>© ${currentYear} San Francisco Deputy Sheriff's Association</p>
-      </div>
-    </div>
+    </body>
+    </html>
   `
 }

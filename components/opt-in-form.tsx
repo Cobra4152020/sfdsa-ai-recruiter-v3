@@ -4,194 +4,171 @@ import type React from "react"
 
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useToast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
-import { useUser } from "@/context/user-context"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Shield, CheckCircle } from "lucide-react"
 
 interface OptInFormProps {
-  isOpen: boolean
   onClose: () => void
   isApplying?: boolean
-  returnUrl?: string
+  isOpen?: boolean
 }
 
-export function OptInForm({ isOpen, onClose, isApplying = false, returnUrl = "/awards" }: OptInFormProps) {
-  const [activeTab, setActiveTab] = useState<"login" | "signup">("signup")
-  const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    agreeTerms: false,
-  })
-  const { toast } = useToast()
-  const router = useRouter()
-  const { login } = useUser()
+export function OptInForm({ onClose, isApplying = false, isOpen = true }: OptInFormProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(isOpen)
+  const [email, setEmail] = useState("")
+  const [name, setName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [interest, setInterest] = useState("general")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [agreeToTerms, setAgreeToTerms] = useState(false)
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
+  const handleClose = () => {
+    setIsDialogOpen(false)
+    onClose()
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
+    setIsSubmitting(true)
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      setIsSubmitted(true)
 
-      // Create mock user
-      const mockUser = {
-        id: `user-${Date.now()}`,
-        name: formData.name || "Demo User",
-        email: formData.email,
-        participation_count: 0,
-        has_applied: isApplying,
-      }
-
-      // Log the user in
-      login(mockUser)
-
-      toast({
-        title: activeTab === "signup" ? "Account created!" : "Welcome back!",
-        description: isApplying
-          ? "Your application process has been started."
-          : "You can now track your progress and earn badges.",
-      })
-
-      onClose()
-
-      // Navigate to return URL if provided
-      if (returnUrl) {
-        router.push(returnUrl)
-      }
+      // Close dialog after showing success message
+      setTimeout(() => {
+        handleClose()
+      }, 3000)
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-      })
+      console.error("Error submitting form:", error)
     } finally {
-      setIsLoading(false)
+      setIsSubmitting(false)
     }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog
+      open={isDialogOpen}
+      onOpenChange={(open) => {
+        setIsDialogOpen(open)
+        if (!open) onClose()
+      }}
+    >
       <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>{isApplying ? "Start Your Application" : "Join Our Community"}</DialogTitle>
-          <DialogDescription>
-            {isApplying
-              ? "Create an account to start your application process and track your progress."
-              : "Sign up to track your engagement, earn badges, and compete on the leaderboard."}
-          </DialogDescription>
-        </DialogHeader>
-
-        <Tabs
-          defaultValue={activeTab}
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as "login" | "signup")}
-        >
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="signup">Sign Up</TabsTrigger>
-            <TabsTrigger value="login">Log In</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="signup">
-            <form onSubmit={handleSubmit} className="space-y-4 py-2">
+        {!isSubmitted ? (
+          <>
+            <DialogHeader>
+              <div className="flex items-center justify-center mb-2">
+                <Shield className="h-8 w-8 text-[#FFD700]" />
+              </div>
+              <DialogTitle className="text-center text-xl">
+                {isApplying ? "Start Your Deputy Sheriff Application" : "Sign up for Recruitment Updates"}
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                {isApplying
+                  ? "Take the first step toward a rewarding career with the San Francisco Sheriff's Office."
+                  : "Get the latest information about the SF Deputy Sheriff recruitment process, events, and opportunities."}
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
-                  name="name"
-                  placeholder="John Doe"
-                  value={formData.name}
-                  onChange={handleChange}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Enter your full name"
                   required
+                  className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
-                  name="email"
                   type="email"
-                  placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
                   required
+                  className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="phone">Phone Number</Label>
                 <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="(415) 555-1234"
+                  className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
                 />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="interest">Area of Interest</Label>
+                <Select value={interest} onValueChange={setInterest}>
+                  <SelectTrigger
+                    id="interest"
+                    className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                  >
+                    <SelectValue placeholder="Select your interest" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="general">General Information</SelectItem>
+                    <SelectItem value="application">Application Process</SelectItem>
+                    <SelectItem value="requirements">Qualifications & Requirements</SelectItem>
+                    <SelectItem value="benefits">Salary & Benefits</SelectItem>
+                    <SelectItem value="training">Academy & Training</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="flex items-center space-x-2">
                 <Checkbox
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  checked={formData.agreeTerms}
-                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, agreeTerms: checked as boolean }))}
+                  id="terms"
+                  checked={agreeToTerms}
+                  onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
                   required
                 />
-                <Label htmlFor="agreeTerms" className="text-sm">
-                  I agree to the Terms of Service and Privacy Policy
+                <Label htmlFor="terms" className="text-sm">
+                  I agree to receive communications about the San Francisco Sheriff's Office recruitment process.
                 </Label>
               </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating Account..." : isApplying ? "Start Application" : "Create Account"}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="login">
-            <form onSubmit={handleSubmit} className="space-y-4 py-2">
-              <div className="space-y-2">
-                <Label htmlFor="login-email">Email</Label>
-                <Input
-                  id="login-email"
-                  name="email"
-                  type="email"
-                  placeholder="john@example.com"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                />
+              <div className="flex justify-end gap-2 pt-2">
+                <Button type="button" variant="outline" onClick={handleClose}>
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={isSubmitting || !agreeToTerms}
+                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                >
+                  {isSubmitting ? "Submitting..." : isApplying ? "Start Application" : "Sign Up"}
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="login-password">Password</Label>
-                <Input
-                  id="login-password"
-                  name="password"
-                  type="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Logging In..." : "Log In"}
-              </Button>
             </form>
-          </TabsContent>
-        </Tabs>
+          </>
+        ) : (
+          <div className="py-6 text-center">
+            <div className="flex justify-center mb-4">
+              <div className="rounded-full bg-green-100 p-3">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+            </div>
+            <h3 className="text-xl font-semibold mb-2">Thank You!</h3>
+            <p className="text-gray-500 dark:text-gray-400">
+              {isApplying
+                ? "Your application has been initiated. Check your email for next steps."
+                : "You've been added to our recruitment updates list."}
+            </p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

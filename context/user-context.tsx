@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { supabase } from "@/lib/supabase-client"
 
@@ -16,6 +18,8 @@ interface UserContextType {
   isLoggedIn: boolean
   login: (user: User) => void
   logout: () => void
+  getUserPoints: () => number
+  setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
 }
 
 const UserContext = createContext<UserContextType>({
@@ -23,6 +27,8 @@ const UserContext = createContext<UserContextType>({
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
+  getUserPoints: () => 0,
+  setCurrentUser: () => {},
 })
 
 export const useUser = () => useContext(UserContext)
@@ -77,16 +83,19 @@ export function UserProvider({ children }: { children: ReactNode }) {
     supabase.auth.signOut().catch(console.error)
   }
 
-  return (
-    <UserContext.Provider
-      value={{
-        currentUser,
-        isLoggedIn: !!currentUser,
-        login,
-        logout,
-      }}
-    >
-      {children}
-    </UserContext.Provider>
-  )
+  const getUserPoints = () => {
+    if (!currentUser) return 0
+    return currentUser.participation_count || 0
+  }
+
+  const contextValue = {
+    currentUser,
+    isLoggedIn: !!currentUser,
+    login,
+    logout,
+    getUserPoints,
+    setCurrentUser,
+  }
+
+  return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
 }

@@ -8,12 +8,12 @@ import { UserProvider } from "@/context/user-context"
 
 interface UserBadgePageProps {
   params: {
-    name: string
+    id: string
   }
 }
 
 export async function generateMetadata({ params }: UserBadgePageProps): Promise<Metadata> {
-  const decodedName = decodeURIComponent(params.name)
+  const decodedName = decodeURIComponent(params.id)
 
   return {
     title: `${decodedName}'s SF Sheriff Recruitment Badge`,
@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: UserBadgePageProps): Promise<
 }
 
 export default function UserBadgePage({ params }: UserBadgePageProps) {
-  const decodedName = decodeURIComponent(params.name)
+  const decodedName = decodeURIComponent(params.id)
 
   return (
     <UserProvider>

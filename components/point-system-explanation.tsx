@@ -1,7 +1,7 @@
 "use client"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Trophy, MessageSquare, FileText, CheckCircle, Award } from "lucide-react"
+import { Trophy, MessageSquare, FileText, CheckCircle, Award, Download, Clock } from "lucide-react"
 import { useUserPoints } from "@/hooks/use-user-points"
 import { Button } from "@/components/ui/button"
 
@@ -72,18 +72,82 @@ export function PointSystemExplanation({ userId, isLoggedIn = false, onLoginClic
     },
   ]
 
+  const pointCategories = [
+    {
+      icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
+      title: "Chat Interactions",
+      description: "Earn points by chatting with our AI assistant and asking questions about the recruitment process.",
+      points: "5-20 points per meaningful interaction",
+    },
+    {
+      icon: <Download className="h-5 w-5 text-green-500" />,
+      title: "Resource Downloads",
+      description: "Download study materials, application guides, and other resources to prepare for the process.",
+      points: "10 points per resource",
+    },
+    {
+      icon: <Clock className="h-5 w-5 text-purple-500" />,
+      title: "Time Spent",
+      description: "Points awarded based on time spent engaging with our recruitment platform.",
+      points: "1 point per minute (up to 30 points per day)",
+    },
+    {
+      icon: <Award className="h-5 w-5 text-yellow-500" />,
+      title: "Badge Achievements",
+      description: "Earn badges by completing specific actions and milestones in the recruitment process.",
+      points: "25-100 points per badge",
+    },
+    {
+      icon: <CheckCircle className="h-5 w-5 text-red-500" />,
+      title: "Application Progress",
+      description: "Advance through the application process to earn substantial points.",
+      points: "50-200 points per stage completed",
+    },
+  ]
+
   if (!isLoggedIn) {
     return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-10">
-          <Trophy className="h-12 w-12 text-yellow-400 mb-4" />
-          <h3 className="text-xl font-bold mb-2">Track Your Progress</h3>
-          <p className="text-center text-muted-foreground mb-6 max-w-md">
-            Sign up or log in to track your points and progress through the recruitment process.
-          </p>
-          <Button onClick={onLoginClick} className="bg-primary hover:bg-primary/90 text-white">
-            Sign Up Now
-          </Button>
+      <Card className="shadow-md">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-2xl flex items-center">
+            <Trophy className="h-6 w-6 text-yellow-500 mr-2" />
+            Track Your Progress
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            <p className="text-gray-600 dark:text-gray-300">
+              Sign up or log in to track your points and progress through the recruitment process.
+            </p>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                <h3 className="font-semibold text-lg mb-2">Earn Points By:</h3>
+                <ul className="space-y-2 list-disc list-inside text-gray-600 dark:text-gray-300">
+                  <li>Engaging with our AI assistant</li>
+                  <li>Completing application steps</li>
+                  <li>Downloading resources</li>
+                  <li>Attending virtual events</li>
+                  <li>Referring other potential candidates</li>
+                </ul>
+              </div>
+
+              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                <h3 className="font-semibold text-lg mb-2">Benefits Include:</h3>
+                <ul className="space-y-2 list-disc list-inside text-gray-600 dark:text-gray-300">
+                  <li>Recognition on the leaderboard</li>
+                  <li>Earning special badges</li>
+                  <li>Exclusive NFT awards</li>
+                  <li>Priority application processing</li>
+                  <li>Access to special resources</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="text-center mt-6">
+              <Button className="bg-green-600 hover:bg-green-700">Start Now</Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
     )
