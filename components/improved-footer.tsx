@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Shield, Facebook, Twitter, Youtube, Instagram, Linkedin, Heart } from "lucide-react"
+import { Shield, Facebook, Twitter, Youtube, Instagram, Linkedin, Heart, UserPlus } from "lucide-react"
 
 export interface ImprovedfooterProps {
   className?: string
@@ -108,6 +108,15 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
               <li>
                 <Link href="/donor-recognition" className="text-gray-300 hover:text-white transition-colors">
                   Donor Recognition
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/volunteer-recruiter"
+                  className="text-gray-300 hover:text-white transition-colors flex items-center"
+                >
+                  <UserPlus className="h-4 w-4 mr-1.5" aria-hidden="true" />
+                  Volunteer Recruiter
                 </Link>
               </li>
             </ul>
