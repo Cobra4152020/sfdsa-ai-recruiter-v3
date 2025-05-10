@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <>
-      <ImprovedHeader showOptInForm={() => {}} />
+      <ImprovedHeader />
       <main className="container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto">
           <Card>

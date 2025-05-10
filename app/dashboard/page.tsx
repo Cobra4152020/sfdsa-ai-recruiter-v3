@@ -20,6 +20,7 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<any>(null)
   const [notifications, setNotifications] = useState<any[]>([])
+  const [badgesCount, setBadgesCount] = useState<number>(0)
   const router = useRouter()
   const { toast } = useToast()
   const supabase = getSupabaseClient()
@@ -85,6 +86,18 @@ export default function DashboardPage() {
             "User",
           ...profile,
         })
+
+        // Fetch badges count
+        const { data: badges, error: badgesError } = await supabase
+          .from("user_badges")
+          .select("*", { count: "exact" })
+          .eq("user_id", session.user.id)
+
+        if (badgesError) {
+          console.error("Error fetching badges:", badgesError)
+        } else {
+          setBadgesCount(badges?.length || 0)
+        }
       } catch (error) {
         console.error("Auth check error:", error)
         toast({
@@ -128,7 +141,7 @@ export default function DashboardPage() {
   if (isLoading) {
     return (
       <>
-        <ImprovedHeader showOptInForm={() => {}} />
+        <ImprovedHeader />
         <main className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
             <div>
@@ -153,7 +166,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <ImprovedHeader showOptInForm={() => {}} />
+      <ImprovedHeader />
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <div>
@@ -216,7 +229,7 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold">{userProfile?.badges_count || 0}</div>
+              <div className="text-3xl font-bold">{badgesCount}</div>
               <p className="text-sm text-gray-500">Earn badges by completing challenges</p>
             </CardContent>
           </Card>
