@@ -3,6 +3,7 @@ import Stripe from "stripe"
 import { createClient } from "@/lib/supabase-client"
 import { headers } from "next/headers"
 import { awardDonationPoints } from "@/lib/donation-points-service"
+import { createNotification } from "@/lib/notification-service"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16",
@@ -52,6 +53,20 @@ export async function POST(request: Request) {
           donationData.amount,
           false, // one-time donation
         )
+
+        // Create a real-time notification for the donation
+        await createNotification({
+          user_id: donationData.donor_id,
+          type: "donation",
+          title: "Thank you for your donation!",
+          message: `Your donation of $${donationData.amount.toFixed(2)} has been received. Thank you for supporting the SF Sheriff's Office!`,
+          action_url: "/donate/thank-you",
+          metadata: {
+            amount: donationData.amount,
+            paymentId: paymentIntent.id,
+            recurring: false,
+          },
+        })
       }
 
       // Record analytics
@@ -119,6 +134,20 @@ export async function POST(request: Request) {
               invoice.amount_paid / 100,
               true, // recurring donation
             )
+
+            // Create a real-time notification for the recurring donation
+            await createNotification({
+              user_id: subscriptionData.donor_id,
+              type: "donation",
+              title: "Thank you for your recurring donation!",
+              message: `Your monthly donation of $${(invoice.amount_paid / 100).toFixed(2)} has been processed. Thank you for your continued support!`,
+              action_url: "/donate/thank-you",
+              metadata: {
+                amount: invoice.amount_paid / 100,
+                paymentId: invoice.id,
+                recurring: true,
+              },
+            })
           }
         }
       }

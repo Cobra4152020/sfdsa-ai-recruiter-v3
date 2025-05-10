@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-clients"
 import type { BadgeType } from "@/lib/badge-utils"
+import { createNotification } from "@/lib/notification-service"
 
 /**
  * This API route provides a unified way to award badges and handle all related actions:
  * 1. Award the badge in the database
  * 2. Update user participation stats if needed
  * 3. Send a notification email
+ * 4. Create a real-time notification
  */
 export async function POST(request: Request) {
   try {
@@ -82,9 +84,26 @@ export async function POST(request: Request) {
           // Continue with the process even if updating points fails
         }
       }
+
+      // 5. Create a real-time notification for the badge award
+      const name = badgeName || getBadgeName(badgeType as BadgeType)
+      const description = badgeDescription || getBadgeDescription(badgeType as BadgeType)
+
+      await createNotification({
+        user_id: userId,
+        type: "badge",
+        title: `You earned the ${name} badge!`,
+        message: description,
+        image_url: `/badge-images/${badgeType}.png`, // Adjust path as needed
+        action_url: `/badge/${badgeType}`,
+        metadata: {
+          badgeType,
+          badgeName: name,
+        },
+      })
     }
 
-    // 5. Send notification email if badge was just earned
+    // 6. Send notification email if badge was just earned
     let notificationSent = false
 
     if (!alreadyEarned && user.email) {

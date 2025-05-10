@@ -2,36 +2,43 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { SkipToContent } from "@/components/skip-to-content"
+import { useEffect } from "react"
 import { usePathname } from "next/navigation"
+import { HeaderWrapper } from "@/components/header-wrapper"
+import { ImprovedFooter } from "@/components/improved-footer"
+import { ThemeProvider } from "@/components/theme-provider"
+import { UserContextProvider } from "@/context/user-context"
+import { SkipToContent } from "@/components/skip-to-content"
+import { EnhancedChatBubble } from "@/components/enhanced-chat-bubble"
+import { NotificationToastListener } from "@/components/notification-toast"
+import { trackPageView } from "@/lib/analytics"
 
-export default function MainLayoutClient({ children }: { children: React.ReactNode }) {
-  const [isScrolled, setIsScrolled] = useState(false)
+export default function MainLayoutClient({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
   const pathname = usePathname()
 
-  // Check if we're on the homepage
-  const isHomePage = pathname === "/"
-
+  // Track page views
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
-    }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    trackPageView(pathname)
+  }, [pathname])
 
   return (
-    <>
-      <SkipToContent />
-      <ImprovedHeader isScrolled={isScrolled} />
-      <main id="main-content" className="min-h-screen pt-8">
-        {children}
-      </main>
-      <ImprovedFooter />
-    </>
+    <ThemeProvider>
+      <UserContextProvider>
+        <SkipToContent />
+        <div className="flex flex-col min-h-screen">
+          <HeaderWrapper />
+          <main id="main-content" className="flex-grow">
+            {children}
+          </main>
+          <ImprovedFooter />
+        </div>
+        <EnhancedChatBubble />
+        <NotificationToastListener />
+      </UserContextProvider>
+    </ThemeProvider>
   )
 }

@@ -11,6 +11,8 @@ interface User {
   email?: string
   participation_count?: number
   has_applied?: boolean
+  first_name?: string
+  last_name?: string
 }
 
 interface UserContextType {
@@ -18,7 +20,7 @@ interface UserContextType {
   isLoggedIn: boolean
   login: (user: User) => void
   logout: () => void
-  getUserPoints: () => number
+  incrementParticipation: (points: number) => Promise<boolean>
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
 }
 
@@ -27,11 +29,12 @@ const UserContext = createContext<UserContextType>({
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
-  getUserPoints: () => 0,
+  incrementParticipation: async () => false,
   setCurrentUser: () => {},
 })
 
 export const useUser = () => useContext(UserContext)
+export const useUserContext = () => useContext(UserContext)
 
 export function UserProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
@@ -46,15 +49,21 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           // Get user profile data
-          const { data: userData, error } = await supabase.from("users").select("*").eq("id", session.user.id).single()
+          const { data: userData, error } = await supabase
+            .from("user_profiles")
+            .select("*")
+            .eq("user_id", session.user.id)
+            .single()
 
           if (!error && userData) {
             setCurrentUser({
-              id: userData.id,
-              name: userData.name || "User",
+              id: userData.user_id,
+              name: userData.first_name + " " + userData.last_name,
               email: userData.email,
-              participation_count: userData.participation_count,
-              has_applied: userData.has_applied,
+              participation_count: userData.points,
+              has_applied: userData.application_status !== "new",
+              first_name: userData.first_name,
+              last_name: userData.last_name,
             })
           } else {
             // For demo purposes, create a mock user
@@ -83,9 +92,20 @@ export function UserProvider({ children }: { children: ReactNode }) {
     supabase.auth.signOut().catch(console.error)
   }
 
-  const getUserPoints = () => {
-    if (!currentUser) return 0
-    return currentUser.participation_count || 0
+  const incrementParticipation = async (points: number) => {
+    if (!currentUser?.id) return false
+    try {
+      const { error } = await supabase
+        .from("users")
+        .update({ participation_count: currentUser.participation_count + points })
+        .eq("id", currentUser.id)
+      if (error) throw error
+      setCurrentUser((prev) => ({ ...prev, participation_count: (prev?.participation_count || 0) + points }))
+      return true
+    } catch (error) {
+      console.error("Error incrementing participation:", error)
+      return false
+    }
   }
 
   const contextValue = {
@@ -93,9 +113,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
     isLoggedIn: !!currentUser,
     login,
     logout,
-    getUserPoints,
+    incrementParticipation,
     setCurrentUser,
   }
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
 }
+
+export const UserContextProvider = UserProvider
