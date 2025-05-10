@@ -12,7 +12,7 @@ import { DebugUser } from "@/components/debug-user"
 import { TopRecruitsScroll } from "@/components/top-recruits-scroll"
 import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
 import { ApplicationProgressGamification } from "@/components/application-progress-gamification"
-import { ReferralRewards } from "@/components/referral-rewards"
+import { PointsIntroduction } from "@/components/points-introduction"
 
 export default function Home() {
   const [isOptInFormOpen, setIsOptInFormOpen] = useState(false)
@@ -43,11 +43,11 @@ export default function Home() {
           </section>
         )}
 
-        {/* Add Referral Rewards section */}
+        {/* Introduction to Points and Rewards System */}
         <section className="py-12 bg-white dark:bg-[#1A1A1A]">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto">
-              <ReferralRewards />
+              <PointsIntroduction />
             </div>
           </div>
         </section>

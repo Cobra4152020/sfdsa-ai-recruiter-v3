@@ -1,13 +1,17 @@
-import type { Metadata } from "next"
 import GamificationExplainer from "./content"
-
-export const metadata: Metadata = {
-  title: "Gamification System | SF Deputy Sheriff Recruitment",
-  description:
-    "Learn about our points system, badges, unlockable content, and NFT rewards in our recruitment platform.",
-  keywords: "gamification, points system, badges, NFT rewards, law enforcement recruitment",
-}
+import { ImprovedHeader } from "@/components/improved-header"
+import { ImprovedFooter } from "@/components/improved-footer"
 
 export default function GamificationPage() {
-  return <GamificationExplainer />
+  return (
+    <>
+      <div className="flex flex-col min-h-screen">
+        <ImprovedHeader />
+        <main className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
+          <GamificationExplainer />
+        </main>
+        <ImprovedFooter />
+      </div>
+    </>
+  )
 }

@@ -27,13 +27,14 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { useToast } from "@/components/ui/use-toast"
 
 export default function GamificationExplainer() {
   const [activeTab, setActiveTab] = useState("points")
   const [showShareDialog, setShowShareDialog] = useState(false)
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div className="container mx-auto px-4 py-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">Recruitment Gamification System</h1>
@@ -436,7 +437,17 @@ function PointsSystemExplainer() {
 }
 
 function ReferralRewardsExplainer({ setShowShareDialog }: { setShowShareDialog: (show: boolean) => void }) {
+  const { toast } = useToast()
   const referralCount = 2 // Demo value
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText("https://sfdsa-recruiter.com/join?ref=demo-user123")
+    toast({
+      title: "Link Copied!",
+      description: "Referral link copied to clipboard",
+      duration: 3000,
+    })
+  }
 
   const referralTiers = [
     {
