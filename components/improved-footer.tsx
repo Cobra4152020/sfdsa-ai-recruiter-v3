@@ -221,7 +221,8 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center">
           <p className="text-sm text-gray-400">
-            © {currentYear} San Francisco Deputy Sheriff's Association. All rights reserved.
+            © {currentYear} San Francisco Deputy Sheriffs' Association 501(c)5 & Protecting San Francisco 501(c)3. All
+            rights reserved.
           </p>
         </div>
       </div>
