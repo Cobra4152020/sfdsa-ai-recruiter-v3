@@ -9,20 +9,52 @@ interface VenmoOptionProps {
   amount: string
   donorName?: string
   donorEmail?: string
+  organization?: "both" | "sfdsa" | "protecting"
 }
 
-export function VenmoOption({ amount, donorName, donorEmail }: VenmoOptionProps) {
+export function VenmoOption({ amount, donorName, donorEmail, organization = "both" }: VenmoOptionProps) {
   const [showQR, setShowQR] = useState(false)
   const { toast } = useToast()
 
-  // Your organization's Venmo username
-  const venmoUsername = "SFDSA-Recruitment"
+  // Your organization's Venmo username based on selection
+  const getVenmoUsername = () => {
+    switch (organization) {
+      case "sfdsa":
+        return "SFDSA-Association"
+      case "protecting":
+        return "Protecting-SF"
+      case "both":
+      default:
+        return "SFDSA-Recruitment" // Default combined account
+    }
+  }
+
+  const venmoUsername = getVenmoUsername()
+
+  // Create note based on organization
+  const getVenmoNote = () => {
+    let note = "Donation"
+
+    if (organization === "both") {
+      note += " to SFDSA & Protecting SF"
+    } else if (organization === "sfdsa") {
+      note += " to SFDSA"
+    } else if (organization === "protecting") {
+      note += " to Protecting SF"
+    }
+
+    if (donorName) {
+      note += " from " + donorName
+    }
+
+    return note
+  }
 
   // Create Venmo deep link
-  const venmoDeepLink = `venmo://paycharge?txn=pay&recipients=${venmoUsername}&amount=${amount}&note=Donation to SFDSA${donorName ? " from " + donorName : ""}`
+  const venmoDeepLink = `venmo://paycharge?txn=pay&recipients=${venmoUsername}&amount=${amount}&note=${encodeURIComponent(getVenmoNote())}`
 
   // Create Venmo web link as fallback
-  const venmoWebLink = `https://venmo.com/${venmoUsername}?txn=pay&amount=${amount}&note=Donation to SFDSA${donorName ? " from " + donorName : ""}`
+  const venmoWebLink = `https://venmo.com/${venmoUsername}?txn=pay&amount=${amount}&note=${encodeURIComponent(getVenmoNote())}`
 
   const handleVenmoClick = () => {
     // Log the donation attempt
@@ -34,6 +66,7 @@ export function VenmoOption({ amount, donorName, donorEmail }: VenmoOptionProps)
           amount,
           donorName,
           donorEmail,
+          organization,
         }),
       }).catch((err) => console.error("Error logging Venmo attempt:", err))
     }

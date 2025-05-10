@@ -24,6 +24,17 @@ export async function POST(request: Request) {
   // Handle different event types
   switch (payload.type) {
     case "payment.created":
+      // Determine organization from note or username
+      let organization = "both" // Default
+      const note = payload.data.note?.toLowerCase() || ""
+      const username = payload.data.recipient?.username?.toLowerCase() || ""
+
+      if (username === "sfdsa-association" || (note.includes("sfdsa") && !note.includes("protecting"))) {
+        organization = "sfdsa"
+      } else if (username === "protecting-sf" || (note.includes("protecting") && !note.includes("sfdsa"))) {
+        organization = "protecting"
+      }
+
       // Record the donation
       await supabase.from("donations").insert({
         amount: payload.data.amount,
@@ -34,6 +45,7 @@ export async function POST(request: Request) {
         payment_id: payload.data.id,
         status: "completed",
         venmo_username: payload.data.sender.username,
+        organization,
       })
 
       // Send receipt if email is available
@@ -46,6 +58,7 @@ export async function POST(request: Request) {
             amount: payload.data.amount,
             donationId: payload.data.id,
             isRecurring: false,
+            organization,
           }),
         })
       }

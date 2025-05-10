@@ -1,11 +1,22 @@
 "use client"
 
 import { useEffect } from "react"
-
 import { useState } from "react"
-
 import Link from "next/link"
-import { Menu, X, Shield, Facebook, Twitter, Youtube, Instagram, Linkedin, Moon, Sun, ChevronDown } from "lucide-react"
+import {
+  Menu,
+  X,
+  Shield,
+  Facebook,
+  Twitter,
+  Youtube,
+  Instagram,
+  Linkedin,
+  Moon,
+  Sun,
+  ChevronDown,
+  Heart,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
 import { usePathname } from "next/navigation"
@@ -68,10 +79,19 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
             </div>
           </Link>
 
+          {/* Donation Button - Desktop */}
+          <Link
+            href="/donate"
+            className="hidden md:flex items-center bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold py-2 px-4 rounded-md transition-colors shadow-md"
+          >
+            <Heart className="h-5 w-5 mr-2" />
+            Donate Now
+          </Link>
+
           {/* Social Icons - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
             <a
-              href="https://facebook.com/sfdsa"
+              href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow us on Facebook"
@@ -80,7 +100,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Facebook className="h-5 w-5" />
             </a>
             <a
-              href="https://twitter.com/sfdsa"
+              href="https://twitter.com/sanfranciscodsa"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow us on Twitter"
@@ -89,7 +109,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Twitter className="h-5 w-5" />
             </a>
             <a
-              href="https://youtube.com/sfdsa"
+              href="https://www.youtube.com/channel/UCgyW7q86c-Mua4bS1a9wBWA"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Subscribe to our YouTube channel"
@@ -98,7 +118,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Youtube className="h-5 w-5" />
             </a>
             <a
-              href="https://instagram.com/sfdsa"
+              href="https://www.instagram.com/sfdeputysheriffsassociation/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Follow us on Instagram"
@@ -107,7 +127,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Instagram className="h-5 w-5" />
             </a>
             <a
-              href="https://linkedin.com/company/sfdsa"
+              href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs%E2%80%99-association/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Connect with us on LinkedIn"
@@ -173,9 +193,6 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   { label: "Spin to Win", href: "/games/spin-to-win" },
                 ]}
               />
-              <Link href="/donate" className="text-white hover:text-[#FFD700] transition-colors">
-                Donate
-              </Link>
               <Link href="/volunteer-login" className="text-white hover:text-[#FFD700] transition-colors">
                 Volunteer Recruiter
               </Link>
@@ -195,7 +212,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                 Apply Now
               </Button>
               <Link href="/login">
-                <Button className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-[#121212] font-medium">
+                <Button className="bg-[#FFD700]/80 hover:bg-[#FFD700] text-[#0A3C1F] dark:text-[#121212] font-medium">
                   Login
                 </Button>
               </Link>
@@ -209,6 +226,15 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
         <div className="md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
           <div className="px-2 pt-2 pb-3 space-y-1 bg-[#0A3C1F] border-t border-white/10">
             {/* Mobile navigation items */}
+
+            {/* Donation Button - Mobile */}
+            <Link
+              href="/donate"
+              className="flex items-center justify-center bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold py-3 px-4 rounded-md transition-colors shadow-md mb-4"
+            >
+              <Heart className="h-5 w-5 mr-2" />
+              Donate Now
+            </Link>
 
             {/* Mobile Benefits dropdown */}
             <div className="block px-3 py-2">
@@ -304,9 +330,6 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               )}
             </div>
 
-            <Link href="/donate" className="block px-3 py-2 text-white hover:text-[#FFD700]">
-              Donate
-            </Link>
             <Link href="/volunteer-login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
               Volunteer Recruiter
             </Link>
@@ -335,7 +358,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
             </Button>
             <Link href="/login" className="flex-1">
               <Button
-                className="w-full bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
+                className="w-full bg-[#FFD700]/80 hover:bg-[#FFD700] text-[#0A3C1F] dark:text-[#121212] font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Login

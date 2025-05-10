@@ -13,14 +13,12 @@ import { loadStripe } from "@stripe/stripe-js"
 import { Elements } from "@stripe/react-stripe-js"
 import { DonationForm } from "@/components/donation-form"
 import { VenmoOption } from "@/components/venmo-option"
+import Image from "next/image"
 
 // Load Stripe outside of component to avoid recreating it
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
   : null
-
-// Add this console log to verify the key is available
-console.log("Stripe key available:", !!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
 
 export default function DonatePage() {
   const [donationAmount, setDonationAmount] = useState<string>("10")
@@ -33,6 +31,7 @@ export default function DonatePage() {
   const [clientSecret, setClientSecret] = useState<string>("")
   const [isRecurring, setIsRecurring] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
+  const [selectedOrganization, setSelectedOrganization] = useState<"both" | "sfdsa" | "protecting">("both")
   const { toast } = useToast()
 
   const amount = customAmount || donationAmount
@@ -60,6 +59,7 @@ export default function DonatePage() {
             isRecurring,
             donationMessage,
             isAnonymous,
+            organization: selectedOrganization,
           }),
         })
 
@@ -68,8 +68,6 @@ export default function DonatePage() {
           throw new Error(data.error)
         }
 
-        // Log the client secret to verify it's being received
-        console.log("Received client secret:", data.clientSecret)
         setClientSecret(data.clientSecret)
       } catch (error) {
         console.error("Payment preparation error:", error)
@@ -98,6 +96,72 @@ export default function DonatePage() {
             Your donations help maintain this recruitment platform and support our mission to build a stronger, safer
             San Francisco.
           </p>
+        </div>
+
+        {/* Organization Selection */}
+        <div className="mb-10">
+          <h2 className="text-xl font-semibold text-center mb-6">Choose where your donation goes</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card
+              className={`cursor-pointer transition-all ${selectedOrganization === "both" ? "ring-2 ring-[#0A3C1F]" : "hover:shadow-md"}`}
+              onClick={() => setSelectedOrganization("both")}
+            >
+              <CardHeader className="text-center pb-2">
+                <div className="flex justify-center">
+                  <div className="w-16 h-16 relative">
+                    <Image
+                      src="/sfdsa-logo.png"
+                      alt="SFDSA Logo"
+                      width={64}
+                      height={64}
+                      className="absolute top-0 left-0 z-10"
+                    />
+                    <Image
+                      src="/protecting-sf-logo.png"
+                      alt="Protecting SF Logo"
+                      width={64}
+                      height={64}
+                      className="absolute top-2 left-4"
+                    />
+                  </div>
+                </div>
+                <CardTitle className="text-lg mt-4">Support Both Organizations</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center text-sm text-gray-600">
+                <p>Split your donation equally between both organizations</p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className={`cursor-pointer transition-all ${selectedOrganization === "sfdsa" ? "ring-2 ring-[#0A3C1F]" : "hover:shadow-md"}`}
+              onClick={() => setSelectedOrganization("sfdsa")}
+            >
+              <CardHeader className="text-center pb-2">
+                <div className="flex justify-center">
+                  <Image src="/sfdsa-logo.png" alt="SFDSA Logo" width={64} height={64} />
+                </div>
+                <CardTitle className="text-lg mt-2">SF Deputy Sheriffs' Association</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center text-sm text-gray-600">
+                <p>Support the 501(c)5 organization representing deputy sheriffs</p>
+              </CardContent>
+            </Card>
+
+            <Card
+              className={`cursor-pointer transition-all ${selectedOrganization === "protecting" ? "ring-2 ring-[#0A3C1F]" : "hover:shadow-md"}`}
+              onClick={() => setSelectedOrganization("protecting")}
+            >
+              <CardHeader className="text-center pb-2">
+                <div className="flex justify-center">
+                  <Image src="/protecting-sf-logo.png" alt="Protecting SF Logo" width={64} height={64} />
+                </div>
+                <CardTitle className="text-lg mt-2">Protecting San Francisco</CardTitle>
+              </CardHeader>
+              <CardContent className="text-center text-sm text-gray-600">
+                <p>Support the 501(c)3 charitable organization (tax-deductible)</p>
+              </CardContent>
+            </Card>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -435,7 +499,12 @@ export default function DonatePage() {
                       {isLoading ? "Preparing..." : "Continue to Payment"}
                     </Button>
                   ) : (
-                    <VenmoOption amount={amount} donorName={donorName} donorEmail={donorEmail} />
+                    <VenmoOption
+                      amount={amount}
+                      donorName={donorName}
+                      donorEmail={donorEmail}
+                      organization={selectedOrganization}
+                    />
                   )}
                 </CardFooter>
               )}
@@ -674,7 +743,8 @@ export default function DonatePage() {
 
         <div className="mt-12 text-center">
           <p className="text-gray-600 mb-4">
-            Protecting San Francisco is a 501(c)(3) non-profit organization. All donations are tax-deductible.
+            Protecting San Francisco is a 501(c)(3) non-profit organization. All donations to this organization are
+            tax-deductible.
           </p>
           <p className="text-sm text-gray-500">Tax ID: 12-3456789</p>
         </div>

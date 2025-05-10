@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Shield, Facebook, Twitter, Youtube, Instagram, Linkedin } from "lucide-react"
+import { Shield, Facebook, Twitter, Youtube, Instagram, Linkedin, Heart } from "lucide-react"
 
 export interface ImprovedfooterProps {
   className?: string
@@ -134,7 +134,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 </a>
               </div>
 
-              <div className="flex items-center">
+              <div className="flex items-center mt-6">
                 <a
                   href="https://protectingsanfrancisco.com/"
                   target="_blank"
@@ -154,7 +154,17 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 </a>
               </div>
 
-              <p>35 Gilbert Street</p>
+              <div className="mt-4">
+                <Link
+                  href="/donate"
+                  className="inline-flex items-center px-4 py-2 bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold rounded-md transition-colors shadow-md"
+                >
+                  <Heart className="h-4 w-4 mr-2" aria-hidden="true" />
+                  <span>Support Our Mission</span>
+                </Link>
+              </div>
+
+              <p className="mt-4">35 Gilbert Street</p>
               <p>San Francisco, CA 94103</p>
               <p>
                 <a href="tel:+14156962428" className="hover:text-white transition-colors">

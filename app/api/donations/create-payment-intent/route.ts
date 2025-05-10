@@ -16,9 +16,10 @@ export async function POST(request: Request) {
       interval = "month",
       donationMessage,
       isAnonymous,
+      organization = "both", // Default to both if not specified
     } = await request.json()
 
-    console.log("Payment intent request:", { amount, donorEmail, isRecurring })
+    console.log("Payment intent request:", { amount, donorEmail, isRecurring, organization })
 
     // Validate the amount
     if (!amount || amount < 1) {
@@ -29,6 +30,13 @@ export async function POST(request: Request) {
 
     // Convert amount to cents for Stripe
     const amountInCents = Math.round(amount * 100)
+
+    // Add organization info to metadata
+    const metadata = {
+      name: donorName || "",
+      organization,
+      message: donationMessage || "",
+    }
 
     if (isRecurring) {
       // Create or retrieve customer
@@ -45,6 +53,7 @@ export async function POST(request: Request) {
         customer = await stripe.customers.create({
           email: donorEmail,
           name: donorName,
+          metadata,
         })
 
         // Store customer in database
@@ -63,7 +72,14 @@ export async function POST(request: Request) {
             price_data: {
               currency: "usd",
               product_data: {
-                name: "Monthly Donation to SF Deputy Sheriff's Association",
+                name: `Monthly Donation to ${
+                  organization === "both"
+                    ? "SF Deputy Sheriff's Association & Protecting San Francisco"
+                    : organization === "sfdsa"
+                      ? "SF Deputy Sheriff's Association"
+                      : "Protecting San Francisco"
+                }`,
+                metadata,
               },
               unit_amount: amountInCents,
               recurring: {
@@ -75,6 +91,7 @@ export async function POST(request: Request) {
         payment_behavior: "default_incomplete",
         payment_settings: { save_default_payment_method: "on_subscription" },
         expand: ["latest_invoice.payment_intent"],
+        metadata,
       })
 
       // Store subscription in database
@@ -85,6 +102,7 @@ export async function POST(request: Request) {
         amount: amount,
         interval: interval,
         status: "incomplete",
+        organization,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -106,9 +124,7 @@ export async function POST(request: Request) {
         currency: "usd",
         payment_method_types: ["card"],
         receipt_email: donorEmail,
-        metadata: {
-          name: donorName || "",
-        },
+        metadata,
       })
 
       // Store donation in database
@@ -119,6 +135,7 @@ export async function POST(request: Request) {
         payment_processor: "stripe",
         payment_id: paymentIntent.id,
         status: "pending",
+        organization,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
