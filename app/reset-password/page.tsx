@@ -3,71 +3,85 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { getSupabaseClient } from "@/lib/supabase-core"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2, CheckCircle } from "lucide-react"
-import Link from "next/link"
+import { getSupabaseClient } from "@/lib/supabase-core"
+import { Lock, AlertCircle, CheckCircle2 } from "lucide-react"
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
+
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { toast } = useToast()
   const supabase = getSupabaseClient()
 
   useEffect(() => {
-    // Check if we have a hash fragment in the URL
-    const hash = window.location.hash
-    if (!hash) {
-      // No hash, user might have navigated here directly
+    // Check if we have the necessary parameters from the reset email
+    if (!searchParams.has("type") || searchParams.get("type") !== "recovery") {
       setError("Invalid password reset link. Please request a new one.")
     }
-  }, [])
+  }, [searchParams])
+
+  const validatePasswords = () => {
+    if (!password) return "Password is required"
+    if (password.length < 6) return "Password must be at least 6 characters"
+    if (password !== confirmPassword) return "Passwords do not match"
+    return null
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError(null)
 
-    // Validate passwords match
-    if (password !== confirmPassword) {
-      setError("Passwords don't match")
-      return
-    }
-
-    // Validate password strength
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters long")
+    const validationError = validatePasswords()
+    if (validationError) {
+      setError(validationError)
+      toast({
+        title: "Password reset failed",
+        description: validationError,
+        variant: "destructive",
+      })
       return
     }
 
     setIsLoading(true)
+    setError(null)
+    setSuccess(false)
 
     try {
-      const { error } = await supabase.auth.updateUser({ password })
+      const { error } = await supabase.auth.updateUser({
+        password,
+      })
 
       if (error) throw error
 
-      setIsSuccess(true)
+      setSuccess(true)
       toast({
         title: "Password updated",
-        description: "Your password has been updated successfully.",
+        description: "Your password has been reset successfully",
       })
+
+      // Redirect to login after a short delay
+      setTimeout(() => {
+        router.push("/login")
+      }, 3000)
     } catch (error) {
       console.error("Password reset error:", error)
-      setError(error instanceof Error ? error.message : "An error occurred during password reset")
+      setError(error instanceof Error ? error.message : "Failed to reset password")
       toast({
-        title: "Password reset failed",
-        description: error instanceof Error ? error.message : "An error occurred during password reset",
+        title: "Reset failed",
+        description: error instanceof Error ? error.message : "Failed to reset password",
         variant: "destructive",
       })
     } finally {
@@ -78,80 +92,84 @@ export default function ResetPasswordPage() {
   return (
     <>
       <ImprovedHeader showOptInForm={() => {}} />
-      <main className="container mx-auto px-4 py-12 flex justify-center">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-2xl text-[#0A3C1F]">Reset Password</CardTitle>
-            <CardDescription>Create a new password for your account</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {isSuccess ? (
-              <div className="text-center py-6">
-                <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Password Reset Complete</h3>
-                <p className="text-gray-600 mb-4">Your password has been updated successfully.</p>
-                <Button onClick={() => router.push("/login")} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 w-full">
-                  Go to Login
-                </Button>
-              </div>
-            ) : (
-              <>
-                {error && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600">
-                    <p className="text-sm">{error}</p>
-                  </div>
-                )}
+      <main className="container mx-auto px-4 py-12">
+        <div className="max-w-md mx-auto">
+          <Card>
+            <CardHeader className="space-y-1">
+              <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">Create new password</CardTitle>
+              <CardDescription className="text-center">Enter your new password below</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md mb-4 flex items-start">
+                  <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="password">New Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      minLength={8}
-                    />
-                    <p className="text-xs text-gray-500">Password must be at least 8 characters long</p>
+              {success ? (
+                <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md mb-4 flex items-start">
+                  <CheckCircle2 className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="font-medium">Password reset successful!</p>
+                    <p className="text-sm mt-1">Your password has been updated. Redirecting to login page...</p>
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      required
-                    />
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit}>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="password">New Password</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500">Password must be at least 6 characters</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <div className="relative">
+                        <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                        <Input
+                          id="confirmPassword"
+                          type="password"
+                          placeholder="••••••••"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          className="pl-10"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
+                      {isLoading ? (
+                        <span className="flex items-center">
+                          <span className="animate-spin mr-2">⟳</span>
+                          Updating...
+                        </span>
+                      ) : (
+                        "Reset Password"
+                      )}
+                    </Button>
                   </div>
-
-                  <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Updating...
-                      </>
-                    ) : (
-                      "Reset Password"
-                    )}
-                  </Button>
                 </form>
-              </>
-            )}
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <div className="text-center">
-              <span className="text-sm text-gray-500">Remember your password?</span>
-              <Link href="/login">
-                <Button variant="link" className="text-[#0A3C1F] p-0 h-auto font-normal text-sm ml-1">
-                  Login
-                </Button>
+              )}
+            </CardContent>
+            <CardFooter className="flex justify-center">
+              <Link href="/login" className="text-sm text-[#0A3C1F] hover:underline">
+                Back to login
               </Link>
-            </div>
-          </CardFooter>
-        </Card>
+            </CardFooter>
+          </Card>
+        </div>
       </main>
       <ImprovedFooter />
     </>

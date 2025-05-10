@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
 import { getSupabaseClient } from "@/lib/supabase-core"
-import { Award, Trophy, Star, Clock, User, FileText, BadgeCheck } from "lucide-react"
+import { Award, Trophy, Star, Clock, User, FileText, BadgeCheck, Bell, Settings, LogOut } from "lucide-react"
 import { RecruitDashboard } from "@/components/recruit-dashboard"
 import { ApplicationProgressGamification } from "@/components/application-progress-gamification"
 import { EarnedBadges } from "@/components/earned-badges"
@@ -19,6 +19,7 @@ import { useUser } from "@/context/user-context"
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [userProfile, setUserProfile] = useState<any>(null)
+  const [notifications, setNotifications] = useState<any[]>([])
   const router = useRouter()
   const { toast } = useToast()
   const supabase = getSupabaseClient()
@@ -51,6 +52,18 @@ export default function DashboardPage() {
           throw profileError
         }
 
+        // Fetch notifications (mock data for now)
+        setNotifications([
+          { id: 1, message: "You earned a new badge!", date: new Date(), read: false },
+          {
+            id: 2,
+            message: "Your application status has been updated",
+            date: new Date(Date.now() - 86400000),
+            read: true,
+          },
+          { id: 3, message: "New trivia challenge available", date: new Date(Date.now() - 172800000), read: false },
+        ])
+
         setUserProfile(
           profile || {
             user_id: session.user.id,
@@ -67,8 +80,9 @@ export default function DashboardPage() {
         setCurrentUser({
           id: session.user.id,
           email: session.user.email || "",
-          firstName: session.user.user_metadata?.first_name || "",
-          lastName: session.user.user_metadata?.last_name || "",
+          name:
+            `${session.user.user_metadata?.first_name || ""} ${session.user.user_metadata?.last_name || ""}`.trim() ||
+            "User",
           ...profile,
         })
       } catch (error) {
@@ -146,9 +160,25 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold text-[#0A3C1F]">Welcome, {userProfile?.first_name || "Recruit"}!</h1>
             <p className="text-gray-600">Track your recruitment progress and achievements</p>
           </div>
-          <Button onClick={handleSignOut} variant="outline" className="mt-4 md:mt-0">
-            Sign Out
-          </Button>
+          <div className="flex items-center space-x-2 mt-4 md:mt-0">
+            <div className="relative">
+              <Button variant="outline" size="icon" className="relative">
+                <Bell className="h-5 w-5" />
+                {notifications.filter((n) => !n.read).length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    {notifications.filter((n) => !n.read).length}
+                  </span>
+                )}
+              </Button>
+            </div>
+            <Button variant="outline" size="icon" onClick={() => router.push("/profile/settings")}>
+              <Settings className="h-5 w-5" />
+            </Button>
+            <Button onClick={handleSignOut} variant="outline">
+              <LogOut className="h-5 w-5 mr-2" />
+              Sign Out
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
