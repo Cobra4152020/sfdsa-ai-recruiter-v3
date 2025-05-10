@@ -13,6 +13,7 @@ import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
 import { supabase } from "@/lib/supabase-client"
 import Link from "next/link"
+import { CardFooter } from "@/components/ui/card"
 
 export default function VolunteerLoginPage() {
   const [email, setEmail] = useState("")
@@ -127,6 +128,25 @@ export default function VolunteerLoginPage() {
               </Button>
             </div>
           </form>
+
+          <CardFooter className="flex flex-col space-y-4">
+            <div className="text-center text-sm">
+              Don't have a volunteer account?{" "}
+              <Link href="/volunteer-register" className="text-[#0A3C1F] hover:underline font-medium">
+                Sign up as a volunteer recruiter
+              </Link>
+            </div>
+            <div className="text-center text-xs text-gray-500">
+              By signing in, you agree to our{" "}
+              <Link href="/terms-of-service" className="underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy-policy" className="underline">
+                Privacy Policy
+              </Link>
+            </div>
+          </CardFooter>
 
           <div className="text-center text-sm text-gray-500">
             <p>
