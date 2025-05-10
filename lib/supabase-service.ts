@@ -1,7 +1,10 @@
-import { createClient as supabaseCreateClient } from "@supabase/supabase-js"
+import { createClient } from "@supabase/supabase-js"
+
+// Re-export createClient
+export { createClient }
 
 // Create a single supabase client for interacting with your database
-export const supabase = supabaseCreateClient(
+export const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL || "",
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
 )
@@ -15,7 +18,7 @@ export function getServiceSupabase() {
     throw new Error("Missing Supabase environment variables")
   }
 
-  return supabaseCreateClient(supabaseUrl, supabaseServiceKey, {
+  return createClient(supabaseUrl, supabaseServiceKey, {
     auth: {
       autoRefreshToken: false,
       persistSession: false,
@@ -32,7 +35,7 @@ export function getClientSupabase() {
     throw new Error("Missing Supabase environment variables")
   }
 
-  return supabaseCreateClient(supabaseUrl, supabaseAnonKey)
+  return createClient(supabaseUrl, supabaseAnonKey)
 }
 
 // Retry function for Supabase operations
