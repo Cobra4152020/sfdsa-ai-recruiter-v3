@@ -156,6 +156,14 @@ export default function LoginPage() {
                     )}
                   </Button>
                 </div>
+                <div className="text-center text-sm text-gray-500 mt-4">
+                  <p>
+                    Are you a volunteer recruiter?{" "}
+                    <Link href="/volunteer-login" className="font-medium text-[#0A3C1F] hover:text-[#0A3C1F]/80">
+                      Login here
+                    </Link>
+                  </p>
+                </div>
               </form>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">

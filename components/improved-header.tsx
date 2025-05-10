@@ -176,6 +176,9 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               <Link href="/donate" className="text-white hover:text-[#FFD700] transition-colors">
                 Donate
               </Link>
+              <Link href="/volunteer-login" className="text-white hover:text-[#FFD700] transition-colors">
+                Volunteer Recruiter
+              </Link>
               <AskSgtKenButton
                 variant="ghost"
                 className="text-white hover:text-[#FFD700] transition-colors p-0 h-auto font-normal"
@@ -303,6 +306,9 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
 
             <Link href="/donate" className="block px-3 py-2 text-white hover:text-[#FFD700]">
               Donate
+            </Link>
+            <Link href="/volunteer-login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
+              Volunteer Recruiter
             </Link>
             <div className="block px-3 py-2 text-white hover:text-[#FFD700]">
               <AskSgtKenButton

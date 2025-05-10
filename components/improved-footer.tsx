@@ -154,6 +154,28 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
               </li>
             </ul>
           </div>
+          <div className="col-span-1">
+            <div className="space-y-2">
+              <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Resources</h3>
+              <ul className="space-y-2">
+                <li>
+                  <Link href="/faq" className="text-gray-300 hover:text-white transition-colors">
+                    FAQ
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                    Contact
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/volunteer-login" className="text-gray-300 hover:text-white transition-colors">
+                    Volunteer Portal
+                  </Link>
+                </li>
+              </ul>
+            </div>
+          </div>
         </div>
 
         <div className="border-t border-white/10 mt-8 pt-8 text-center">
