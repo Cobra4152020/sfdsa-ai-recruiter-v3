@@ -23,7 +23,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
             </p>
             <div className="flex space-x-4">
               <a
-                href="https://facebook.com"
+                href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Facebook"
@@ -32,7 +32,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 <Facebook className="h-5 w-5" />
               </a>
               <a
-                href="https://twitter.com"
+                href="https://twitter.com/sanfranciscodsa"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Twitter"
@@ -41,7 +41,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 <Twitter className="h-5 w-5" />
               </a>
               <a
-                href="https://youtube.com"
+                href="https://www.youtube.com/channel/UCgyW7q86c-Mua4bS1a9wBWA"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Subscribe to our YouTube channel"
@@ -50,7 +50,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 <Youtube className="h-5 w-5" />
               </a>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/sfdeputysheriffsassociation/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Instagram"
@@ -59,7 +59,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 <Instagram className="h-5 w-5" />
               </a>
               <a
-                href="https://linkedin.com"
+                href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs%E2%80%99-association/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Connect with us on LinkedIn"
@@ -111,8 +111,26 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Contact Us</h3>
             <address className="not-italic text-sm text-gray-300 space-y-2">
-              <p>San Francisco Deputy Sheriffs' Association 501(c)5</p>
-              <p>Protecting San Francisco 501(c)3</p>
+              <p>
+                <a
+                  href="https://sanfranciscodsa.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  San Francisco Deputy Sheriffs' Association 501(c)5
+                </a>
+              </p>
+              <p>
+                <a
+                  href="https://protectingsanfrancisco.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors"
+                >
+                  Protecting San Francisco 501(c)3
+                </a>
+              </p>
               <p>35 Gilbert Street</p>
               <p>San Francisco, CA 94103</p>
               <p className="mt-2">
