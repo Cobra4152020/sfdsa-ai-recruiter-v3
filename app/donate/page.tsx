@@ -8,12 +8,14 @@ import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
-import { Coffee, Heart, Trophy, Star, CreditCard } from "lucide-react"
+import { Coffee, Heart, Trophy, Star, CreditCard, HandHeart, Users, BookOpen, Building } from "lucide-react"
 import { loadStripe } from "@stripe/stripe-js"
 import { Elements } from "@stripe/react-stripe-js"
 import { DonationForm } from "@/components/donation-form"
 import { VenmoOption } from "@/components/venmo-option"
 import Image from "next/image"
+import { DonationImpactDisplay } from "@/components/donation-impact-display"
+import { MonthlyImpactCalculator } from "@/components/monthly-impact-calculator"
 
 // Load Stripe outside of component to avoid recreating it
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
@@ -31,7 +33,6 @@ export default function DonatePage() {
   const [clientSecret, setClientSecret] = useState<string>("")
   const [isRecurring, setIsRecurring] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [selectedOrganization, setSelectedOrganization] = useState<"both" | "sfdsa" | "protecting">("both")
   const { toast } = useToast()
 
   const amount = customAmount || donationAmount
@@ -59,7 +60,7 @@ export default function DonatePage() {
             isRecurring,
             donationMessage,
             isAnonymous,
-            organization: selectedOrganization,
+            organization: "protecting", // Always set to Protecting SF
           }),
         })
 
@@ -98,99 +99,67 @@ export default function DonatePage() {
           </p>
         </div>
 
-        {/* Organization Selection */}
-        <div className="mb-10">
-          <h2 className="text-xl font-semibold text-center mb-6">Choose where your donation goes</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card
-              className={`cursor-pointer transition-all ${selectedOrganization === "both" ? "ring-2 ring-[#0A3C1F]" : "hover:shadow-md"}`}
-              onClick={() => setSelectedOrganization("both")}
-            >
-              <CardHeader className="text-center pb-2">
-                <div className="flex justify-center">
-                  <div className="w-16 h-16 relative">
-                    <Image
-                      src="/sfdsa-logo.png"
-                      alt="SFDSA Logo"
-                      width={64}
-                      height={64}
-                      className="absolute top-0 left-0 z-10"
-                    />
-                    <Image
-                      src="/protecting-sf-logo.png"
-                      alt="Protecting SF Logo"
-                      width={64}
-                      height={64}
-                      className="absolute top-2 left-4"
-                    />
-                  </div>
-                </div>
-                <CardTitle className="text-lg mt-4">Support Both Organizations</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center text-sm text-gray-600">
-                <p>Split your donation equally between both organizations</p>
-              </CardContent>
-            </Card>
+        {/* Organization Information */}
+        <div className="mb-10 bg-white rounded-lg border border-[#0A3C1F]/20 p-6">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-6">
+            <div className="flex-shrink-0">
+              <Image
+                src="/protecting-sf-logo.png"
+                alt="Protecting San Francisco Logo"
+                width={120}
+                height={120}
+                className="rounded-lg"
+              />
+            </div>
+            <div className="flex-grow max-w-xl">
+              <h2 className="text-xl font-bold text-[#0A3C1F] mb-2">Protecting San Francisco</h2>
+              <p className="text-gray-700">
+                Support the 501(c)3 charitable organization (tax-deductible) and the charitable arm of the San Francisco
+                Deputy Sheriffs' Association. Your contributions directly fund recruitment initiatives, community
+                outreach, and educational programs.
+              </p>
+            </div>
+          </div>
 
-            <Card
-              className={`cursor-pointer transition-all ${selectedOrganization === "sfdsa" ? "ring-2 ring-[#0A3C1F]" : "hover:shadow-md"}`}
-              onClick={() => setSelectedOrganization("sfdsa")}
-            >
-              <CardHeader className="text-center pb-2">
-                <div className="flex justify-center">
-                  <Image src="/sfdsa-logo.png" alt="SFDSA Logo" width={64} height={64} />
-                </div>
-                <CardTitle className="text-lg mt-2">SF Deputy Sheriffs' Association</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center text-sm text-gray-600">
-                <p>Support the 501(c)5 organization representing deputy sheriffs</p>
-              </CardContent>
-            </Card>
+          <div className="flex flex-col md:flex-row items-center justify-center gap-6">
+            <div className="flex-shrink-0">
+              <Image
+                src="/sfdsa-logo.png"
+                alt="San Francisco Deputy Sheriffs' Association Logo"
+                width={120}
+                height={120}
+                className="rounded-lg"
+              />
+            </div>
+            <div className="flex-grow max-w-xl">
+              <h2 className="text-xl font-bold text-[#0A3C1F] mb-2">San Francisco Deputy Sheriffs' Association</h2>
+              <p className="text-gray-700">
+                The SFDSA is a 501(c)5 organization representing deputy sheriffs. While the SFDSA does not accept
+                donations directly, it works closely with Protecting San Francisco to support recruitment and community
+                initiatives.
+              </p>
+            </div>
+          </div>
 
-            <Card
-              className={`cursor-pointer transition-all ${selectedOrganization === "protecting" ? "ring-2 ring-[#0A3C1F]" : "hover:shadow-md"}`}
-              onClick={() => setSelectedOrganization("protecting")}
-            >
-              <CardHeader className="text-center pb-2">
-                <div className="flex justify-center">
-                  <Image src="/protecting-sf-logo.png" alt="Protecting SF Logo" width={64} height={64} />
-                </div>
-                <CardTitle className="text-lg mt-2">Protecting San Francisco</CardTitle>
-              </CardHeader>
-              <CardContent className="text-center text-sm text-gray-600">
-                <p>Support the 501(c)3 charitable organization (tax-deductible)</p>
-              </CardContent>
-            </Card>
+          <div className="mt-6 p-4 bg-[#0A3C1F]/5 rounded-lg">
+            <p className="text-center font-medium text-[#0A3C1F]">
+              All donations made through this site are processed via Stripe and Venmo and are directed to Protecting San
+              Francisco, a registered 501(c)3 charitable organization.
+            </p>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <Card className="bg-white border-[#0A3C1F]/20">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+          <Card className="bg-white border-[#0A3C1F]/20 col-span-1">
             <CardHeader className="text-center pb-2">
               <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
                 <Coffee className="h-8 w-8 text-[#0A3C1F]" />
               </div>
-              <CardTitle className="text-xl text-[#0A3C1F]">Buy Sgt. Ken a Coffee</CardTitle>
+              <CardTitle className="text-xl text-[#0A3C1F]">Small Gift</CardTitle>
             </CardHeader>
             <CardContent className="text-center pt-2">
-              <p className="text-gray-600 mb-4">
-                Help keep Sgt. Ken caffeinated and ready to assist potential recruits!
-              </p>
+              <p className="text-gray-600 mb-4">Every contribution makes a difference, no matter the size.</p>
               <div className="flex justify-center space-x-2">
-                <Button
-                  variant="outline"
-                  className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
-                  onClick={() => {
-                    setDonationAmount("5")
-                    setCustomAmount("")
-                    toast({
-                      title: "Amount selected",
-                      description: "You've selected a $5 donation",
-                    })
-                  }}
-                >
-                  $5
-                </Button>
                 <Button
                   variant="outline"
                   className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
@@ -209,17 +178,15 @@ export default function DonatePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-[#0A3C1F]/20">
+          <Card className="bg-white border-[#0A3C1F]/20 col-span-1">
             <CardHeader className="text-center pb-2">
               <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-                <Trophy className="h-8 w-8 text-[#0A3C1F]" />
+                <HandHeart className="h-8 w-8 text-[#0A3C1F]" />
               </div>
-              <CardTitle className="text-xl text-[#0A3C1F]">Support the Platform</CardTitle>
+              <CardTitle className="text-xl text-[#0A3C1F]">Supporter</CardTitle>
             </CardHeader>
             <CardContent className="text-center pt-2">
-              <p className="text-gray-600 mb-4">
-                Help us maintain and improve this recruitment platform for future deputies.
-              </p>
+              <p className="text-gray-600 mb-4">Help us reach more potential recruits with your support.</p>
               <div className="flex justify-center space-x-2">
                 <Button
                   variant="outline"
@@ -235,6 +202,20 @@ export default function DonatePage() {
                 >
                   $25
                 </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-white border-[#0A3C1F]/20 col-span-1">
+            <CardHeader className="text-center pb-2">
+              <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
+                <Trophy className="h-8 w-8 text-[#0A3C1F]" />
+              </div>
+              <CardTitle className="text-xl text-[#0A3C1F]">Champion</CardTitle>
+            </CardHeader>
+            <CardContent className="text-center pt-2">
+              <p className="text-gray-600 mb-4">Make a significant impact on our recruitment initiatives.</p>
+              <div className="flex justify-center space-x-2">
                 <Button
                   variant="outline"
                   className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
@@ -253,15 +234,15 @@ export default function DonatePage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white border-[#0A3C1F]/20">
+          <Card className="bg-white border-[#0A3C1F]/20 col-span-1">
             <CardHeader className="text-center pb-2">
               <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
                 <Heart className="h-8 w-8 text-[#0A3C1F]" />
               </div>
-              <CardTitle className="text-xl text-[#0A3C1F]">Become a Benefactor</CardTitle>
+              <CardTitle className="text-xl text-[#0A3C1F]">Benefactor</CardTitle>
             </CardHeader>
             <CardContent className="text-center pt-2">
-              <p className="text-gray-600 mb-4">Make a significant impact with a larger donation to our mission.</p>
+              <p className="text-gray-600 mb-4">Transform our ability to serve the community.</p>
               <div className="flex justify-center space-x-2">
                 <Button
                   variant="outline"
@@ -276,20 +257,6 @@ export default function DonatePage() {
                   }}
                 >
                   $100
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
-                  onClick={() => {
-                    setDonationAmount("250")
-                    setCustomAmount("")
-                    toast({
-                      title: "Amount selected",
-                      description: "You've selected a $250 donation",
-                    })
-                  }}
-                >
-                  $250
                 </Button>
               </div>
             </CardContent>
@@ -386,6 +353,8 @@ export default function DonatePage() {
                         />
                       </div>
                     </div>
+
+                    <DonationImpactDisplay amount={donationAmount} customAmount={customAmount} />
 
                     <div className="space-y-2">
                       <Label htmlFor="donor-name">Your Name (Optional)</Label>
@@ -503,7 +472,7 @@ export default function DonatePage() {
                       amount={amount}
                       donorName={donorName}
                       donorEmail={donorEmail}
-                      organization={selectedOrganization}
+                      organization="protecting"
                     />
                   )}
                 </CardFooter>
@@ -591,6 +560,8 @@ export default function DonatePage() {
                         />
                       </div>
                     </div>
+
+                    <DonationImpactDisplay amount={donationAmount} customAmount={customAmount} />
 
                     <div className="space-y-2">
                       <Label htmlFor="monthly-name">Your Name (Optional)</Label>
@@ -685,20 +656,143 @@ export default function DonatePage() {
                 </CardFooter>
               )}
             </Card>
+            <MonthlyImpactCalculator />
           </TabsContent>
         </Tabs>
 
+        <div className="mt-12 bg-white rounded-lg border border-[#0A3C1F]/20 p-6 max-w-2xl mx-auto">
+          <h2 className="text-xl font-bold text-[#0A3C1F] mb-6 text-center">Your Donation's Impact</h2>
+
+          <div className="space-y-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="flex items-center mb-3">
+                  <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    $10
+                  </div>
+                  <h3 className="font-semibold text-[#0A3C1F]">Recruit Information Package</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Provides comprehensive information packages for 5 potential recruits, including career guides,
+                  application checklists, and preparation materials.
+                </p>
+              </div>
+
+              <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="flex items-center mb-3">
+                  <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    $25
+                  </div>
+                  <h3 className="font-semibold text-[#0A3C1F]">AI Assistant Improvements</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Helps enhance Sgt. Ken's AI capabilities with updated information and improved response accuracy to
+                  better assist potential recruits with their questions.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="flex items-center mb-3">
+                  <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    $50
+                  </div>
+                  <h3 className="font-semibold text-[#0A3C1F]">Community Outreach</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Supports a community outreach event to connect with diverse neighborhoods and share information about
+                  careers in law enforcement with underrepresented groups.
+                </p>
+              </div>
+
+              <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="flex items-center mb-3">
+                  <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    $100
+                  </div>
+                  <h3 className="font-semibold text-[#0A3C1F]">Recruitment Workshop</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Funds a recruitment workshop that provides hands-on training for physical fitness tests, interview
+                  preparation, and written exam strategies for up to 10 potential recruits.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="flex items-center mb-3">
+                  <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    $250
+                  </div>
+                  <h3 className="font-semibold text-[#0A3C1F]">Mentorship Program</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Supports our mentorship program that pairs experienced deputies with recruits throughout the
+                  application process, providing guidance and support for up to 5 recruits.
+                </p>
+              </div>
+
+              <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="flex items-center mb-3">
+                  <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    $500+
+                  </div>
+                  <h3 className="font-semibold text-[#0A3C1F]">Scholarship Support</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Contributes to our scholarship fund that helps promising candidates with training costs, equipment,
+                  and educational expenses as they prepare for a career in law enforcement.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 text-center">
+            <p className="text-sm text-gray-600 italic">
+              Your donation of any amount makes a difference in our mission to build a stronger, more diverse Sheriff's
+              Department for San Francisco.
+            </p>
+          </div>
+        </div>
+
         <div className="mt-12 bg-[#0A3C1F]/5 rounded-lg p-6 max-w-2xl mx-auto">
-          <h2 className="text-xl font-bold text-[#0A3C1F] mb-4">Where Your Donation Goes</h2>
-          <div className="space-y-4">
+          <h2 className="text-xl font-bold text-[#0A3C1F] mb-4">Our Mission</h2>
+          <div className="space-y-6">
             <div className="flex items-start">
               <div className="mr-4 mt-1">
-                <Star className="h-5 w-5 text-[#0A3C1F]" />
+                <Users className="h-5 w-5 text-[#0A3C1F]" />
               </div>
               <div>
-                <h3 className="font-medium">Platform Maintenance</h3>
+                <h3 className="font-medium">Diverse Recruitment</h3>
                 <p className="text-gray-600 text-sm">
-                  Keeping our recruitment platform running smoothly with regular updates and technical support.
+                  We're committed to building a Sheriff's Department that reflects the diversity of San Francisco,
+                  recruiting qualified candidates from all communities.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="mr-4 mt-1">
+                <BookOpen className="h-5 w-5 text-[#0A3C1F]" />
+              </div>
+              <div>
+                <h3 className="font-medium">Education & Preparation</h3>
+                <p className="text-gray-600 text-sm">
+                  We provide resources, training, and mentorship to help candidates prepare for a successful career in
+                  law enforcement.
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start">
+              <div className="mr-4 mt-1">
+                <Building className="h-5 w-5 text-[#0A3C1F]" />
+              </div>
+              <div>
+                <h3 className="font-medium">Community Connection</h3>
+                <p className="text-gray-600 text-sm">
+                  We foster stronger connections between the Sheriff's Department and the communities it serves through
+                  outreach and education.
                 </p>
               </div>
             </div>
@@ -707,34 +801,10 @@ export default function DonatePage() {
                 <Star className="h-5 w-5 text-[#0A3C1F]" />
               </div>
               <div>
-                <h3 className="font-medium">Recruitment Resources</h3>
+                <h3 className="font-medium">Excellence in Service</h3>
                 <p className="text-gray-600 text-sm">
-                  Developing educational materials and resources to help potential recruits prepare for a career in law
-                  enforcement.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start">
-              <div className="mr-4 mt-1">
-                <Star className="h-5 w-5 text-[#0A3C1F]" />
-              </div>
-              <div>
-                <h3 className="font-medium">Community Outreach</h3>
-                <p className="text-gray-600 text-sm">
-                  Supporting outreach programs that connect with diverse communities to build a more representative
-                  Sheriff's Department.
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start">
-              <div className="mr-4 mt-1">
-                <Star className="h-5 w-5 text-[#0A3C1F]" />
-              </div>
-              <div>
-                <h3 className="font-medium">Sgt. Ken AI Assistant</h3>
-                <p className="text-gray-600 text-sm">
-                  Improving and maintaining our AI assistant to provide 24/7 support to potential recruits with
-                  questions about joining the Sheriff's Department.
+                  We support initiatives that promote the highest standards of professionalism, integrity, and service
+                  within the Sheriff's Department.
                 </p>
               </div>
             </div>
@@ -743,8 +813,7 @@ export default function DonatePage() {
 
         <div className="mt-12 text-center">
           <p className="text-gray-600 mb-4">
-            Protecting San Francisco is a 501(c)(3) non-profit organization. All donations to this organization are
-            tax-deductible.
+            Protecting San Francisco is a 501(c)(3) non-profit organization. All donations are tax-deductible.
           </p>
           <p className="text-sm text-gray-500">Tax ID: 12-3456789</p>
         </div>

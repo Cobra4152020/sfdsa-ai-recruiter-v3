@@ -16,10 +16,9 @@ export async function POST(request: Request) {
       interval = "month",
       donationMessage,
       isAnonymous,
-      organization = "both", // Default to both if not specified
     } = await request.json()
 
-    console.log("Payment intent request:", { amount, donorEmail, isRecurring, organization })
+    console.log("Payment intent request:", { amount, donorEmail, isRecurring })
 
     // Validate the amount
     if (!amount || amount < 1) {
@@ -34,8 +33,8 @@ export async function POST(request: Request) {
     // Add organization info to metadata
     const metadata = {
       name: donorName || "",
-      organization,
       message: donationMessage || "",
+      organization: "protecting", // Always set to Protecting SF
     }
 
     if (isRecurring) {
@@ -72,13 +71,7 @@ export async function POST(request: Request) {
             price_data: {
               currency: "usd",
               product_data: {
-                name: `Monthly Donation to ${
-                  organization === "both"
-                    ? "SF Deputy Sheriff's Association & Protecting San Francisco"
-                    : organization === "sfdsa"
-                      ? "SF Deputy Sheriff's Association"
-                      : "Protecting San Francisco"
-                }`,
+                name: "Monthly Donation to Protecting San Francisco",
                 metadata,
               },
               unit_amount: amountInCents,
@@ -102,7 +95,7 @@ export async function POST(request: Request) {
         amount: amount,
         interval: interval,
         status: "incomplete",
-        organization,
+        organization: "protecting", // Always set to Protecting SF
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -135,7 +128,7 @@ export async function POST(request: Request) {
         payment_processor: "stripe",
         payment_id: paymentIntent.id,
         status: "pending",
-        organization,
+        organization: "protecting", // Always set to Protecting SF
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })

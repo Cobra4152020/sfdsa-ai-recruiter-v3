@@ -9,39 +9,19 @@ interface VenmoOptionProps {
   amount: string
   donorName?: string
   donorEmail?: string
-  organization?: "both" | "sfdsa" | "protecting"
+  organization?: string // Kept for backward compatibility
 }
 
-export function VenmoOption({ amount, donorName, donorEmail, organization = "both" }: VenmoOptionProps) {
+export function VenmoOption({ amount, donorName, donorEmail }: VenmoOptionProps) {
   const [showQR, setShowQR] = useState(false)
   const { toast } = useToast()
 
-  // Your organization's Venmo username based on selection
-  const getVenmoUsername = () => {
-    switch (organization) {
-      case "sfdsa":
-        return "SFDSA-Association"
-      case "protecting":
-        return "Protecting-SF"
-      case "both":
-      default:
-        return "SFDSA-Recruitment" // Default combined account
-    }
-  }
+  // Always use Protecting SF's Venmo username
+  const venmoUsername = "Protecting-SF"
 
-  const venmoUsername = getVenmoUsername()
-
-  // Create note based on organization
+  // Create note
   const getVenmoNote = () => {
-    let note = "Donation"
-
-    if (organization === "both") {
-      note += " to SFDSA & Protecting SF"
-    } else if (organization === "sfdsa") {
-      note += " to SFDSA"
-    } else if (organization === "protecting") {
-      note += " to Protecting SF"
-    }
+    let note = "Donation to Protecting San Francisco"
 
     if (donorName) {
       note += " from " + donorName
@@ -66,7 +46,7 @@ export function VenmoOption({ amount, donorName, donorEmail, organization = "bot
           amount,
           donorName,
           donorEmail,
-          organization,
+          organization: "protecting", // Always set to Protecting SF
         }),
       }).catch((err) => console.error("Error logging Venmo attempt:", err))
     }
@@ -128,7 +108,9 @@ export function VenmoOption({ amount, donorName, donorEmail, organization = "bot
           </div>
 
           <div className="mb-4">
-            <p className="text-sm text-gray-600">Please include your name and "Donation" in the payment note.</p>
+            <p className="text-sm text-gray-600">
+              Please include your name and "Donation to Protecting San Francisco" in the payment note.
+            </p>
           </div>
 
           <Button variant="outline" onClick={() => setShowQR(false)}>
