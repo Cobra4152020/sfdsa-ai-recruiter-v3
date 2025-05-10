@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Trophy, Medal, Share2, ChevronRight } from "lucide-react"
+import { Trophy, Medal, Share2, ChevronRight, Bell } from "lucide-react"
 import Link from "next/link"
 import { BadgeSharingDialog } from "./badge-sharing-dialog"
 
@@ -139,6 +139,12 @@ export function UserProfile({ userId, showDetails = true }: UserProfileProps) {
                     </Button>
                   </Link>
                 )}
+              </div>
+              <div className="mt-4">
+                <Link href="/profile/notifications" className="flex items-center text-primary hover:underline">
+                  <Bell className="mr-2 h-4 w-4" />
+                  Manage Notification Preferences
+                </Link>
               </div>
             </div>
           </div>
