@@ -111,7 +111,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Contact Us</h3>
             <address className="not-italic text-sm text-gray-300 space-y-2">
-              <p>San Francisco Deputy Sheriffs' Association 510(c)5</p>
+              <p>San Francisco Deputy Sheriffs' Association 501(c)5</p>
               <p>Protecting San Francisco 501(c)3</p>
               <p>35 Gilbert Street</p>
               <p>San Francisco, CA 94103</p>
