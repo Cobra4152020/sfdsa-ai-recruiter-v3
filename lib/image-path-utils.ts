@@ -1,41 +1,86 @@
-/**
- * Utility functions for handling image paths consistently across the application
- */
+import { env } from "./env-utils"
 
 /**
- * Get the correct path for an image, handling both development and production environments
- * @param path The relative path to the image in the public directory
- * @returns The correct path to use in the application
+ * Resolves an image path based on the current environment
+ * @param path The relative path to the image
+ * @returns The full path to the image
  */
-export function getImagePath(path: string): string {
-  // Remove leading slash if present to ensure consistency
-  const cleanPath = path.startsWith("/") ? path.substring(1) : path
+export function resolveImagePath(path: string): string {
+  // Remove leading slash if present
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path
 
-  // In production, we might need to adjust paths based on the deployment environment
-  // For now, we'll just ensure the path is correctly formatted
-  return `/${cleanPath}`
+  // In development or when using mock data, use the local path
+  if (process.env.NODE_ENV === "development" || env("USE_MOCK_DATA") === "true") {
+    return `/${cleanPath}`
+  }
+
+  // In production, use the Vercel URL
+  const baseUrl = env("NEXT_PUBLIC_VERCEL_URL") || ""
+  const protocol = baseUrl.includes("localhost") ? "http" : "https"
+
+  if (!baseUrl) {
+    console.warn("NEXT_PUBLIC_VERCEL_URL is not defined, falling back to relative path")
+    return `/${cleanPath}`
+  }
+
+  return `${protocol}://${baseUrl}/${cleanPath}`
 }
 
 /**
- * Check if an image exists at the given path
- * This is useful for development debugging
+ * Checks if an image exists at the given path
  * @param path The path to check
  * @returns A promise that resolves to true if the image exists
  */
 export async function checkImageExists(path: string): Promise<boolean> {
   try {
-    const response = await fetch(getImagePath(path), { method: "HEAD" })
+    const response = await fetch(path, { method: "HEAD" })
     return response.ok
   } catch (error) {
-    console.error(`Error checking image at ${path}:`, error)
+    console.error(`Error checking if image exists at ${path}:`, error)
     return false
   }
 }
 
 /**
- * Get a fallback image path if the original image fails to load
- * @returns A fallback image path
+ * Gets a list of all available image paths
+ * This is a mock implementation and would need to be replaced with actual logic
+ * in a production environment
  */
-export function getFallbackImagePath(): string {
-  return "/abstract-geometric-shapes.png"
+export function getAvailableImagePaths(): string[] {
+  return [
+    "/sfdsa-logo.png",
+    "/protecting-sf-logo.png",
+    "/document-icon.png",
+    "/fitness-icon.png",
+    "/psychology-icon.png",
+    "/chat-icon.png",
+    "/generic-badge.png",
+    "/diverse-group-brainstorming.png",
+    "/sf-sheriff-deputies.png",
+    "/male-law-enforcement-headshot.png",
+    "/san-francisco-deputy-sheriff.png",
+    "/female-law-enforcement-headshot.png",
+    "/asian-male-officer-headshot.png",
+    "/veterans-law-enforcement-training.png",
+    "/san-francisco-apartments.png",
+    "/law-enforcement-training.png",
+    "/job-interview-preparation.png",
+    "/castro-district-san-francisco.png",
+    "/san-francisco-cable-car.png",
+    "/lombard-street-san-francisco.png",
+    "/silicon-valley-tech.png",
+    "/north-beach-italian-street.png",
+    "/boudin-sourdough.png",
+    "/summer-of-love-1967-san-francisco.png",
+    "/mission-dolores-san-francisco.png",
+    "/1906-san-francisco-aftermath.png",
+    "/golden-gate-bridge.png",
+    "/alcatraz-prison-san-francisco.png",
+    "/1906-san-francisco-earthquake.png",
+    "/san-francisco-cable-car-powell.png",
+    "/lombard-street-crooked.png",
+    "/silicon-valley-tech-hq.png",
+    "/north-beach-italian-restaurants.png",
+    "/abstract-geometric-shapes.png",
+  ]
 }

@@ -1,62 +1,80 @@
 "use client"
 
-import { useState } from "react"
-import Image from "next/image"
-import { getFallbackImagePath } from "@/lib/image-path-utils"
+import { useState, useEffect } from "react"
+import Image, { type ImageProps } from "next/image"
+import { resolveImagePath, checkImageExists } from "@/lib/image-path-utils"
 
-interface OptimizedImageProps {
+interface OptimizedImageProps extends Omit<ImageProps, "src"> {
   src: string
-  alt: string
-  width?: number
-  height?: number
+  fallbackSrc?: string
   className?: string
-  priority?: boolean
 }
 
-export default function OptimizedImage({
+export function OptimizedImage({
   src,
+  fallbackSrc = "/abstract-geometric-shapes.png",
   alt,
-  width = 500,
-  height = 300,
-  className = "",
-  priority = false,
+  width,
+  height,
+  className,
+  ...props
 }: OptimizedImageProps) {
-  const [imgSrc, setImgSrc] = useState(src)
-  const [hasError, setHasError] = useState(false)
+  const [imageSrc, setImageSrc] = useState<string>(src)
+  const [imageError, setImageError] = useState<boolean>(false)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    const resolvedSrc = resolveImagePath(src)
+
+    const verifyImage = async () => {
+      try {
+        const exists = await checkImageExists(resolvedSrc)
+        if (!exists) {
+          console.warn(`Image at ${resolvedSrc} does not exist, using fallback`)
+          setImageSrc(fallbackSrc)
+        } else {
+          setImageSrc(resolvedSrc)
+        }
+      } catch (error) {
+        console.error("Error verifying image:", error)
+        setImageSrc(fallbackSrc)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    verifyImage()
+  }, [src, fallbackSrc])
 
   const handleError = () => {
-    if (!hasError) {
-      console.warn(`Image failed to load: ${src}`)
-      setImgSrc(getFallbackImagePath())
-      setHasError(true)
+    if (!imageError) {
+      console.warn(`Error loading image from ${imageSrc}, using fallback`)
+      setImageSrc(fallbackSrc)
+      setImageError(true)
     }
   }
 
-  // For external URLs, use regular img tag
-  if (src.startsWith("http")) {
-    return (
-      <img
-        src={imgSrc || "/placeholder.svg"}
-        alt={alt}
-        width={width}
-        height={height}
-        className={className}
-        onError={handleError}
-      />
-    )
-  }
-
-  // For local images, use Next.js Image component
   return (
-    <Image
-      src={imgSrc || "/placeholder.svg"}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
-      priority={priority}
-      onError={handleError}
-      unoptimized={true}
-    />
+    <>
+      {isLoading ? (
+        <div
+          className={`bg-gray-200 animate-pulse ${className}`}
+          style={{
+            width: typeof width === "number" ? `${width}px` : width,
+            height: typeof height === "number" ? `${height}px` : height,
+          }}
+        />
+      ) : (
+        <Image
+          src={imageSrc || "/placeholder.svg"}
+          alt={alt}
+          width={width}
+          height={height}
+          onError={handleError}
+          className={className}
+          {...props}
+        />
+      )}
+    </>
   )
 }

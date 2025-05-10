@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Shield, Facebook, Twitter, Youtube, Instagram, Linkedin } from "lucide-react"
 
 export interface ImprovedfooterProps {
@@ -110,30 +111,52 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
           {/* Contact Info */}
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Contact Us</h3>
-            <address className="not-italic text-sm text-gray-300 space-y-2">
-              <p>
+            <address className="not-italic text-sm text-gray-300 space-y-4">
+              <div className="flex items-center">
                 <a
                   href="https://sanfranciscodsa.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
+                  className="flex items-center hover:text-white transition-colors group"
                 >
-                  San Francisco Deputy Sheriffs' Association 501(c)5
+                  <div className="w-12 h-12 mr-3 flex-shrink-0">
+                    <Image
+                      src="/sfdsa-logo.png"
+                      alt="San Francisco Deputy Sheriffs' Association Logo"
+                      width={48}
+                      height={48}
+                      className="object-contain"
+                    />
+                  </div>
+                  <span className="group-hover:text-white transition-colors">
+                    San Francisco Deputy Sheriffs' Association 501(c)5
+                  </span>
                 </a>
-              </p>
-              <p>
+              </div>
+
+              <div className="flex items-center">
                 <a
                   href="https://protectingsanfrancisco.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="hover:text-white transition-colors"
+                  className="flex items-center hover:text-white transition-colors group"
                 >
-                  Protecting San Francisco 501(c)3
+                  <div className="w-12 h-12 mr-3 flex-shrink-0">
+                    <Image
+                      src="/protecting-sf-logo.png"
+                      alt="Protecting San Francisco Logo"
+                      width={48}
+                      height={48}
+                      className="object-contain"
+                    />
+                  </div>
+                  <span className="group-hover:text-white transition-colors">Protecting San Francisco 501(c)3</span>
                 </a>
-              </p>
+              </div>
+
               <p>35 Gilbert Street</p>
               <p>San Francisco, CA 94103</p>
-              <p className="mt-2">
+              <p>
                 <a href="tel:+14156962428" className="hover:text-white transition-colors">
                   Phone: (415) 696-2428
                 </a>
