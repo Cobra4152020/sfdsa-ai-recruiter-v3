@@ -1,51 +1,37 @@
-import { NextResponse } from "next/server"
+import { type NextRequest, NextResponse } from "next/server"
 import { createNotification } from "@/lib/notification-service"
+import { supabase } from "@/lib/supabase-client"
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { userId, title, message, type } = await request.json()
+    // Get user ID from session
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-    if (!userId || !title || !message) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "User ID, title, and message are required",
-        },
-        { status: 400 },
-      )
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    // Create a test notification
+    const userId = session.user.id
+    const { type = "test", title, message, actionUrl, imageUrl } = await request.json()
+
     const notification = await createNotification({
-      user_id: userId,
-      type: type || "system",
-      title,
-      message,
-      action_url: type === "badge" ? "/badges" : type === "donation" ? "/donate/thank-you" : undefined,
+      userId,
+      type,
+      title: title || "Test Notification",
+      message: message || "This is a test notification.",
+      actionUrl,
+      imageUrl,
     })
 
-    if (!notification) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Failed to create test notification",
-        },
-        { status: 500 },
-      )
+    if (notification) {
+      return NextResponse.json({ success: true, notification })
+    } else {
+      return NextResponse.json({ error: "Failed to create test notification" }, { status: 500 })
     }
-
-    return NextResponse.json({
-      success: true,
-      notification,
-    })
   } catch (error) {
     console.error("Error creating test notification:", error)
-    return NextResponse.json(
-      {
-        success: false,
-        message: "An unexpected error occurred",
-      },
-      { status: 500 },
-    )
+    return NextResponse.json({ error: "Failed to create test notification" }, { status: 500 })
   }
 }

@@ -1,26 +1,24 @@
-import { NextResponse } from "next/server"
-import { getUserNotifications } from "@/lib/notification-service"
+import { type NextRequest, NextResponse } from "next/server"
+import { getNotifications } from "@/lib/notification-service"
+import { supabase } from "@/lib/supabase-client"
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url)
-    const userId = searchParams.get("userId")
-    const limit = searchParams.get("limit") ? Number.parseInt(searchParams.get("limit")!) : 20
-    const offset = searchParams.get("offset") ? Number.parseInt(searchParams.get("offset")!) : 0
-    const includeRead = searchParams.get("includeRead") === "true"
+    // Get user ID from session
+    const {
+      data: { session },
+    } = await supabase.auth.getSession()
 
-    if (!userId) {
-      return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
+    if (!session?.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const notifications = await getUserNotifications(userId, limit, offset, includeRead)
+    const userId = session.user.id
+    const notifications = await getNotifications(userId)
 
-    return NextResponse.json({
-      success: true,
-      notifications,
-    })
+    return NextResponse.json({ notifications })
   } catch (error) {
     console.error("Error fetching notifications:", error)
-    return NextResponse.json({ success: false, message: "Failed to fetch notifications" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to fetch notifications" }, { status: 500 })
   }
 }

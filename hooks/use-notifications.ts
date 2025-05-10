@@ -1,158 +1,150 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
-import { createClient } from "@supabase/supabase-js"
-import type { Notification } from "@/lib/notification-service"
-import { useToast } from "@/components/ui/use-toast"
+import {
+  getNotifications,
+  getUnreadCount,
+  markAsRead,
+  markAllAsRead,
+  deleteNotification,
+  deleteAllNotifications,
+  type Notification,
+} from "@/lib/notification-service"
+import { supabase } from "@/lib/supabase-client"
 
 export function useNotifications(userId?: string | null) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState<Error | null>(null)
-  const { toast } = useToast()
-
-  const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+  const [isSubscribed, setIsSubscribed] = useState(false)
 
   const fetchNotifications = useCallback(async () => {
     if (!userId) {
       setNotifications([])
       setUnreadCount(0)
-      setIsLoading(false)
+      setLoading(false)
       return
     }
 
+    setLoading(true)
+    setError(null)
+
     try {
-      setIsLoading(true)
+      const [notificationsData, count] = await Promise.all([getNotifications(userId), getUnreadCount(userId)])
 
-      // Fetch notifications
-      const { data, error: fetchError } = await supabase
-        .from("notifications")
-        .select("*")
-        .eq("user_id", userId)
-        .order("created_at", { ascending: false })
-        .limit(20)
-
-      if (fetchError) throw new Error(fetchError.message)
-
-      setNotifications(data || [])
-
-      // Fetch unread count
-      const { data: countData, error: countError } = await supabase
-        .from("user_notification_counts")
-        .select("unread_count")
-        .eq("user_id", userId)
-        .single()
-
-      if (countError && countError.code !== "PGRST116") throw new Error(countError.message)
-
-      setUnreadCount(countData?.unread_count || 0)
+      setNotifications(notificationsData)
+      setUnreadCount(count)
     } catch (err) {
-      console.error("Error fetching notifications:", err)
-      setError(err as Error)
+      console.error("Error in useNotifications:", err)
+      setError(err instanceof Error ? err : new Error(String(err)))
     } finally {
-      setIsLoading(false)
+      setLoading(false)
     }
-  }, [userId, supabase])
+  }, [userId])
 
-  const markAsRead = useCallback(
-    async (notificationId: number) => {
-      if (!userId) return false
-
-      try {
-        const { error } = await supabase
-          .from("notifications")
-          .update({ is_read: true })
-          .eq("id", notificationId)
-          .eq("user_id", userId)
-
-        if (error) throw new Error(error.message)
-
-        // Update local state
-        setNotifications((prev) => prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n)))
-        setUnreadCount((prev) => Math.max(0, prev - 1))
-
-        return true
-      } catch (err) {
-        console.error("Error marking notification as read:", err)
-        return false
-      }
-    },
-    [userId, supabase],
-  )
-
-  const markAllAsRead = useCallback(async () => {
-    if (!userId) return false
-
-    try {
-      const { error } = await supabase
-        .from("notifications")
-        .update({ is_read: true })
-        .eq("user_id", userId)
-        .eq("is_read", false)
-
-      if (error) throw new Error(error.message)
-
-      // Update local state
-      setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })))
-      setUnreadCount(0)
-
-      return true
-    } catch (err) {
-      console.error("Error marking all notifications as read:", err)
-      return false
-    }
-  }, [userId, supabase])
+  // Initial fetch
+  useEffect(() => {
+    fetchNotifications()
+  }, [fetchNotifications])
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!userId) return
+    if (!userId || isSubscribed) return
 
-    // Initial fetch
-    fetchNotifications()
-
-    // Subscribe to notifications table changes
-    const subscription = supabase
-      .channel("notifications-changes")
+    // Subscribe to changes in the notifications table for this user
+    const channel = supabase
+      .channel(`notifications:${userId}`)
       .on(
         "postgres_changes",
         {
-          event: "INSERT",
+          event: "*",
           schema: "public",
           table: "notifications",
           filter: `user_id=eq.${userId}`,
         },
-        (payload) => {
-          const newNotification = payload.new as Notification
-
-          // Update notifications list
-          setNotifications((prev) => [newNotification, ...prev])
-
-          // Update unread count
-          setUnreadCount((prev) => prev + 1)
-
-          // Show toast notification
-          toast({
-            title: newNotification.title,
-            description: newNotification.message,
-            duration: 5000,
-          })
+        () => {
+          // Refetch notifications when changes occur
+          fetchNotifications()
         },
       )
       .subscribe()
 
+    setIsSubscribed(true)
+
     return () => {
-      supabase.removeChannel(subscription)
+      supabase.removeChannel(channel)
+      setIsSubscribed(false)
     }
-  }, [userId, supabase, fetchNotifications, toast])
+  }, [userId, isSubscribed, fetchNotifications])
+
+  const handleMarkAsRead = useCallback(
+    async (notificationId: string) => {
+      if (!userId) return false
+
+      const success = await markAsRead(notificationId)
+      if (success) {
+        setNotifications((prev) =>
+          prev.map((notification) =>
+            notification.id === notificationId ? { ...notification, is_read: true } : notification,
+          ),
+        )
+        setUnreadCount((prev) => Math.max(0, prev - 1))
+      }
+      return success
+    },
+    [userId],
+  )
+
+  const handleMarkAllAsRead = useCallback(async () => {
+    if (!userId) return false
+
+    const success = await markAllAsRead(userId)
+    if (success) {
+      setNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })))
+      setUnreadCount(0)
+    }
+    return success
+  }, [userId])
+
+  const handleDeleteNotification = useCallback(
+    async (notificationId: string) => {
+      if (!userId) return false
+
+      const notification = notifications.find((n) => n.id === notificationId)
+      const success = await deleteNotification(notificationId)
+
+      if (success) {
+        setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
+        if (notification && !notification.is_read) {
+          setUnreadCount((prev) => Math.max(0, prev - 1))
+        }
+      }
+      return success
+    },
+    [userId, notifications],
+  )
+
+  const handleDeleteAllNotifications = useCallback(async () => {
+    if (!userId) return false
+
+    const success = await deleteAllNotifications(userId)
+    if (success) {
+      setNotifications([])
+      setUnreadCount(0)
+    }
+    return success
+  }, [userId])
 
   return {
     notifications,
     unreadCount,
-    isLoading,
+    loading,
     error,
-    markAsRead,
-    markAllAsRead,
+    markAsRead: handleMarkAsRead,
+    markAllAsRead: handleMarkAllAsRead,
+    deleteNotification: handleDeleteNotification,
+    deleteAllNotifications: handleDeleteAllNotifications,
     refresh: fetchNotifications,
   }
 }
