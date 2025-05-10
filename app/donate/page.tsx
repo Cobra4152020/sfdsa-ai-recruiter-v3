@@ -34,6 +34,7 @@ export default function DonatePage() {
   const [isRecurring, setIsRecurring] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(false)
   const { toast } = useToast()
+  const [allowRecognition, setAllowRecognition] = useState<boolean>(false)
 
   const amount = customAmount || donationAmount
 
@@ -61,6 +62,7 @@ export default function DonatePage() {
             donationMessage,
             isAnonymous,
             organization: "protecting", // Always set to Protecting SF
+            allowRecognition,
           }),
         })
 
@@ -392,6 +394,19 @@ export default function DonatePage() {
                       </Label>
                     </div>
 
+                    <div className="flex items-center space-x-2 mt-2">
+                      <input
+                        type="checkbox"
+                        id="allow-recognition"
+                        className="h-4 w-4 rounded border-gray-300 text-[#0A3C1F] focus:ring-[#0A3C1F]"
+                        checked={allowRecognition}
+                        onChange={(e) => setAllowRecognition(e.target.checked)}
+                      />
+                      <Label htmlFor="allow-recognition" className="text-sm font-normal">
+                        I would like my name to appear on the donor recognition wall
+                      </Label>
+                    </div>
+
                     <div className="space-y-2">
                       <Label htmlFor="message">Message (Optional)</Label>
                       <textarea
@@ -596,6 +611,19 @@ export default function DonatePage() {
                       />
                       <Label htmlFor="monthly-anonymous" className="text-sm font-normal">
                         Make my donations anonymous
+                      </Label>
+                    </div>
+
+                    <div className="flex items-center space-x-2 mt-2">
+                      <input
+                        type="checkbox"
+                        id="allow-recognition"
+                        className="h-4 w-4 rounded border-gray-300 text-[#0A3C1F] focus:ring-[#0A3C1F]"
+                        checked={allowRecognition}
+                        onChange={(e) => setAllowRecognition(e.target.checked)}
+                      />
+                      <Label htmlFor="allow-recognition" className="text-sm font-normal">
+                        I would like my name to appear on the donor recognition wall
                       </Label>
                     </div>
 

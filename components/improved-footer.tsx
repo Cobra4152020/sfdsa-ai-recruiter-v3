@@ -105,6 +105,11 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                   SF Trivia
                 </Link>
               </li>
+              <li>
+                <Link href="/donor-recognition" className="text-gray-300 hover:text-white transition-colors">
+                  Donor Recognition
+                </Link>
+              </li>
             </ul>
           </div>
 

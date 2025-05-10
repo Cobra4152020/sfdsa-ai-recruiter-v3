@@ -8,6 +8,7 @@ import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
+import { Label } from "@/components/ui/label"
 
 interface DonationFormProps {
   amount: number
@@ -22,6 +23,7 @@ export function DonationForm({ amount, isRecurring, onCancel }: DonationFormProp
 
   const [isLoading, setIsLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const [allowRecognition, setAllowRecognition] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -67,6 +69,19 @@ export function DonationForm({ amount, isRecurring, onCancel }: DonationFormProp
       <CardContent>
         <form id="payment-form" onSubmit={handleSubmit} className="space-y-6">
           <PaymentElement id="payment-element" />
+
+          <div className="flex items-center space-x-2 mt-3">
+            <input
+              type="checkbox"
+              id="recognition"
+              className="h-4 w-4 rounded border-gray-300 text-[#0A3C1F] focus:ring-[#0A3C1F]"
+              checked={allowRecognition}
+              onChange={(e) => setAllowRecognition(e.target.checked)}
+            />
+            <Label htmlFor="recognition" className="text-sm font-normal">
+              I would like my name to appear on the donor recognition wall
+            </Label>
+          </div>
 
           {message && <div className="text-sm text-red-500 mt-4">{message}</div>}
 

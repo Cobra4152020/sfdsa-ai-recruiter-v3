@@ -16,6 +16,7 @@ export async function POST(request: Request) {
       interval = "month",
       donationMessage,
       isAnonymous,
+      allowRecognition,
     } = await request.json()
 
     console.log("Payment intent request:", { amount, donorEmail, isRecurring })
@@ -131,6 +132,7 @@ export async function POST(request: Request) {
         organization: "protecting", // Always set to Protecting SF
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
+        allow_recognition: allowRecognition || false,
       })
 
       // Add logging before returning the response

@@ -36,6 +36,23 @@ export default function ThankYouPage() {
           </Button>
         </CardFooter>
       </Card>
+      <div className="mt-8 p-6 bg-[#0A3C1F]/5 rounded-lg">
+        <h3 className="text-lg font-semibold text-[#0A3C1F] mb-2">Donor Recognition</h3>
+        <p className="text-gray-600 mb-4">
+          If you chose to be recognized for your donation, your name will appear on our{" "}
+          <a href="/donor-recognition" className="text-[#0A3C1F] font-medium hover:underline">
+            Donor Recognition Wall
+          </a>{" "}
+          within 24-48 hours.
+        </p>
+        <p className="text-gray-600">
+          If you'd like to change your recognition preferences, please contact us at{" "}
+          <a href="mailto:donations@protectingsanfrancisco.com" className="text-[#0A3C1F] font-medium hover:underline">
+            donations@protectingsanfrancisco.com
+          </a>
+          .
+        </p>
+      </div>
     </div>
   )
 }
