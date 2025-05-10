@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-clients"
+import { constructUrl } from "@/lib/url-utils"
 
 export async function POST(request: Request) {
   try {
@@ -78,7 +79,7 @@ export async function POST(request: Request) {
 
     // Send welcome email
     try {
-      await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000"}/api/send-welcome-email`, {
+      await fetch(constructUrl("/api/send-welcome-email"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

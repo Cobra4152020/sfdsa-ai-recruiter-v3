@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { getSupabaseClient } from "@/lib/supabase-core"
 import { Mail, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react"
+import { constructUrl } from "@/lib/url-utils"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
@@ -33,7 +34,7 @@ export default function ForgotPasswordPage() {
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
+        redirectTo: constructUrl("/reset-password"),
       })
 
       if (error) throw error

@@ -1,9 +1,9 @@
 interface WelcomeTemplateProps {
   recipientName: string
-  dashboardUrl: string
+  loginUrl: string
 }
 
-export function welcome({ recipientName, dashboardUrl }: WelcomeTemplateProps): string {
+export function welcome({ recipientName, loginUrl }: WelcomeTemplateProps): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -80,7 +80,7 @@ export function welcome({ recipientName, dashboardUrl }: WelcomeTemplateProps): 
           <p>Our recruitment platform is designed to guide you through each step of the process and help you prepare for a successful career in law enforcement.</p>
           
           <p>
-            <a href="${dashboardUrl}" class="button">Go to Your Dashboard</a>
+            <a href="${loginUrl}" class="button">Log In to Your Account</a>
           </p>
           
           <p>If you have any questions, please don't hesitate to contact our recruitment team.</p>

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-clients"
 import { sendEmail } from "@/lib/email/send-email"
 import { emailTemplates } from "@/lib/email/templates"
+import { constructUrl } from "@/lib/url-utils"
 
 export async function POST(request: Request) {
   try {
@@ -33,13 +34,7 @@ export async function POST(request: Request) {
     }
 
     // Generate login URL
-    const baseUrl = process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_URL}`
-      : process.env.NEXT_PUBLIC_VERCEL_URL
-        ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-        : "http://localhost:3000"
-
-    const loginUrl = `${baseUrl}/login`
+    const loginUrl = constructUrl("/login")
 
     // Send welcome email
     const emailResult = await sendEmail({

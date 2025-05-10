@@ -2,6 +2,7 @@
 
 import { getServiceSupabase } from "@/lib/supabase-service"
 import { revalidatePath } from "next/cache"
+import { authConfig } from "@/lib/supabase-auth-config"
 
 interface VolunteerRegistrationData {
   firstName: string
@@ -41,6 +42,7 @@ export async function registerVolunteerRecruiter(data: VolunteerRegistrationData
         referral_source: data.referralSource,
         is_volunteer_recruiter: true,
       },
+      ...authConfig.getSignUpOptions(true),
     })
 
     if (authError) {

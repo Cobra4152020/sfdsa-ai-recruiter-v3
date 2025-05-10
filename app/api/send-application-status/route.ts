@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { sendEmail } from "@/lib/email/send-email"
 import { emailTemplates } from "@/lib/email/templates"
+import { constructUrl } from "@/lib/url-utils"
 
 export async function POST(request: Request) {
   try {
@@ -13,8 +14,8 @@ export async function POST(request: Request) {
     // Get the appropriate template based on status
     const templateFunction = emailTemplates.getStatusTemplate(status)
 
-    // Generate the dashboard URL (in a real app, this would be a valid URL)
-    const dashboardUrl = `${process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000"}/applicant/dashboard?tracking=${trackingNumber}`
+    // Generate the dashboard URL
+    const dashboardUrl = constructUrl(`/applicant/dashboard?tracking=${trackingNumber}`)
 
     // Generate the application URL
     const applicationUrl = "https://careers.sf.gov/interest/public-safety/sheriff/"
