@@ -18,6 +18,7 @@ import {
   Heart,
   Rocket,
   FileText,
+  GamepadIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
@@ -41,7 +42,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
   const [mobileDropdowns, setMobileDropdowns] = useState({
     topRecruits: false,
     playTheGame: false,
-    benefits: false,
+    missionBriefing: false,
   })
   const { currentUser } = useUser()
 
@@ -174,17 +175,15 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6" aria-label="Main Navigation">
-              <Link
-                href="/mission-briefing"
-                className="text-white hover:text-[#FFD700] transition-colors flex items-center"
-              >
-                <FileText className="h-4 w-4 mr-1" />
-                Mission Briefing
-              </Link>
               <DropdownNav
-                label="Benefits"
+                label={
+                  <span className="flex items-center">
+                    <FileText className="h-4 w-4 mr-1" />
+                    Mission Briefing
+                  </span>
+                }
                 items={[
-                  { label: "Overview", href: "/#benefits" },
+                  { label: "Overview", href: "/mission-briefing" },
                   { label: "G.I. Bill", href: "/gi-bill" },
                   { label: "Discounted Housing", href: "/discounted-housing" },
                 ]}
@@ -198,16 +197,23 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   { label: "NFT Awards", href: "/nft-awards/coming-soon" },
                 ]}
               />
-              <Link
-                href="/deputy-launchpad"
-                className="text-white hover:text-[#FFD700] transition-colors flex items-center"
-              >
-                <Rocket className="h-4 w-4 mr-1" />
-                Deputy Launchpad
-              </Link>
               <DropdownNav
-                label="Play the Game"
+                label={
+                  <span className="flex items-center">
+                    <GamepadIcon className="h-4 w-4 mr-1" />
+                    Play the Game
+                  </span>
+                }
                 items={[
+                  {
+                    label: (
+                      <span className="flex items-center">
+                        <Rocket className="h-4 w-4 mr-1" />
+                        Deputy Launchpad
+                      </span>
+                    ),
+                    href: "/deputy-launchpad",
+                  },
                   { label: "Play Trivia w/ Sgt. Ken", href: "/trivia" },
                   { label: "Memory Match Deluxe", href: "/games/memory-match" },
                   { label: "Spin to Win", href: "/games/spin-to-win" },
@@ -261,35 +267,24 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               Donate Now
             </Link>
 
-            {/* Mission Briefing Link */}
-            <Link href="/mission-briefing" className="block px-3 py-2 text-white hover:text-[#FFD700]">
-              <FileText className="h-4 w-4 inline mr-2" />
-              Mission Briefing
-            </Link>
-
-            {/* Deputy Launchpad Link */}
-            <Link href="/deputy-launchpad" className="block px-3 py-2 text-white hover:text-[#FFD700]">
-              <Rocket className="h-4 w-4 inline mr-2" />
-              Deputy Launchpad
-            </Link>
-
-            {/* Mobile Benefits dropdown */}
+            {/* Mobile Mission Briefing dropdown */}
             <div className="block px-3 py-2">
               <button
-                onClick={() => setMobileDropdowns((prev) => ({ ...prev, benefits: !prev.benefits }))}
+                onClick={() => setMobileDropdowns((prev) => ({ ...prev, missionBriefing: !prev.missionBriefing }))}
                 className="flex items-center w-full text-white hover:text-[#FFD700]"
               >
-                Benefits
+                <FileText className="h-4 w-4 mr-2" />
+                Mission Briefing
                 <ChevronDown
                   className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
-                    "transform rotate-180": mobileDropdowns.benefits,
+                    "transform rotate-180": mobileDropdowns.missionBriefing,
                   })}
                 />
               </button>
 
-              {mobileDropdowns.benefits && (
+              {mobileDropdowns.missionBriefing && (
                 <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link href="/#benefits" className="block text-white hover:text-[#FFD700]">
+                  <Link href="/mission-briefing" className="block text-white hover:text-[#FFD700]">
                     Overview
                   </Link>
                   <Link href="/gi-bill" className="block text-white hover:text-[#FFD700]">
@@ -341,6 +336,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                 onClick={() => setMobileDropdowns((prev) => ({ ...prev, playTheGame: !prev.playTheGame }))}
                 className="flex items-center w-full text-white hover:text-[#FFD700]"
               >
+                <GamepadIcon className="h-4 w-4 mr-2" />
                 Play the Game
                 <ChevronDown
                   className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
@@ -351,6 +347,10 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
 
               {mobileDropdowns.playTheGame && (
                 <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                  <Link href="/deputy-launchpad" className="block text-white hover:text-[#FFD700] flex items-center">
+                    <Rocket className="h-4 w-4 mr-1" />
+                    Deputy Launchpad
+                  </Link>
                   <Link href="/trivia" className="block text-white hover:text-[#FFD700]">
                     Play Trivia w/ Sgt. Ken
                   </Link>

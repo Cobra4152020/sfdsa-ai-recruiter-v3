@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Briefcase, GraduationCap, DollarSign, Clock, Shield, Users, Clipboard } from "lucide-react"
+import { FileText, Briefcase, GraduationCap, DollarSign, Clock, Shield, Users, Clipboard, Rocket } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
@@ -87,6 +87,7 @@ export default function MissionBriefingContent() {
                 </p>
                 <Link href="/deputy-launchpad">
                   <Button variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
+                    <Rocket className="h-4 w-4 mr-2" />
                     Visit Deputy Launchpad
                   </Button>
                 </Link>
