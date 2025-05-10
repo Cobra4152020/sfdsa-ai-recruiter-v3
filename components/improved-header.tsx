@@ -191,7 +191,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               >
                 Apply Now
               </Button>
-              <Link href="/login">
+              <Link href="/admin/login">
                 <Button className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-[#121212] font-medium">
                   Login
                 </Button>
@@ -311,7 +311,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                 position="static"
               />
             </div>
-            <Link href="/login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
+            <Link href="/admin/login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
               Login
             </Link>
           </div>
@@ -327,7 +327,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
             >
               Apply Now
             </Button>
-            <Link href="/login" className="flex-1">
+            <Link href="/admin/login" className="flex-1">
               <Button
                 className="w-full bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}
