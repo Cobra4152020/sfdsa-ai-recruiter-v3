@@ -18,14 +18,55 @@ export function LinkChecker() {
     setError(null)
 
     try {
-      const linkResults = await checkAllLinks()
-      setResults(linkResults)
+      // First, collect all links from the page
+      const links = findAllLinks()
+
+      // For client-side, we'll check a small batch directly
+      if (links.length <= 10) {
+        const linkResults = await checkAllLinks()
+        setResults(linkResults)
+      } else {
+        // For larger batches, use the API endpoint
+        const response = await fetch("/api/health/links", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ urls: links }),
+        })
+
+        if (!response.ok) {
+          throw new Error(`API error: ${response.status}`)
+        }
+
+        const data = await response.json()
+        if (!data.success) {
+          throw new Error(data.message)
+        }
+
+        setResults(data.results)
+      }
     } catch (err) {
       console.error("Error checking links:", err)
       setError(err instanceof Error ? err.message : "An unexpected error occurred")
     } finally {
       setIsChecking(false)
     }
+  }
+
+  // Function to find all links on the page
+  function findAllLinks(): string[] {
+    const links: string[] = []
+    const anchors = document.querySelectorAll("a")
+
+    anchors.forEach((anchor) => {
+      const href = anchor.getAttribute("href")
+      if (href && !href.startsWith("#") && !href.startsWith("javascript:") && !links.includes(href)) {
+        links.push(href)
+      }
+    })
+
+    return links
   }
 
   useEffect(() => {
