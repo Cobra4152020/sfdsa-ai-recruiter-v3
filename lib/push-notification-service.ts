@@ -1,13 +1,22 @@
 import { supabase } from "@/lib/supabase-client"
 
-// Check if the browser supports push notifications
-export function isPushNotificationSupported() {
-  return "serviceWorker" in navigator && "PushManager" in window
+// Check if the browser supports notifications
+export function isNotificationSupported() {
+  return "Notification" in window
+}
+
+// Request notification permission
+export async function requestNotificationPermission(): Promise<NotificationPermission> {
+  if (!isNotificationSupported()) {
+    return "denied"
+  }
+
+  return await Notification.requestPermission()
 }
 
 // Register the service worker
 export async function registerServiceWorker() {
-  if (!isPushNotificationSupported()) {
+  if (!("serviceWorker" in navigator)) {
     return null
   }
 
@@ -22,127 +31,100 @@ export async function registerServiceWorker() {
   }
 }
 
-// Subscribe to push notifications
-export async function subscribeToPushNotifications(userId: string) {
-  if (!isPushNotificationSupported()) {
-    return null
-  }
+// Save notification preferences
+export async function saveNotificationPreferences(userId: string, enabled: boolean) {
+  if (!userId) return false
 
   try {
-    // Wait for service worker to be ready
-    const registration = await navigator.serviceWorker.ready
-
-    // Get the subscription if it exists
-    let subscription = await registration.pushManager.getSubscription()
-
-    // If no subscription exists, create one
-    if (!subscription) {
-      try {
-        subscription = await registration.pushManager.subscribe({
-          userVisibleOnly: true,
-          // Use a simple application server key
-          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
-        })
-      } catch (error) {
-        console.error("Failed to subscribe to push notifications:", error)
-        return null
-      }
-    }
-
-    // Store the subscription in the database
-    await saveSubscription(userId, subscription)
-
-    return subscription
-  } catch (error) {
-    console.error("Error subscribing to push notifications:", error)
-    return null
-  }
-}
-
-// Unsubscribe from push notifications
-export async function unsubscribeFromPushNotifications(userId: string) {
-  if (!isPushNotificationSupported()) {
-    return false
-  }
-
-  try {
-    const registration = await navigator.serviceWorker.ready
-    const subscription = await registration.pushManager.getSubscription()
-
-    if (subscription) {
-      await subscription.unsubscribe()
-      await deleteSubscription(userId, subscription.endpoint)
-      return true
-    }
-
-    return false
-  } catch (error) {
-    console.error("Error unsubscribing from push notifications:", error)
-    return false
-  }
-}
-
-// Check if the user is subscribed to push notifications
-export async function isSubscribedToPushNotifications() {
-  if (!isPushNotificationSupported()) {
-    return false
-  }
-
-  try {
-    const registration = await navigator.serviceWorker.ready
-    const subscription = await registration.pushManager.getSubscription()
-    return !!subscription
-  } catch (error) {
-    console.error("Error checking push notification subscription:", error)
-    return false
-  }
-}
-
-// Save the subscription to the database
-async function saveSubscription(userId: string, subscription: PushSubscription) {
-  try {
-    // Extract the necessary data from the subscription
-    const subscriptionJSON = subscription.toJSON()
-    const endpoint = subscriptionJSON.endpoint
-    const p256dh = subscriptionJSON.keys?.p256dh
-    const auth = subscriptionJSON.keys?.auth
-
-    if (!endpoint || !p256dh || !auth) {
-      console.error("Invalid subscription data")
-      return false
-    }
-
-    const { error } = await supabase.from("push_subscriptions").upsert(
+    const { error } = await supabase.from("user_notification_settings").upsert(
       {
         user_id: userId,
-        endpoint,
-        p256dh,
-        auth,
-        created_at: new Date().toISOString(),
+        push_notifications: enabled,
         updated_at: new Date().toISOString(),
       },
       {
-        onConflict: "endpoint",
+        onConflict: "user_id",
       },
     )
 
     if (error) throw error
     return true
   } catch (error) {
-    console.error("Error saving push subscription:", error)
+    console.error("Error saving notification preferences:", error)
     return false
   }
 }
 
-// Delete the subscription from the database
-async function deleteSubscription(userId: string, endpoint: string) {
+// Get notification preferences
+export async function getNotificationPreferences(userId: string) {
+  if (!userId) return { push_notifications: false }
+
   try {
-    const { error } = await supabase.from("push_subscriptions").delete().eq("user_id", userId).eq("endpoint", endpoint)
+    const { data, error } = await supabase
+      .from("user_notification_settings")
+      .select("push_notifications")
+      .eq("user_id", userId)
+      .single()
 
     if (error) throw error
-    return true
+    return data || { push_notifications: false }
   } catch (error) {
-    console.error("Error deleting push subscription:", error)
+    console.error("Error getting notification preferences:", error)
+    return { push_notifications: false }
+  }
+}
+
+// Check if notifications are enabled
+export async function areNotificationsEnabled(userId: string): Promise<boolean> {
+  if (!isNotificationSupported()) {
+    return false
+  }
+
+  // Check browser permission
+  if (Notification.permission !== "granted") {
+    return false
+  }
+
+  // Check user preferences
+  const prefs = await getNotificationPreferences(userId)
+  return prefs.push_notifications
+}
+
+// Enable notifications
+export async function enableNotifications(userId: string): Promise<boolean> {
+  if (!isNotificationSupported()) {
+    return false
+  }
+
+  try {
+    // Request permission if needed
+    if (Notification.permission !== "granted") {
+      const permission = await requestNotificationPermission()
+      if (permission !== "granted") {
+        return false
+      }
+    }
+
+    // Register service worker
+    const registration = await registerServiceWorker()
+    if (!registration) {
+      return false
+    }
+
+    // Save preferences
+    return await saveNotificationPreferences(userId, true)
+  } catch (error) {
+    console.error("Error enabling notifications:", error)
+    return false
+  }
+}
+
+// Disable notifications
+export async function disableNotifications(userId: string): Promise<boolean> {
+  try {
+    return await saveNotificationPreferences(userId, false)
+  } catch (error) {
+    console.error("Error disabling notifications:", error)
     return false
   }
 }

@@ -4,15 +4,15 @@ import { getServiceSupabase } from "@/lib/supabase-clients"
 
 export async function POST(request: Request) {
   try {
-    const supabase = getServiceSupabase()
-    const { userId, title, message, type = "system" } = await request.json()
+    const { userId, title, message, type = "system", actionUrl } = await request.json()
 
     if (!userId || !title || !message) {
       return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 })
     }
 
     // Verify the user exists
-    const { data: user, error: userError } = await supabase.from("users").select("id").eq("id", userId).single()
+    const supabase = getServiceSupabase()
+    const { data: user, error: userError } = await supabase.from("profiles").select("id").eq("id", userId).single()
 
     if (userError || !user) {
       return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       title,
       message,
       send_push: true,
-      action_url: "/notifications",
+      action_url: actionUrl || "/notifications",
       image_url: `/public/${type}-icon.png`,
     })
 
@@ -35,11 +35,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Push notification sent successfully",
+      message: "Notification created successfully",
       notification,
     })
   } catch (error) {
-    console.error("Error sending test push notification:", error)
-    return NextResponse.json({ success: false, message: "Failed to send push notification" }, { status: 500 })
+    console.error("Error sending test notification:", error)
+    return NextResponse.json({ success: false, message: "Failed to send notification" }, { status: 500 })
   }
 }

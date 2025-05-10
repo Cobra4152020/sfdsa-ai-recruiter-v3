@@ -8,13 +8,21 @@ import { ImprovedFooter } from "@/components/improved-footer"
 import { SkipToContent } from "@/components/skip-to-content"
 import { usePathname } from "next/navigation"
 import { NotificationToastListener } from "@/components/notification-toast-listener"
+import { NotificationPoller } from "@/components/notification-poller"
+import { useUser } from "@/context/user-context"
 
 export default function MainLayoutClient({ children }: { children: React.ReactNode }) {
-  const [isScrolled, setIsScrolled] = useState(false)
   const pathname = usePathname()
+  const { user } = useUser()
+  const [mounted, setMounted] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
 
   // Check if we're on the homepage
   const isHomePage = pathname === "/"
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,6 +33,10 @@ export default function MainLayoutClient({ children }: { children: React.ReactNo
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
+  if (!mounted) {
+    return <>{children}</>
+  }
+
   return (
     <>
       <SkipToContent />
@@ -34,6 +46,8 @@ export default function MainLayoutClient({ children }: { children: React.ReactNo
       </main>
       <ImprovedFooter />
       <NotificationToastListener />
+      {/* Add the notification poller if user is logged in */}
+      {user && <NotificationPoller userId={user.id} />}
     </>
   )
 }

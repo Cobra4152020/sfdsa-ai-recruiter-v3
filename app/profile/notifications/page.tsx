@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { redirect } from "next/navigation"
-import { getServerSession } from "@/lib/supabase-server"
+import { createServerClient } from "@/lib/supabase-server"
 import { PushNotificationPermission } from "@/components/push-notification-permission"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -12,8 +12,14 @@ export const metadata: Metadata = {
 }
 
 export default async function NotificationPreferencesPage() {
-  const session = await getServerSession()
+  const supabase = createServerClient()
 
+  // Get the user session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
+  // Redirect to login if not authenticated
   if (!session) {
     redirect("/login?redirect=/profile/notifications")
   }
@@ -64,40 +70,6 @@ export default async function NotificationPreferencesPage() {
                   <p className="text-sm text-muted-foreground">Receive occasional updates about the platform</p>
                 </div>
                 <Switch id="email-news" defaultChecked />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>In-App Notifications</CardTitle>
-            <CardDescription>Manage which notifications appear in the app</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="inapp-badges">Badge Achievements</Label>
-                  <p className="text-sm text-muted-foreground">Show notifications when you earn new badges</p>
-                </div>
-                <Switch id="inapp-badges" defaultChecked />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="inapp-donations">Donation Confirmations</Label>
-                  <p className="text-sm text-muted-foreground">Show notifications when your donations are processed</p>
-                </div>
-                <Switch id="inapp-donations" defaultChecked />
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="space-y-0.5">
-                  <Label htmlFor="inapp-leaderboard">Leaderboard Updates</Label>
-                  <p className="text-sm text-muted-foreground">Show notifications about your leaderboard position</p>
-                </div>
-                <Switch id="inapp-leaderboard" defaultChecked />
               </div>
             </div>
           </CardContent>

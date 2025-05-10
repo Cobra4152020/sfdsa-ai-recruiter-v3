@@ -1,41 +1,39 @@
 // Service Worker for Push Notifications
-self.addEventListener("push", (event) => {
-  try {
-    // Try to parse the data as JSON
-    let data
-    try {
-      data = event.data.json()
-    } catch (e) {
-      // If parsing fails, use the text as the message
-      data = {
-        title: "New Notification",
-        message: event.data ? event.data.text() : "You have a new notification",
-      }
-    }
 
-    const options = {
-      body: data.message || "You have a new notification",
-      icon: data.icon || "/notification-icon.png",
-      badge: "/sfdsa-logo.png",
-      data: {
-        url: data.actionUrl || "/",
-      },
-      vibrate: [100, 50, 100],
-      tag: data.tag || "default",
-    }
+// Instead of relying on the push event, we'll use a polling mechanism
+// to check for new notifications in the queue
 
-    event.waitUntil(self.registration.showNotification(data.title || "New Notification", options))
-  } catch (error) {
-    console.error("Error handling push event:", error)
-    // Show a generic notification as fallback
-    event.waitUntil(
-      self.registration.showNotification("New Notification", {
-        body: "You have a new notification",
-        icon: "/notification-icon.png",
-      }),
-    )
+// Set up a periodic sync if supported
+self.addEventListener("periodicsync", (event) => {
+  if (event.tag === "check-notifications") {
+    event.waitUntil(checkNotifications())
   }
 })
+
+// Also check for notifications when the service worker activates
+self.addEventListener("activate", (event) => {
+  event.waitUntil(clients.claim())
+  // Check for notifications on activation
+  event.waitUntil(checkNotifications())
+})
+
+// Handle message events from the client
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "CHECK_NOTIFICATIONS") {
+    event.waitUntil(checkNotifications())
+  }
+})
+
+// Function to check for new notifications
+async function checkNotifications() {
+  try {
+    // We'll implement a client-side polling mechanism instead
+    // This will be handled by the client code
+    console.log("Service worker checking for notifications")
+  } catch (error) {
+    console.error("Error checking for notifications:", error)
+  }
+}
 
 // Handle notification click
 self.addEventListener("notificationclick", (event) => {
@@ -63,11 +61,7 @@ self.addEventListener("notificationclick", (event) => {
   )
 })
 
-// Ensure the service worker is properly activated
+// Ensure the service worker is properly installed
 self.addEventListener("install", (event) => {
   self.skipWaiting()
-})
-
-self.addEventListener("activate", (event) => {
-  event.waitUntil(clients.claim())
 })

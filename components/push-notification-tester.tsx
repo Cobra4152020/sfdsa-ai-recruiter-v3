@@ -16,6 +16,7 @@ export function PushNotificationTester() {
   const [title, setTitle] = useState("")
   const [message, setMessage] = useState("")
   const [type, setType] = useState("system")
+  const [actionUrl, setActionUrl] = useState("/")
   const [isLoading, setIsLoading] = useState(false)
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
 
@@ -35,6 +36,7 @@ export function PushNotificationTester() {
           title,
           message,
           type,
+          actionUrl,
         }),
       })
 
@@ -119,6 +121,16 @@ export function PushNotificationTester() {
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Enter notification message"
           required
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="actionUrl">Action URL (optional)</Label>
+        <Input
+          id="actionUrl"
+          value={actionUrl}
+          onChange={(e) => setActionUrl(e.target.value)}
+          placeholder="Enter URL to open when notification is clicked"
         />
       </div>
 

@@ -1,26 +1,20 @@
 import { getServiceSupabase } from "@/lib/supabase-clients"
 
-// We'll use a more direct approach without the web-push library
-// to avoid the inheritance chain issues
-interface PushNotificationPayload {
+// This implementation avoids using the problematic web-push library
+export interface PushNotificationPayload {
   title: string
   message: string
   icon?: string
   badge?: string
   actionUrl?: string
   tag?: string
-  renotify?: boolean
-  actions?: Array<{
-    action: string
-    title: string
-    icon?: string
-  }>
 }
 
-export async function sendPushNotification(userId: string, payload: PushNotificationPayload) {
+export async function sendPushNotification(userId: string, payload: PushNotificationPayload): Promise<boolean> {
   try {
-    // Get the user's push subscriptions
     const supabase = getServiceSupabase()
+
+    // Get the user's push subscriptions
     const { data: subscriptions, error } = await supabase.from("push_subscriptions").select("*").eq("user_id", userId)
 
     if (error) {
@@ -33,21 +27,28 @@ export async function sendPushNotification(userId: string, payload: PushNotifica
       return false
     }
 
-    // Instead of using web-push directly, we'll use the Push API via a server action
-    // This avoids the problematic dependency
+    // Instead of using web-push, we'll store the notification in a queue table
+    // that will be processed by a client-side polling mechanism
     const results = await Promise.all(
-      subscriptions.map(async (sub) => {
+      subscriptions.map(async (subscription) => {
         try {
-          // Store the notification in the database for the service worker to pick up
-          const { error: notifError } = await supabase.from("push_notification_queue").insert({
-            subscription_id: sub.id,
-            payload: JSON.stringify(payload),
-            created_at: new Date().toISOString(),
+          // Store the notification in the push_notification_queue table
+          const { error: queueError } = await supabase.from("push_notification_queue").insert({
+            subscription_id: subscription.id,
+            payload: {
+              title: payload.title,
+              message: payload.message,
+              icon: payload.icon || "/notification-icon.png",
+              badge: payload.badge || "/sfdsa-logo.png",
+              actionUrl: payload.actionUrl || "/",
+              tag: payload.tag || "default",
+            },
             status: "pending",
+            created_at: new Date().toISOString(),
           })
 
-          if (notifError) {
-            console.error("Error queueing push notification:", notifError)
+          if (queueError) {
+            console.error("Error queueing push notification:", queueError)
             return false
           }
 
