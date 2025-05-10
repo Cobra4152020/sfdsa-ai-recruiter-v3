@@ -3,16 +3,34 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Trophy, Award, Lock, Star, Zap, MessageSquare, FileText, Download, Clock, CheckCircle } from "lucide-react"
+import {
+  Trophy,
+  Award,
+  Lock,
+  Star,
+  Zap,
+  MessageSquare,
+  FileText,
+  Download,
+  Clock,
+  CheckCircle,
+  Users,
+  Gift,
+  Share2,
+} from "lucide-react"
 import { AchievementBadge } from "@/components/achievement-badge"
 import { Progress } from "@/components/ui/progress"
 import { NFT_AWARD_TIERS } from "@/lib/nft-utils"
 import Image from "next/image"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
 
 export default function GamificationExplainer() {
   const [activeTab, setActiveTab] = useState("points")
+  const [showShareDialog, setShowShareDialog] = useState(false)
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -26,12 +44,15 @@ export default function GamificationExplainer() {
         </div>
 
         <Tabs defaultValue="points" value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid grid-cols-5 mb-8">
+          <TabsList className="grid grid-cols-6 mb-8">
             <TabsTrigger value="points" className="text-sm sm:text-base">
               <Trophy className="h-4 w-4 mr-2 hidden sm:inline" /> Points System
             </TabsTrigger>
             <TabsTrigger value="badges" className="text-sm sm:text-base">
               <Award className="h-4 w-4 mr-2 hidden sm:inline" /> Badges
+            </TabsTrigger>
+            <TabsTrigger value="referrals" className="text-sm sm:text-base">
+              <Users className="h-4 w-4 mr-2 hidden sm:inline" /> Referrals
             </TabsTrigger>
             <TabsTrigger value="unlockables" className="text-sm sm:text-base">
               <Lock className="h-4 w-4 mr-2 hidden sm:inline" /> Unlockable Content
@@ -50,6 +71,10 @@ export default function GamificationExplainer() {
 
           <TabsContent value="badges" className="space-y-6">
             <BadgesExplainer />
+          </TabsContent>
+
+          <TabsContent value="referrals" className="space-y-6">
+            <ReferralRewardsExplainer setShowShareDialog={setShowShareDialog} />
           </TabsContent>
 
           <TabsContent value="unlockables" className="space-y-6">
@@ -101,6 +126,49 @@ export default function GamificationExplainer() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Share Dialog */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Share Your Referral Link</DialogTitle>
+            <DialogDescription>
+              Share this link with potential recruits and earn rewards when they sign up!
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-2 gap-4 my-4">
+            <Button className="bg-[#1877F2] hover:bg-[#1877F2]/90">Facebook</Button>
+            <Button className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90">Twitter</Button>
+            <Button className="bg-[#0A66C2] hover:bg-[#0A66C2]/90">LinkedIn</Button>
+            <Button className="bg-[#25D366] hover:bg-[#25D366]/90">WhatsApp</Button>
+          </div>
+
+          <div className="relative mt-2">
+            <Input value="https://sfdsa-recruiter.com/join?ref=demo-user123" readOnly />
+            <Button
+              className="absolute right-1 top-1 h-7"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                navigator.clipboard.writeText("https://sfdsa-recruiter.com/join?ref=demo-user123")
+              }}
+            >
+              Copy
+            </Button>
+          </div>
+
+          <div className="bg-[#0A3C1F]/10 border border-[#0A3C1F]/20 rounded-lg p-4 mt-4">
+            <h4 className="font-medium text-[#0A3C1F] flex items-center">
+              <Award className="mr-2 h-4 w-4 text-[#0A3C1F]" />
+              Referral Tip
+            </h4>
+            <p className="text-sm mt-1">
+              Personalize your message when sharing your link to increase the chances of your friends signing up!
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
@@ -195,6 +263,51 @@ function PointsSystemExplainer() {
       description: "Advance through the application process to earn substantial points.",
       points: "50-200 points per stage completed",
     },
+    {
+      icon: <Users className="h-5 w-5 text-indigo-500" />,
+      title: "Referrals",
+      description: "Refer potential recruits to earn points when they sign up using your referral link.",
+      points: "100 points per successful referral",
+    },
+    {
+      icon: <Gift className="h-5 w-5 text-pink-500" />,
+      title: "Donations",
+      description: "Support the SFDSA through donations to earn points and special recognition.",
+      points: "10 points per dollar donated",
+    },
+    {
+      icon: <Share2 className="h-5 w-5 text-orange-500" />,
+      title: "Social Sharing",
+      description: "Share content, badges, or your achievements on social media to earn points.",
+      points: "25 points per share",
+    },
+  ]
+
+  const gamePoints = [
+    {
+      name: "Trivia Games",
+      description: "Test your knowledge about San Francisco and law enforcement",
+      points: "10 points per correct answer, 25 bonus points for perfect scores",
+      icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
+    },
+    {
+      name: "Word Constructor",
+      description: "Build words related to law enforcement and public safety",
+      points: "5 points per word, bonus points for longer words",
+      icon: <FileText className="h-5 w-5 text-green-500" />,
+    },
+    {
+      name: "Memory Match",
+      description: "Match pairs of cards featuring law enforcement concepts",
+      points: "2 points per match, time bonuses available",
+      icon: <Star className="h-5 w-5 text-yellow-500" />,
+    },
+    {
+      name: "Spin to Win",
+      description: "Daily opportunity to spin for random point rewards",
+      points: "10-100 random points per day",
+      icon: <Zap className="h-5 w-5 text-purple-500" />,
+    },
   ]
 
   return (
@@ -251,6 +364,33 @@ function PointsSystemExplainer() {
             </div>
 
             <div className="mt-8">
+              <h3 className="text-xl font-semibold mb-4">Games & Points</h3>
+              <p className="mb-4">
+                Engage with our interactive games to earn points while learning about law enforcement and the San
+                Francisco Sheriff's Department.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {gamePoints.map((game, index) => (
+                  <div key={index} className="flex p-4 border rounded-lg">
+                    <div className="mr-3">{game.icon}</div>
+                    <div>
+                      <h4 className="font-medium">{game.name}</h4>
+                      <p className="text-sm text-muted-foreground">{game.description}</p>
+                      <div className="mt-2 text-sm font-medium text-[#0A3C1F]">{game.points}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4">
+                <Link href="/games">
+                  <Button variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
+                    Play Games
+                  </Button>
+                </Link>
+              </div>
+            </div>
+
+            <div className="mt-8">
               <h3 className="text-xl font-semibold mb-4">Point Tiers and Rewards</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {pointTiers.map((tier) => (
@@ -287,6 +427,148 @@ function PointsSystemExplainer() {
                   </Button>
                 </Link>
               </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  )
+}
+
+function ReferralRewardsExplainer({ setShowShareDialog }: { setShowShareDialog: (show: boolean) => void }) {
+  const referralCount = 2 // Demo value
+
+  const referralTiers = [
+    {
+      count: 1,
+      reward: "+100 Points",
+      description: "Refer your first recruit",
+      icon: <Trophy className="h-5 w-5 text-[#FFD700]" />,
+      achieved: referralCount >= 1,
+    },
+    {
+      count: 3,
+      reward: "Connector Badge",
+      description: "Refer 3 potential recruits",
+      icon: <Award className="h-5 w-5 text-[#0A3C1F]" />,
+      achieved: referralCount >= 3,
+    },
+    {
+      count: 5,
+      reward: "+500 Points",
+      description: "Refer 5 potential recruits",
+      icon: <Trophy className="h-5 w-5 text-[#FFD700]" />,
+      achieved: referralCount >= 5,
+    },
+    {
+      count: 10,
+      reward: "Recruitment Champion NFT",
+      description: "Refer 10 potential recruits",
+      icon: <Star className="h-5 w-5 text-[#FFD700]" />,
+      achieved: referralCount >= 10,
+    },
+    {
+      count: 25,
+      reward: "VIP Recruitment Event Access",
+      description: "Refer 25 potential recruits",
+      icon: <Gift className="h-5 w-5 text-[#0A3C1F]" />,
+      achieved: referralCount >= 25,
+    },
+  ]
+
+  // Find the next tier
+  const nextTier = referralTiers.find((tier) => !tier.achieved)
+
+  // Calculate progress to next tier
+  const progressToNextTier = nextTier ? Math.min(100, Math.round((referralCount / nextTier.count) * 100)) : 100
+
+  return (
+    <>
+      <Card className="w-full shadow-md">
+        <CardHeader className="bg-[#0A3C1F] text-white">
+          <CardTitle className="flex items-center">
+            <Users className="mr-2 h-5 w-5" />
+            Referral Rewards Program
+          </CardTitle>
+          <CardDescription className="text-gray-200">
+            Refer potential recruits and earn exclusive rewards
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="mb-6">
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h3 className="text-lg font-medium">Your Referrals</h3>
+                <p className="text-sm text-gray-500">You've referred {referralCount} potential recruits</p>
+              </div>
+              <Button
+                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                onClick={() => setShowShareDialog(true)}
+              >
+                <Share2 className="mr-2 h-4 w-4" />
+                Share Your Link
+              </Button>
+            </div>
+
+            {nextTier && (
+              <div className="mt-4">
+                <div className="flex justify-between mb-1 text-sm">
+                  <span>Progress to next reward: {nextTier.reward}</span>
+                  <span>
+                    {referralCount}/{nextTier.count} referrals
+                  </span>
+                </div>
+                <Progress value={progressToNextTier} className="h-2" />
+                <p className="text-xs text-gray-500 mt-1">
+                  Refer {nextTier.count - referralCount} more recruits to unlock {nextTier.reward}
+                </p>
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-4">
+            <h3 className="font-medium">Referral Reward Tiers</h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {referralTiers.map((tier) => (
+                <div
+                  key={tier.count}
+                  className={`p-4 border rounded-lg transition-all ${
+                    tier.achieved ? "bg-[#0A3C1F]/5 border-[#0A3C1F]/20" : "border-gray-200"
+                  }`}
+                >
+                  <div className="flex items-center mb-2">
+                    <div className={`p-2 rounded-full ${tier.achieved ? "bg-[#0A3C1F]/10" : "bg-gray-100"}`}>
+                      {tier.icon}
+                    </div>
+                    <div className="ml-3">
+                      <h4 className="font-medium">{tier.reward}</h4>
+                      <p className="text-xs text-gray-500">{tier.description}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-between items-center mt-2">
+                    <span className="text-sm font-medium">{tier.count} Referrals</span>
+                    {tier.achieved ? (
+                      <Badge className="bg-[#0A3C1F] text-white">Unlocked</Badge>
+                    ) : (
+                      <Badge variant="outline" className="text-gray-500">
+                        Locked
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 pt-4 border-t">
+              <h3 className="font-medium mb-2">How It Works</h3>
+              <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
+                <li>Share your unique referral link with potential recruits</li>
+                <li>When they sign up using your link, you get credit for the referral</li>
+                <li>As your referral count grows, you unlock exclusive rewards</li>
+                <li>Track your progress and rewards on this page</li>
+              </ol>
             </div>
           </div>
         </CardContent>

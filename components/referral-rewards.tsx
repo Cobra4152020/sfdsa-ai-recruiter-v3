@@ -11,6 +11,7 @@ import { Award, Gift, Share2, Users, Trophy, Star } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import Link from "next/link"
 
 interface ReferralTier {
   count: number
@@ -124,10 +125,17 @@ export function ReferralRewards() {
           </div>
 
           <div className="space-y-4">
-            <h3 className="font-medium">Referral Reward Tiers</h3>
+            <div className="flex justify-between items-center">
+              <h3 className="font-medium">Referral Reward Tiers</h3>
+              <Link href="/gamification">
+                <Button variant="link" className="text-[#0A3C1F] p-0">
+                  Learn more about referrals
+                </Button>
+              </Link>
+            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {referralTiers.map((tier) => (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {referralTiers.slice(0, 3).map((tier) => (
                 <div
                   key={tier.count}
                   className={`p-4 border rounded-lg transition-all ${
@@ -156,16 +164,6 @@ export function ReferralRewards() {
                   </div>
                 </div>
               ))}
-            </div>
-
-            <div className="mt-6 pt-4 border-t">
-              <h3 className="font-medium mb-2">How It Works</h3>
-              <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
-                <li>Share your unique referral link with potential recruits</li>
-                <li>When they sign up using your link, you get credit for the referral</li>
-                <li>As your referral count grows, you unlock exclusive rewards</li>
-                <li>Track your progress and rewards on this page</li>
-              </ol>
             </div>
           </div>
         </CardContent>
