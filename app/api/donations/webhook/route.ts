@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@/lib/supabase-client"
 import { headers } from "next/headers"
+import { awardDonationPoints } from "@/lib/donation-points-service"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16",
@@ -35,6 +36,23 @@ export async function POST(request: Request) {
         .from("donations")
         .update({ status: "completed", updated_at: new Date().toISOString() })
         .eq("payment_id", paymentIntent.id)
+
+      // Get the donation details
+      const { data: donationData } = await supabase
+        .from("donations")
+        .select("*")
+        .eq("payment_id", paymentIntent.id)
+        .single()
+
+      if (donationData && donationData.donor_id) {
+        // Award points for the donation
+        await awardDonationPoints(
+          donationData.donor_id,
+          paymentIntent.id,
+          donationData.amount,
+          false, // one-time donation
+        )
+      }
 
       // Record analytics
       await supabase.from("donation_analytics").insert({
@@ -70,17 +88,38 @@ export async function POST(request: Request) {
 
         // Create a donation record for this payment
         if (invoice.customer_email) {
-          await supabase.from("donations").insert({
-            amount: invoice.amount_paid / 100,
-            donor_email: invoice.customer_email,
-            donor_name: invoice.customer_name || null,
-            payment_processor: "stripe",
-            payment_id: invoice.id,
-            subscription_id: invoice.subscription,
-            status: "completed",
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
-          })
+          const { data: insertedDonation } = await supabase
+            .from("donations")
+            .insert({
+              amount: invoice.amount_paid / 100,
+              donor_email: invoice.customer_email,
+              donor_name: invoice.customer_name || null,
+              payment_processor: "stripe",
+              payment_id: invoice.id,
+              subscription_id: invoice.subscription,
+              status: "completed",
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString(),
+            })
+            .select()
+            .single()
+
+          // Get customer ID
+          const { data: subscriptionData } = await supabase
+            .from("subscriptions")
+            .select("donor_id")
+            .eq("subscription_id", invoice.subscription)
+            .single()
+
+          if (subscriptionData && subscriptionData.donor_id && insertedDonation) {
+            // Award points for the recurring donation
+            await awardDonationPoints(
+              subscriptionData.donor_id,
+              invoice.id,
+              invoice.amount_paid / 100,
+              true, // recurring donation
+            )
+          }
         }
       }
       break

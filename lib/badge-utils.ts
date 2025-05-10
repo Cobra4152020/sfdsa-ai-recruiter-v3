@@ -19,12 +19,21 @@ export type BadgeType =
   | "quick-learner"
   | "persistent-explorer"
   | "dedicated-applicant"
+  | "first-donation"
+  | "recurring-donor"
+  | "generous-donor"
+  | "donation-milestone-5"
+  | "donation-milestone-10"
+  | "donation-milestone-25"
+  | "donation-amount-250"
+  | "donation-amount-500"
+  | "donation-amount-1000"
 
 export interface Badge {
   id: string
   name: string
   description: string
-  category: "application" | "participation"
+  category: "application" | "participation" | "donation"
   color: string
   icon: string
 }
@@ -179,6 +188,80 @@ export async function getBadgeById(id: string): Promise<Badge | null> {
       category: "participation",
       color: "bg-red-500",
       icon: "/placeholder.svg?key=lv4ao",
+    },
+
+    // Donation badges
+    {
+      id: "first-donation",
+      name: "First Donation",
+      description: "Made your first donation to support our mission",
+      category: "donation",
+      color: "bg-green-500",
+      icon: "/placeholder.svg?key=donation1",
+    },
+    {
+      id: "recurring-donor",
+      name: "Recurring Donor",
+      description: "Set up a recurring donation to provide ongoing support",
+      category: "donation",
+      color: "bg-blue-600",
+      icon: "/placeholder.svg?key=donation2",
+    },
+    {
+      id: "generous-donor",
+      name: "Generous Donor",
+      description: "Made a significant donation of $100 or more",
+      category: "donation",
+      color: "bg-purple-600",
+      icon: "/placeholder.svg?key=donation3",
+    },
+    {
+      id: "donation-milestone-5",
+      name: "5 Donations",
+      description: "Made 5 separate donations to support our cause",
+      category: "donation",
+      color: "bg-amber-500",
+      icon: "/placeholder.svg?key=donation4",
+    },
+    {
+      id: "donation-milestone-10",
+      name: "10 Donations",
+      description: "Made 10 separate donations to support our cause",
+      category: "donation",
+      color: "bg-amber-600",
+      icon: "/placeholder.svg?key=donation5",
+    },
+    {
+      id: "donation-milestone-25",
+      name: "25 Donations",
+      description: "Made 25 separate donations to support our cause",
+      category: "donation",
+      color: "bg-amber-700",
+      icon: "/placeholder.svg?key=donation6",
+    },
+    {
+      id: "donation-amount-250",
+      name: "Silver Supporter",
+      description: "Donated a total of $250 or more",
+      category: "donation",
+      color: "bg-gray-400",
+      icon: "/placeholder.svg?key=donation7",
+    },
+    {
+      id: "donation-amount-500",
+      name: "Gold Supporter",
+      description: "Donated a total of $500 or more",
+      category: "donation",
+      color: "bg-yellow-500",
+      icon: "/placeholder.svg?key=donation8",
+    },
+    {
+      id: "donation-amount-1000",
+      name: "Platinum Supporter",
+      description: "Donated a total of $1,000 or more",
+      category: "donation",
+      color: "bg-slate-300",
+      icon: "/placeholder.svg?key=donation9",
     },
   ]
 
