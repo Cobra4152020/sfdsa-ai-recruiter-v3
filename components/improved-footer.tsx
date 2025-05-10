@@ -111,18 +111,18 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
           <div className="col-span-1">
             <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Contact Us</h3>
             <address className="not-italic text-sm text-gray-300 space-y-2">
-              <p>San Francisco Sheriff's Department</p>
-              <p>City Hall, Room 456</p>
-              <p>1 Dr. Carlton B. Goodlett Place</p>
-              <p>San Francisco, CA 94102</p>
+              <p>San Francisco Deputy Sheriffs' Association 510(c)5</p>
+              <p>Protecting San Francisco 501(c)3</p>
+              <p>35 Gilbert Street</p>
+              <p>San Francisco, CA 94103</p>
               <p className="mt-2">
-                <a href="tel:+14155547225" className="hover:text-white transition-colors">
-                  Phone: (415) 554-7225
+                <a href="tel:+14156962428" className="hover:text-white transition-colors">
+                  Phone: (415) 696-2428
                 </a>
               </p>
               <p>
-                <a href="mailto:recruitment@sfgov.org" className="hover:text-white transition-colors">
-                  Email: recruitment@sfgov.org
+                <a href="mailto:email@protectingsanfrancisco.com" className="hover:text-white transition-colors">
+                  Email: email@protectingsanfrancisco.com
                 </a>
               </p>
             </address>
