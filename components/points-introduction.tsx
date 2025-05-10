@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { Trophy, Award, Lock } from "lucide-react"
+import { Trophy, Award, Lock, Rocket } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 export function PointsIntroduction() {
@@ -42,8 +42,11 @@ export function PointsIntroduction() {
         </div>
       </div>
       <div className="mt-6 text-center">
-        <Link href="/gamification">
-          <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">Learn About Our Gamification System</Button>
+        <Link href="/deputy-launchpad">
+          <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+            <Rocket className="mr-2 h-4 w-4" />
+            Visit Deputy Launchpad
+          </Button>
         </Link>
       </div>
     </div>

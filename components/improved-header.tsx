@@ -16,6 +16,8 @@ import {
   Sun,
   ChevronDown,
   Heart,
+  Rocket,
+  FileText,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
@@ -172,6 +174,13 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-6" aria-label="Main Navigation">
+              <Link
+                href="/mission-briefing"
+                className="text-white hover:text-[#FFD700] transition-colors flex items-center"
+              >
+                <FileText className="h-4 w-4 mr-1" />
+                Mission Briefing
+              </Link>
               <DropdownNav
                 label="Benefits"
                 items={[
@@ -189,10 +198,16 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   { label: "NFT Awards", href: "/nft-awards/coming-soon" },
                 ]}
               />
+              <Link
+                href="/deputy-launchpad"
+                className="text-white hover:text-[#FFD700] transition-colors flex items-center"
+              >
+                <Rocket className="h-4 w-4 mr-1" />
+                Deputy Launchpad
+              </Link>
               <DropdownNav
                 label="Play the Game"
                 items={[
-                  { label: "Explainer", href: "/gamification" },
                   { label: "Play Trivia w/ Sgt. Ken", href: "/trivia" },
                   { label: "Memory Match Deluxe", href: "/games/memory-match" },
                   { label: "Spin to Win", href: "/games/spin-to-win" },
@@ -244,6 +259,18 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
             >
               <Heart className="h-5 w-5 mr-2" />
               Donate Now
+            </Link>
+
+            {/* Mission Briefing Link */}
+            <Link href="/mission-briefing" className="block px-3 py-2 text-white hover:text-[#FFD700]">
+              <FileText className="h-4 w-4 inline mr-2" />
+              Mission Briefing
+            </Link>
+
+            {/* Deputy Launchpad Link */}
+            <Link href="/deputy-launchpad" className="block px-3 py-2 text-white hover:text-[#FFD700]">
+              <Rocket className="h-4 w-4 inline mr-2" />
+              Deputy Launchpad
             </Link>
 
             {/* Mobile Benefits dropdown */}
@@ -324,9 +351,6 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
 
               {mobileDropdowns.playTheGame && (
                 <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link href="/gamification" className="block text-white hover:text-[#FFD700]">
-                    Explainer
-                  </Link>
                   <Link href="/trivia" className="block text-white hover:text-[#FFD700]">
                     Play Trivia w/ Sgt. Ken
                   </Link>
