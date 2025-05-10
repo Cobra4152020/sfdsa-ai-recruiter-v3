@@ -1,5 +1,5 @@
-import type { ReactNode } from "react"
 import { DonorCard } from "@/components/donor-card"
+import type { ReactNode } from "react"
 
 type Donor = {
   id: string
@@ -25,16 +25,14 @@ export function DonorTier({ title, description, donors, tierColor, icon, showTit
   return (
     <div className="space-y-4">
       {showTitle && (
-        <div className="flex items-center gap-2 mb-4">
+        <div className="flex items-center gap-2 mb-2">
           <div className="p-2 rounded-full" style={{ backgroundColor: `${tierColor}20` }}>
-            <div className="text-white" style={{ color: tierColor }}>
+            <div className="text-white p-1 rounded-full" style={{ backgroundColor: tierColor }}>
               {icon}
             </div>
           </div>
           <div>
-            <h2 className="text-xl font-bold" style={{ color: tierColor }}>
-              {title}
-            </h2>
+            <h2 className="text-xl font-bold">{title}</h2>
             <p className="text-sm text-gray-500">{description}</p>
           </div>
         </div>

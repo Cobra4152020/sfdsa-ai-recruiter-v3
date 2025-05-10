@@ -84,3 +84,12 @@ export function getAvailableImagePaths(): string[] {
     "/abstract-geometric-shapes.png",
   ]
 }
+
+/**
+ * Gets the full path to an image
+ * @param path The relative path to the image
+ * @returns The full path to the image
+ */
+export function getImagePath(path: string): string {
+  return resolveImagePath(path)
+}

@@ -33,3 +33,13 @@ export function getBaseUrl(): string {
 
   return "http://localhost:3000"
 }
+
+/**
+ * Gets an environment variable with a fallback
+ * @param key The environment variable key
+ * @param fallback Optional fallback value
+ * @returns The environment variable value or fallback
+ */
+export function env(key: string, fallback = ""): string {
+  return process.env[key] || fallback
+}
