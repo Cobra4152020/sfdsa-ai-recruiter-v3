@@ -10,52 +10,26 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { getSupabaseClient } from "@/lib/supabase-core"
 import { useToast } from "@/components/ui/use-toast"
 import { Loader2 } from "lucide-react"
-import Link from "next/link"
 
 export default function RegisterPage() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agreeTerms: false,
-  })
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
   const supabase = getSupabaseClient()
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }))
-  }
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
+    if (password !== confirmPassword) {
       toast({
         title: "Passwords don't match",
-        description: "Please make sure your passwords match",
-        variant: "destructive",
-      })
-      return
-    }
-
-    // Validate terms agreement
-    if (!formData.agreeTerms) {
-      toast({
-        title: "Terms agreement required",
-        description: "You must agree to the terms and conditions",
+        description: "Please make sure your passwords match.",
         variant: "destructive",
       })
       return
@@ -64,38 +38,19 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      // Register with Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email: formData.email,
-        password: formData.password,
-        options: {
-          data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-          },
-        },
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
       })
 
       if (error) throw error
 
-      // Send welcome email
-      await fetch("/api/send-welcome-email", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          firstName: formData.firstName,
-        }),
-      })
-
       toast({
         title: "Registration successful",
-        description: "Your account has been created. Please check your email to verify your account.",
+        description: "Please check your email to verify your account.",
       })
 
-      // Redirect to login
+      // Redirect to login page
       router.push("/login")
     } catch (error) {
       console.error("Registration error:", error)
@@ -116,73 +71,41 @@ export default function RegisterPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl text-[#0A3C1F]">Create an Account</CardTitle>
-            <CardDescription>Join our community and track your recruitment progress</CardDescription>
+            <CardDescription>Sign up to track your application progress</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
-                  <Input id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} required />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} required />
-                </div>
-              </div>
-
+            <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={formData.email} onChange={handleChange} required />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <Input
                   id="password"
-                  name="password"
                   type="password"
-                  value={formData.password}
-                  onChange={handleChange}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   required
-                  minLength={8}
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <Input
                   id="confirmPassword"
-                  name="confirmPassword"
                   type="password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   required
                 />
               </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="agreeTerms"
-                  name="agreeTerms"
-                  checked={formData.agreeTerms}
-                  onCheckedChange={(checked) => setFormData((prev) => ({ ...prev, agreeTerms: checked as boolean }))}
-                />
-                <label
-                  htmlFor="agreeTerms"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  I agree to the{" "}
-                  <Link href="/terms-of-service" className="text-[#0A3C1F] hover:underline">
-                    Terms of Service
-                  </Link>{" "}
-                  and{" "}
-                  <Link href="/privacy-policy" className="text-[#0A3C1F] hover:underline">
-                    Privacy Policy
-                  </Link>
-                </label>
-              </div>
-
               <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
                 {isLoading ? (
                   <>
@@ -190,7 +113,7 @@ export default function RegisterPage() {
                     Creating account...
                   </>
                 ) : (
-                  "Create Account"
+                  "Sign Up"
                 )}
               </Button>
             </form>
@@ -203,7 +126,7 @@ export default function RegisterPage() {
                 className="text-[#0A3C1F] p-0 h-auto font-normal text-sm ml-1"
                 onClick={() => router.push("/login")}
               >
-                Login
+                Log in
               </Button>
             </div>
           </CardFooter>

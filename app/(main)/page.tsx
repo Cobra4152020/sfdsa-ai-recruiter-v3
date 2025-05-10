@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <>
       <main className="flex-1">
-        <HeroSection onGetStarted={() => {}} showOptInForm={showOptInForm} />
+        <HeroSection onGetStarted={() => showOptInForm(true)} showOptInForm={showOptInForm} />
 
         {/* Top Recruits section moved to top, right after hero */}
         <TopRecruitsScroll />

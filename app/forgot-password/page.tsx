@@ -12,7 +12,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from "@/components/ui/label"
 import { getSupabaseClient } from "@/lib/supabase-core"
 import { useToast } from "@/components/ui/use-toast"
-import { Loader2, ArrowLeft, CheckCircle } from "lucide-react"
+import { Loader2, ArrowLeft } from "lucide-react"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
@@ -22,7 +22,7 @@ export default function ForgotPasswordPage() {
   const { toast } = useToast()
   const supabase = getSupabaseClient()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
@@ -34,10 +34,14 @@ export default function ForgotPasswordPage() {
       if (error) throw error
 
       setIsSubmitted(true)
+      toast({
+        title: "Reset link sent",
+        description: "Check your email for a link to reset your password.",
+      })
     } catch (error) {
       console.error("Password reset error:", error)
       toast({
-        title: "Password reset failed",
+        title: "Reset failed",
         description: error instanceof Error ? error.message : "An error occurred during password reset",
         variant: "destructive",
       })
@@ -53,20 +57,15 @@ export default function ForgotPasswordPage() {
         <Card className="w-full max-w-md">
           <CardHeader>
             <CardTitle className="text-2xl text-[#0A3C1F]">Reset Password</CardTitle>
-            <CardDescription>Enter your email to receive a password reset link</CardDescription>
+            <CardDescription>
+              {isSubmitted
+                ? "Check your email for a password reset link"
+                : "Enter your email to receive a password reset link"}
+            </CardDescription>
           </CardHeader>
           <CardContent>
-            {isSubmitted ? (
-              <div className="text-center py-6">
-                <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <h3 className="text-lg font-medium mb-2">Check your email</h3>
-                <p className="text-gray-600 mb-4">
-                  We've sent a password reset link to <span className="font-medium">{email}</span>
-                </p>
-                <p className="text-sm text-gray-500">If you don't see it, check your spam folder</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
+            {!isSubmitted ? (
+              <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="email">Email</Label>
                   <Input
@@ -89,11 +88,21 @@ export default function ForgotPasswordPage() {
                   )}
                 </Button>
               </form>
+            ) : (
+              <div className="text-center py-4">
+                <p className="mb-4">
+                  We've sent a password reset link to <strong>{email}</strong>. Please check your email and follow the
+                  instructions to reset your password.
+                </p>
+                <p className="text-sm text-gray-500">
+                  If you don't see the email, check your spam folder or request another reset link.
+                </p>
+              </div>
             )}
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Button variant="link" className="text-[#0A3C1F]" onClick={() => router.push("/login")}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+            <Button variant="link" className="text-[#0A3C1F] flex items-center" onClick={() => router.push("/login")}>
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Login
             </Button>
           </CardFooter>

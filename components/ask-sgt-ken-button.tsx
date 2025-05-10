@@ -402,6 +402,7 @@ export function AskSgtKenButton({
         onClick={() => setIsDialogOpen(true)}
         className={`${className} rounded-md px-3 py-1 sgt-ken-button-hover subtle-glow relative`}
         aria-label="Chat with Sergeant Ken"
+        type="button"
       >
         <span className="flex items-center relative">
           <span className="wiggle-icon">
