@@ -24,12 +24,17 @@ const nextConfig = {
     domains: [
       'fonts.googleapis.com', 
       'fonts.gstatic.com',
-      'sfdeputysheriff.com'
+      'sfdeputysheriff.com',
+      'www.sfdeputysheriff.com'
     ],
     remotePatterns: [
       {
         protocol: 'https',
         hostname: 'sfdeputysheriff.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.sfdeputysheriff.com',
       },
     ],
   },
