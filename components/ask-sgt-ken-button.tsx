@@ -99,6 +99,13 @@ export function AskSgtKenButton({
       background-color: rgba(255, 215, 0, 0.2) !important;
       transition: all 0.3s ease;
     }
+    @keyframes bounceSlight {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .animate-bounce-subtle {
+      animation: bounceSlight 2s ease-in-out infinite;
+    }
   `
     document.head.appendChild(style)
 
@@ -389,7 +396,7 @@ export function AskSgtKenButton({
     }
 
     if (position === "fixed") {
-      buttonStyle += "fixed bottom-6 right-6 z-40 shadow-lg "
+      buttonStyle += "fixed bottom-6 right-6 z-40 shadow-lg animate-bounce-subtle "
     }
 
     return buttonStyle

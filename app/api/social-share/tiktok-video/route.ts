@@ -1,7 +1,37 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { trackEngagement } from "@/lib/analytics"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import { imageGenerationClient } from "@/lib/image-generation-client"
+import path from "path"
+import fs from "fs"
+import os from "os"
+import { v4 as uuidv4 } from "uuid"
+
+// Check if we're in a Node.js environment with canvas and video support
+let videoSupport = false
+let generateVideo, generateBadgeTikTokFrames, generateNFTTikTokFrames
+
+try {
+  // Dynamically import video-related modules
+  if (typeof window === "undefined") {
+    const videoUtils = require("@/lib/video-utils")
+    generateVideo = videoUtils.generateVideo
+    generateBadgeTikTokFrames = videoUtils.generateBadgeTikTokFrames
+    generateNFTTikTokFrames = videoUtils.generateNFTTikTokFrames
+
+    // Check if ffmpeg is available
+    const { execSync } = require("child_process")
+    try {
+      execSync("ffmpeg -version", { stdio: "ignore" })
+      videoSupport = true
+    } catch (e) {
+      console.warn("FFmpeg not available")
+      videoSupport = false
+    }
+  }
+} catch (error) {
+  console.warn("Video generation support not available:", error)
+  videoSupport = false
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,39 +60,85 @@ export async function POST(request: NextRequest) {
       points_awarded: 50, // Award points for TikTok sharing (more than Instagram)
     })
 
-    // Check if the image generation service is available
-    const serviceAvailable = await imageGenerationClient.isAvailable()
-
-    if (!serviceAvailable) {
-      // Fallback to a simple response if the service is not available
+    // If video generation is not supported in this environment, return a fallback response
+    if (!videoSupport) {
       return NextResponse.json({
         success: true,
         message: "Share recorded successfully",
         fallback: true,
-        imageUrl: imageUrl || "/generic-badge.png",
+        imageUrl: imageUrl || "/generic-badge.png", // Use provided image or fallback
       })
     }
 
-    // Use the dedicated service to generate the video
-    const response = await imageGenerationClient.generateTikTokVideo({
-      achievementType,
-      achievementId,
-      achievementTitle,
-      achievementDescription,
-      imageUrl,
-    })
+    // Determine image paths
+    const logoPath = `${process.cwd()}/public/sfdsa-logo.png`
 
-    // Get the content type from the response
-    const contentType = response.headers.get("Content-Type") || "video/mp4"
-    const contentDisposition = response.headers.get("Content-Disposition") || ""
+    let achievementImagePath = imageUrl
+    // If no image URL provided, use a default based on achievement type
+    if (!achievementImagePath) {
+      if (achievementType === "badge") {
+        achievementImagePath = `${process.cwd()}/public/generic-badge.png`
+      } else if (achievementType === "nft") {
+        achievementImagePath = `${process.cwd()}/public/achievement-icon.png`
+      } else {
+        achievementImagePath = `${process.cwd()}/public/sfdsa-logo.png`
+      }
+    } else if (achievementImagePath.startsWith("/")) {
+      // Convert relative URL to absolute file path
+      achievementImagePath = `${process.cwd()}/public${achievementImagePath}`
+    }
 
-    // Stream the response directly to the client
-    const buffer = await response.arrayBuffer()
+    // Create temp directory for video generation
+    const tempDir = path.join(os.tmpdir(), `tiktok-${uuidv4()}`)
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true })
+    }
 
-    return new NextResponse(buffer, {
+    // Output video path
+    const outputPath = path.join(tempDir, `${achievementType}-${achievementId}.mp4`)
+
+    // Generate frames based on achievement type
+    let frames
+    if (achievementType === "badge") {
+      frames = generateBadgeTikTokFrames(achievementTitle, achievementDescription || "", achievementImagePath, logoPath)
+    } else if (achievementType === "nft") {
+      frames = generateNFTTikTokFrames(achievementTitle, achievementDescription || "", achievementImagePath, logoPath)
+    } else {
+      // Default frames for other achievement types
+      frames = generateBadgeTikTokFrames(achievementTitle, achievementDescription || "", achievementImagePath, logoPath)
+    }
+
+    // Video configuration
+    const videoConfig = {
+      width: 1080,
+      height: 1920,
+      fps: 30,
+      duration: 3, // 3 seconds
+      outputPath,
+      tempDir,
+      watermark: {
+        text: "sfdeputysheriff.com",
+        position: "bottom-right" as const,
+        fontSize: 40,
+        color: "rgba(255, 215, 0, 0.8)",
+        padding: 30,
+      },
+    }
+
+    // Generate the video
+    await generateVideo(frames, videoConfig)
+
+    // Read the generated video
+    const videoBuffer = fs.readFileSync(outputPath)
+
+    // Clean up temp directory
+    fs.rmSync(tempDir, { recursive: true, force: true })
+
+    // Return the video as a response
+    return new NextResponse(videoBuffer, {
       headers: {
-        "Content-Type": contentType,
-        "Content-Disposition": contentDisposition,
+        "Content-Type": "video/mp4",
+        "Content-Disposition": `attachment; filename="${achievementType}-${achievementId}.mp4"`,
       },
     })
   } catch (error) {

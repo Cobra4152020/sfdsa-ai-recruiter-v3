@@ -19,12 +19,12 @@ import {
   Rocket,
   FileText,
   GamepadIcon,
+  MessageSquare,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
 import { DropdownNav } from "@/components/ui/dropdown-nav"
 import { cn } from "@/lib/utils"
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
 import { NotificationBell } from "@/components/notification-bell"
 import { useUser } from "@/context/user-context"
 
@@ -219,14 +219,13 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   { label: "Spin to Win", href: "/games/spin-to-win" },
                 ]}
               />
-              <Link href="/volunteer-login" className="text-white hover:text-[#FFD700] transition-colors">
-                Volunteer Recruiter
+              {/* Remove Volunteer Recruiter Link */}
+              <Link href="/chat-with-sgt-ken" className="text-white hover:text-[#FFD700] transition-colors">
+                <span className="flex items-center">
+                  <MessageSquare className="h-4 w-4 mr-1" />
+                  Ask Sgt. Ken
+                </span>
               </Link>
-              <AskSgtKenButton
-                variant="ghost"
-                className="text-white hover:text-[#FFD700] transition-colors p-0 h-auto font-normal"
-                position="static"
-              />
             </nav>
 
             {/* Right side buttons */}
@@ -364,16 +363,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               )}
             </div>
 
-            <Link href="/volunteer-login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
-              Volunteer Recruiter
-            </Link>
-            <div className="block px-3 py-2 text-white hover:text-[#FFD700]">
-              <AskSgtKenButton
-                variant="ghost"
-                className="text-white hover:text-[#FFD700] transition-colors p-0 h-auto font-normal"
-                position="static"
-              />
-            </div>
+            {/* Remove Volunteer Recruiter Link */}
             <Link href="/login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
               Login
             </Link>
