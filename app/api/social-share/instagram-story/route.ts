@@ -1,24 +1,30 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createCanvas, loadImage, registerFont } from "canvas"
 import { trackEngagement } from "@/lib/analytics"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-import path from "path"
-import { createAnimatedGif, generateBadgeAnimationFrames, generateNFTAnimationFrames } from "@/lib/animation-utils"
 
-// Register fonts for canvas
+// Check if we're in a Node.js environment with canvas support
+let canvasSupport = false
+let createAnimatedGif, generateBadgeAnimationFrames, generateNFTAnimationFrames
+let loadImage, createCanvas, registerFont
+
 try {
-  // Check if we're in a Node.js environment (not client-side)
+  // Dynamically import canvas-related modules
   if (typeof window === "undefined") {
-    // Register fonts - adjust paths as needed for your project
-    registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Bold.ttf"), { family: "Inter", weight: "bold" })
-    registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Medium.ttf"), { family: "Inter", weight: "medium" })
-    registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Regular.ttf"), {
-      family: "Inter",
-      weight: "normal",
-    })
+    const canvasModule = require("canvas")
+    loadImage = canvasModule.loadImage
+    createCanvas = canvasModule.createCanvas
+    registerFont = canvasModule.registerFont
+
+    const animationUtils = require("@/lib/animation-utils")
+    createAnimatedGif = animationUtils.createAnimatedGif
+    generateBadgeAnimationFrames = animationUtils.generateBadgeAnimationFrames
+    generateNFTAnimationFrames = animationUtils.generateNFTAnimationFrames
+
+    canvasSupport = true
   }
 } catch (error) {
-  console.error("Error registering fonts:", error)
+  console.warn("Canvas support not available:", error)
+  canvasSupport = false
 }
 
 // Instagram story dimensions
@@ -34,7 +40,7 @@ export async function POST(request: NextRequest) {
       achievementTitle,
       achievementDescription,
       imageUrl,
-      animated = true, // New parameter to toggle between animated and static
+      animated = true,
     } = await request.json()
 
     if (!userId || !achievementType || !achievementTitle) {
@@ -60,6 +66,16 @@ export async function POST(request: NextRequest) {
       points_awarded: 25, // Award points for Instagram sharing
       metadata: { animated },
     })
+
+    // If canvas is not supported in this environment, return a fallback response
+    if (!canvasSupport) {
+      return NextResponse.json({
+        success: true,
+        message: "Share recorded successfully",
+        fallback: true,
+        imageUrl: imageUrl || "/generic-badge.png", // Use provided image or fallback
+      })
+    }
 
     // Determine image paths
     const logoPath = `${process.cwd()}/public/sfdsa-logo.png`

@@ -73,6 +73,26 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
   const [isGeneratingTikTok, setIsGeneratingTikTok] = useState(false)
   const { currentUser } = useUser()
 
+  // Add this function to handle fallback responses
+  const handleFallbackResponse = async (response: any, platform: string) => {
+    if (response.fallback && response.imageUrl) {
+      // Create a download link for the fallback image
+      const link = document.createElement("a")
+      link.href = response.imageUrl
+      link.download = `${achievement.type}-${achievement.id}.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      toast({
+        title: "Share recorded!",
+        description: `Your ${platform} share has been recorded and points awarded. Download your image to share manually.`,
+      })
+      return true
+    }
+    return false
+  }
+
   const handleShare = async (platform: SocialPlatform) => {
     if (!currentUser) return
 
@@ -231,6 +251,96 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
     setPreviewImageUrl(null) // Clear existing preview
   }
 
+  // Then update the share functions to use this fallback handler
+  // For example, in the handleInstagramShare function:
+  const handleInstagramShare = async () => {
+    setIsSharing(true)
+    try {
+      const shareOptions = {
+        title: achievement.title,
+        text: achievement.description,
+        url: achievement.shareUrl,
+        hashtags: ["SFSheriff", "LawEnforcement", "Recruitment"],
+        via: "SFSheriff",
+        image: achievement.imageUrl,
+        achievementType: achievement.type,
+        achievementId: achievement.id,
+        userId: currentUser.id,
+        animated: isAnimated,
+      }
+
+      const response = await SocialSharingService.getInstagramStoryImage(shareOptions)
+
+      if (response.success && response.imageUrl) {
+        setInstagramImageUrl(response.imageUrl)
+        setIsPreviewAnimated(!!response.isAnimated)
+        setShowInstagramInstructions(true)
+      } else {
+        const handled = await handleFallbackResponse(response, "Instagram")
+        if (!handled) {
+          toast({
+            title: "Instagram sharing failed",
+            description: response.error || "Unable to generate Instagram story image. Please try again.",
+            variant: "destructive",
+          })
+        }
+      }
+    } catch (error) {
+      console.error("Error sharing to Instagram:", error)
+      toast({
+        title: "Error",
+        description: "Failed to generate Instagram story. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSharing(false)
+    }
+  }
+
+  // Similarly update the TikTok share function
+  const handleTikTokShare = async () => {
+    setIsSharing(true)
+    try {
+      const shareOptions = {
+        title: achievement.title,
+        text: achievement.description,
+        url: achievement.shareUrl,
+        hashtags: ["SFSheriff", "LawEnforcement", "Recruitment"],
+        via: "SFSheriff",
+        image: achievement.imageUrl,
+        achievementType: achievement.type,
+        achievementId: achievement.id,
+        userId: currentUser.id,
+        animated: isAnimated,
+      }
+
+      const response = await SocialSharingService.getTikTokVideo(shareOptions)
+
+      if (response.success && response.videoUrl) {
+        setTiktokVideoUrl(response.videoUrl)
+        setShowTikTokInstructions(true)
+      } else {
+        const handled = await handleFallbackResponse(response, "TikTok")
+        if (!handled) {
+          toast({
+            title: "TikTok sharing failed",
+            description: response.error || "Unable to generate TikTok video. Please try again.",
+            variant: "destructive",
+          })
+        }
+      }
+    } catch (error) {
+      console.error("Error sharing to TikTok:", error)
+      toast({
+        title: "Error",
+        description: "Failed to generate TikTok video. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsSharing(false)
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
@@ -383,7 +493,7 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
                   </Button>
 
                   <Button
-                    onClick={() => handleShare("instagram")}
+                    onClick={() => handleInstagramShare()}
                     className="flex flex-col items-center h-auto py-3 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45]"
                     disabled={isSharing}
                   >
@@ -396,7 +506,7 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
                   </Button>
 
                   <Button
-                    onClick={() => handleShare("tiktok")}
+                    onClick={() => handleTikTokShare()}
                     className="flex flex-col items-center h-auto py-3 bg-black hover:bg-black/90"
                     disabled={isSharing}
                   >
