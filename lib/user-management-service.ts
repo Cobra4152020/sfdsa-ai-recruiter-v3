@@ -52,6 +52,25 @@ export interface UserStats {
 }
 
 /**
+ * Verify if a user is an admin
+ */
+export async function verifyAdminAccess(userId: string): Promise<boolean> {
+  try {
+    const { data, error } = await supabaseAdmin.from("user_roles").select("role").eq("user_id", userId).single()
+
+    if (error) {
+      console.error("Error verifying admin access:", error)
+      return false
+    }
+
+    return data?.role === "admin"
+  } catch (error) {
+    console.error("Error verifying admin access:", error)
+    return false
+  }
+}
+
+/**
  * Get all users with their roles
  */
 export async function getAllUsers(
