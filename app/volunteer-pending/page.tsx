@@ -1,51 +1,67 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { ImprovedHeader } from "@/components/improved-header"
+import { ImprovedFooter } from "@/components/improved-footer"
+import { Clock, CheckCircle, Mail } from "lucide-react"
 
 export default function VolunteerPendingPage() {
   return (
-    <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-[70vh]">
-      <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-md text-center">
-        <h1 className="text-2xl font-bold text-[#0A3C1F] mb-4">Account Verification Pending</h1>
+    <>
+      <ImprovedHeader />
+      <main className="container mx-auto px-4 py-12">
+        <Card className="max-w-md mx-auto">
+          <CardHeader className="space-y-1">
+            <div className="flex justify-center mb-4">
+              <Clock className="h-16 w-16 text-[#0A3C1F]" />
+            </div>
+            <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+              Account Pending Verification
+            </CardTitle>
+            <CardDescription className="text-center">
+              Your volunteer recruiter account is pending verification by an administrator.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-amber-50 border border-amber-200 rounded-md p-4">
+              <p className="text-amber-800">
+                Thank you for registering as a volunteer recruiter. Your account is currently under review. This process
+                typically takes 1-2 business days.
+              </p>
+            </div>
 
-        <div className="mb-6">
-          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-10 w-10 text-amber-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </div>
-
-          <p className="text-gray-600 mb-4">
-            Your volunteer recruiter account is pending verification. Our team will review your application and activate
-            your account soon.
-          </p>
-
-          <p className="text-gray-600 mb-6">
-            You'll receive an email notification once your account has been verified. This process typically takes 1-2
-            business days.
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/">Return to Home</Link>
-          </Button>
-
-          <Button asChild className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/80">
-            <Link href="/resend-confirmation">Resend Verification Email</Link>
-          </Button>
-        </div>
-      </div>
-    </div>
+            <div className="space-y-2">
+              <div className="flex items-start space-x-2">
+                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5" />
+                <p className="text-sm">Your registration has been received</p>
+              </div>
+              <div className="flex items-start space-x-2">
+                <Clock className="h-5 w-5 text-amber-600 mt-0.5" />
+                <p className="text-sm">Administrator review in progress</p>
+              </div>
+              <div className="flex items-start space-x-2">
+                <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
+                <p className="text-sm">You will receive an email when your account is approved</p>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex flex-col space-y-4">
+            <Button asChild variant="outline" className="w-full">
+              <Link href="/">Return to Home Page</Link>
+            </Button>
+            <div className="text-center text-sm text-gray-500">
+              <p>
+                If you have any questions, please{" "}
+                <Link href="/contact" className="text-[#0A3C1F] hover:underline">
+                  contact us
+                </Link>
+                .
+              </p>
+            </div>
+          </CardFooter>
+        </Card>
+      </main>
+      <ImprovedFooter />
+    </>
   )
 }

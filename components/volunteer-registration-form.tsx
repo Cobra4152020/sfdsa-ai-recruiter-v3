@@ -1,133 +1,311 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { z } from "zod"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/components/ui/use-toast"
-import { Form } from "@/components/ui/form"
-import { AlertCircle } from "lucide-react"
-import { registerVolunteerRecruiter } from "@/app/actions/volunteer-registration"
+import { authService } from "@/lib/auth-service"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { UserPlus, Mail, Lock, User, Phone, Building, MapPin, Briefcase, AlertCircle } from "lucide-react"
 
-// Form validation schema
-const formSchema = z
-  .object({
-    firstName: z.string().min(2, "First name must be at least 2 characters"),
-    lastName: z.string().min(2, "Last name must be at least 2 characters"),
-    email: z.string().email("Please enter a valid email address"),
-    phone: z.string().min(10, "Please enter a valid phone number"),
-    organization: z.string().optional(),
-    position: z.string().optional(),
-    location: z.string().min(2, "Please enter your location"),
-    password: z
-      .string()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-      .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-      .regex(/[0-9]/, "Password must contain at least one number")
-      .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-    confirmPassword: z.string(),
-    referralSource: z.string().optional(),
-    agreeTerms: z.boolean().refine((val) => val === true, {
-      message: "You must agree to the terms and conditions",
-    }),
-    agreePrivacy: z.boolean().refine((val) => val === true, {
-      message: "You must agree to the privacy policy",
-    }),
+export function VolunteerRegistrationForm() {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    organization: "",
+    position: "",
+    location: "",
+    password: "",
+    confirmPassword: "",
   })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  })
-
-type FormValues = z.infer<typeof formSchema>
-
-interface VolunteerRegistrationFormProps {
-  isSubmitting: boolean
-  setIsSubmitting: (value: boolean) => void
-}
-
-export function VolunteerRegistrationForm({ isSubmitting, setIsSubmitting }: VolunteerRegistrationFormProps) {
+  const [agreeTerms, setAgreeTerms] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
   const router = useRouter()
   const { toast } = useToast()
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      firstName: "",
-      lastName: "",
-      email: "",
-      phone: "",
-      organization: "",
-      position: "",
-      location: "",
-      password: "",
-      confirmPassword: "",
-      referralSource: "",
-      agreeTerms: false,
-      agreePrivacy: false,
-    },
-  })
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target
+    setFormData((prev) => ({ ...prev, [name]: value }))
+  }
 
-  async function onSubmit(data: FormValues) {
-    setIsSubmitting(true)
+  const validateForm = () => {
+    if (!formData.firstName.trim()) return "First name is required"
+    if (!formData.lastName.trim()) return "Last name is required"
+    if (!formData.email.trim()) return "Email is required"
+    if (!formData.phone.trim()) return "Phone number is required"
+    if (!formData.organization.trim()) return "Organization is required"
+    if (!formData.position.trim()) return "Position is required"
+    if (!formData.location.trim()) return "Location is required"
+    if (!formData.password) return "Password is required"
+    if (formData.password.length < 6) return "Password must be at least 6 characters"
+    if (formData.password !== formData.confirmPassword) return "Passwords do not match"
+    if (!agreeTerms) return "You must agree to the terms and conditions"
+    return null
+  }
+
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const validationError = validateForm()
+    if (validationError) {
+      setError(validationError)
+      toast({
+        title: "Registration failed",
+        description: validationError,
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoading(true)
     setError(null)
 
     try {
-      const result = await registerVolunteerRecruiter({
-        firstName: data.firstName,
-        lastName: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        organization: data.organization || "",
-        position: data.position || "",
-        location: data.location,
-        password: data.password,
-        referralSource: data.referralSource || "",
-      })
+      const result = await authService.registerVolunteerRecruiter(
+        formData.email,
+        formData.password,
+        formData.firstName,
+        formData.lastName,
+        formData.phone,
+        formData.organization,
+        formData.position,
+        formData.location,
+      )
 
-      if (result.error) {
-        throw new Error(result.error)
+      if (!result.success) {
+        throw new Error(result.message)
       }
 
       toast({
-        title: "Registration successful!",
-        description: result.requiresConfirmation
-          ? "Please check your email to confirm your account."
-          : "Your volunteer recruiter account has been created. You can now log in.",
+        title: "Registration successful",
+        description: "Your account has been created and is pending verification.",
       })
 
-      // Redirect to login page with confirmation message
-      setTimeout(() => {
-        router.push(result.requiresConfirmation ? "/volunteer-login?needsConfirmation=true" : "/volunteer-login")
-      }, 1500)
-    } catch (err) {
-      console.error("Registration error:", err)
-      setError(err instanceof Error ? err.message : "Failed to register. Please try again.")
+      // Redirect to pending page
+      router.push("/volunteer-pending")
+    } catch (error) {
+      console.error("Registration error:", error)
+      setError(error instanceof Error ? error.message : "Failed to create account")
       toast({
         title: "Registration failed",
-        description: err instanceof Error ? err.message : "An unexpected error occurred",
+        description: error instanceof Error ? error.message : "Failed to create account",
         variant: "destructive",
       })
     } finally {
-      setIsSubmitting(false)
+      setIsLoading(false)
     }
   }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <Card className="max-w-md mx-auto">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+          Volunteer Recruiter Registration
+        </CardTitle>
+        <CardDescription className="text-center">
+          Register as a volunteer recruiter to help with recruitment efforts
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md flex items-start">
-            <AlertCircle className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-            <span>{error}</span>
-          </div>
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
         )}
-
-        {/* Form fields remain the same */}
-      </form>
-    </Form>
+        <form onSubmit={handleRegister} className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First Name</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="firstName"
+                  name="firstName"
+                  placeholder="John"
+                  value={formData.firstName}
+                  onChange={handleChange}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last Name</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input
+                  id="lastName"
+                  name="lastName"
+                  placeholder="Doe"
+                  value={formData.lastName}
+                  onChange={handleChange}
+                  className="pl-10"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="name@example.com"
+                value={formData.email}
+                onChange={handleChange}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <div className="relative">
+              <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="phone"
+                name="phone"
+                type="tel"
+                placeholder="(555) 123-4567"
+                value={formData.phone}
+                onChange={handleChange}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="organization">Organization</Label>
+            <div className="relative">
+              <Building className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="organization"
+                name="organization"
+                placeholder="Company or Organization"
+                value={formData.organization}
+                onChange={handleChange}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="position">Position</Label>
+            <div className="relative">
+              <Briefcase className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="position"
+                name="position"
+                placeholder="Your Role"
+                value={formData.position}
+                onChange={handleChange}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location">Location</Label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="location"
+                name="location"
+                placeholder="City, State"
+                value={formData.location}
+                onChange={handleChange}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password">Password</Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                placeholder="••••••••"
+                value={formData.password}
+                onChange={handleChange}
+                className="pl-10"
+                required
+              />
+            </div>
+            <p className="text-xs text-gray-500">Password must be at least 6 characters</p>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                className="pl-10"
+                required
+              />
+            </div>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Checkbox id="terms" checked={agreeTerms} onCheckedChange={(checked) => setAgreeTerms(checked === true)} />
+            <label
+              htmlFor="terms"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+            >
+              I agree to the{" "}
+              <Link href="/terms-of-service" className="text-[#0A3C1F] hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy-policy" className="text-[#0A3C1F] hover:underline">
+                Privacy Policy
+              </Link>
+            </label>
+          </div>
+          <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
+            {isLoading ? (
+              <span className="flex items-center">
+                <span className="animate-spin mr-2">⟳</span>
+                Creating account...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Register as Volunteer Recruiter
+              </span>
+            )}
+          </Button>
+        </form>
+      </CardContent>
+      <CardFooter className="flex justify-center">
+        <div className="text-center text-sm">
+          Already have an account?{" "}
+          <Link href="/volunteer-login" className="text-[#0A3C1F] hover:underline font-medium">
+            Sign in
+          </Link>
+        </div>
+      </CardFooter>
+    </Card>
   )
 }

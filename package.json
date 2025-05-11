@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
-    "@hookform/resolvers": "latest",
+    "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -64,7 +64,7 @@
     "react": "^19",
     "react-day-picker": "latest",
     "react-dom": "^19",
-    "react-hook-form": "latest",
+    "react-hook-form": "^7.54.1",
     "react-qr-code": "latest",
     "react-resizable-panels": "^2.1.7",
     "recharts": "latest",
@@ -77,7 +77,7 @@
     "vaul": "^0.9.6",
     "web-vitals": "latest",
     "ws": "latest",
-    "zod": "latest"
+    "zod": "^3.24.1"
   },
   "devDependencies": {
     "@types/node": "^22",
