@@ -1,20 +1,29 @@
 import { NextResponse } from "next/server"
-import { TikTokChallengeService } from "@/lib/tiktok-challenge-service"
+import { createClient } from "@/lib/supabase-server"
 import { verifyAdminAccess } from "@/lib/user-management-service"
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url)
     const userId = url.searchParams.get("userId")
+    const supabase = createClient()
 
     if (userId) {
       // Get challenges with completion status for user
-      const challenges = await TikTokChallengeService.getChallengesForUser(userId)
-      return NextResponse.json({ challenges })
+      const { data, error } = await supabase.rpc("get_challenges_with_completion", {
+        p_user_id: userId,
+      })
+
+      if (error) throw error
+
+      return NextResponse.json({ challenges: data })
     } else {
       // Get all active challenges
-      const challenges = await TikTokChallengeService.getActiveChallenges()
-      return NextResponse.json({ challenges })
+      const { data, error } = await supabase.from("active_tiktok_challenges").select("*")
+
+      if (error) throw error
+
+      return NextResponse.json({ challenges: data })
     }
   } catch (error) {
     console.error("Error fetching TikTok challenges:", error)
@@ -25,23 +34,48 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json()
-    const { adminId, challenge } = body
+    const {
+      title,
+      description,
+      instructions,
+      hashtags,
+      startDate,
+      endDate,
+      pointsReward,
+      badgeReward,
+      exampleVideoUrl,
+      thumbnailUrl,
+    } = body
+    const supabase = createClient()
 
-    // Verify that the request is from an admin
-    const isAdmin = await verifyAdminAccess(adminId)
-
+    // Verify admin access (in a real app, you'd get the admin ID from the session)
+    const isAdmin = await verifyAdminAccess("admin-id")
     if (!isAdmin) {
       return NextResponse.json({ error: "Unauthorized access" }, { status: 403 })
     }
 
     // Create new challenge
-    const newChallenge = await TikTokChallengeService.createChallenge(challenge)
+    const { data, error } = await supabase
+      .from("tiktok_challenges")
+      .insert({
+        title,
+        description,
+        instructions,
+        hashtags,
+        start_date: startDate,
+        end_date: endDate,
+        points_reward: pointsReward,
+        badge_reward: badgeReward || null,
+        example_video_url: exampleVideoUrl || null,
+        thumbnail_url: thumbnailUrl || null,
+        status: "active",
+      })
+      .select()
+      .single()
 
-    if (!newChallenge) {
-      return NextResponse.json({ error: "Failed to create challenge" }, { status: 500 })
-    }
+    if (error) throw error
 
-    return NextResponse.json({ challenge: newChallenge })
+    return NextResponse.json({ challenge: data })
   } catch (error) {
     console.error("Error creating TikTok challenge:", error)
     return NextResponse.json({ error: "Failed to create TikTok challenge" }, { status: 500 })

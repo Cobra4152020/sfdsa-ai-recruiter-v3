@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@emotion/is-prop-valid": "latest",
-    "@hookform/resolvers": "^3.9.1",
+    "@hookform/resolvers": "latest",
     "@radix-ui/react-accordion": "1.2.2",
     "@radix-ui/react-alert-dialog": "1.1.4",
     "@radix-ui/react-aspect-ratio": "1.1.1",
@@ -43,6 +43,7 @@
     "@supabase/auth-helpers-nextjs": "latest",
     "@supabase/supabase-js": "latest",
     "autoprefixer": "^10.4.20",
+    "canvas": "latest",
     "canvas-confetti": "latest",
     "child_process": "latest",
     "class-variance-authority": "^0.7.1",
@@ -67,7 +68,7 @@
     "react": "^19",
     "react-day-picker": "latest",
     "react-dom": "^19",
-    "react-hook-form": "^7.54.1",
+    "react-hook-form": "latest",
     "react-qr-code": "latest",
     "react-resizable-panels": "^2.1.7",
     "recharts": "latest",
@@ -80,7 +81,7 @@
     "vaul": "^0.9.6",
     "web-vitals": "latest",
     "ws": "latest",
-    "zod": "^3.24.1"
+    "zod": "latest"
   },
   "devDependencies": {
     "@types/node": "^22",
