@@ -13,19 +13,7 @@ export default function GamesPage() {
       href: "/games/word-constructor",
       emoji: "📝",
     },
-    {
-      title: "Memory Match Deluxe",
-      description:
-        "Test your memory by matching pairs of cards. Find all matches as quickly as possible to maximize your score.",
-      href: "/games/memory-match",
-      emoji: "🎮",
-    },
-    {
-      title: "Spin to Win",
-      description: "Spin the wheel to win or lose points in this game of chance. Will luck be on your side?",
-      href: "/games/spin-to-win",
-      emoji: "🎡",
-    },
+    // Memory Match and Spin to Win games removed
   ]
 
   return (

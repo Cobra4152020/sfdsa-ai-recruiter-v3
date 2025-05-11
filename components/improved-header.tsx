@@ -221,8 +221,8 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                     href: "/deputy-launchpad",
                   },
                   { label: "Play Trivia w/ Sgt. Ken", href: "/trivia" },
-                  { label: "Memory Match Deluxe", href: "/games/memory-match" },
-                  { label: "Spin to Win", href: "/games/spin-to-win" },
+                  { label: "Word Constructor", href: "/games/word-constructor" },
+                  // Memory Match and Spin to Win games removed
                 ]}
               />
               <Link href="/chat-with-sgt-ken" className="text-white hover:text-[#FFD700] transition-colors">
@@ -359,12 +359,10 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   <Link href="/trivia" className="block text-white hover:text-[#FFD700]">
                     Play Trivia w/ Sgt. Ken
                   </Link>
-                  <Link href="/games/memory-match" className="block text-white hover:text-[#FFD700]">
-                    Memory Match Deluxe
+                  <Link href="/games/word-constructor" className="block text-white hover:text-[#FFD700]">
+                    Word Constructor
                   </Link>
-                  <Link href="/games/spin-to-win" className="block text-white hover:text-[#FFD700]">
-                    Spin to Win
-                  </Link>
+                  {/* Memory Match and Spin to Win games removed */}
                 </div>
               )}
             </div>
