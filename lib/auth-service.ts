@@ -284,4 +284,38 @@ export const authService = {
       return false
     }
   },
+
+  /**
+   * Send a magic link for passwordless login
+   */
+  async sendMagicLink(email: string, redirectUrl: string): Promise<AuthResult> {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      })
+
+      if (error) {
+        return {
+          success: false,
+          message: error.message,
+          error,
+        }
+      }
+
+      return {
+        success: true,
+        message: "Magic link sent successfully",
+      }
+    } catch (error) {
+      console.error("Magic link error:", error)
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to send magic link",
+        error,
+      }
+    }
+  },
 }

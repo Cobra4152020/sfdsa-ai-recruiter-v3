@@ -3,26 +3,30 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react"
-import { authService } from "@/lib/auth-service"
+import { AlertCircle, InfoIcon, Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { supabase } from "@/lib/supabase-client-singleton"
+import { useUser } from "@/context/user-context"
 
-export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }) {
+export function UserLoginForm() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const needsConfirmation = searchParams.get("needsConfirmation") === "true"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
   const { toast } = useToast()
+  const { login } = useUser()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -30,26 +34,52 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
     setError(null)
 
     try {
-      const result = await authService.signInWithPassword(email, password)
-
-      if (!result.success) {
-        throw new Error(result.message)
-      }
-
-      toast({
-        title: "Login successful",
-        description: "Welcome back!",
+      // Sign in with Supabase
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      // Redirect based on user type
-      if (result.userType === "volunteer") {
-        router.push("/volunteer-dashboard")
-      } else {
-        router.push(redirectTo)
+      if (signInError) throw signInError
+
+      if (data.user) {
+        // Get user profile data
+        const { data: userData, error: profileError } = await supabase
+          .from("user_profiles")
+          .select("*")
+          .eq("user_id", data.user.id)
+          .single()
+
+        if (!profileError && userData) {
+          login({
+            id: userData.id || data.user.id,
+            name: `${userData.first_name || ""} ${userData.last_name || ""}`.trim() || "User",
+            email: userData.email || data.user.email,
+            participation_count: userData.points || 0,
+            has_applied: userData.application_status !== "new" && userData.application_status !== null,
+          })
+        } else {
+          // Basic login with just auth data
+          login({
+            id: data.user.id,
+            name: data.user.user_metadata?.name || "User",
+            email: data.user.email,
+          })
+        }
+
+        toast({
+          title: "Login successful",
+          description: "Welcome to your recruitment dashboard!",
+        })
+
+        // Redirect to dashboard
+        router.push("/dashboard")
       }
     } catch (error) {
       console.error("Login error:", error)
-      setError(error instanceof Error ? error.message : "Failed to sign in")
+      setError(
+        error instanceof Error ? error.message : "Failed to sign in. Please check your credentials and try again.",
+      )
     } finally {
       setIsLoading(false)
     }
@@ -65,7 +95,12 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
     setError(null)
 
     try {
-      const { error } = await authService.sendMagicLink(email, `${window.location.origin}${redirectTo}`)
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
+      })
 
       if (error) throw error
 
@@ -82,9 +117,19 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      {needsConfirmation && (
+        <Alert className="mb-6 bg-blue-50 border-blue-200">
+          <InfoIcon className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-700">
+            Please check your email to confirm your account before logging in. The confirmation link will expire in 24
+            hours.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -157,7 +202,7 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
         </Button>
       </form>
 
-      <div className="relative">
+      <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300"></div>
         </div>
@@ -176,20 +221,14 @@ export function LoginForm({ redirectTo = "/dashboard" }: { redirectTo?: string }
         Sign in with Magic Link
       </Button>
 
-      <div className="text-center">
+      <div className="text-center space-y-2 mt-4">
         <p className="text-sm text-gray-600">
-          Don't have an account?{" "}
-          <Link href="/register" className="text-[#0A3C1F] hover:underline">
-            Sign up
-          </Link>
-        </p>
-        <p className="mt-2 text-sm text-gray-600">
           Are you a volunteer recruiter?{" "}
-          <Link href="/volunteer-login" className="text-[#0A3C1F] hover:underline">
-            Volunteer login
+          <Link href="/volunteer-login" className="text-[#0A3C1F] hover:underline font-medium">
+            Volunteer Login
           </Link>
         </p>
       </div>
-    </div>
+    </>
   )
 }
