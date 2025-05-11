@@ -13,9 +13,13 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/components/ui/use-toast"
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react"
 import { authService } from "@/lib/auth-service"
-import { volunteerAuthService } from "@/lib/volunteer-auth-service"
 
-export function VolunteerLoginForm() {
+interface LoginFormProps {
+  redirectTo?: string
+  onSuccess?: () => void
+}
+
+export function LoginForm({ redirectTo = "/dashboard", onSuccess }: LoginFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -31,28 +35,22 @@ export function VolunteerLoginForm() {
     setError(null)
 
     try {
-      // First authenticate with Supabase
-      const authResult = await authService.signInWithPassword(email, password)
+      const result = await authService.signInWithPassword(email, password)
 
-      if (!authResult.success) {
-        throw new Error(authResult.message)
-      }
-
-      // Then check if user is a volunteer recruiter
-      if (authResult.userId) {
-        const isVolunteer = await volunteerAuthService.isVolunteerRecruiter(authResult.userId)
-
-        if (!isVolunteer) {
-          throw new Error("You do not have volunteer recruiter access. Please contact support.")
-        }
+      if (!result.success) {
+        throw new Error(result.message)
       }
 
       toast({
         title: "Login successful",
-        description: "Welcome to the Volunteer Recruiter Dashboard!",
+        description: "Welcome back!",
       })
 
-      router.push("/volunteer-dashboard")
+      if (onSuccess) {
+        onSuccess()
+      } else {
+        router.push(redirectTo)
+      }
     } catch (error) {
       console.error("Login error:", error)
       setError(error instanceof Error ? error.message : "Failed to sign in")
@@ -71,7 +69,7 @@ export function VolunteerLoginForm() {
     setError(null)
 
     try {
-      const result = await authService.signInWithMagicLink(email, `${window.location.origin}/volunteer-dashboard`)
+      const result = await authService.signInWithMagicLink(email, `${window.location.origin}${redirectTo}`)
 
       if (!result.success) {
         throw new Error(result.message)
@@ -183,20 +181,6 @@ export function VolunteerLoginForm() {
       >
         Sign in with Magic Link
       </Button>
-
-      <div className="text-center space-y-2">
-        <p className="text-sm text-gray-600">
-          Don&apos;t have an account?{" "}
-          <Link href="/volunteer-register" className="text-[#0A3C1F] hover:underline font-medium">
-            Register as a Volunteer Recruiter
-          </Link>
-        </p>
-        <p className="text-sm text-gray-600">
-          <Link href="/resend-confirmation" className="text-[#0A3C1F] hover:underline">
-            Resend confirmation email
-          </Link>
-        </p>
-      </div>
     </div>
   )
 }
