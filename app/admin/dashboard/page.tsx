@@ -20,6 +20,7 @@ import {
   CheckCircle,
   XCircle,
   RefreshCw,
+  UserCog,
 } from "lucide-react"
 import { getSupabaseClient } from "@/lib/supabase-core"
 
@@ -201,6 +202,20 @@ export default function AdminDashboard() {
                 </CardHeader>
                 <CardContent>
                   <CardDescription>View and manage applicant data and track recruitment progress</CardDescription>
+                </CardContent>
+              </Card>
+            </Link>
+
+            <Link href="/admin/users" className="block">
+              <Card className="h-full hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-lg">User Management</CardTitle>
+                    <UserCog className="h-5 w-5 text-[#0A3C1F]" />
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <CardDescription>Manage users, roles, and permissions across the platform</CardDescription>
                 </CardContent>
               </Card>
             </Link>
