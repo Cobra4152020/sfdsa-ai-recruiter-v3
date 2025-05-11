@@ -1,50 +1,45 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
 
 export async function GET() {
   try {
     // Get environment variables
-    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "Not set"
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      return NextResponse.json({
-        success: false,
-        error: "Missing Supabase configuration",
-        environmentVariables: {
-          NEXT_PUBLIC_SITE_URL: siteUrl,
-          NODE_ENV: process.env.NODE_ENV,
-        },
-      })
+    const envVars = {
+      NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
+      NODE_ENV: process.env.NODE_ENV,
+      VERCEL_URL: process.env.VERCEL_URL,
     }
 
-    // Create Supabase client
-    const supabase = createClient(supabaseUrl, supabaseAnonKey)
+    // Determine the base URL
+    let baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (!baseUrl && process.env.VERCEL_URL) {
+      baseUrl = `https://${process.env.VERCEL_URL}`
+    } else if (!baseUrl) {
+      baseUrl = "http://localhost:3000"
+    }
 
-    // Get the current URL used by the application
-    const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : siteUrl || "http://localhost:3000"
-
-    // Compute some example URLs to check configuration
+    // Compute important URLs
     const computedUrls = {
       baseUrl,
       loginRedirectUrl: `${baseUrl}/login`,
       callbackUrl: `${baseUrl}/api/auth/callback`,
     }
 
+    // Check if the configuration is valid
+    const isProduction = process.env.NODE_ENV === "production"
+    const hasCorrectSiteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.includes("sfdeputysheriff.com")
+
+    const isValid = !isProduction || hasCorrectSiteUrl
+
     return NextResponse.json({
-      success: true,
-      environmentVariables: {
-        NEXT_PUBLIC_SITE_URL: siteUrl,
-        NODE_ENV: process.env.NODE_ENV,
-        VERCEL_URL: process.env.VERCEL_URL || "Not set",
-      },
+      isValid,
+      environment: process.env.NODE_ENV || "development",
+      siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "Not set",
+      envVars,
       computedUrls,
     })
   } catch (error) {
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "An unknown error occurred",
-    })
+    console.error("Error checking site URL:", error)
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 })
   }
 }

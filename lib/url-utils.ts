@@ -1,33 +1,42 @@
 /**
- * Returns the base URL of the application based on environment variables
- * Prioritizes NEXT_PUBLIC_SITE_URL for production environments
+ * Get the base URL for the application
+ * Prioritizes NEXT_PUBLIC_SITE_URL over VERCEL_URL
  */
 export function getBaseUrl(): string {
-  // First priority: NEXT_PUBLIC_SITE_URL (explicitly set for production)
+  // First priority: NEXT_PUBLIC_SITE_URL
   if (process.env.NEXT_PUBLIC_SITE_URL) {
     return process.env.NEXT_PUBLIC_SITE_URL
   }
 
-  // Second priority: Vercel deployment URL
-  if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  }
-
-  // Third priority: VERCEL_URL (server-side only)
+  // Second priority: VERCEL_URL (for preview deployments)
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`
   }
 
   // Fallback for local development
-  return process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://www.sfdeputysheriff.com"
+  return "http://localhost:3000"
 }
 
 /**
- * Constructs a full URL by appending the path to the base URL
+ * Construct a full URL from a path
  */
 export function constructUrl(path: string): string {
   const baseUrl = getBaseUrl()
-  // Ensure path starts with / and there's no double //
+  // Ensure path starts with a slash
   const normalizedPath = path.startsWith("/") ? path : `/${path}`
   return `${baseUrl}${normalizedPath}`
+}
+
+/**
+ * Get the callback URL for authentication
+ */
+export function getCallbackUrl(): string {
+  return constructUrl("/api/auth/callback")
+}
+
+/**
+ * Get the login redirect URL
+ */
+export function getLoginRedirectUrl(): string {
+  return constructUrl("/login")
 }
