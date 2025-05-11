@@ -20,6 +20,7 @@ import {
   FileText,
   GamepadIcon,
   MessageSquare,
+  Trophy,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useTheme } from "@/components/theme-provider"
@@ -189,7 +190,12 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                 ]}
               />
               <DropdownNav
-                label="Top Recruits"
+                label={
+                  <span className="flex items-center">
+                    <Trophy className="h-4 w-4 mr-1" />
+                    Top Recruits
+                  </span>
+                }
                 items={[
                   { label: "Top Recruits", href: "/awards" },
                   { label: "Leaderboard", href: "/awards#leaderboard" },
@@ -219,7 +225,6 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   { label: "Spin to Win", href: "/games/spin-to-win" },
                 ]}
               />
-              {/* Remove Volunteer Recruiter Link */}
               <Link href="/chat-with-sgt-ken" className="text-white hover:text-[#FFD700] transition-colors">
                 <span className="flex items-center">
                   <MessageSquare className="h-4 w-4 mr-1" />
@@ -302,6 +307,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                 onClick={() => setMobileDropdowns((prev) => ({ ...prev, topRecruits: !prev.topRecruits }))}
                 className="flex items-center w-full text-white hover:text-[#FFD700]"
               >
+                <Trophy className="h-4 w-4 mr-2" />
                 Top Recruits
                 <ChevronDown
                   className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
@@ -363,7 +369,13 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
               )}
             </div>
 
-            {/* Remove Volunteer Recruiter Link */}
+            <Link
+              href="/chat-with-sgt-ken"
+              className="block px-3 py-2 text-white hover:text-[#FFD700] flex items-center"
+            >
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Ask Sgt. Ken
+            </Link>
             <Link href="/login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
               Login
             </Link>

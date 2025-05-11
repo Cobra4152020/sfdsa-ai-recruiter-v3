@@ -45,6 +45,7 @@ export default function MainLayoutClient({ children }: { children: React.ReactNo
       <main id="main-content" className="min-h-screen pt-8">
         {children}
       </main>
+      {/* Floating chat bubble positioned on the right side */}
       <div className="fixed bottom-6 right-6 z-50">
         <AskSgtKenButton position="fixed" variant="secondary" />
       </div>
