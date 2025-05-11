@@ -8,12 +8,12 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/components/ui/use-toast"
-import { AlertCircle, InfoIcon, Mail, Lock, Eye, EyeOff } from "lucide-react"
-import { supabase } from "@/lib/supabase-client-singleton"
-import { useUser } from "@/context/user-context"
+import { Mail, Lock, Eye, EyeOff, AlertCircle, InfoIcon } from "lucide-react"
+import { authService } from "@/lib/unified-auth-service"
+import { SocialLoginButtons } from "@/components/social-login-buttons"
 
 export function UserLoginForm() {
   const router = useRouter()
@@ -26,7 +26,6 @@ export function UserLoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
-  const { login } = useUser()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -34,52 +33,22 @@ export function UserLoginForm() {
     setError(null)
 
     try {
-      // Sign in with Supabase
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      const result = await authService.signInWithPassword(email, password)
+
+      if (!result.success) {
+        throw new Error(result.message)
+      }
+
+      toast({
+        title: "Login successful",
+        description: `Welcome back${result.name ? ", " + result.name : ""}!`,
       })
 
-      if (signInError) throw signInError
-
-      if (data.user) {
-        // Get user profile data
-        const { data: userData, error: profileError } = await supabase
-          .from("user_profiles")
-          .select("*")
-          .eq("user_id", data.user.id)
-          .single()
-
-        if (!profileError && userData) {
-          login({
-            id: userData.id || data.user.id,
-            name: `${userData.first_name || ""} ${userData.last_name || ""}`.trim() || "User",
-            email: userData.email || data.user.email,
-            participation_count: userData.points || 0,
-            has_applied: userData.application_status !== "new" && userData.application_status !== null,
-          })
-        } else {
-          // Basic login with just auth data
-          login({
-            id: data.user.id,
-            name: data.user.user_metadata?.name || "User",
-            email: data.user.email,
-          })
-        }
-
-        toast({
-          title: "Login successful",
-          description: "Welcome to your recruitment dashboard!",
-        })
-
-        // Redirect to dashboard
-        router.push("/dashboard")
-      }
+      // Redirect to the appropriate dashboard based on user type
+      router.push(result.redirectUrl || "/dashboard")
     } catch (error) {
       console.error("Login error:", error)
-      setError(
-        error instanceof Error ? error.message : "Failed to sign in. Please check your credentials and try again.",
-      )
+      setError(error instanceof Error ? error.message : "Failed to sign in")
     } finally {
       setIsLoading(false)
     }
@@ -95,14 +64,11 @@ export function UserLoginForm() {
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithOtp({
-        email,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-        },
-      })
+      const result = await authService.signInWithMagicLink(email)
 
-      if (error) throw error
+      if (!result.success) {
+        throw new Error(result.message)
+      }
 
       toast({
         title: "Magic link sent",
@@ -122,8 +88,7 @@ export function UserLoginForm() {
         <Alert className="mb-6 bg-blue-50 border-blue-200">
           <InfoIcon className="h-4 w-4 text-blue-600" />
           <AlertDescription className="text-blue-700">
-            Please check your email to confirm your account before logging in. The confirmation link will expire in 24
-            hours.
+            Please check your email to confirm your account before logging in.
           </AlertDescription>
         </Alert>
       )}
@@ -134,6 +99,17 @@ export function UserLoginForm() {
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      <SocialLoginButtons onLoginStart={() => setError(null)} className="mb-6" />
+
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300"></div>
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-white px-2 text-gray-500">Or continue with email</span>
+        </div>
+      </div>
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">
@@ -197,7 +173,7 @@ export function UserLoginForm() {
               Signing in...
             </span>
           ) : (
-            "Sign In"
+            "Sign In with Email"
           )}
         </Button>
       </form>
@@ -223,9 +199,14 @@ export function UserLoginForm() {
 
       <div className="text-center space-y-2 mt-4">
         <p className="text-sm text-gray-600">
-          Are you a volunteer recruiter?{" "}
-          <Link href="/volunteer-login" className="text-[#0A3C1F] hover:underline font-medium">
-            Volunteer Login
+          Don&apos;t have an account?{" "}
+          <Link href="/register" className="text-[#0A3C1F] hover:underline font-medium">
+            Register as a Recruit
+          </Link>
+        </p>
+        <p className="text-sm text-gray-600">
+          <Link href="/volunteer-login" className="text-[#0A3C1F] hover:underline">
+            Volunteer Recruiter Login
           </Link>
         </p>
       </div>
