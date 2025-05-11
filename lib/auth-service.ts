@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase-client-singleton"
+import { supabaseAdmin } from "@/lib/supabase-service"
 
 export interface AuthResult {
   success: boolean
@@ -90,8 +91,8 @@ export const authService = {
         }
       }
 
-      // Insert into recruit.users table
-      const { error: insertError } = await supabase.from("recruit.users").insert({
+      // Use the admin client to insert into recruit.users table (bypassing RLS)
+      const { error: insertError } = await supabaseAdmin.from("recruit.users").insert({
         id: data.user.id,
         email: data.user.email,
         name: name || data.user.email?.split("@")[0] || "User",
@@ -107,8 +108,8 @@ export const authService = {
         }
       }
 
-      // Set user type
-      const { error: typeError } = await supabase.from("user_types").insert({
+      // Set user type using admin client
+      const { error: typeError } = await supabaseAdmin.from("user_types").insert({
         user_id: data.user.id,
         user_type: "recruit",
       })
@@ -178,8 +179,8 @@ export const authService = {
         }
       }
 
-      // Insert into volunteer.recruiters table
-      const { error: insertError } = await supabase.from("volunteer.recruiters").insert({
+      // Use the admin client to insert into volunteer.recruiters table (bypassing RLS)
+      const { error: insertError } = await supabaseAdmin.from("volunteer.recruiters").insert({
         id: data.user.id,
         email: data.user.email,
         first_name: firstName,
@@ -200,8 +201,8 @@ export const authService = {
         }
       }
 
-      // Set user type
-      const { error: typeError } = await supabase.from("user_types").insert({
+      // Set user type using admin client
+      const { error: typeError } = await supabaseAdmin.from("user_types").insert({
         user_id: data.user.id,
         user_type: "volunteer",
       })

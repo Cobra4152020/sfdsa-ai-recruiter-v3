@@ -20,6 +20,8 @@ export async function middleware(req: NextRequest) {
       // Redirect to appropriate login page
       if (isVolunteerRoute) {
         return NextResponse.redirect(new URL("/volunteer-login", req.url))
+      } else if (isAdminRoute) {
+        return NextResponse.redirect(new URL("/admin/login", req.url))
       } else {
         return NextResponse.redirect(new URL("/login", req.url))
       }
