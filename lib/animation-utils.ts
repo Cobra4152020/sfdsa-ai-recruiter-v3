@@ -1,6 +1,40 @@
-import { Canvas, type CanvasRenderingContext2D, loadImage } from "canvas"
 import GIFEncoder from "gif-encoder-2"
 import type { AnimationFrame, AnimationConfig, TextAnimationConfig } from "@/types/animation"
+
+// Dynamically import canvas only at runtime
+let Canvas: any = null
+let loadImage: any = null
+
+// Only import canvas in a server context
+if (typeof window === "undefined") {
+  try {
+    const canvasModule = require("canvas")
+    Canvas = canvasModule.Canvas
+    loadImage = canvasModule.loadImage
+  } catch (error) {
+    console.error("Canvas module not available:", error)
+    // Provide fallback implementations
+    Canvas = class {
+      constructor() {
+        return {
+          getContext: () => ({
+            createLinearGradient: () => ({ addColorStop: () => {} }),
+            fillRect: () => {},
+            drawImage: () => {},
+            fillText: () => {},
+            measureText: () => ({ width: 0 }),
+            fillStyle: "",
+            font: "",
+            textAlign: "",
+            globalAlpha: 1,
+          }),
+          toBuffer: () => Buffer.from([]),
+        }
+      }
+    }
+    loadImage = async () => ({})
+  }
+}
 
 /**
  * Creates a GIF animation with the specified frames and configuration
@@ -40,12 +74,7 @@ export async function createAnimatedGif(
 /**
  * Draws a single animation frame
  */
-async function drawAnimationFrame(
-  ctx: CanvasRenderingContext2D,
-  frame: AnimationFrame,
-  width: number,
-  height: number,
-): Promise<void> {
+async function drawAnimationFrame(ctx: any, frame: AnimationFrame, width: number, height: number): Promise<void> {
   // Draw background
   if (frame.background) {
     if (typeof frame.background === "string") {
@@ -195,7 +224,7 @@ async function drawAnimationFrame(
 /**
  * Draws text with animation effects
  */
-function drawAnimatedText(ctx: CanvasRenderingContext2D, textConfig: TextAnimationConfig, canvasWidth: number): void {
+function drawAnimatedText(ctx: any, textConfig: TextAnimationConfig, canvasWidth: number): void {
   ctx.save()
 
   // Set text properties

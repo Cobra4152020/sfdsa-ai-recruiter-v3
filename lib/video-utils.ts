@@ -1,9 +1,43 @@
-import { Canvas, loadImage } from "canvas"
 import fs from "fs"
 import path from "path"
 import { spawn } from "child_process"
 import { v4 as uuidv4 } from "uuid"
 import os from "os"
+
+// Dynamically import canvas only at runtime
+let Canvas: any = null
+let loadImage: any = null
+
+// Only import canvas in a server context
+if (typeof window === "undefined") {
+  try {
+    const canvasModule = require("canvas")
+    Canvas = canvasModule.Canvas
+    loadImage = canvasModule.loadImage
+  } catch (error) {
+    console.error("Canvas module not available:", error)
+    // Provide fallback implementations
+    Canvas = class {
+      constructor() {
+        return {
+          getContext: () => ({
+            createLinearGradient: () => ({ addColorStop: () => {} }),
+            fillRect: () => {},
+            drawImage: () => {},
+            fillText: () => {},
+            measureText: () => ({ width: 0 }),
+            fillStyle: "",
+            font: "",
+            textAlign: "",
+            globalAlpha: 1,
+          }),
+          toBuffer: () => Buffer.from([]),
+        }
+      }
+    }
+    loadImage = async () => ({})
+  }
+}
 
 export interface VideoFrame {
   background?: {

@@ -1,24 +1,58 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { createCanvas, loadImage, registerFont } from "canvas"
 import { trackEngagement } from "@/lib/analytics"
 import { supabaseAdmin } from "@/lib/supabase-admin"
 import path from "path"
 import { createAnimatedGif, generateBadgeAnimationFrames, generateNFTAnimationFrames } from "@/lib/animation-utils"
 
-// Register fonts for canvas
-try {
-  // Check if we're in a Node.js environment (not client-side)
-  if (typeof window === "undefined") {
-    // Register fonts - adjust paths as needed for your project
-    registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Bold.ttf"), { family: "Inter", weight: "bold" })
-    registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Medium.ttf"), { family: "Inter", weight: "medium" })
-    registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Regular.ttf"), {
-      family: "Inter",
-      weight: "normal",
+// Dynamically import canvas only at runtime
+const canvas: any = null
+let registerFont: any = null
+let loadImage: any = null
+let createCanvas: any = null
+
+// Only import canvas in a server context
+if (typeof window === "undefined") {
+  try {
+    const canvasModule = require("canvas")
+    createCanvas = canvasModule.createCanvas
+    loadImage = canvasModule.loadImage
+    registerFont = canvasModule.registerFont
+
+    // Register fonts for canvas
+    try {
+      // Register fonts - adjust paths as needed for your project
+      registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Bold.ttf"), { family: "Inter", weight: "bold" })
+      registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Medium.ttf"), {
+        family: "Inter",
+        weight: "medium",
+      })
+      registerFont(path.join(process.cwd(), "public", "fonts", "Inter-Regular.ttf"), {
+        family: "Inter",
+        weight: "normal",
+      })
+    } catch (fontError) {
+      console.error("Error registering fonts:", fontError)
+    }
+  } catch (error) {
+    console.error("Canvas module not available:", error)
+    // Provide fallback or mock implementations if needed
+    createCanvas = () => ({
+      getContext: () => ({
+        createLinearGradient: () => ({ addColorStop: () => {} }),
+        fillRect: () => {},
+        drawImage: () => {},
+        fillText: () => {},
+        measureText: () => ({ width: 0 }),
+        fillStyle: "",
+        font: "",
+        textAlign: "",
+        globalAlpha: 1,
+      }),
+      toBuffer: () => Buffer.from([]),
     })
+    loadImage = async () => ({})
+    registerFont = () => {}
   }
-} catch (error) {
-  console.error("Error registering fonts:", error)
 }
 
 // Instagram story dimensions
@@ -60,6 +94,18 @@ export async function POST(request: NextRequest) {
       points_awarded: 25, // Award points for Instagram sharing
       metadata: { animated },
     })
+
+    // Check if canvas is available
+    if (!createCanvas || !loadImage) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "Image generation is not available in this environment",
+          message: "Your share has been recorded, but image generation is not available.",
+        },
+        { status: 200 },
+      )
+    }
 
     // Determine image paths
     const logoPath = `${process.cwd()}/public/sfdsa-logo.png`

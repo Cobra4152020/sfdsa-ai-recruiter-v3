@@ -43,7 +43,6 @@
     "@supabase/auth-helpers-nextjs": "latest",
     "@supabase/supabase-js": "latest",
     "autoprefixer": "^10.4.20",
-    "canvas": "latest",
     "canvas-confetti": "latest",
     "child_process": "latest",
     "class-variance-authority": "^0.7.1",
