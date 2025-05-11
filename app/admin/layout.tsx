@@ -6,5 +6,9 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  return <AdminAuthCheck>{children}</AdminAuthCheck>
+  // Check if the current path is /admin/login
+  const isAdminLoginPage = typeof window !== "undefined" && window.location.pathname === "/admin/login"
+
+  // Only apply AdminAuthCheck if not on the login page
+  return isAdminLoginPage ? children : <AdminAuthCheck>{children}</AdminAuthCheck>
 }
