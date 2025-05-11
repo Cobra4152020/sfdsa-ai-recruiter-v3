@@ -1,6 +1,14 @@
 import { trackEngagement } from "@/lib/analytics"
 
-export type SocialPlatform = "twitter" | "facebook" | "linkedin" | "whatsapp" | "email" | "copy" | "instagram"
+export type SocialPlatform =
+  | "twitter"
+  | "facebook"
+  | "linkedin"
+  | "whatsapp"
+  | "email"
+  | "copy"
+  | "instagram"
+  | "tiktok"
 
 export interface ShareOptions {
   title: string
@@ -12,7 +20,7 @@ export interface ShareOptions {
   achievementType?: string
   achievementId?: string
   userId?: string
-  animated?: boolean // New option to toggle animation
+  animated?: boolean
 }
 
 export interface ShareResult {
@@ -20,6 +28,7 @@ export interface ShareResult {
   platform: SocialPlatform
   error?: string
   imageUrl?: string
+  videoUrl?: string
   isAnimated?: boolean
 }
 
@@ -141,6 +150,56 @@ export const SocialSharingService = {
   },
 
   /**
+   * Generate TikTok video and provide download
+   */
+  async getTikTokVideo(options: ShareOptions): Promise<ShareResult> {
+    try {
+      if (!options.userId || !options.achievementType || !options.achievementId) {
+        console.error("Missing required parameters for TikTok video")
+        return {
+          success: false,
+          platform: "tiktok",
+          error: "Missing required parameters",
+        }
+      }
+
+      const response = await fetch("/api/social-share/tiktok-video", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: options.userId,
+          achievementType: options.achievementType,
+          achievementId: options.achievementId,
+          achievementTitle: options.title,
+          achievementDescription: options.text,
+          imageUrl: options.image,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to generate TikTok video: ${response.statusText}`)
+      }
+
+      // Create a blob URL for the video
+      const blob = await response.blob()
+      return {
+        success: true,
+        platform: "tiktok",
+        videoUrl: URL.createObjectURL(blob),
+      }
+    } catch (error) {
+      console.error("Error generating TikTok video:", error)
+      return {
+        success: false,
+        platform: "tiktok",
+        error: "Failed to generate TikTok video",
+      }
+    }
+  },
+
+  /**
    * Share content using the Web Share API if available, otherwise open in a new window
    */
   async share(platform: SocialPlatform, options: ShareOptions): Promise<ShareResult> {
@@ -175,6 +234,11 @@ export const SocialSharingService = {
       // Special handling for Instagram
       if (platform === "instagram") {
         return await this.getInstagramStoryImage(options)
+      }
+
+      // Special handling for TikTok
+      if (platform === "tiktok") {
+        return await this.getTikTokVideo(options)
       }
 
       // If Web Share API is available and not using "copy" platform

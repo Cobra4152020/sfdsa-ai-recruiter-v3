@@ -167,6 +167,7 @@ importers:
       openai:
         specifier: latest
         version: 4.98.0(ws@8.18.2)(zod@3.24.1)
+      os: {specifier: latest, version: 0.1.2}
       path:
         specifier: latest
         version: 0.12.7
@@ -2043,6 +2044,9 @@ packages:
         optional: true
       zod:
         optional: true
+
+  os@0.1.2:
+    resolution: {integrity: sha512-ZoXJkvAnljwvc56MbvhtKVWmSkzV712k42Is2mA0+0KTSRakq5XXuXpjZjgAt9ctzl51ojhQWakQQpmOvXWfjQ==}
 
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
@@ -4308,6 +4312,8 @@ snapshots:
       zod: 3.24.1
     transitivePeerDependencies:
       - encoding
+
+  os@0.1.2: {}
 
   package-json-from-dist@1.0.1: {}
 
