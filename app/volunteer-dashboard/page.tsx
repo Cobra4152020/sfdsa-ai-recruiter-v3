@@ -6,7 +6,7 @@ import { VolunteerRecruiterDashboard } from "@/components/volunteer-recruiter-da
 import { RecruiterAnalyticsDashboard } from "@/components/recruiter-analytics-dashboard"
 import { ReferralLinkGenerator } from "@/components/referral-link-generator"
 import { useToast } from "@/components/ui/use-toast"
-import { supabase } from "@/lib/supabase-client"
+import { supabase } from "@/lib/supabase-client-singleton"
 
 export default function VolunteerDashboardPage() {
   const { toast } = useToast()
@@ -15,23 +15,56 @@ export default function VolunteerDashboardPage() {
   const [user, setUser] = useState<any>(null)
 
   useEffect(() => {
+    let isMounted = true
+
     async function checkAuth() {
-      setIsLoading(true)
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
+      try {
+        setIsLoading(true)
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
 
-      if (!session) {
-        window.location.href = "/volunteer-login"
-        return
+        if (!session) {
+          if (isMounted) {
+            window.location.href = "/volunteer-login"
+          }
+          return
+        }
+
+        // Check if user has volunteer_recruiter role
+        const { data: userRoles, error } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .single()
+
+        if (error || !userRoles || userRoles.role !== "volunteer_recruiter") {
+          console.error("Role verification failed:", error || "No volunteer role found")
+          if (isMounted) {
+            window.location.href = "/volunteer-login"
+          }
+          return
+        }
+
+        const { data: userData } = await supabase.auth.getUser()
+
+        if (isMounted) {
+          setUser(userData.user)
+          setIsLoading(false)
+        }
+      } catch (error) {
+        console.error("Auth check error:", error)
+        if (isMounted) {
+          window.location.href = "/volunteer-login"
+        }
       }
-
-      const { data: userData } = await supabase.auth.getUser()
-      setUser(userData.user)
-      setIsLoading(false)
     }
 
     checkAuth()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   if (isLoading) {

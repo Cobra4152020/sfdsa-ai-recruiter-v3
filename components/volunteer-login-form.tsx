@@ -3,26 +3,27 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
-import { Mail, Lock, Eye, EyeOff, AlertCircle } from "lucide-react"
-import { authService } from "@/lib/auth-service"
-import { volunteerAuthService } from "@/lib/volunteer-auth-service"
+import { AlertCircle, InfoIcon, Mail, Lock, Eye, EyeOff } from "lucide-react"
+import { supabase } from "@/lib/supabase-client-singleton"
 
 export function VolunteerLoginForm() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const needsConfirmation = searchParams.get("needsConfirmation") === "true"
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
   const { toast } = useToast()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -31,31 +32,39 @@ export function VolunteerLoginForm() {
     setError(null)
 
     try {
-      // First authenticate with Supabase
-      const authResult = await authService.signInWithPassword(email, password)
-
-      if (!authResult.success) {
-        throw new Error(authResult.message)
-      }
-
-      // Then check if user is a volunteer recruiter
-      if (authResult.userId) {
-        const isVolunteer = await volunteerAuthService.isVolunteerRecruiter(authResult.userId)
-
-        if (!isVolunteer) {
-          throw new Error("You do not have volunteer recruiter access. Please contact support.")
-        }
-      }
-
-      toast({
-        title: "Login successful",
-        description: "Welcome to the Volunteer Recruiter Dashboard!",
+      // Sign in with Supabase
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      router.push("/volunteer-dashboard")
+      if (signInError) throw signInError
+
+      if (data.user) {
+        // Check if user has volunteer_recruiter role
+        const { data: userRoles, error: roleError } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", data.user.id)
+          .single()
+
+        if (roleError || !userRoles || userRoles.role !== "volunteer_recruiter") {
+          throw new Error("You do not have volunteer recruiter access. Please contact support.")
+        }
+
+        toast({
+          title: "Login successful",
+          description: "Welcome to the Volunteer Recruiter Dashboard!",
+        })
+
+        // Redirect to volunteer dashboard
+        router.push("/volunteer-dashboard")
+      }
     } catch (error) {
       console.error("Login error:", error)
-      setError(error instanceof Error ? error.message : "Failed to sign in")
+      setError(
+        error instanceof Error ? error.message : "Failed to sign in. Please check your credentials and try again.",
+      )
     } finally {
       setIsLoading(false)
     }
@@ -71,11 +80,14 @@ export function VolunteerLoginForm() {
     setError(null)
 
     try {
-      const result = await authService.signInWithMagicLink(email, `${window.location.origin}/volunteer-dashboard`)
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${window.location.origin}/volunteer-dashboard`,
+        },
+      })
 
-      if (!result.success) {
-        throw new Error(result.message)
-      }
+      if (error) throw error
 
       toast({
         title: "Magic link sent",
@@ -90,9 +102,19 @@ export function VolunteerLoginForm() {
   }
 
   return (
-    <div className="space-y-6">
+    <>
+      {needsConfirmation && (
+        <Alert className="mb-6 bg-blue-50 border-blue-200">
+          <InfoIcon className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-700">
+            Please check your email to confirm your account before logging in. The confirmation link will expire in 24
+            hours.
+          </AlertDescription>
+        </Alert>
+      )}
+
       {error && (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>{error}</AlertDescription>
         </Alert>
@@ -165,7 +187,7 @@ export function VolunteerLoginForm() {
         </Button>
       </form>
 
-      <div className="relative">
+      <div className="relative my-4">
         <div className="absolute inset-0 flex items-center">
           <div className="w-full border-t border-gray-300"></div>
         </div>
@@ -184,7 +206,7 @@ export function VolunteerLoginForm() {
         Sign in with Magic Link
       </Button>
 
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-2 mt-4">
         <p className="text-sm text-gray-600">
           Don&apos;t have an account?{" "}
           <Link href="/volunteer-register" className="text-[#0A3C1F] hover:underline font-medium">
@@ -197,6 +219,6 @@ export function VolunteerLoginForm() {
           </Link>
         </p>
       </div>
-    </div>
+    </>
   )
 }

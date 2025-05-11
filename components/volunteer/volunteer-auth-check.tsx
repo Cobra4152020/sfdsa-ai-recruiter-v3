@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase-client"
+import { supabase } from "@/lib/supabase-client-singleton"
 
 export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) {
   const [isVolunteer, setIsVolunteer] = useState<boolean | null>(null)
@@ -12,6 +12,8 @@ export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) 
   const router = useRouter()
 
   useEffect(() => {
+    let isMounted = true
+
     async function checkVolunteerStatus() {
       try {
         const {
@@ -19,7 +21,9 @@ export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) 
         } = await supabase.auth.getSession()
 
         if (!session) {
-          router.push("/volunteer-login")
+          if (isMounted) {
+            router.push("/volunteer-login")
+          }
           return
         }
 
@@ -30,21 +34,39 @@ export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) 
           .eq("user_id", session.user.id)
           .single()
 
-        if (error || !userRoles || userRoles.role !== "volunteer_recruiter") {
-          router.push("/volunteer-login")
+        if (error) {
+          console.error("Error fetching user role:", error)
+          if (isMounted) {
+            router.push("/volunteer-login")
+          }
           return
         }
 
-        setIsVolunteer(true)
+        if (!userRoles || userRoles.role !== "volunteer_recruiter") {
+          console.log("User does not have volunteer_recruiter role:", userRoles)
+          if (isMounted) {
+            router.push("/volunteer-login")
+          }
+          return
+        }
+
+        if (isMounted) {
+          setIsVolunteer(true)
+          setIsLoading(false)
+        }
       } catch (error) {
         console.error("Error checking volunteer status:", error)
-        router.push("/volunteer-login")
-      } finally {
-        setIsLoading(false)
+        if (isMounted) {
+          router.push("/volunteer-login")
+        }
       }
     }
 
     checkVolunteerStatus()
+
+    return () => {
+      isMounted = false
+    }
   }, [router])
 
   if (isLoading) {

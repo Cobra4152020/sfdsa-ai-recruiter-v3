@@ -1,0 +1,95 @@
+"use client"
+
+import { useState, useEffect } from "react"
+import { supabase } from "@/lib/supabase-client-singleton"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+
+export function AuthDebug() {
+  const [sessionData, setSessionData] = useState<any>(null)
+  const [userRoles, setUserRoles] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  async function checkSession() {
+    try {
+      setLoading(true)
+      setError(null)
+
+      // Get session
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+
+      if (sessionError) {
+        throw sessionError
+      }
+
+      setSessionData(sessionData)
+
+      // If we have a session, check roles
+      if (sessionData.session) {
+        const { data: rolesData, error: rolesError } = await supabase
+          .from("user_roles")
+          .select("*")
+          .eq("user_id", sessionData.session.user.id)
+
+        if (rolesError) {
+          throw rolesError
+        }
+
+        setUserRoles(rolesData)
+      }
+    } catch (err) {
+      console.error("Auth debug error:", err)
+      setError(err instanceof Error ? err.message : "Unknown error occurred")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    checkSession()
+  }, [])
+
+  return (
+    <Card className="w-full">
+      <CardHeader>
+        <CardTitle>Authentication Debug</CardTitle>
+        <CardDescription>Check your authentication status and roles</CardDescription>
+      </CardHeader>
+      <CardContent>
+        {loading ? (
+          <div className="flex justify-center p-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A3C1F]"></div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 p-4 rounded-md text-red-700 mb-4">
+            <p className="font-bold">Error:</p>
+            <p>{error}</p>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-medium mb-2">Session Status:</h3>
+              <div className="bg-gray-50 p-3 rounded-md overflow-auto max-h-40">
+                <pre className="text-xs">{JSON.stringify(sessionData, null, 2)}</pre>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="font-medium mb-2">User Roles:</h3>
+              <div className="bg-gray-50 p-3 rounded-md overflow-auto max-h-40">
+                <pre className="text-xs">{JSON.stringify(userRoles, null, 2)}</pre>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <Button onClick={checkSession} variant="outline" size="sm">
+                Refresh Data
+              </Button>
+            </div>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  )
+}
