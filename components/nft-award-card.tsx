@@ -5,8 +5,8 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { ExternalLink, Share2 } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
 import Image from "next/image"
+import { AchievementShareDialog } from "./achievement-share-dialog"
 
 interface NFTAwardCardProps {
   id: string
@@ -34,6 +34,7 @@ export function NFTAwardCard({
   className,
 }: NFTAwardCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const isAwarded = !!awardedAt
 
   const formattedDate = awardedAt
@@ -43,30 +44,6 @@ export function NFTAwardCard({
         day: "numeric",
       })
     : null
-
-  const handleShare = async () => {
-    if (!isAwarded) return
-
-    const shareUrl = `${window.location.origin}/nft-awards/${id}`
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: `My ${name} NFT Award`,
-          text: `Check out my ${name} NFT Award from the San Francisco Sheriff's Office recruitment program!`,
-          url: shareUrl,
-        })
-      } catch (error) {
-        console.error("Error sharing:", error)
-      }
-    } else {
-      navigator.clipboard.writeText(shareUrl)
-      toast({
-        title: "Link copied!",
-        description: "Share this link with others to show off your NFT award.",
-      })
-    }
-  }
 
   return (
     <>
@@ -92,7 +69,7 @@ export function NFTAwardCard({
             View Details
           </Button>
           {isAwarded && (
-            <Button variant="outline" size="sm" onClick={handleShare}>
+            <Button variant="outline" size="sm" onClick={() => setIsShareDialogOpen(true)}>
               <Share2 className="h-4 w-4 mr-1" />
               Share
             </Button>
@@ -155,6 +132,20 @@ export function NFTAwardCard({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Share Dialog */}
+      {isAwarded && (
+        <AchievementShareDialog
+          isOpen={isShareDialogOpen}
+          onClose={() => setIsShareDialogOpen(false)}
+          achievement={{
+            title: `${name} NFT Award`,
+            description: `I earned the ${name} NFT Award in my journey to become a San Francisco Deputy Sheriff! ${description}`,
+            imageUrl: imageUrl,
+            shareUrl: `${typeof window !== "undefined" ? window.location.origin : ""}/nft-awards/${id}`,
+          }}
+        />
+      )}
     </>
   )
 }
