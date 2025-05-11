@@ -2,10 +2,9 @@ import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "../types/database"
 
 /**
- * Creates a Supabase client with service role privileges
- * This should only be used in server-side contexts
+ * Creates a Supabase client with service role privileges for server-side use.
  */
-export const createClient = () => {
+export const createServerClient = () => {
   const supabaseUrl = process.env.SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
@@ -22,23 +21,12 @@ export const createClient = () => {
 }
 
 /**
- * Creates a Supabase client with service role privileges for server-side use.
- * This is an alias for createClient to maintain compatibility with code expecting this function name.
+ * Creates a Supabase client with service role privileges
+ * This should only be used in server-side contexts
+ * This is an alias for createServerClient for backward compatibility
  */
-export const createServerClient = () => {
-  const supabaseUrl = process.env.SUPABASE_URL
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-  if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error("Missing Supabase environment variables")
-  }
-
-  return createSupabaseClient<Database>(supabaseUrl, supabaseServiceKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-    },
-  })
+export const createClient = () => {
+  return createServerClient()
 }
 
 /**
