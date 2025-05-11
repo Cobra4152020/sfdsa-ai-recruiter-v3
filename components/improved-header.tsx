@@ -221,8 +221,13 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                     href: "/deputy-launchpad",
                   },
                   { label: "Play Trivia w/ Sgt. Ken", href: "/trivia" },
+                  { label: "SF Football Trivia", href: "/trivia/sf-football" },
+                  { label: "SF Baseball Trivia", href: "/trivia/sf-baseball" },
+                  { label: "SF Basketball Trivia", href: "/trivia/sf-basketball" },
+                  { label: "SF District Trivia", href: "/trivia/sf-districts" },
+                  { label: "SF Tourist Spots Trivia", href: "/trivia/sf-tourist-spots" },
+                  { label: "SF Day Trips Trivia", href: "/trivia/sf-day-trips" },
                   { label: "Word Constructor", href: "/games/word-constructor" },
-                  // Memory Match and Spin to Win games removed
                 ]}
               />
               <Link href="/chat-with-sgt-ken" className="text-white hover:text-[#FFD700] transition-colors">
@@ -359,10 +364,27 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   <Link href="/trivia" className="block text-white hover:text-[#FFD700]">
                     Play Trivia w/ Sgt. Ken
                   </Link>
+                  <Link href="/trivia/sf-football" className="block text-white hover:text-[#FFD700]">
+                    SF Football Trivia
+                  </Link>
+                  <Link href="/trivia/sf-baseball" className="block text-white hover:text-[#FFD700]">
+                    SF Baseball Trivia
+                  </Link>
+                  <Link href="/trivia/sf-basketball" className="block text-white hover:text-[#FFD700]">
+                    SF Basketball Trivia
+                  </Link>
+                  <Link href="/trivia/sf-districts" className="block text-white hover:text-[#FFD700]">
+                    SF District Trivia
+                  </Link>
+                  <Link href="/trivia/sf-tourist-spots" className="block text-white hover:text-[#FFD700]">
+                    SF Tourist Spots Trivia
+                  </Link>
+                  <Link href="/trivia/sf-day-trips" className="block text-white hover:text-[#FFD700]">
+                    SF Day Trips Trivia
+                  </Link>
                   <Link href="/games/word-constructor" className="block text-white hover:text-[#FFD700]">
                     Word Constructor
                   </Link>
-                  {/* Memory Match and Spin to Win games removed */}
                 </div>
               )}
             </div>
