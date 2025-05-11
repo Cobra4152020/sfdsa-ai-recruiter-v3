@@ -12,6 +12,7 @@ export interface ShareOptions {
   achievementType?: string
   achievementId?: string
   userId?: string
+  animated?: boolean // New option to toggle animation
 }
 
 export interface ShareResult {
@@ -19,6 +20,7 @@ export interface ShareResult {
   platform: SocialPlatform
   error?: string
   imageUrl?: string
+  isAnimated?: boolean
 }
 
 /**
@@ -87,12 +89,18 @@ export const SocialSharingService = {
   /**
    * Generate Instagram story image and provide download
    */
-  async getInstagramStoryImage(options: ShareOptions): Promise<string | null> {
+  async getInstagramStoryImage(options: ShareOptions): Promise<ShareResult> {
     try {
       if (!options.userId || !options.achievementType || !options.achievementId) {
         console.error("Missing required parameters for Instagram story")
-        return null
+        return {
+          success: false,
+          platform: "instagram",
+          error: "Missing required parameters",
+        }
       }
+
+      const animated = options.animated !== false // Default to true if not specified
 
       const response = await fetch("/api/social-share/instagram-story", {
         method: "POST",
@@ -106,6 +114,7 @@ export const SocialSharingService = {
           achievementTitle: options.title,
           achievementDescription: options.text,
           imageUrl: options.image,
+          animated,
         }),
       })
 
@@ -115,10 +124,19 @@ export const SocialSharingService = {
 
       // Create a blob URL for the image
       const blob = await response.blob()
-      return URL.createObjectURL(blob)
+      return {
+        success: true,
+        platform: "instagram",
+        imageUrl: URL.createObjectURL(blob),
+        isAnimated: animated,
+      }
     } catch (error) {
       console.error("Error generating Instagram story:", error)
-      return null
+      return {
+        success: false,
+        platform: "instagram",
+        error: "Failed to generate Instagram story image",
+      }
     }
   },
 
@@ -133,6 +151,7 @@ export const SocialSharingService = {
           platform,
           achievementTitle: options.title,
           userId: options.userId,
+          animated: options.animated,
         })
 
         // Also send to our API to track shares and award points
@@ -148,25 +167,14 @@ export const SocialSharingService = {
             contentId: options.achievementId || "",
             contentTitle: options.title,
             url: options.url,
+            animated: options.animated,
           }),
         }).catch((err) => console.error("Error tracking share:", err))
       }
 
       // Special handling for Instagram
       if (platform === "instagram") {
-        const imageUrl = await this.getInstagramStoryImage(options)
-        if (!imageUrl) {
-          return {
-            success: false,
-            platform,
-            error: "Failed to generate Instagram story image",
-          }
-        }
-        return {
-          success: true,
-          platform,
-          imageUrl,
-        }
+        return await this.getInstagramStoryImage(options)
       }
 
       // If Web Share API is available and not using "copy" platform

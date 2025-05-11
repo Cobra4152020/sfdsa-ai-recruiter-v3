@@ -15,11 +15,15 @@ import {
   MessageCircle,
   Download,
   Instagram,
+  Loader2,
+  Play,
 } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
 import { SocialSharingService, type SocialPlatform } from "@/lib/social-sharing-service"
 import { useUser } from "@/context/user-context"
 import Image from "next/image"
+import { Switch } from "@/components/ui/switch"
+import { Label } from "@/components/ui/label"
 
 interface AchievementShareDialogProps {
   isOpen: boolean
@@ -40,6 +44,10 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
   const [isSharing, setIsSharing] = useState(false)
   const [instagramImageUrl, setInstagramImageUrl] = useState<string | null>(null)
   const [showInstagramInstructions, setShowInstagramInstructions] = useState(false)
+  const [isAnimated, setIsAnimated] = useState(true) // Default to animated
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false)
+  const [isPreviewAnimated, setIsPreviewAnimated] = useState(false)
+  const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
   const { currentUser } = useUser()
 
   const handleShare = async (platform: SocialPlatform) => {
@@ -58,6 +66,7 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
         achievementType: achievement.type,
         achievementId: achievement.id,
         userId: currentUser.id,
+        animated: isAnimated, // Pass the animation preference
       }
 
       const result = await SocialSharingService.share(platform, shareOptions)
@@ -73,6 +82,7 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
         } else if (platform === "instagram") {
           if (result.imageUrl) {
             setInstagramImageUrl(result.imageUrl)
+            setIsPreviewAnimated(!!result.isAnimated)
             setShowInstagramInstructions(true)
           } else {
             toast({
@@ -112,7 +122,7 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
     // Create a temporary link element
     const link = document.createElement("a")
     link.href = instagramImageUrl
-    link.download = `${achievement.type}-${achievement.id}.png`
+    link.download = `${achievement.type}-${achievement.id}${isPreviewAnimated ? "-animated.gif" : ".png"}`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -121,6 +131,53 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
       title: "Image downloaded!",
       description: "Now you can share it to your Instagram story.",
     })
+  }
+
+  const generatePreview = async () => {
+    if (!currentUser) return
+
+    setIsGeneratingPreview(true)
+
+    try {
+      const shareOptions = {
+        title: achievement.title,
+        text: achievement.description,
+        url: achievement.shareUrl,
+        image: achievement.imageUrl,
+        achievementType: achievement.type,
+        achievementId: achievement.id,
+        userId: currentUser.id,
+        animated: isAnimated,
+      }
+
+      const result = await SocialSharingService.getInstagramStoryImage(shareOptions)
+
+      if (result.success && result.imageUrl) {
+        setPreviewImageUrl(result.imageUrl)
+        setIsPreviewAnimated(!!result.isAnimated)
+      } else {
+        toast({
+          title: "Preview generation failed",
+          description: result.error || "Unable to generate preview. Please try again.",
+          variant: "destructive",
+        })
+      }
+    } catch (error) {
+      console.error("Error generating preview:", error)
+      toast({
+        title: "Preview generation failed",
+        description: "An unexpected error occurred.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsGeneratingPreview(false)
+    }
+  }
+
+  // Clear preview when animation option changes
+  const handleAnimationToggle = (newValue: boolean) => {
+    setIsAnimated(newValue)
+    setPreviewImageUrl(null) // Clear existing preview
   }
 
   return (
@@ -135,20 +192,30 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
 
             <div className="flex flex-col items-center py-4">
               <div className="relative w-full max-w-[200px] aspect-[9/16] mb-4 border rounded overflow-hidden">
-                <Image
-                  src={instagramImageUrl || "/placeholder.svg"}
-                  alt="Instagram Story Preview"
-                  fill
-                  className="object-cover"
-                />
+                {isPreviewAnimated ? (
+                  // For animated GIFs
+                  <img
+                    src={instagramImageUrl || "/placeholder.svg"}
+                    alt="Instagram Story Preview"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  // For static images
+                  <Image
+                    src={instagramImageUrl || "/placeholder.svg"}
+                    alt="Instagram Story Preview"
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
 
               <ol className="list-decimal pl-5 space-y-2 text-sm mb-4">
-                <li>Download the image by clicking the button below</li>
+                <li>Download the {isPreviewAnimated ? "animated GIF" : "image"} by clicking the button below</li>
                 <li>Open Instagram on your phone</li>
                 <li>Tap the + icon at the top and select "Story"</li>
                 <li>Swipe up to access your gallery or tap the gallery icon</li>
-                <li>Select the downloaded image</li>
+                <li>Select the downloaded {isPreviewAnimated ? "GIF" : "image"}</li>
                 <li>Add any additional stickers or text if desired</li>
                 <li>Tap "Your Story" to share</li>
               </ol>
@@ -190,6 +257,14 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
               </TabsList>
 
               <TabsContent value="social" className="py-4">
+                <div className="flex items-center justify-between space-x-2 mb-4">
+                  <div className="space-y-0.5">
+                    <Label htmlFor="animated-stories">Animated Instagram Stories</Label>
+                    <p className="text-muted-foreground text-xs">Create eye-catching animated stories</p>
+                  </div>
+                  <Switch id="animated-stories" checked={isAnimated} onCheckedChange={handleAnimationToggle} />
+                </div>
+
                 <div className="grid grid-cols-3 gap-4">
                   <Button
                     onClick={() => handleShare("twitter")}
@@ -223,7 +298,11 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
                     className="flex flex-col items-center h-auto py-3 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45]"
                     disabled={isSharing}
                   >
-                    <Instagram className="h-5 w-5 mb-1" />
+                    {isSharing ? (
+                      <Loader2 className="h-5 w-5 mb-1 animate-spin" />
+                    ) : (
+                      <Instagram className="h-5 w-5 mb-1" />
+                    )}
                     <span className="text-xs">Instagram</span>
                   </Button>
 
@@ -263,40 +342,94 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
               </TabsContent>
 
               <TabsContent value="preview" className="py-4">
-                <div className="border rounded-md p-4 bg-gray-50 dark:bg-gray-900">
-                  <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0 w-12 h-12 relative">
-                      {achievement.imageUrl ? (
-                        <Image
-                          src={achievement.imageUrl || "/placeholder.svg"}
-                          alt={achievement.title}
-                          width={48}
-                          height={48}
-                          className="rounded-md object-cover"
-                        />
-                      ) : (
-                        <div className="w-12 h-12 bg-[#0A3C1F] rounded-md flex items-center justify-center">
-                          <Share2 className="h-6 w-6 text-white" />
+                {activeTab === "preview" && (
+                  <div className="flex flex-col items-center space-y-4">
+                    {previewImageUrl ? (
+                      <div className="relative w-full max-w-[250px] aspect-[9/16] border rounded overflow-hidden">
+                        {isPreviewAnimated ? (
+                          <img
+                            src={previewImageUrl || "/placeholder.svg"}
+                            alt="Instagram Story Preview"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Image
+                            src={previewImageUrl || "/placeholder.svg"}
+                            alt="Instagram Story Preview"
+                            fill
+                            className="object-cover"
+                          />
+                        )}
+                      </div>
+                    ) : (
+                      <div className="border rounded-md p-4 mb-4 bg-gray-50 dark:bg-gray-900 w-full">
+                        <div className="flex items-start space-x-4">
+                          <div className="flex-shrink-0 w-12 h-12 relative">
+                            {achievement.imageUrl ? (
+                              <Image
+                                src={achievement.imageUrl || "/placeholder.svg"}
+                                alt={achievement.title}
+                                width={48}
+                                height={48}
+                                className="rounded-md object-cover"
+                              />
+                            ) : (
+                              <div className="w-12 h-12 bg-[#0A3C1F] rounded-md flex items-center justify-center">
+                                <Share2 className="h-6 w-6 text-white" />
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-sm">San Francisco Sheriff's Department</h3>
+                            <p className="text-xs text-muted-foreground mb-2">Achievement Unlocked</p>
+
+                            <h4 className="font-medium text-sm">{achievement.title}</h4>
+                            <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
+
+                            <div className="mt-3 text-xs text-blue-600 dark:text-blue-400">sfdeputysheriff.com</div>
+                          </div>
                         </div>
+                      </div>
+                    )}
+
+                    <Button onClick={generatePreview} disabled={isGeneratingPreview} className="w-full">
+                      {isGeneratingPreview ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Generating Preview...
+                        </>
+                      ) : (
+                        <>
+                          {previewImageUrl ? (
+                            <>
+                              <Play className="h-4 w-4 mr-2" />
+                              Regenerate {isAnimated ? "Animated" : "Static"} Preview
+                            </>
+                          ) : (
+                            <>
+                              <Play className="h-4 w-4 mr-2" />
+                              Generate {isAnimated ? "Animated" : "Static"} Preview
+                            </>
+                          )}
+                        </>
                       )}
+                    </Button>
+
+                    <div className="flex items-center justify-between w-full mt-2">
+                      <Label htmlFor="preview-animated" className="text-sm">
+                        {isAnimated ? "Animated GIF" : "Static Image"}
+                      </Label>
+                      <Switch id="preview-animated" checked={isAnimated} onCheckedChange={handleAnimationToggle} />
                     </div>
 
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-sm">San Francisco Sheriff's Department</h3>
-                      <p className="text-xs text-muted-foreground mb-2">Achievement Unlocked</p>
-
-                      <h4 className="font-medium text-sm">{achievement.title}</h4>
-                      <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
-
-                      <div className="mt-3 text-xs text-blue-600 dark:text-blue-400">sfdeputysheriff.com</div>
-                    </div>
+                    <p className="text-xs text-center text-muted-foreground mt-2">
+                      {isAnimated
+                        ? "Animated stories are more eye-catching but may take longer to generate."
+                        : "Static images load faster but don't include animations."}
+                    </p>
                   </div>
-                </div>
-
-                <p className="text-xs text-center text-muted-foreground mt-4">
-                  This is how your achievement will appear when shared on most platforms. Actual appearance may vary by
-                  platform.
-                </p>
+                )}
               </TabsContent>
             </Tabs>
           </>
