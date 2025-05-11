@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     }
 
     // Verify this is a valid activity type
-    if (!Object.keys(RecruiterActivityType).includes(activityType)) {
+    if (!Object.values(RecruiterActivityType).includes(activityType)) {
       return NextResponse.json({ success: false, message: "Invalid activity type" }, { status: 400 })
     }
 

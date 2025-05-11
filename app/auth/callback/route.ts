@@ -1,18 +1,15 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { createServerClient } from "@/lib/supabase-server"
+import { createClient } from "@/lib/supabase-clients"
+import { NextResponse } from "next/server"
 
-export async function GET(request: NextRequest) {
-  const requestUrl = new URL(request.url)
-  const code = requestUrl.searchParams.get("code")
-  const next = requestUrl.searchParams.get("next") || "/"
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url)
+  const code = searchParams.get("code")
+  const next = searchParams.get("next") || "/volunteer-dashboard"
 
   if (code) {
-    const supabase = createServerClient()
-
-    // Exchange the code for a session
+    const supabase = createClient()
     await supabase.auth.exchangeCodeForSession(code)
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(new URL(next, requestUrl.origin))
+  return NextResponse.redirect(new URL(next, request.url))
 }

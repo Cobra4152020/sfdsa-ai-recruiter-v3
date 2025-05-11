@@ -4,34 +4,35 @@ import { createNotification } from "@/lib/notification-service"
 import { awardBadgeToUser } from "@/lib/badge-utils"
 
 // Activity types for recruiters
-export type RecruiterActivityType =
-  | "referral_signup" // Someone signs up using recruiter's link
-  | "referral_application" // Referral submits an application
-  | "referral_interview" // Referral gets an interview
-  | "referral_hire" // Referral gets hired
-  | "create_referral_link" // Recruiter creates a new referral link
-  | "send_email_invite" // Recruiter sends an email invitation
-  | "login_streak" // Recruiter logs in consistently
-  | "complete_training" // Recruiter completes training
-  | "reward_redemption" // Recruiter redeems a reward
-  | "tier_achievement" // Recruiter reaches a new tier
-  | "social_share" // Recruiter shares on social media
-  | "feedback_submission" // Recruiter provides feedback
+export enum RecruiterActivityType {
+  REFERRAL_SIGNUP = "referral_signup", // Someone signs up using recruiter's link
+  REFERRAL_APPLICATION = "referral_application", // Referral submits an application
+  REFERRAL_INTERVIEW = "referral_interview", // Referral gets an interview
+  REFERRAL_HIRE = "referral_hire", // Referral gets hired
+  CREATE_REFERRAL_LINK = "create_referral_link", // Recruiter creates a new referral link
+  SEND_EMAIL_INVITE = "send_email_invite", // Recruiter sends an email invitation
+  LOGIN_STREAK = "login_streak", // Recruiter logs in consistently
+  COMPLETE_TRAINING = "complete_training", // Recruiter completes training
+  REWARD_REDEMPTION = "reward_redemption", // Recruiter redeems a reward
+  TIER_ACHIEVEMENT = "tier_achievement", // Recruiter reaches a new tier
+  SOCIAL_SHARE = "social_share", // Recruiter shares on social media
+  FEEDBACK_SUBMISSION = "feedback_submission", // Recruiter provides feedback
+}
 
 // Point values for different activities
 export const ACTIVITY_POINTS: Record<RecruiterActivityType, number> = {
-  referral_signup: 50,
-  referral_application: 150,
-  referral_interview: 300,
-  referral_hire: 1000,
-  create_referral_link: 10,
-  send_email_invite: 20,
-  login_streak: 25,
-  complete_training: 100,
-  reward_redemption: 0,
-  tier_achievement: 0,
-  social_share: 30,
-  feedback_submission: 50,
+  [RecruiterActivityType.REFERRAL_SIGNUP]: 50,
+  [RecruiterActivityType.REFERRAL_APPLICATION]: 150,
+  [RecruiterActivityType.REFERRAL_INTERVIEW]: 300,
+  [RecruiterActivityType.REFERRAL_HIRE]: 1000,
+  [RecruiterActivityType.CREATE_REFERRAL_LINK]: 10,
+  [RecruiterActivityType.SEND_EMAIL_INVITE]: 20,
+  [RecruiterActivityType.LOGIN_STREAK]: 25,
+  [RecruiterActivityType.COMPLETE_TRAINING]: 100,
+  [RecruiterActivityType.REWARD_REDEMPTION]: 0,
+  [RecruiterActivityType.TIER_ACHIEVEMENT]: 0,
+  [RecruiterActivityType.SOCIAL_SHARE]: 30,
+  [RecruiterActivityType.FEEDBACK_SUBMISSION]: 50,
 }
 
 // Interface for reward item
