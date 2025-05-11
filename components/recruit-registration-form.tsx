@@ -11,9 +11,11 @@ import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { authService } from "@/lib/auth-service"
 
-export function LoginForm() {
+export function RecruitRegistrationForm() {
+  const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
@@ -21,10 +23,19 @@ export function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!email || !password) {
+    if (!name || !email || !password) {
       toast({
         title: "Error",
-        description: "Please enter both email and password",
+        description: "Please fill in all required fields",
+        variant: "destructive",
+      })
+      return
+    }
+
+    if (password !== confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
         variant: "destructive",
       })
       return
@@ -33,31 +44,25 @@ export function LoginForm() {
     setIsLoading(true)
 
     try {
-      const result = await authService.signInWithPassword(email, password)
+      const result = await authService.registerRecruit(email, password, name)
 
       if (result.success) {
         toast({
-          title: "Success",
-          description: "You have been logged in successfully",
+          title: "Registration successful",
+          description: "Your account has been created successfully",
         })
-
-        // Redirect based on user type
-        if (result.userType === "volunteer") {
-          router.push("/volunteer-dashboard")
-        } else {
-          router.push("/dashboard")
-        }
+        router.push("/dashboard")
       } else {
         toast({
-          title: "Login failed",
+          title: "Registration failed",
           description: result.message,
           variant: "destructive",
         })
       }
     } catch (error) {
-      console.error("Login error:", error)
+      console.error("Registration error:", error)
       toast({
-        title: "Login failed",
+        title: "Registration failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       })
@@ -69,10 +74,14 @@ export function LoginForm() {
   return (
     <div className="mx-auto max-w-md space-y-6 p-6 bg-white rounded-lg shadow-md">
       <div className="space-y-2 text-center">
-        <h1 className="text-3xl font-bold">Login</h1>
-        <p className="text-gray-500">Enter your credentials to access your account</p>
+        <h1 className="text-3xl font-bold">Create an Account</h1>
+        <p className="text-gray-500">Sign up as a recruit to access exclusive resources</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="name">Full Name</Label>
+          <Input id="name" placeholder="John Doe" value={name} onChange={(e) => setName(e.target.value)} required />
+        </div>
         <div className="space-y-2">
           <Label htmlFor="email">Email</Label>
           <Input
@@ -85,12 +94,7 @@ export function LoginForm() {
           />
         </div>
         <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <Label htmlFor="password">Password</Label>
-            <Link href="/forgot-password" className="text-sm text-[#0A3C1F] hover:underline">
-              Forgot password?
-            </Link>
-          </div>
+          <Label htmlFor="password">Password</Label>
           <Input
             id="password"
             type="password"
@@ -99,21 +103,31 @@ export function LoginForm() {
             required
           />
         </div>
+        <div className="space-y-2">
+          <Label htmlFor="confirmPassword">Confirm Password</Label>
+          <Input
+            id="confirmPassword"
+            type="password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
+          />
+        </div>
         <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/80" disabled={isLoading}>
-          {isLoading ? "Logging in..." : "Login"}
+          {isLoading ? "Creating Account..." : "Create Account"}
         </Button>
       </form>
       <div className="text-center text-sm">
         <p>
-          Don't have an account?{" "}
-          <Link href="/register" className="text-[#0A3C1F] hover:underline">
-            Sign up
+          Already have an account?{" "}
+          <Link href="/login" className="text-[#0A3C1F] hover:underline">
+            Sign in
           </Link>
         </p>
         <p className="mt-2">
-          Are you a volunteer recruiter?{" "}
-          <Link href="/volunteer-login" className="text-[#0A3C1F] hover:underline">
-            Volunteer login
+          Want to become a volunteer recruiter?{" "}
+          <Link href="/volunteer-register" className="text-[#0A3C1F] hover:underline">
+            Register as a volunteer
           </Link>
         </p>
       </div>

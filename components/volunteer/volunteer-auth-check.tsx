@@ -27,25 +27,26 @@ export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) 
           return
         }
 
-        // Check if user has volunteer_recruiter role
-        const { data: userRoles, error } = await supabase
-          .from("user_roles")
-          .select("role")
-          .eq("user_id", session.user.id)
+        // Check if user exists in volunteer.recruiters table
+        const { data: volunteerData, error: volunteerError } = await supabase
+          .from("volunteer.recruiters")
+          .select("id, is_active")
+          .eq("id", session.user.id)
           .single()
 
-        if (error) {
-          console.error("Error fetching user role:", error)
+        if (volunteerError || !volunteerData) {
+          console.error("User not found in volunteer.recruiters:", volunteerError)
           if (isMounted) {
             router.push("/volunteer-login")
           }
           return
         }
 
-        if (!userRoles || userRoles.role !== "volunteer_recruiter") {
-          console.log("User does not have volunteer_recruiter role:", userRoles)
+        // Check if volunteer is active
+        if (!volunteerData.is_active) {
+          console.log("Volunteer account is not active")
           if (isMounted) {
-            router.push("/volunteer-login")
+            router.push("/volunteer-pending")
           }
           return
         }
