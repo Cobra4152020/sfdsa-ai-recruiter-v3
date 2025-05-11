@@ -1,35 +1,7 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { trackEngagement } from "@/lib/analytics"
 import { supabaseAdmin } from "@/lib/supabase-admin"
-
-// Check if we're in a Node.js environment with canvas support
-let canvasSupport = false
-let createAnimatedGif, generateBadgeAnimationFrames, generateNFTAnimationFrames
-let loadImage, createCanvas, registerFont
-
-try {
-  // Dynamically import canvas-related modules
-  if (typeof window === "undefined") {
-    const canvasModule = require("canvas")
-    loadImage = canvasModule.loadImage
-    createCanvas = canvasModule.createCanvas
-    registerFont = canvasModule.registerFont
-
-    const animationUtils = require("@/lib/animation-utils")
-    createAnimatedGif = animationUtils.createAnimatedGif
-    generateBadgeAnimationFrames = animationUtils.generateBadgeAnimationFrames
-    generateNFTAnimationFrames = animationUtils.generateNFTAnimationFrames
-
-    canvasSupport = true
-  }
-} catch (error) {
-  console.warn("Canvas support not available:", error)
-  canvasSupport = false
-}
-
-// Instagram story dimensions
-const STORY_WIDTH = 1080
-const STORY_HEIGHT = 1920
+import { imageGenerationClient } from "@/lib/image-generation-client"
 
 export async function POST(request: NextRequest) {
   try {
@@ -67,219 +39,42 @@ export async function POST(request: NextRequest) {
       metadata: { animated },
     })
 
-    // If canvas is not supported in this environment, return a fallback response
-    if (!canvasSupport) {
+    // Check if the image generation service is available
+    const serviceAvailable = await imageGenerationClient.isAvailable()
+
+    if (!serviceAvailable) {
+      // Fallback to a simple response if the service is not available
       return NextResponse.json({
         success: true,
         message: "Share recorded successfully",
         fallback: true,
-        imageUrl: imageUrl || "/generic-badge.png", // Use provided image or fallback
+        imageUrl: imageUrl || "/generic-badge.png",
       })
     }
 
-    // Determine image paths
-    const logoPath = `${process.cwd()}/public/sfdsa-logo.png`
+    // Use the dedicated service to generate the image
+    const response = await imageGenerationClient.generateInstagramStory({
+      achievementType,
+      achievementId,
+      achievementTitle,
+      achievementDescription,
+      imageUrl,
+      animated,
+    })
 
-    let achievementImagePath = imageUrl
-    // If no image URL provided, use a default based on achievement type
-    if (!achievementImagePath) {
-      if (achievementType === "badge") {
-        achievementImagePath = `${process.cwd()}/public/generic-badge.png`
-      } else if (achievementType === "nft") {
-        achievementImagePath = `${process.cwd()}/public/achievement-icon.png`
-      } else {
-        achievementImagePath = `${process.cwd()}/public/sfdsa-logo.png`
-      }
-    } else if (achievementImagePath.startsWith("/")) {
-      // Convert relative URL to absolute file path
-      achievementImagePath = `${process.cwd()}/public${achievementImagePath}`
-    }
+    // Get the content type from the response
+    const contentType = response.headers.get("Content-Type") || "image/png"
+    const contentDisposition = response.headers.get("Content-Disposition") || ""
 
-    // Generate appropriate response based on whether animation is requested
-    if (animated) {
-      // Generate animated GIF
-      let animationFrames
+    // Stream the response directly to the client
+    const buffer = await response.arrayBuffer()
 
-      if (achievementType === "badge") {
-        animationFrames = await generateBadgeAnimationFrames(
-          achievementTitle,
-          achievementDescription || "",
-          achievementImagePath,
-          logoPath,
-        )
-      } else if (achievementType === "nft") {
-        animationFrames = await generateNFTAnimationFrames(
-          achievementTitle,
-          achievementDescription || "",
-          achievementImagePath,
-          logoPath,
-        )
-      } else {
-        // Default animation for other achievement types
-        animationFrames = await generateBadgeAnimationFrames(
-          achievementTitle,
-          achievementDescription || "",
-          achievementImagePath,
-          logoPath,
-        )
-      }
-
-      // Create the GIF
-      const animationConfig = {
-        frameDelay: 100, // 100ms between frames (10 FPS)
-        quality: 10, // Balance of quality vs file size
-        loop: true, // Loop forever
-      }
-
-      const gifBuffer = await createAnimatedGif(STORY_WIDTH, STORY_HEIGHT, animationFrames, animationConfig)
-
-      // Return the GIF as a response
-      return new NextResponse(gifBuffer, {
-        headers: {
-          "Content-Type": "image/gif",
-          "Content-Disposition": `attachment; filename="${achievementType}-${achievementId}-animated.gif"`,
-        },
-      })
-    } else {
-      // Create static image (original implementation)
-      const canvas = createCanvas(STORY_WIDTH, STORY_HEIGHT)
-      const ctx = canvas.getContext("2d")
-
-      // Background gradient
-      const gradient = ctx.createLinearGradient(0, 0, 0, STORY_HEIGHT)
-      gradient.addColorStop(0, "#0A3C1F") // Dark green at top
-      gradient.addColorStop(1, "#0A3C1F80") // Transparent green at bottom
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, STORY_WIDTH, STORY_HEIGHT)
-
-      // Add overlay pattern for visual interest
-      ctx.globalAlpha = 0.1
-      for (let i = 0; i < STORY_WIDTH; i += 40) {
-        for (let j = 0; j < STORY_HEIGHT; j += 40) {
-          ctx.fillStyle = "white"
-          ctx.fillRect(i, j, 20, 20)
-        }
-      }
-      ctx.globalAlpha = 1
-
-      // Load and draw the SF Sheriff logo
-      try {
-        const logoImage = await loadImage(logoPath)
-        const logoSize = 200
-        ctx.drawImage(logoImage, STORY_WIDTH / 2 - logoSize / 2, 120, logoSize, logoSize)
-      } catch (error) {
-        console.error("Error loading logo:", error)
-        // Continue without the logo if there's an error
-      }
-
-      // Achievement image
-      try {
-        const achievementImage = await loadImage(achievementImagePath)
-        const imageSize = 400
-        ctx.drawImage(
-          achievementImage,
-          STORY_WIDTH / 2 - imageSize / 2,
-          STORY_HEIGHT / 2 - imageSize / 2 - 100,
-          imageSize,
-          imageSize,
-        )
-      } catch (error) {
-        console.error("Error loading achievement image:", error)
-        // Continue without the achievement image if there's an error
-      }
-
-      // Add achievement title
-      ctx.fillStyle = "#FFFFFF"
-      ctx.font = "bold 60px Inter"
-      ctx.textAlign = "center"
-      ctx.fillText("Achievement Unlocked!", STORY_WIDTH / 2, STORY_HEIGHT / 2 + 200)
-
-      // Add achievement name
-      ctx.fillStyle = "#FFD700" // Gold color
-      ctx.font = "bold 80px Inter"
-      ctx.textAlign = "center"
-
-      // Handle long titles by splitting into multiple lines if needed
-      const words = achievementTitle.split(" ")
-      let line = ""
-      const lines = []
-      const y = STORY_HEIGHT / 2 + 300
-
-      for (let i = 0; i < words.length; i++) {
-        const testLine = line + words[i] + " "
-        const metrics = ctx.measureText(testLine)
-        if (metrics.width > STORY_WIDTH - 200 && i > 0) {
-          lines.push(line)
-          line = words[i] + " "
-        } else {
-          line = testLine
-        }
-      }
-      lines.push(line)
-
-      // Draw each line
-      lines.forEach((line, index) => {
-        ctx.fillText(line.trim(), STORY_WIDTH / 2, y + index * 90)
-      })
-
-      // Add description if provided
-      if (achievementDescription) {
-        ctx.fillStyle = "#FFFFFF"
-        ctx.font = "40px Inter"
-        ctx.textAlign = "center"
-
-        // Handle long descriptions by splitting into multiple lines
-        const descWords = achievementDescription.split(" ")
-        let descLine = ""
-        const descLines = []
-        const descY = y + lines.length * 90 + 80
-
-        for (let i = 0; i < descWords.length; i++) {
-          const testLine = descLine + descWords[i] + " "
-          const metrics = ctx.measureText(testLine)
-          if (metrics.width > STORY_WIDTH - 200 && i > 0) {
-            descLines.push(descLine)
-            descLine = descWords[i] + " "
-          } else {
-            descLine = testLine
-          }
-        }
-        descLines.push(descLine)
-
-        // Draw each line (limit to 3 lines to avoid overcrowding)
-        descLines.slice(0, 3).forEach((line, index) => {
-          ctx.fillText(line.trim(), STORY_WIDTH / 2, descY + index * 50)
-        })
-
-        // Add ellipsis if description was truncated
-        if (descLines.length > 3) {
-          ctx.fillText("...", STORY_WIDTH / 2, descY + 3 * 50)
-        }
-      }
-
-      // Add call to action
-      ctx.fillStyle = "#FFFFFF"
-      ctx.font = "bold 40px Inter"
-      ctx.textAlign = "center"
-      ctx.fillText("Join me at SF Sheriff's Department!", STORY_WIDTH / 2, STORY_HEIGHT - 200)
-
-      // Add website URL
-      ctx.fillStyle = "#FFD700" // Gold color
-      ctx.font = "bold 50px Inter"
-      ctx.textAlign = "center"
-      ctx.fillText("sfdeputysheriff.com", STORY_WIDTH / 2, STORY_HEIGHT - 120)
-
-      // Convert canvas to buffer
-      const buffer = canvas.toBuffer("image/png")
-
-      // Return the image as a response
-      return new NextResponse(buffer, {
-        headers: {
-          "Content-Type": "image/png",
-          "Content-Disposition": `attachment; filename="${achievementType}-${achievementId}.png"`,
-        },
-      })
-    }
+    return new NextResponse(buffer, {
+      headers: {
+        "Content-Type": contentType,
+        "Content-Disposition": contentDisposition,
+      },
+    })
   } catch (error) {
     console.error("Error generating Instagram story:", error)
     return NextResponse.json({ success: false, error: "Failed to generate Instagram story image" }, { status: 500 })
