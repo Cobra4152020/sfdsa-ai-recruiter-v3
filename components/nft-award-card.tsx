@@ -143,6 +143,8 @@ export function NFTAwardCard({
             description: `I earned the ${name} NFT Award in my journey to become a San Francisco Deputy Sheriff! ${description}`,
             imageUrl: imageUrl,
             shareUrl: `${typeof window !== "undefined" ? window.location.origin : ""}/nft-awards/${id}`,
+            type: "nft",
+            id: id,
           }}
         />
       )}

@@ -1,6 +1,6 @@
 import { trackEngagement } from "@/lib/analytics"
 
-export type SocialPlatform = "twitter" | "facebook" | "linkedin" | "whatsapp" | "email" | "copy"
+export type SocialPlatform = "twitter" | "facebook" | "linkedin" | "whatsapp" | "email" | "copy" | "instagram"
 
 export interface ShareOptions {
   title: string
@@ -9,12 +9,16 @@ export interface ShareOptions {
   hashtags?: string[]
   via?: string
   image?: string
+  achievementType?: string
+  achievementId?: string
+  userId?: string
 }
 
 export interface ShareResult {
   success: boolean
   platform: SocialPlatform
   error?: string
+  imageUrl?: string
 }
 
 /**
@@ -81,16 +85,54 @@ export const SocialSharingService = {
   },
 
   /**
+   * Generate Instagram story image and provide download
+   */
+  async getInstagramStoryImage(options: ShareOptions): Promise<string | null> {
+    try {
+      if (!options.userId || !options.achievementType || !options.achievementId) {
+        console.error("Missing required parameters for Instagram story")
+        return null
+      }
+
+      const response = await fetch("/api/social-share/instagram-story", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: options.userId,
+          achievementType: options.achievementType,
+          achievementId: options.achievementId,
+          achievementTitle: options.title,
+          achievementDescription: options.text,
+          imageUrl: options.image,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to generate Instagram story: ${response.statusText}`)
+      }
+
+      // Create a blob URL for the image
+      const blob = await response.blob()
+      return URL.createObjectURL(blob)
+    } catch (error) {
+      console.error("Error generating Instagram story:", error)
+      return null
+    }
+  },
+
+  /**
    * Share content using the Web Share API if available, otherwise open in a new window
    */
-  async share(platform: SocialPlatform, options: ShareOptions, userId?: string): Promise<ShareResult> {
+  async share(platform: SocialPlatform, options: ShareOptions): Promise<ShareResult> {
     try {
       // Track sharing analytics
-      if (userId) {
+      if (options.userId) {
         trackEngagement("achievement_share", {
           platform,
           achievementTitle: options.title,
-          userId,
+          userId: options.userId,
         })
 
         // Also send to our API to track shares and award points
@@ -100,13 +142,31 @@ export const SocialSharingService = {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId,
+            userId: options.userId,
             platform,
-            contentType: "achievement",
+            contentType: options.achievementType || "achievement",
+            contentId: options.achievementId || "",
             contentTitle: options.title,
             url: options.url,
           }),
         }).catch((err) => console.error("Error tracking share:", err))
+      }
+
+      // Special handling for Instagram
+      if (platform === "instagram") {
+        const imageUrl = await this.getInstagramStoryImage(options)
+        if (!imageUrl) {
+          return {
+            success: false,
+            platform,
+            error: "Failed to generate Instagram story image",
+          }
+        }
+        return {
+          success: true,
+          platform,
+          imageUrl,
+        }
       }
 
       // If Web Share API is available and not using "copy" platform

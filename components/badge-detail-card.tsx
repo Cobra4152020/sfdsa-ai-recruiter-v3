@@ -185,6 +185,8 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
             description: `I earned the ${badge.name} badge in my journey to become a San Francisco Deputy Sheriff! ${badge.description}`,
             imageUrl: badge.icon,
             shareUrl: `${typeof window !== "undefined" ? window.location.origin : ""}/badge/${badge.id}?ref=${currentUser?.id}`,
+            type: "badge",
+            id: badge.id,
           }}
         />
       )}
