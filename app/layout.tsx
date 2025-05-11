@@ -25,8 +25,8 @@ export default function RootLayout({
 
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <body>
+        <ThemeProvider>
           {children}
           <PerformanceMonitor />
         </ThemeProvider>
