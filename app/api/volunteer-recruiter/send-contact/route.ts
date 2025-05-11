@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-service"
 import { sendEmail } from "@/lib/email/send-email"
+import { getSystemSetting } from "@/lib/system-settings"
 
 export async function POST(request: Request) {
   try {
@@ -19,6 +20,10 @@ export async function POST(request: Request) {
 
     // Generate a unique tracking ID
     const trackingId = `REC-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
+
+    // Get the admin email from system settings
+    const adminEmail = await getSystemSetting("RECRUITMENT_EMAIL", "recruitment@sfdeputysheriff.com")
+    const fromEmail = await getSystemSetting("DEFAULT_REPLY_TO", "no-reply@sfdeputysheriff.com")
 
     // In a real implementation, we would save this to a database
     const supabase = getServiceSupabase()
@@ -111,7 +116,7 @@ export async function POST(request: Request) {
             <p>I'd be happy to answer any questions you might have or connect you with a recruiter who can provide more detailed information.</p>
             
             <div style="text-align: center; margin-top: 30px;">
-              <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://example.com"}/register?ref=${trackingId}" class="button">Learn More About Joining SFSD</a>
+              <a href="${process.env.NEXT_PUBLIC_SITE_URL || "https://sfdeputysheriff.com"}/register?ref=${trackingId}" class="button">Learn More About Joining SFSD</a>
             </div>
             
             <p style="margin-top: 30px;">Thank you for your time and consideration.</p>
@@ -120,7 +125,7 @@ export async function POST(request: Request) {
           </div>
           <div class="footer">
             <p>This email was sent by the San Francisco Sheriff's Department Recruitment Team.</p>
-            <p>If you have any questions, please contact us at email@protectingsanfrancisco.com</p>
+            <p>If you have any questions, please contact us at ${adminEmail}</p>
             <p>© ${new Date().getFullYear()} San Francisco Sheriff's Department. All rights reserved.</p>
           </div>
         </div>
@@ -134,13 +139,13 @@ export async function POST(request: Request) {
         to: email,
         subject: "San Francisco Sheriff's Department - Career Opportunity",
         html: htmlEmail,
-        from: "email@protectingsanfrancisco.com",
-        replyTo: "email@protectingsanfrancisco.com",
+        from: `SF Deputy Sheriff Recruitment <${fromEmail}>`,
+        replyTo: adminEmail,
       })
 
       // Forward the recruit information to the admin email
       await sendEmail({
-        to: "email@protectingsanfrancisco.com",
+        to: adminEmail,
         subject: "New Recruit Referral",
         html: `
           <h2>New Recruit Referral</h2>

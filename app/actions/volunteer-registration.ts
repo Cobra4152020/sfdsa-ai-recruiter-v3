@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { authConfig } from "@/lib/supabase-auth-config"
 import { constructUrl } from "@/lib/url-utils"
 import { sendVolunteerConfirmationEmail } from "@/lib/email/volunteer-emails"
+import { getSystemSetting } from "@/lib/system-settings"
 import crypto from "crypto"
 
 interface VolunteerRegistrationData {
@@ -116,6 +117,9 @@ export async function registerVolunteerRecruiter(data: VolunteerRegistrationData
       return { error: "Failed to generate confirmation token" }
     }
 
+    // Get admin notification email from system settings
+    const adminEmail = await getSystemSetting("NOTIFICATION_EMAIL", "notifications@sfdeputysheriff.com")
+
     // Send confirmation email
     const confirmationUrl = `${constructUrl()}/volunteer-confirm?token=${token}`
     const emailResult = await sendVolunteerConfirmationEmail(
@@ -127,6 +131,29 @@ export async function registerVolunteerRecruiter(data: VolunteerRegistrationData
     if (!emailResult.success) {
       console.error("Error sending confirmation email:", emailResult.message)
       // Don't fail registration if email fails, but log it
+    }
+
+    // Send admin notification
+    try {
+      const { sendEmail } = await import("@/lib/email/send-email")
+      await sendEmail({
+        to: adminEmail,
+        subject: "New Volunteer Recruiter Registration",
+        html: `
+          <h2>New Volunteer Recruiter Registration</h2>
+          <p><strong>Name:</strong> ${data.firstName} ${data.lastName}</p>
+          <p><strong>Email:</strong> ${data.email}</p>
+          <p><strong>Phone:</strong> ${data.phone}</p>
+          <p><strong>Organization:</strong> ${data.organization}</p>
+          <p><strong>Position:</strong> ${data.position}</p>
+          <p><strong>Location:</strong> ${data.location}</p>
+          <p><strong>Referral Source:</strong> ${data.referralSource}</p>
+          <p>The user will need to confirm their email before they can access the volunteer recruiter dashboard.</p>
+        `,
+      })
+    } catch (emailError) {
+      console.error("Error sending admin notification:", emailError)
+      // Don't fail registration if admin notification fails
     }
 
     // Revalidate paths
