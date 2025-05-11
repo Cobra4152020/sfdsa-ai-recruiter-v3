@@ -21,7 +21,7 @@ export async function middleware(req: NextRequest) {
       if (isVolunteerRoute) {
         return NextResponse.redirect(new URL("/volunteer-login", req.url))
       } else if (isAdminRoute) {
-        return NextResponse.redirect(new URL("/admin/login", req.url))
+        return NextResponse.redirect(new URL("/admin-login", req.url))
       } else {
         return NextResponse.redirect(new URL("/login", req.url))
       }
@@ -67,5 +67,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/volunteer-dashboard/:path*", "/admin/:path*", "/((?!admin/login).*)"],
+  matcher: ["/dashboard/:path*", "/volunteer-dashboard/:path*", "/admin/:path*", "/((?!admin-login).*)"],
 }
