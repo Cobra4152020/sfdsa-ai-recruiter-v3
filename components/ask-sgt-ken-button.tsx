@@ -63,6 +63,7 @@ export function AskSgtKenButton({
   const [offlineMode, setOfflineMode] = useState(false)
   const [retryCount, setRetryCount] = useState(0)
   const [messageCount, setMessageCount] = useState(0)
+  const [isHovering, setIsHovering] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { incrementParticipation = () => Promise.resolve(), currentUser } = useUser()
   const { toast } = useToast()
@@ -106,7 +107,100 @@ export function AskSgtKenButton({
     .animate-bounce-subtle {
       animation: bounceSlight 2s ease-in-out infinite;
     }
-  `
+    
+    /* Enhanced hover effects */
+    .floating-btn {
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .floating-btn:hover {
+      transform: scale(1.1) translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(10, 60, 31, 0.3), 0 8px 10px -6px rgba(10, 60, 31, 0.2);
+    }
+    .floating-btn:active {
+      transform: scale(0.95);
+      box-shadow: 0 5px 15px -3px rgba(10, 60, 31, 0.3), 0 4px 6px -4px rgba(10, 60, 31, 0.2);
+    }
+    
+    .floating-btn .hover-ring {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      border-radius: 50%;
+      border: 2px solid #FFD700;
+      opacity: 0;
+      transform: scale(0.8);
+      transition: all 0.3s ease;
+    }
+    .floating-btn:hover .hover-ring {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    
+    .floating-btn .hover-text {
+      position: absolute;
+      top: -40px;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background-color: #0A3C1F;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+    .floating-btn:hover .hover-text {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .floating-btn .hover-text:after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -5px;
+      border-width: 5px;
+      border-style: solid;
+      border-color: #0A3C1F transparent transparent transparent;
+    }
+    
+    @keyframes pulse-ring {
+      0% {
+        transform: scale(0.8);
+        opacity: 0.5;
+      }
+      70% {
+        transform: scale(1.2);
+        opacity: 0;
+      }
+      100% {
+        transform: scale(1.2);
+        opacity: 0;
+      }
+    }
+    .pulse-ring {
+      position: absolute;
+      top: -8px;
+      left: -8px;
+      right: -8px;
+      bottom: -8px;
+      border-radius: 50%;
+      border: 2px solid #FFD700;
+      animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    }
+    
+    /* Icon hover effect */
+    .icon-container {
+      transition: transform 0.3s ease;
+    }
+    .floating-btn:hover .icon-container {
+      transform: rotate(15deg);
+    }
+    `
     document.head.appendChild(style)
 
     return () => {
@@ -396,7 +490,7 @@ export function AskSgtKenButton({
     }
 
     if (position === "fixed") {
-      buttonStyle += "fixed bottom-6 right-6 z-40 shadow-lg animate-bounce-subtle "
+      buttonStyle += "fixed bottom-6 right-6 z-40 shadow-lg floating-btn "
     }
 
     return buttonStyle
@@ -432,8 +526,18 @@ export function AskSgtKenButton({
         size={size}
         className={`${getButtonStyle()} subtle-glow relative`}
         onClick={() => setIsDialogOpen(true)}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+        aria-label="Chat with Sergeant Ken"
       >
-        <span className="wiggle-icon">
+        {position === "fixed" && (
+          <>
+            <div className="pulse-ring"></div>
+            <div className="hover-ring"></div>
+            <div className="hover-text">Chat with Sgt. Ken</div>
+          </>
+        )}
+        <span className={`${position === "fixed" ? "icon-container" : "wiggle-icon"}`}>
           <MessageSquare className="mr-2 h-5 w-5" />
         </span>
         Ask Sgt. Ken
