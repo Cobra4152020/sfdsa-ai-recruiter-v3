@@ -12,6 +12,7 @@ export const authConfig = {
     emailVerification: constructUrl("/email-verification"),
     signUp: constructUrl("/register"),
     volunteerSignUp: constructUrl("/volunteer-register"),
+    volunteerConfirm: constructUrl("/volunteer-confirm"),
   },
 
   /**
@@ -45,6 +46,15 @@ export const authConfig = {
   getSignUpOptions(isVolunteer = false) {
     return {
       redirectTo: isVolunteer ? authConfig.redirectUrls.volunteerSignUp : authConfig.redirectUrls.signUp,
+    }
+  },
+
+  /**
+   * Configure auth redirect for volunteer confirmation
+   */
+  getVolunteerConfirmOptions() {
+    return {
+      redirectTo: authConfig.redirectUrls.volunteerConfirm,
     }
   },
 }

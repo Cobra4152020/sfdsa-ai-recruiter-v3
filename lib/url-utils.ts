@@ -19,7 +19,7 @@ export function getBaseUrl(): string {
   }
 
   // Fallback for local development
-  return process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://sfdsa-ai-recruiter.vercel.app"
+  return process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://www.sfdeputysheriff.com"
 }
 
 /**
