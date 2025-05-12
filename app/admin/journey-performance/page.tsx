@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { Suspense } from "react"
 import { JourneyPerformanceDashboard } from "@/components/journey-performance-dashboard"
 import { createServerClient } from "@/lib/supabase-server"

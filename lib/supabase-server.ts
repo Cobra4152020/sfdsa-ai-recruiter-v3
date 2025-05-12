@@ -9,36 +9,46 @@ import type { Database } from "../types/database"
  */
 export function createServerClient() {
   try {
-    // For server components, we need to use cookies() from next/headers
-    const cookieStore = cookies()
+    // Try to get cookies, but handle the case when they're not available (static rendering)
+    let cookieStore
+    try {
+      cookieStore = cookies()
+    } catch (error) {
+      // If cookies() fails (during static rendering), fall back to direct client
+      console.warn("Cookies not available, falling back to direct client")
+      return getDirectClient()
+    }
 
     // First try to use the auth-helpers method
     try {
       return createServerComponentClient<Database>({ cookies: () => cookieStore })
     } catch (error) {
       console.warn("Failed to create server component client, falling back to direct client:", error)
-
-      // Fallback to direct client creation
-      const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
-      const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-      if (!supabaseUrl || !supabaseKey) {
-        console.warn("Missing Supabase environment variables, using mock client")
-        // Return a mock client that won't throw errors
-        return getMockClient()
-      }
-
-      return createSupabaseClient<Database>(supabaseUrl, supabaseKey, {
-        auth: {
-          persistSession: false,
-          autoRefreshToken: false,
-        },
-      })
+      return getDirectClient()
     }
   } catch (error) {
     console.error("Error creating Supabase client:", error)
     return getMockClient() // Return a mock client instead of throwing
   }
+}
+
+// Helper function to create a direct client without cookies
+function getDirectClient() {
+  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn("Missing Supabase environment variables, using mock client")
+    // Return a mock client that won't throw errors
+    return getMockClient()
+  }
+
+  return createSupabaseClient<Database>(supabaseUrl, supabaseKey, {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+    },
+  })
 }
 
 // Export aliases for backward compatibility
@@ -162,6 +172,10 @@ function getMockClient() {
           error: null,
         }),
       }),
+    }),
+    rpc: () => ({
+      data: null,
+      error: null,
     }),
     auth: {
       getSession: () => Promise.resolve({ data: { session: null }, error: null }),

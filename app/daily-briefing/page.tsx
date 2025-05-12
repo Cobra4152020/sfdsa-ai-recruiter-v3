@@ -51,9 +51,45 @@ const fallbackBriefing = {
   ],
 }
 
+// Function to check if a table exists in the database
+async function checkTableExists(tableName: string) {
+  try {
+    const supabase = getServerSupabase()
+
+    // Try to query the information_schema to check if the table exists
+    const { data, error } = await supabase
+      .from("information_schema.tables")
+      .select("table_name")
+      .eq("table_schema", "public")
+      .eq("table_name", tableName)
+      .maybeSingle()
+
+    if (error) {
+      console.warn(`Error checking if ${tableName} table exists:`, error)
+      return false
+    }
+
+    return !!data
+  } catch (error) {
+    console.error(`Exception in checkTableExists for ${tableName}:`, error)
+    return false
+  }
+}
+
 // Function to fetch today's briefing from the database
 async function getTodaysBriefing() {
   try {
+    // First check if the daily_briefings table exists
+    const tableExists = await checkTableExists("daily_briefings")
+
+    if (!tableExists) {
+      console.warn("daily_briefings table does not exist")
+      return {
+        briefing: fallbackBriefing,
+        error: "The daily briefings system is not yet set up. Please contact an administrator.",
+      }
+    }
+
     const supabase = getServerSupabase()
 
     // Get today's date in YYYY-MM-DD format

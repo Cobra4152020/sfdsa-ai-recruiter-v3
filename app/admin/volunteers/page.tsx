@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic"
+
 import { getPendingVolunteerRecruiters } from "@/app/actions/admin-actions"
 import { VolunteerApprovalList } from "@/components/admin/volunteer-approval-list"
 
