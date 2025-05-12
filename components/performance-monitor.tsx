@@ -1,149 +1,49 @@
 "use client"
 
-import { useEffect } from "react"
-import { reportPerformanceMetric, getRating } from "@/lib/performance-monitoring"
+import { useEffect, useState } from "react"
+import { usePathname } from "next/navigation"
 
 export default function PerformanceMonitor() {
+  const pathname = usePathname()
+  const [mounted, setMounted] = useState(false)
+
   useEffect(() => {
-    // Only run in the browser
-    if (typeof window === "undefined") return
+    setMounted(true)
 
-    // Only run in production or when explicitly enabled
-    const isEnabled =
-      process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === "true"
+    // Only run performance monitoring if enabled
+    if (process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING !== "true") {
+      return
+    }
 
-    if (!isEnabled) return
+    try {
+      // Record page view timing
+      const navigationTiming = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming
+      const pageLoadTime = navigationTiming ? navigationTiming.loadEventEnd - navigationTiming.startTime : null
 
-    // Function to report web vitals
-    const reportWebVitals = async () => {
-      try {
-        // Dynamically import web-vitals to reduce bundle size
-        const webVitals = await import("web-vitals")
-
-        // Report Core Web Vitals
-        webVitals.onCLS((metric) => {
-          try {
-            reportPerformanceMetric({
-              name: "CLS",
-              value: metric.value,
-              rating: getRating("CLS", metric.value),
-              navigationType: metric.navigationType,
-              id: metric.id,
-              path: window.location.pathname,
-              timestamp: Date.now(),
-            })
-          } catch (error) {
-            console.warn("Error reporting CLS:", error)
-          }
+      // Only send metrics if we have valid timing data
+      if (pageLoadTime && pageLoadTime > 0) {
+        // Send performance data to API
+        fetch("/api/performance/metrics", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            path: pathname,
+            loadTime: pageLoadTime,
+            timestamp: new Date().toISOString(),
+          }),
+          // Use keepalive to ensure the request completes even if the page is unloaded
+          keepalive: true,
+        }).catch((error) => {
+          console.error("Failed to send performance metrics:", error)
         })
-
-        webVitals.onFCP((metric) => {
-          try {
-            reportPerformanceMetric({
-              name: "FCP",
-              value: metric.value,
-              rating: getRating("FCP", metric.value),
-              navigationType: metric.navigationType,
-              id: metric.id,
-              path: window.location.pathname,
-              timestamp: Date.now(),
-            })
-          } catch (error) {
-            console.warn("Error reporting FCP:", error)
-          }
-        })
-
-        webVitals.onLCP((metric) => {
-          try {
-            reportPerformanceMetric({
-              name: "LCP",
-              value: metric.value,
-              rating: getRating("LCP", metric.value),
-              navigationType: metric.navigationType,
-              id: metric.id,
-              path: window.location.pathname,
-              timestamp: Date.now(),
-            })
-          } catch (error) {
-            console.warn("Error reporting LCP:", error)
-          }
-        })
-
-        webVitals.onTTFB((metric) => {
-          try {
-            reportPerformanceMetric({
-              name: "TTFB",
-              value: metric.value,
-              rating: getRating("TTFB", metric.value),
-              navigationType: metric.navigationType,
-              id: metric.id,
-              path: window.location.pathname,
-              timestamp: Date.now(),
-            })
-          } catch (error) {
-            console.warn("Error reporting TTFB:", error)
-          }
-        })
-
-        // Try to report FID, but it might not be available in all browsers
-        try {
-          if (typeof webVitals.onFID === "function") {
-            webVitals.onFID((metric) => {
-              try {
-                reportPerformanceMetric({
-                  name: "FID",
-                  value: metric.value,
-                  rating: getRating("FID", metric.value),
-                  navigationType: metric.navigationType,
-                  id: metric.id,
-                  path: window.location.pathname,
-                  timestamp: Date.now(),
-                })
-              } catch (error) {
-                console.warn("Error reporting FID:", error)
-              }
-            })
-          }
-        } catch (error) {
-          console.warn("FID measurement not available:", error)
-        }
-
-        // Try to report INP, but it might not be available in all browsers
-        try {
-          if (typeof webVitals.onINP === "function") {
-            webVitals.onINP((metric) => {
-              try {
-                reportPerformanceMetric({
-                  name: "INP",
-                  value: metric.value,
-                  rating: getRating("INP", metric.value),
-                  navigationType: metric.navigationType,
-                  id: metric.id,
-                  path: window.location.pathname,
-                  timestamp: Date.now(),
-                })
-              } catch (error) {
-                console.warn("Error reporting INP:", error)
-              }
-            })
-          }
-        } catch (error) {
-          console.warn("INP measurement not available:", error)
-        }
-      } catch (error) {
-        console.warn("Error loading web-vitals:", error)
       }
+    } catch (error) {
+      console.error("Error in performance monitoring:", error)
     }
+  }, [pathname])
 
-    // Report web vitals
-    reportWebVitals()
-
-    // Clean up function
-    return () => {
-      // No cleanup needed
-    }
-  }, [])
-
-  // This component doesn't render anything
+  // Don't render anything visible
   return null
 }
