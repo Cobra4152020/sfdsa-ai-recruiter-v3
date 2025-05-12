@@ -5,45 +5,12 @@ import { AlertCircle } from "lucide-react"
 import { BriefingCard } from "@/components/daily-briefing/briefing-card"
 import { BriefingStats } from "@/components/daily-briefing/briefing-stats"
 import { BriefingLeaderboard } from "@/components/daily-briefing/briefing-leaderboard"
+import { createClient } from "@/lib/supabase-clients"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 3600 // Revalidate every hour
 
-// Static fallback content component - this is a Server Component
-function FallbackBriefingUI() {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-center mb-8">Daily Briefing</h1>
-
-      <Alert variant="warning" className="mb-6">
-        <AlertCircle className="h-4 w-4" />
-        <AlertTitle>Temporary Service Interruption</AlertTitle>
-        <AlertDescription>
-          We're currently experiencing issues loading the daily briefing. Our team has been notified and is working on a
-          fix. Please try again later.
-        </AlertDescription>
-      </Alert>
-
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-2xl font-semibold mb-4">Today's Briefing Highlights</h2>
-        <p className="mb-4">While we're resolving the technical difficulties, here are some important reminders:</p>
-        <ul className="list-disc pl-5 space-y-2">
-          <li>Remember to check your equipment at the beginning of each shift</li>
-          <li>Community engagement remains a top priority for the department</li>
-          <li>Report any safety concerns through the appropriate channels</li>
-          <li>Upcoming training sessions are posted on the internal bulletin board</li>
-        </ul>
-
-        <div className="mt-6 pt-6 border-t">
-          <h3 className="text-xl font-medium mb-3">Contact Information</h3>
-          <p>If you need immediate assistance, please contact the department at the non-emergency line.</p>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Fallback briefing data - static data that doesn't require API calls
+// Fallback briefing data - used when database fetch fails
 const fallbackBriefing = {
   id: "fallback-briefing",
   title: "San Francisco Deputy Sheriff's Daily Briefing",
@@ -84,21 +51,119 @@ const fallbackBriefing = {
   ],
 }
 
+// Function to fetch today's briefing from the database
+async function getTodaysBriefing() {
+  try {
+    const supabase = createClient()
+
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0]
+
+    // Query the daily_briefings table for today's briefing
+    const { data, error } = await supabase.from("daily_briefings").select("*").eq("date", today).single()
+
+    if (error) {
+      console.error("Error fetching today's briefing:", error)
+
+      // If no briefing for today, get the most recent one
+      const { data: recentData, error: recentError } = await supabase
+        .from("daily_briefings")
+        .select("*")
+        .order("date", { ascending: false })
+        .limit(1)
+        .single()
+
+      if (recentError) {
+        console.error("Error fetching recent briefing:", recentError)
+        return { briefing: fallbackBriefing, error: "Failed to load briefing from database" }
+      }
+
+      return { briefing: recentData, error: null }
+    }
+
+    return { briefing: data, error: null }
+  } catch (error) {
+    console.error("Exception in getTodaysBriefing:", error)
+    return { briefing: fallbackBriefing, error: "An unexpected error occurred" }
+  }
+}
+
+// Function to get user's briefing stats
+async function getBriefingStats(briefingId) {
+  try {
+    const supabase = createClient()
+
+    // Get total attendees
+    const { count: totalAttendees, error: attendeesError } = await supabase
+      .from("briefing_attendance")
+      .select("id", { count: "exact", head: true })
+      .eq("briefing_id", briefingId)
+
+    // Get total shares
+    const { count: totalShares, error: sharesError } = await supabase
+      .from("briefing_shares")
+      .select("id", { count: "exact", head: true })
+      .eq("briefing_id", briefingId)
+
+    return {
+      total_attendees: totalAttendees || 0,
+      total_shares: totalShares || 0,
+      user_attended: false,
+      user_shared: false,
+      user_platforms_shared: [],
+    }
+  } catch (error) {
+    console.error("Error fetching briefing stats:", error)
+    return {
+      total_attendees: 0,
+      total_shares: 0,
+      user_attended: false,
+      user_shared: false,
+      user_platforms_shared: [],
+    }
+  }
+}
+
 // Main page component
-export default function DailyBriefingPage() {
-  // Render the fallback UI directly instead of passing it as a prop
-  const fallbackUI = <FallbackBriefingUI />
+export default async function DailyBriefingPage() {
+  // Fetch the briefing data from the database
+  const { briefing, error } = await getTodaysBriefing()
+
+  // Get stats for the briefing
+  const stats = briefing
+    ? await getBriefingStats(briefing.id)
+    : {
+        total_attendees: 0,
+        total_shares: 0,
+        user_attended: false,
+        user_shared: false,
+        user_platforms_shared: [],
+      }
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Daily Briefing</h1>
 
+      {error && (
+        <Alert variant="warning" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Note</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">
-          <ErrorBoundary fallback={fallbackUI}>
+          <ErrorBoundary
+            fallback={
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-2xl font-semibold mb-4">Today's Briefing</h2>
+                <p className="text-gray-500">The briefing content is temporarily unavailable.</p>
+              </div>
+            }
+          >
             <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
-              {/* Use the static fallback briefing data directly */}
-              <BriefingCard briefing={fallbackBriefing} />
+              <BriefingCard briefing={briefing} />
             </Suspense>
           </ErrorBoundary>
         </div>
@@ -113,7 +178,7 @@ export default function DailyBriefingPage() {
             }
           >
             <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
-              <BriefingStats />
+              <BriefingStats stats={stats} userStreak={0} />
             </Suspense>
           </ErrorBoundary>
 
