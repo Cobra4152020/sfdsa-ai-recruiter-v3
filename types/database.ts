@@ -116,8 +116,8 @@ export interface Database {
         }
       }
 
-      // ... other existing tables
+      // You may have other tables here
     }
-    // ... other existing schema elements
+    // You may have other schema elements here
   }
 }

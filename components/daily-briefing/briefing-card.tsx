@@ -4,9 +4,10 @@ import { useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ThemeIcon } from "./theme-icon"
-import { Check, Award } from "lucide-react"
+import { Check, Award, AlertCircle, Info } from "lucide-react"
 import type { DailyBriefing } from "@/lib/daily-briefing-service"
 import { formatDate } from "@/lib/utils"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import confetti from "canvas-confetti"
 
 type BriefingCardProps = {
@@ -26,22 +27,28 @@ type BriefingCardProps = {
     points: number
     alreadyShared?: boolean
   }>
+  isHistorical?: boolean
 }
 
-export function BriefingCard({ briefing, onAttend, onShare }: BriefingCardProps) {
+export function BriefingCard({ briefing, onAttend, onShare, isHistorical = false }: BriefingCardProps) {
   const [isAttending, setIsAttending] = useState(false)
   const [isSharing, setIsSharing] = useState(false)
   const [attended, setAttended] = useState(false)
   const [shared, setShared] = useState(false)
   const [pointsEarned, setPointsEarned] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const handleAttend = async () => {
-    if (isAttending || attended) return
+    if (isAttending || attended || isHistorical) return
 
     setIsAttending(true)
+    setError(null)
+
     try {
+      console.log("Attempting to mark briefing as attended:", briefing.id)
       const result = await onAttend(briefing.id)
+      console.log("Attendance result:", result)
 
       if (result.success) {
         setAttended(true)
@@ -58,9 +65,12 @@ export function BriefingCard({ briefing, onAttend, onShare }: BriefingCardProps)
 
           setTimeout(() => setShowConfetti(false), 3000)
         }
+      } else {
+        setError("Failed to mark briefing as attended. Please try again.")
       }
     } catch (error) {
       console.error("Error attending briefing:", error)
+      setError("An error occurred while marking the briefing as attended. Please try again.")
     } finally {
       setIsAttending(false)
     }
@@ -70,6 +80,8 @@ export function BriefingCard({ briefing, onAttend, onShare }: BriefingCardProps)
     if (isSharing || shared) return
 
     setIsSharing(true)
+    setError(null)
+
     try {
       const result = await onShare(briefing.id, platform)
 
@@ -88,9 +100,12 @@ export function BriefingCard({ briefing, onAttend, onShare }: BriefingCardProps)
 
           setTimeout(() => setShowConfetti(false), 3000)
         }
+      } else {
+        setError("Failed to share briefing. Please try again.")
       }
     } catch (error) {
       console.error("Error sharing briefing:", error)
+      setError("An error occurred while sharing the briefing. Please try again.")
     } finally {
       setIsSharing(false)
     }
@@ -142,6 +157,22 @@ export function BriefingCard({ briefing, onAttend, onShare }: BriefingCardProps)
       </CardHeader>
 
       <CardContent className="space-y-6">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {isHistorical && (
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              You are viewing a historical briefing. Attendance and points cannot be earned for past briefings.
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
           <blockquote className="text-xl italic font-semibold text-gray-800">"{briefing.quote}"</blockquote>
           <div className="mt-2 text-right text-gray-600">— {briefing.quote_author}</div>
@@ -159,26 +190,28 @@ export function BriefingCard({ briefing, onAttend, onShare }: BriefingCardProps)
       </CardContent>
 
       <CardFooter className="flex flex-col sm:flex-row gap-3 pt-2">
-        <Button
-          onClick={handleAttend}
-          disabled={isAttending || attended}
-          className="w-full sm:w-auto"
-          variant={attended ? "outline" : "default"}
-        >
-          {isAttending ? (
-            <>Loading...</>
-          ) : attended ? (
-            <>
-              <Check className="mr-2 h-4 w-4" />
-              Attended
-            </>
-          ) : (
-            <>
-              <Award className="mr-2 h-4 w-4" />
-              Mark as Attended
-            </>
-          )}
-        </Button>
+        {!isHistorical && (
+          <Button
+            onClick={handleAttend}
+            disabled={isAttending || attended || isHistorical}
+            className="w-full sm:w-auto"
+            variant={attended ? "outline" : "default"}
+          >
+            {isAttending ? (
+              <>Loading...</>
+            ) : attended ? (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Attended
+              </>
+            ) : (
+              <>
+                <Award className="mr-2 h-4 w-4" />
+                Mark as Attended
+              </>
+            )}
+          </Button>
+        )}
 
         <div className="flex gap-2 w-full sm:w-auto sm:ml-auto">
           <Button onClick={shareOnTwitter} disabled={isSharing} variant="outline" className="flex-1">

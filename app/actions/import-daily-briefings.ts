@@ -3,9 +3,17 @@
 import { createClient } from "@/lib/supabase-server"
 import { revalidatePath } from "next/cache"
 
-export async function importDailyBriefings(csvUrl: string) {
+type BriefingImportResult = {
+  success: boolean
+  importedCount?: number
+  errorCount?: number
+  error?: string
+  details?: string[]
+}
+
+export async function importDailyBriefings(csvUrl: string): Promise<BriefingImportResult> {
   try {
-    console.log("Starting import of daily briefings from CSV")
+    console.log("Starting import of daily briefings from CSV:", csvUrl)
 
     // Fetch the CSV data
     const response = await fetch(csvUrl)
@@ -31,56 +39,30 @@ export async function importDailyBriefings(csvUrl: string) {
       sgtKenTakeIndex === -1 ||
       callToActionIndex === -1
     ) {
-      throw new Error("CSV is missing required columns")
+      throw new Error(
+        `CSV is missing required columns. Found: ${headers.join(", ")}. Required: date, quote, author, sgt_ken_take, call_to_action`,
+      )
     }
 
     // Function to determine theme based on content
-    const inferTheme = (quote: string, sgtKenTake: string): string => {
-      const lowerQuote = quote.toLowerCase()
-      const lowerTake = sgtKenTake.toLowerCase()
+    const inferTheme = (quote: string, sgtKenTake: string, author: string): string => {
+      const combinedText = `${quote.toLowerCase()} ${sgtKenTake.toLowerCase()} ${author.toLowerCase()}`
 
-      if (
-        lowerQuote.includes("duty") ||
-        lowerTake.includes("duty") ||
-        lowerQuote.includes("obligation") ||
-        lowerTake.includes("obligation")
-      ) {
-        return "duty"
-      } else if (
-        lowerQuote.includes("courage") ||
-        lowerTake.includes("courage") ||
-        lowerQuote.includes("brave") ||
-        lowerTake.includes("brave")
-      ) {
-        return "courage"
-      } else if (
-        lowerQuote.includes("respect") ||
-        lowerTake.includes("respect") ||
-        lowerQuote.includes("honor") ||
-        lowerTake.includes("honor")
-      ) {
-        return "respect"
-      } else if (
-        lowerQuote.includes("service") ||
-        lowerTake.includes("service") ||
-        lowerQuote.includes("serve") ||
-        lowerTake.includes("serve")
-      ) {
-        return "service"
-      } else if (
-        lowerQuote.includes("lead") ||
-        lowerTake.includes("lead") ||
-        lowerQuote.includes("leader") ||
-        lowerTake.includes("leader")
-      ) {
-        return "leadership"
-      } else if (
-        lowerQuote.includes("resilience") ||
-        lowerTake.includes("resilience") ||
-        lowerQuote.includes("strength") ||
-        lowerTake.includes("strength")
-      ) {
-        return "resilience"
+      // Theme keywords mapping
+      const themeKeywords = {
+        duty: ["duty", "obligation", "responsibility", "commitment", "service", "honor"],
+        courage: ["courage", "brave", "bravery", "fearless", "valor", "strength", "bold"],
+        respect: ["respect", "honor", "dignity", "courtesy", "esteem", "regard", "admiration"],
+        service: ["service", "serve", "help", "assist", "aid", "support", "community"],
+        leadership: ["lead", "leader", "leadership", "guide", "direct", "inspire", "influence"],
+        resilience: ["resilience", "endure", "persevere", "overcome", "adapt", "recover", "persist"],
+      }
+
+      // Check each theme's keywords
+      for (const [theme, keywords] of Object.entries(themeKeywords)) {
+        if (keywords.some((keyword) => combinedText.includes(keyword))) {
+          return theme
+        }
       }
 
       // Default to rotating themes based on row number
@@ -92,75 +74,119 @@ export async function importDailyBriefings(csvUrl: string) {
     const supabase = createClient()
     let importedCount = 0
     let errorCount = 0
+    const errorDetails: string[] = []
 
+    // Process CSV data in batches to avoid overwhelming the database
+    const BATCH_SIZE = 50
+    const batches = []
+    let currentBatch = []
+
+    // Skip header row (i=0)
     for (let i = 1; i < rows.length; i++) {
-      if (!rows[i].trim()) continue // Skip empty rows
+      const row = rows[i].trim()
+      if (!row) continue // Skip empty rows
 
-      const columns = rows[i].split(",")
+      // Parse CSV row, handling quoted fields that might contain commas
+      const parseCSVRow = (row: string) => {
+        const result = []
+        let inQuotes = false
+        let currentValue = ""
 
-      // Handle quoted fields that might contain commas
-      const processedColumns = []
-      let currentField = ""
-      let inQuotes = false
+        for (let i = 0; i < row.length; i++) {
+          const char = row[i]
 
-      for (const col of columns) {
-        if (inQuotes) {
-          currentField += "," + col
-          if (col.endsWith('"')) {
-            inQuotes = false
-            processedColumns.push(currentField.slice(1, -1)) // Remove quotes
-            currentField = ""
-          }
-        } else {
-          if (col.startsWith('"') && !col.endsWith('"')) {
-            inQuotes = true
-            currentField = col
+          if (char === '"') {
+            inQuotes = !inQuotes
+          } else if (char === "," && !inQuotes) {
+            result.push(currentValue)
+            currentValue = ""
           } else {
-            processedColumns.push(col.replace(/^"|"$/g, "")) // Remove quotes if present
+            currentValue += char
           }
         }
+
+        // Add the last value
+        result.push(currentValue)
+
+        // Clean up quotes
+        return result.map((val) => val.replace(/^"|"$/g, "").trim())
       }
 
-      const date = processedColumns[dateIndex]?.trim()
-      const quote = processedColumns[quoteIndex]?.trim()
-      const author = processedColumns[authorIndex]?.trim()
-      const sgtKenTake = processedColumns[sgtKenTakeIndex]?.trim()
-      const callToAction = processedColumns[callToActionIndex]?.trim()
+      const columns = parseCSVRow(row)
 
-      if (!date || !quote || !sgtKenTake || !callToAction) {
-        console.error(`Row ${i} is missing required fields`)
+      if (columns.length <= Math.max(dateIndex, quoteIndex, authorIndex, sgtKenTakeIndex, callToActionIndex)) {
         errorCount++
+        errorDetails.push(
+          `Row ${i}: Not enough columns. Found ${columns.length}, needed at least ${Math.max(dateIndex, quoteIndex, authorIndex, sgtKenTakeIndex, callToActionIndex) + 1}`,
+        )
         continue
       }
 
-      const theme = inferTheme(quote, sgtKenTake)
+      const date = columns[dateIndex]
+      const quote = columns[quoteIndex]
+      const author = columns[authorIndex]
+      const sgtKenTake = columns[sgtKenTakeIndex]
+      const callToAction = columns[callToActionIndex]
 
+      if (!date || !quote || !author || !sgtKenTake || !callToAction) {
+        errorCount++
+        errorDetails.push(`Row ${i}: Missing required fields`)
+        continue
+      }
+
+      // Validate date format (YYYY-MM-DD)
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        errorCount++
+        errorDetails.push(`Row ${i}: Invalid date format. Expected YYYY-MM-DD, got ${date}`)
+        continue
+      }
+
+      const theme = inferTheme(quote, sgtKenTake, author)
+
+      currentBatch.push({
+        date,
+        theme,
+        quote,
+        quote_author: author,
+        sgt_ken_take: sgtKenTake,
+        call_to_action: callToAction,
+        created_at: new Date().toISOString(),
+        active: true,
+      })
+
+      if (currentBatch.length >= BATCH_SIZE) {
+        batches.push([...currentBatch])
+        currentBatch = []
+      }
+    }
+
+    // Add the last batch if it has any items
+    if (currentBatch.length > 0) {
+      batches.push(currentBatch)
+    }
+
+    // Process batches
+    for (const batch of batches) {
       try {
-        const { error } = await supabase.from("daily_briefings").upsert(
-          {
-            date,
-            theme,
-            quote,
-            quote_author: author,
-            sgt_ken_take: sgtKenTake,
-            call_to_action: callToAction,
-            created_at: new Date().toISOString(),
-            active: true,
-          },
-          {
+        const { error, count } = await supabase
+          .from("daily_briefings")
+          .upsert(batch, {
             onConflict: "date",
-          },
-        )
+            ignoreDuplicates: false,
+          })
+          .select(null, { count: "exact" })
 
         if (error) {
-          console.error(`Error importing row ${i}:`, error)
-          errorCount++
+          console.error("Error importing batch:", error)
+          errorCount += batch.length
+          errorDetails.push(`Batch error: ${error.message}`)
         } else {
-          importedCount++
+          importedCount += count || 0
         }
       } catch (err) {
-        console.error(`Exception importing row ${i}:`, err)
-        errorCount++
+        console.error("Exception importing batch:", err)
+        errorCount += batch.length
+        errorDetails.push(`Batch exception: ${err instanceof Error ? err.message : String(err)}`)
       }
     }
 
@@ -173,6 +199,7 @@ export async function importDailyBriefings(csvUrl: string) {
       success: true,
       importedCount,
       errorCount,
+      details: errorDetails.length > 0 ? errorDetails : undefined,
     }
   } catch (error) {
     console.error("Error importing daily briefings:", error)
