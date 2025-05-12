@@ -4,6 +4,7 @@ import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Link from "next/link"
 import {
   Trophy,
@@ -18,10 +19,15 @@ import {
   Building2,
   Castle,
   Trees,
+  CheckCircle2,
+  Info,
+  Medal,
 } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
-import { CategoryLegend } from "@/components/trivia/category-legend"
+import { useTriviaHistory } from "@/hooks/use-trivia-history"
+import { useUser } from "@/context/user-context"
+import { formatDistanceToNow } from "date-fns"
 
 type Category = {
   name: string
@@ -140,6 +146,21 @@ const triviaGames = [
 
 export default function TriviaHubPage() {
   const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+  const { gameHistory, isLoading: isHistoryLoading } = useTriviaHistory()
+  const { isLoggedIn } = useUser()
+
+  // Function to get score percentage
+  const getScorePercentage = (score: number, total: number) => {
+    return Math.round((score / total) * 100)
+  }
+
+  // Function to get appropriate badge color based on score percentage
+  const getScoreBadgeColor = (percentage: number) => {
+    if (percentage >= 90) return "bg-yellow-500 text-white" // Gold
+    if (percentage >= 70) return "bg-gray-400 text-white" // Silver
+    if (percentage >= 50) return "bg-amber-700 text-white" // Bronze
+    return "bg-blue-500 text-white" // Default blue
+  }
 
   return (
     <>
@@ -148,7 +169,62 @@ export default function TriviaHubPage() {
         <div className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
             <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2 md:mb-0">San Francisco Trivia Games</h1>
-            <CategoryLegend />
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex items-center gap-1 text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                      <Info className="h-4 w-4" />
+                      <span>Categories</span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="p-4 max-w-xs">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold">Trivia Categories</h3>
+                      <div className="grid grid-cols-2 gap-2">
+                        {Object.entries(categories).map(([id, category]) => (
+                          <div key={id} className="flex items-center gap-1">
+                            <div className={`p-1 rounded-full ${category.bgColor}`}>{category.icon}</div>
+                            <span>{category.name}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
+              {isLoggedIn && (
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="flex items-center gap-1 text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+                        <Medal className="h-4 w-4" />
+                        <span>Your Progress</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="p-4 max-w-xs">
+                      <div className="space-y-2">
+                        <h3 className="font-semibold">Your Trivia Progress</h3>
+                        <p className="text-sm text-gray-500">
+                          {Object.keys(gameHistory).length > 0
+                            ? `You've played ${Object.keys(gameHistory).length} out of ${triviaGames.length} games.`
+                            : "You haven't played any games yet. Start playing to track your progress!"}
+                        </p>
+                        <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
+                          <div
+                            className="h-full bg-[#0A3C1F]"
+                            style={{
+                              width: `${(Object.keys(gameHistory).length / triviaGames.length) * 100}%`,
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </div>
           </div>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto text-center">
             Test your knowledge about San Francisco with these fun trivia games hosted by Sgt. Ken. Earn points, badges,
@@ -157,77 +233,118 @@ export default function TriviaHubPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {triviaGames.map((game) => (
-            <Card
-              key={game.id}
-              className={`overflow-hidden border ${game.color} transition-all duration-300 ease-in-out
-                ${hoveredCard === game.id ? `shadow-lg ${game.hoverColor} scale-[1.02] z-10` : "hover:shadow-md"}`}
-              onMouseEnter={() => setHoveredCard(game.id)}
-              onMouseLeave={() => setHoveredCard(null)}
-            >
-              <div className="relative h-48 overflow-hidden">
-                <Image
-                  src={game.image || "/placeholder.svg"}
-                  alt={game.name}
-                  fill
-                  className={`object-cover transition-transform duration-500 ease-in-out
-                    ${hoveredCard === game.id ? "scale-110" : ""}`}
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  priority={game.id === "sf-football" || game.id === "sf-baseball"}
-                />
-                <div
-                  className={`absolute inset-0 bg-black opacity-0 transition-opacity duration-300
-                  ${hoveredCard === game.id ? "opacity-10" : ""}`}
-                ></div>
+          {triviaGames.map((game) => {
+            const gameResult = gameHistory[game.id]
+            const hasPlayed = !!gameResult
+            const scorePercentage = hasPlayed ? getScorePercentage(gameResult.bestScore, gameResult.totalQuestions) : 0
 
-                {/* Category Badges */}
-                <div className="absolute top-2 right-2 flex flex-wrap justify-end gap-1 max-w-[70%]">
-                  {game.categories.map((categoryId) => {
-                    const category = categories[categoryId]
-                    return (
-                      <div
-                        key={categoryId}
-                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${category.bgColor} ${category.textColor} 
-                          shadow-sm transition-transform duration-300 ${hoveredCard === game.id ? "scale-110" : ""}`}
-                        title={`Category: ${category.name}`}
-                      >
-                        {category.icon}
-                        <span>{category.name}</span>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  <div className={`transition-transform duration-300 ${hoveredCard === game.id ? "scale-110" : ""}`}>
-                    {game.icon}
+            return (
+              <Card
+                key={game.id}
+                className={`overflow-hidden border ${game.color} transition-all duration-300 ease-in-out
+                  ${hoveredCard === game.id ? `shadow-lg ${game.hoverColor} scale-[1.02] z-10` : "hover:shadow-md"}`}
+                onMouseEnter={() => setHoveredCard(game.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
+                <div className="relative h-48 overflow-hidden">
+                  <Image
+                    src={game.image || "/placeholder.svg"}
+                    alt={game.name}
+                    fill
+                    className={`object-cover transition-transform duration-500 ease-in-out
+                      ${hoveredCard === game.id ? "scale-110" : ""}`}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    priority={game.id === "sf-football" || game.id === "sf-baseball"}
+                  />
+                  <div
+                    className={`absolute inset-0 bg-black opacity-0 transition-opacity duration-300
+                    ${hoveredCard === game.id ? "opacity-10" : ""}`}
+                  ></div>
+
+                  {/* Category Badges */}
+                  <div className="absolute top-2 right-2 flex flex-wrap justify-end gap-1 max-w-[70%]">
+                    {game.categories.map((categoryId) => {
+                      const category = categories[categoryId]
+                      return (
+                        <div
+                          key={categoryId}
+                          className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${category.bgColor} ${category.textColor} 
+                            shadow-sm transition-transform duration-300 ${hoveredCard === game.id ? "scale-110" : ""}`}
+                          title={`Category: ${category.name}`}
+                        >
+                          {category.icon}
+                          <span>{category.name}</span>
+                        </div>
+                      )
+                    })}
                   </div>
-                  <CardTitle
-                    className={`text-xl ${game.textColor} transition-all duration-300
-                    ${hoveredCard === game.id ? "font-bold" : ""}`}
-                  >
-                    {game.name}
-                  </CardTitle>
+
+                  {/* Played Badge */}
+                  {hasPlayed && (
+                    <div className="absolute top-2 left-2">
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div
+                              className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium shadow-sm transition-transform duration-300 ${getScoreBadgeColor(
+                                scorePercentage,
+                              )} ${hoveredCard === game.id ? "scale-110" : ""}`}
+                            >
+                              <CheckCircle2 className="h-3 w-3" />
+                              <span>
+                                {gameResult.bestScore}/{gameResult.totalQuestions}
+                              </span>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <div className="space-y-1">
+                              <p className="font-medium">
+                                Best Score: {gameResult.bestScore}/{gameResult.totalQuestions} ({scorePercentage}%)
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Played {gameResult.timesPlayed} time{gameResult.timesPlayed !== 1 ? "s" : ""}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Last played: {formatDistanceToNow(new Date(gameResult.lastPlayed))} ago
+                              </p>
+                            </div>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  )}
                 </div>
-                <CardDescription>{game.description}</CardDescription>
-              </CardHeader>
-              <CardFooter className="pt-2">
-                <Link href={`/trivia/${game.id}`} className="w-full">
-                  <Button
-                    className={`w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 transition-all duration-300
-                      ${hoveredCard === game.id ? "shadow-md" : ""}`}
-                  >
-                    <Trophy
-                      className={`h-4 w-4 mr-2 transition-transform duration-300
-                      ${hoveredCard === game.id ? "scale-125" : ""}`}
-                    />
-                    Play Now
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
+                <CardHeader className="pb-2">
+                  <div className="flex items-center gap-2">
+                    <div className={`transition-transform duration-300 ${hoveredCard === game.id ? "scale-110" : ""}`}>
+                      {game.icon}
+                    </div>
+                    <CardTitle
+                      className={`text-xl ${game.textColor} transition-all duration-300
+                      ${hoveredCard === game.id ? "font-bold" : ""}`}
+                    >
+                      {game.name}
+                    </CardTitle>
+                  </div>
+                  <CardDescription>{game.description}</CardDescription>
+                </CardHeader>
+                <CardFooter className="pt-2">
+                  <Link href={`/trivia/${game.id}`} className="w-full">
+                    <Button
+                      className={`w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 transition-all duration-300
+                        ${hoveredCard === game.id ? "shadow-md" : ""}`}
+                    >
+                      <Trophy
+                        className={`h-4 w-4 mr-2 transition-transform duration-300
+                        ${hoveredCard === game.id ? "scale-125" : ""}`}
+                      />
+                      {hasPlayed ? "Play Again" : "Play Now"}
+                    </Button>
+                  </Link>
+                </CardFooter>
+              </Card>
+            )
+          })}
         </div>
       </main>
       <ImprovedFooter />
