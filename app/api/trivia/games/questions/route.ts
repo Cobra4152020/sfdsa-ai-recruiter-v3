@@ -1,340 +1,437 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
-import { error, info, warn } from "@/lib/logging-service"
 import { v4 as uuidv4 } from "uuid"
 
-// Fallback questions for each game
-const fallbackQuestions = {
-  "sf-football": [
-    {
-      id: "sf-football-1",
-      question: "Which team plays their home games at Levi's Stadium?",
-      options: ["San Francisco 49ers", "Oakland Raiders", "San Francisco Giants", "Golden State Warriors"],
-      correctAnswer: 0,
-      explanation:
-        "The San Francisco 49ers play their home games at Levi's Stadium, which opened in 2014 in Santa Clara.",
-      difficulty: "easy",
-      category: "football",
-      imageUrl: "/levis-stadium-49ers.png",
-    },
-    {
-      id: "sf-football-2",
-      question: "Who is the 49ers' all-time leader in passing yards?",
-      options: ["Steve Young", "Joe Montana", "Colin Kaepernick", "Jimmy Garoppolo"],
-      correctAnswer: 1,
-      explanation:
-        "Joe Montana is the 49ers' all-time leader in passing yards with 35,124 yards during his time with the team from 1979 to 1992.",
-      difficulty: "medium",
-      category: "football",
-      imageUrl: "/joe-montana-49ers.png",
-    },
-    {
-      id: "sf-football-3",
-      question: "In which Super Bowl did the 49ers defeat the Cincinnati Bengals 20-16?",
-      options: ["Super Bowl XVI", "Super Bowl XIX", "Super Bowl XXIII", "Super Bowl XXIV"],
-      correctAnswer: 2,
-      explanation: "The 49ers defeated the Bengals 20-16 in Super Bowl XXIII, played on January 22, 1989.",
-      difficulty: "hard",
-      category: "football",
-      imageUrl: "/49ers-super-bowl-xxiii.png",
-    },
-    {
-      id: "sf-football-4",
-      question: "Which 49ers quarterback won the NFL MVP award in 1992?",
-      options: ["Joe Montana", "Steve Young", "Jeff Garcia", "Colin Kaepernick"],
-      correctAnswer: 1,
-      explanation: "Steve Young won the NFL MVP award in 1992, the first of his three MVP awards.",
-      difficulty: "medium",
-      category: "football",
-      imageUrl: "/steve-young-mvp.png",
-    },
-    {
-      id: "sf-football-5",
-      question: "Who holds the 49ers record for most rushing yards in a career?",
-      options: ["Frank Gore", "Roger Craig", "Joe Perry", "Garrison Hearst"],
-      correctAnswer: 0,
-      explanation: "Frank Gore is the 49ers' all-time rushing leader with 11,073 yards from 2005 to 2014.",
-      difficulty: "medium",
-      category: "football",
-      imageUrl: "/frank-gore-49ers.png",
-    },
-  ],
-  "sf-baseball": [
-    {
-      id: "sf-baseball-1",
-      question: "Where do the San Francisco Giants play their home games?",
-      options: ["AT&T Park", "Oracle Park", "Candlestick Park", "PacBell Park"],
-      correctAnswer: 1,
-      explanation: "The San Francisco Giants play at Oracle Park, which was renamed from AT&T Park in 2019.",
-      difficulty: "easy",
-      category: "baseball",
-      imageUrl: "/oracle-park-giants.png",
-    },
-    {
-      id: "sf-baseball-2",
-      question: "Which Giants player hit 73 home runs in a single season, setting an MLB record?",
-      options: ["Willie Mays", "Barry Bonds", "Willie McCovey", "Buster Posey"],
-      correctAnswer: 1,
-      explanation: "Barry Bonds hit 73 home runs in the 2001 season, setting the MLB single-season home run record.",
-      difficulty: "easy",
-      category: "baseball",
-      imageUrl: "/barry-bonds-giants-record.png",
-    },
-    {
-      id: "sf-baseball-3",
-      question: "In what year did the Giants move from New York to San Francisco?",
-      options: ["1952", "1958", "1962", "1970"],
-      correctAnswer: 1,
-      explanation: "The Giants moved from New York to San Francisco in 1958.",
-      difficulty: "medium",
-      category: "baseball",
-      imageUrl: "/giants-move-1958.png",
-    },
-    {
-      id: "sf-baseball-4",
-      question: "How many World Series championships have the San Francisco Giants won?",
-      options: ["1", "2", "3", "4"],
-      correctAnswer: 2,
-      explanation: "The San Francisco Giants have won 3 World Series championships (2010, 2012, and 2014).",
-      difficulty: "medium",
-      category: "baseball",
-      imageUrl: "/placeholder.svg?key=taw9f",
-    },
-    {
-      id: "sf-baseball-5",
-      question: "Who is the Giants' all-time leader in home runs?",
-      options: ["Barry Bonds", "Willie Mays", "Willie McCovey", "Mel Ott"],
-      correctAnswer: 1,
-      explanation: "Willie Mays is the Giants' all-time leader with 646 home runs during his time with the team.",
-      difficulty: "medium",
-      category: "baseball",
-      imageUrl: "/placeholder.svg?height=300&width=500&query=Willie Mays Giants home run",
-    },
-  ],
-  "sf-basketball": [
-    {
-      id: "sf-basketball-1",
-      question: "Where do the Golden State Warriors play their home games?",
-      options: ["Oracle Arena", "Chase Center", "SAP Center", "Levi's Stadium"],
-      correctAnswer: 1,
-      explanation: "The Golden State Warriors play at Chase Center in San Francisco, which opened in 2019.",
-      difficulty: "easy",
-      category: "basketball",
-      imageUrl: "/chase-center-gsw.png",
-    },
-    {
-      id: "sf-basketball-2",
-      question: "Who holds the Warriors' franchise record for most points in a single game?",
-      options: ["Stephen Curry", "Klay Thompson", "Wilt Chamberlain", "Kevin Durant"],
-      correctAnswer: 2,
-      explanation:
-        "Wilt Chamberlain scored 100 points for the Warriors against the New York Knicks on March 2, 1962, which remains an NBA record.",
-      difficulty: "medium",
-      category: "basketball",
-      imageUrl: "/placeholder.svg?height=300&width=500&query=Wilt Chamberlain Warriors 100 points",
-    },
-    {
-      id: "sf-basketball-3",
-      question: "How many NBA championships have the Warriors won since moving to the Bay Area?",
-      options: ["3", "4", "6", "7"],
-      correctAnswer: 3,
-      explanation: "The Warriors have won 7 NBA championships since moving to the Bay Area in 1962.",
-      difficulty: "medium",
-      category: "basketball",
-      imageUrl: "/placeholder.svg?height=300&width=500&query=Golden State Warriors NBA championship trophy",
-    },
-    {
-      id: "sf-basketball-4",
-      question: "Which Warriors player set the NBA record for most 3-pointers in a single game with 14?",
-      options: ["Stephen Curry", "Klay Thompson", "Kevin Durant", "Draymond Green"],
-      correctAnswer: 1,
-      explanation:
-        "Klay Thompson set the NBA record with 14 three-pointers in a game against the Chicago Bulls in 2018.",
-      difficulty: "medium",
-      category: "basketball",
-      imageUrl: "/placeholder.svg?height=300&width=500&query=Klay Thompson three point record",
-    },
-    {
-      id: "sf-basketball-5",
-      question: "In what year did the Warriors draft Stephen Curry?",
-      options: ["2007", "2008", "2009", "2010"],
-      correctAnswer: 2,
-      explanation: "The Warriors drafted Stephen Curry with the 7th overall pick in the 2009 NBA Draft.",
-      difficulty: "easy",
-      category: "basketball",
-      imageUrl: "/placeholder.svg?height=300&width=500&query=Stephen Curry draft Warriors 2009",
-    },
-  ],
-  "sf-districts": [
-    {
-      id: "sf-districts-1",
-      question: "Which San Francisco district is known for its LGBTQ+ history and culture?",
-      options: ["Mission District", "Castro District", "North Beach", "Haight-Ashbury"],
-      correctAnswer: 1,
-      explanation:
-        "The Castro District is known for its LGBTQ+ history and culture, and has been a symbol of LGBTQ+ activism since the 1960s.",
-      difficulty: "easy",
-      category: "districts",
-      imageUrl: "/castro-rainbow-flags.png",
-    },
-    {
-      id: "sf-districts-2",
-      question: "Which district is home to San Francisco's Chinatown?",
-      options: ["Financial District", "North Beach", "Nob Hill", "Richmond District"],
-      correctAnswer: 0,
-      explanation:
-        "San Francisco's Chinatown is located adjacent to the Financial District and is the oldest Chinatown in North America.",
-      difficulty: "easy",
-      category: "districts",
-      imageUrl: "/san-francisco-chinatown-gate.png",
-    },
-    {
-      id: "sf-districts-3",
-      question: "Which San Francisco district was the center of the 'Beat Generation' in the 1950s?",
-      options: ["Mission District", "Haight-Ashbury", "North Beach", "SoMa"],
-      correctAnswer: 2,
-      explanation: "North Beach was the center of the Beat Generation movement in the 1950s.",
-      difficulty: "medium",
-      category: "districts",
-      imageUrl: "/north-beach-italian-street.png",
-    },
-    {
-      id: "sf-districts-4",
-      question: "Which district was the center of the 'Summer of Love' in 1967?",
-      options: ["Castro", "Mission", "Haight-Ashbury", "Tenderloin"],
-      correctAnswer: 2,
-      explanation: "Haight-Ashbury was the center of the counterculture 'Summer of Love' in 1967.",
-      difficulty: "medium",
-      category: "districts",
-      imageUrl: "/summer-of-love-1967-san-francisco.png",
-    },
-    {
-      id: "sf-districts-5",
-      question: "Which San Francisco district is known for its Latino culture and murals?",
-      options: ["Mission District", "Noe Valley", "Sunset District", "Richmond District"],
-      correctAnswer: 0,
-      explanation: "The Mission District is known for its strong Latino culture and colorful murals.",
-      difficulty: "easy",
-      category: "districts",
-      imageUrl: "/mission-district-sf.png",
-    },
-  ],
-  "sf-tourist-spots": [
-    {
-      id: "sf-tourist-spots-1",
-      question: "Which famous prison is located on an island in San Francisco Bay?",
-      options: ["San Quentin", "Alcatraz", "Folsom", "Rikers Island"],
-      correctAnswer: 1,
-      explanation: "Alcatraz Island in San Francisco Bay was home to the infamous federal prison from 1934 to 1963.",
-      difficulty: "easy",
-      category: "tourist-spots",
-      imageUrl: "/alcatraz-island-san-francisco.png",
-    },
-    {
-      id: "sf-tourist-spots-2",
-      question: "What is the name of the famous crooked street in San Francisco?",
-      options: ["Market Street", "Lombard Street", "Van Ness Avenue", "Geary Boulevard"],
-      correctAnswer: 1,
-      explanation: "Lombard Street is known as the 'crookedest street in the world' with its eight hairpin turns.",
-      difficulty: "easy",
-      category: "tourist-spots",
-      imageUrl: "/lombard-street-crooked.png",
-    },
-    {
-      id: "sf-tourist-spots-3",
-      question: "Which famous San Francisco landmark opened in 1937?",
-      options: ["Coit Tower", "Golden Gate Bridge", "Fisherman's Wharf", "Transamerica Pyramid"],
-      correctAnswer: 1,
-      explanation: "The Golden Gate Bridge opened in 1937 and has become the iconic symbol of San Francisco.",
-      difficulty: "easy",
-      category: "tourist-spots",
-      imageUrl: "/golden-gate-bridge.png",
-    },
-    {
-      id: "sf-tourist-spots-4",
-      question: "What is the name of the famous square in San Francisco's downtown?",
-      options: ["Pioneer Square", "Union Square", "Market Square", "Embarcadero Plaza"],
-      correctAnswer: 1,
-      explanation:
-        "Union Square is a 2.6-acre public plaza in downtown San Francisco and one of the city's main shopping areas.",
-      difficulty: "medium",
-      category: "tourist-spots",
-      imageUrl: "/union-square-san-francisco.png",
-    },
-    {
-      id: "sf-tourist-spots-5",
-      question: "Which famous San Francisco attraction features historic cable cars?",
-      options: ["Cable Car Museum", "Fisherman's Wharf", "Powell-Hyde Line", "All of the above"],
-      correctAnswer: 3,
-      explanation:
-        "All of these are famous San Francisco attractions featuring historic cable cars. The Cable Car Museum, Fisherman's Wharf, and the Powell-Hyde Line are all popular tourist destinations.",
-      difficulty: "medium",
-      category: "tourist-spots",
-      imageUrl: "/san-francisco-cable-car-powell.png",
-    },
-  ],
-  "sf-day-trips": [
-    {
-      id: "sf-day-trips-1",
-      question: "Which famous wine region is located north of San Francisco?",
-      options: ["Sonoma Valley", "Napa Valley", "Both Sonoma and Napa Valley", "Central Valley"],
-      correctAnswer: 2,
-      explanation:
-        "Both Sonoma Valley and Napa Valley are famous wine regions located north of San Francisco, perfect for day trips.",
-      difficulty: "easy",
-      category: "day-trips",
-      imageUrl: "/napa-valley-vineyards.png",
-    },
-    {
-      id: "sf-day-trips-2",
-      question: "Which coastal town south of San Francisco is known for its aquarium and cannery row?",
-      options: ["Santa Cruz", "Half Moon Bay", "Monterey", "Carmel-by-the-Sea"],
-      correctAnswer: 2,
-      explanation:
-        "Monterey is known for the world-famous Monterey Bay Aquarium and historic Cannery Row, made famous by John Steinbeck.",
-      difficulty: "medium",
-      category: "day-trips",
-      imageUrl: "/monterey-bay-aquarium-interior.png",
-    },
-    {
-      id: "sf-day-trips-3",
-      question: "Which national park, famous for its giant redwoods, is located near San Francisco?",
-      options: [
-        "Yosemite National Park",
-        "Muir Woods National Monument",
-        "Sequoia National Park",
-        "Kings Canyon National Park",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "Muir Woods National Monument is famous for its old-growth coastal redwoods and is located just north of San Francisco.",
-      difficulty: "easy",
-      category: "day-trips",
-      imageUrl: "/muir-woods-day-trip.png",
-    },
-    {
-      id: "sf-day-trips-4",
-      question: "Which picturesque waterfront town is located just across the Golden Gate Bridge from San Francisco?",
-      options: ["Oakland", "Berkeley", "Sausalito", "Tiburon"],
-      correctAnswer: 2,
-      explanation:
-        "Sausalito is a picturesque waterfront town located just across the Golden Gate Bridge from San Francisco.",
-      difficulty: "easy",
-      category: "day-trips",
-      imageUrl: "/sausalito-day-trip.png",
-    },
-    {
-      id: "sf-day-trips-5",
-      question: "Which famous technology region is located south of San Francisco?",
-      options: ["Silicon Valley", "Tech Alley", "Digital Heights", "Computer Canyon"],
-      correctAnswer: 0,
-      explanation:
-        "Silicon Valley, the global center for technology and innovation, is located south of San Francisco.",
-      difficulty: "easy",
-      category: "day-trips",
-      imageUrl: "/silicon-valley-tech-hq.png",
-    },
-  ],
+// Football trivia questions
+const footballQuestions = [
+  {
+    id: "fb-1",
+    question: "In what year did the San Francisco 49ers win their first Super Bowl?",
+    options: ["1982", "1985", "1989", "1995"],
+    correctAnswer: 0,
+    explanation:
+      "The 49ers won their first Super Bowl (Super Bowl XVI) on January 24, 1982, defeating the Cincinnati Bengals 26-21.",
+    difficulty: "medium",
+    category: "football",
+    imageUrl: "/levis-stadium-49ers.png",
+    imageAlt: "Levi's Stadium, home of the San Francisco 49ers",
+  },
+  {
+    id: "fb-2",
+    question: "Who is the 49ers' all-time leader in passing yards?",
+    options: ["Steve Young", "Joe Montana", "Jeff Garcia", "John Brodie"],
+    correctAnswer: 1,
+    explanation:
+      "Joe Montana is the 49ers' all-time leader in passing yards with 35,124 yards during his time with the team (1979-1992).",
+    difficulty: "medium",
+    category: "football",
+    imageUrl: "/joe-montana-49ers.png",
+    imageAlt: "Joe Montana in his San Francisco 49ers uniform",
+  },
+  {
+    id: "fb-3",
+    question: "How many Super Bowl championships have the San Francisco 49ers won?",
+    options: ["3", "5", "6", "7"],
+    correctAnswer: 1,
+    explanation:
+      "The San Francisco 49ers have won 5 Super Bowl championships (1981, 1984, 1988, 1989, and 1994 seasons).",
+    difficulty: "easy",
+    category: "football",
+    imageUrl: "/49ers-super-bowl-xxiii.png",
+    imageAlt: "San Francisco 49ers celebrating a Super Bowl victory",
+  },
+  {
+    id: "fb-4",
+    question: "Which 49ers quarterback won the NFL MVP award in 1992?",
+    options: ["Joe Montana", "Steve Young", "Jeff Garcia", "Colin Kaepernick"],
+    correctAnswer: 1,
+    explanation: "Steve Young won the NFL MVP award in 1992, the first of his two MVP awards with the 49ers.",
+    difficulty: "medium",
+    category: "football",
+    imageUrl: "/steve-young-mvp.png",
+    imageAlt: "Steve Young in action as 49ers quarterback",
+  },
+  {
+    id: "fb-5",
+    question: "Who is the 49ers' all-time rushing leader?",
+    options: ["Roger Craig", "Frank Gore", "Garrison Hearst", "Joe Perry"],
+    correctAnswer: 1,
+    explanation:
+      "Frank Gore is the 49ers' all-time rushing leader with 11,073 yards during his time with the team (2005-2014).",
+    difficulty: "medium",
+    category: "football",
+    imageUrl: "/frank-gore-49ers.png",
+    imageAlt: "Frank Gore running with the football for the 49ers",
+  },
+  {
+    id: "fb-6",
+    question: "What was the name of the 49ers' home stadium before Levi's Stadium?",
+    options: ["Oracle Park", "Candlestick Park", "Monster Park", "3Com Park"],
+    correctAnswer: 1,
+    explanation: "Candlestick Park was the 49ers' home from 1971 to 2013, before they moved to Levi's Stadium in 2014.",
+    difficulty: "easy",
+    category: "football",
+    imageUrl: "/levis-stadium-49ers.png",
+    imageAlt: "Aerial view of Levi's Stadium in Santa Clara",
+  },
+  {
+    id: "fb-7",
+    question: "Which 49ers head coach led the team to 5 Super Bowl victories?",
+    options: ["Bill Walsh", "George Seifert", "Jim Harbaugh", "Steve Mariucci"],
+    correctAnswer: 0,
+    explanation: "Bill Walsh led the 49ers to 3 Super Bowl victories, while George Seifert led them to the other 2.",
+    difficulty: "hard",
+    category: "football",
+    imageUrl: "/joe-montana-49ers.png",
+    imageAlt: "Bill Walsh coaching the San Francisco 49ers",
+  },
+  {
+    id: "fb-8",
+    question: "In what year did the 49ers move to Levi's Stadium?",
+    options: ["2012", "2014", "2016", "2018"],
+    correctAnswer: 1,
+    explanation: "The 49ers moved to Levi's Stadium in Santa Clara for the 2014 NFL season.",
+    difficulty: "easy",
+    category: "football",
+    imageUrl: "/levis-stadium-49ers.png",
+    imageAlt: "Levi's Stadium during a 49ers game",
+  },
+  {
+    id: "fb-9",
+    question: "Which 49ers wide receiver is known as 'The GOAT'?",
+    options: ["Terrell Owens", "Dwight Clark", "Jerry Rice", "John Taylor"],
+    correctAnswer: 2,
+    explanation:
+      "Jerry Rice is widely considered the greatest wide receiver of all time and nicknamed 'The GOAT' (Greatest Of All Time).",
+    difficulty: "easy",
+    category: "football",
+    imageUrl: "/joe-montana-49ers.png",
+    imageAlt: "Jerry Rice making a catch for the 49ers",
+  },
+  {
+    id: "fb-10",
+    question: "What is the name of the 49ers' famous play in the 1981 NFC Championship Game?",
+    options: ["The Drive", "The Catch", "The Fumble", "The Tackle"],
+    correctAnswer: 1,
+    explanation:
+      "'The Catch' refers to Dwight Clark's game-winning touchdown reception from Joe Montana against the Dallas Cowboys.",
+    difficulty: "medium",
+    category: "football",
+    imageUrl: "/49ers-super-bowl-xxiii.png",
+    imageAlt: "Dwight Clark making 'The Catch'",
+  },
+]
+
+// Baseball trivia questions
+const baseballQuestions = [
+  {
+    id: "bb-1",
+    question: "In what year did the Giants move to San Francisco from New York?",
+    options: ["1952", "1958", "1962", "1970"],
+    correctAnswer: 1,
+    explanation: "The Giants moved from New York to San Francisco in 1958.",
+    difficulty: "medium",
+    category: "baseball",
+    imageUrl: "/giants-move-1958.png",
+    imageAlt: "Historic image of the Giants' move to San Francisco",
+  },
+  {
+    id: "bb-2",
+    question: "What is the name of the San Francisco Giants' home ballpark?",
+    options: ["AT&T Park", "Oracle Park", "Candlestick Park", "PacBell Park"],
+    correctAnswer: 1,
+    explanation: "Oracle Park (formerly AT&T Park and PacBell Park) has been the Giants' home since 2000.",
+    difficulty: "easy",
+    category: "baseball",
+    imageUrl: "/oracle-park-giants.png",
+    imageAlt: "Oracle Park, home of the San Francisco Giants",
+  },
+  {
+    id: "bb-3",
+    question: "How many World Series championships have the San Francisco Giants won?",
+    options: ["1", "3", "5", "8"],
+    correctAnswer: 1,
+    explanation: "The San Francisco Giants have won 3 World Series championships (2010, 2012, and 2014).",
+    difficulty: "easy",
+    category: "baseball",
+    imageUrl: "/oracle-park-giants.png",
+    imageAlt: "San Francisco Giants celebrating a World Series victory",
+  },
+  {
+    id: "bb-4",
+    question: "Which Giants player hit 73 home runs in a single season, setting an MLB record?",
+    options: ["Willie Mays", "Willie McCovey", "Barry Bonds", "Buster Posey"],
+    correctAnswer: 2,
+    explanation: "Barry Bonds hit 73 home runs in 2001, setting the MLB single-season record.",
+    difficulty: "easy",
+    category: "baseball",
+    imageUrl: "/barry-bonds-giants-record.png",
+    imageAlt: "Barry Bonds hitting a home run for the Giants",
+  },
+  {
+    id: "bb-5",
+    question: "What is the nickname of the Giants' home ballpark on San Francisco Bay?",
+    options: ["The Yard", "The Box", "The Cove", "The Bay"],
+    correctAnswer: 0,
+    explanation: "Oracle Park is often referred to as 'The Yard' by locals and fans.",
+    difficulty: "medium",
+    category: "baseball",
+    imageUrl: "/oracle-park-giants.png",
+    imageAlt: "Oracle Park with San Francisco Bay in the background",
+  },
+]
+
+// Basketball trivia questions
+const basketballQuestions = [
+  {
+    id: "bk-1",
+    question: "In what year did the Golden State Warriors move to San Francisco from Philadelphia?",
+    options: ["1962", "1971", "1985", "1999"],
+    correctAnswer: 0,
+    explanation:
+      "The Warriors moved from Philadelphia to San Francisco in 1962, and later became the Golden State Warriors in 1971.",
+    difficulty: "medium",
+    category: "basketball",
+    imageUrl: "/chase-center-gsw.png",
+    imageAlt: "Chase Center, home of the Golden State Warriors",
+  },
+  {
+    id: "bk-2",
+    question: "What is the name of the Golden State Warriors' home arena in San Francisco?",
+    options: ["Oracle Arena", "Chase Center", "SAP Center", "Cow Palace"],
+    correctAnswer: 1,
+    explanation:
+      "Chase Center has been the Warriors' home arena since 2019, after they moved from Oracle Arena in Oakland.",
+    difficulty: "easy",
+    category: "basketball",
+    imageUrl: "/chase-center-gsw.png",
+    imageAlt: "Chase Center in San Francisco",
+  },
+  {
+    id: "bk-3",
+    question: "How many NBA championships have the Golden State Warriors won since 2015?",
+    options: ["2", "3", "4", "5"],
+    correctAnswer: 2,
+    explanation: "The Golden State Warriors have won 4 NBA championships since 2015 (2015, 2017, 2018, and 2022).",
+    difficulty: "easy",
+    category: "basketball",
+    imageUrl: "/chase-center-gsw.png",
+    imageAlt: "Golden State Warriors celebrating an NBA championship",
+  },
+  {
+    id: "bk-4",
+    question: "Which Warriors player is known as the 'Splash Brother' along with Klay Thompson?",
+    options: ["Kevin Durant", "Draymond Green", "Stephen Curry", "Andrew Wiggins"],
+    correctAnswer: 2,
+    explanation:
+      "Stephen Curry and Klay Thompson are known as the 'Splash Brothers' for their exceptional three-point shooting.",
+    difficulty: "easy",
+    category: "basketball",
+    imageUrl: "/chase-center-gsw.png",
+    imageAlt: "Stephen Curry shooting a three-pointer",
+  },
+  {
+    id: "bk-5",
+    question: "In what year did the Warriors move from Oakland to San Francisco?",
+    options: ["2017", "2018", "2019", "2020"],
+    correctAnswer: 2,
+    explanation: "The Warriors moved from Oracle Arena in Oakland to Chase Center in San Francisco in 2019.",
+    difficulty: "medium",
+    category: "basketball",
+    imageUrl: "/chase-center-gsw.png",
+    imageAlt: "Aerial view of Chase Center in San Francisco",
+  },
+]
+
+// San Francisco districts trivia questions
+const districtsQuestions = [
+  {
+    id: "dist-1",
+    question: "Which San Francisco district is known as 'Little Italy'?",
+    options: ["Mission District", "North Beach", "Chinatown", "Nob Hill"],
+    correctAnswer: 1,
+    explanation: "North Beach is known as San Francisco's Little Italy, famous for its Italian restaurants and cafes.",
+    difficulty: "medium",
+    category: "districts",
+    imageUrl: "/north-beach-italian-street.png",
+    imageAlt: "Italian restaurants in North Beach, San Francisco",
+  },
+  {
+    id: "dist-2",
+    question: "Which district is home to the famous 'Painted Ladies' Victorian houses?",
+    options: ["Haight-Ashbury", "Pacific Heights", "Alamo Square", "Noe Valley"],
+    correctAnswer: 2,
+    explanation:
+      "The 'Painted Ladies' are located in Alamo Square, a residential neighborhood and park in San Francisco.",
+    difficulty: "medium",
+    category: "districts",
+    imageUrl: "/mission-district-sf.png",
+    imageAlt: "The Painted Ladies Victorian houses in Alamo Square",
+  },
+  {
+    id: "dist-3",
+    question: "Which San Francisco district is known for its Hispanic culture and murals?",
+    options: ["Mission District", "Sunset District", "Richmond District", "Tenderloin"],
+    correctAnswer: 0,
+    explanation: "The Mission District is known for its Hispanic culture, colorful murals, and vibrant street art.",
+    difficulty: "easy",
+    category: "districts",
+    imageUrl: "/mission-district-sf.png",
+    imageAlt: "Colorful murals in the Mission District",
+  },
+  {
+    id: "dist-4",
+    question: "Which district is home to San Francisco's Japantown?",
+    options: ["Western Addition", "Fillmore", "Pacific Heights", "Presidio"],
+    correctAnswer: 0,
+    explanation: "Japantown is located in the Western Addition district of San Francisco.",
+    difficulty: "hard",
+    category: "districts",
+    imageUrl: "/mission-district-sf.png",
+    imageAlt: "Japantown in San Francisco",
+  },
+  {
+    id: "dist-5",
+    question: "Which San Francisco district is known for its LGBTQ+ history and culture?",
+    options: ["SoMa", "Castro", "Noe Valley", "Hayes Valley"],
+    correctAnswer: 1,
+    explanation: "The Castro District is known as a center of LGBTQ+ culture and activism in San Francisco.",
+    difficulty: "easy",
+    category: "districts",
+    imageUrl: "/castro-rainbow-flags.png",
+    imageAlt: "Rainbow flags in the Castro District",
+  },
+]
+
+// San Francisco tourist spots trivia questions
+const touristSpotsQuestions = [
+  {
+    id: "tour-1",
+    question: "Which famous prison is located on an island in San Francisco Bay?",
+    options: ["San Quentin", "Alcatraz", "Folsom", "Rikers Island"],
+    correctAnswer: 1,
+    explanation: "Alcatraz Island in San Francisco Bay was home to the infamous federal prison from 1934 to 1963.",
+    difficulty: "easy",
+    category: "tourist-spots",
+    imageUrl: "/alcatraz-island-san-francisco.png",
+    imageAlt: "Alcatraz Island in San Francisco Bay",
+  },
+  {
+    id: "tour-2",
+    question: "What is the name of the famous crooked street in San Francisco?",
+    options: ["Market Street", "Lombard Street", "Powell Street", "California Street"],
+    correctAnswer: 1,
+    explanation: "Lombard Street is known as the 'crookedest street in the world' with its eight hairpin turns.",
+    difficulty: "easy",
+    category: "tourist-spots",
+    imageUrl: "/lombard-street-crooked.png",
+    imageAlt: "The famous winding section of Lombard Street",
+  },
+  {
+    id: "tour-3",
+    question: "Which famous San Francisco landmark has towers that rise 746 feet above the water?",
+    options: ["Coit Tower", "Transamerica Pyramid", "Golden Gate Bridge", "Salesforce Tower"],
+    correctAnswer: 2,
+    explanation: "The Golden Gate Bridge's towers rise 746 feet above the water.",
+    difficulty: "medium",
+    category: "tourist-spots",
+    imageUrl: "/golden-gate-bridge.png",
+    imageAlt: "The Golden Gate Bridge in San Francisco",
+  },
+  {
+    id: "tour-4",
+    question: "What is the name of San Francisco's famous Chinatown entrance gate?",
+    options: ["Dragon Gate", "Golden Gate", "Chinatown Gate", "Fortune Gate"],
+    correctAnswer: 0,
+    explanation: "The Dragon Gate marks the entrance to San Francisco's Chinatown on Grant Avenue.",
+    difficulty: "medium",
+    category: "tourist-spots",
+    imageUrl: "/san-francisco-chinatown-gate.png",
+    imageAlt: "The Dragon Gate entrance to San Francisco's Chinatown",
+  },
+  {
+    id: "tour-5",
+    question: "Which famous San Francisco square is known for high-end shopping?",
+    options: ["Ghirardelli Square", "Union Square", "Portsmouth Square", "Washington Square"],
+    correctAnswer: 1,
+    explanation:
+      "Union Square is San Francisco's premier shopping district with luxury retailers and department stores.",
+    difficulty: "easy",
+    category: "tourist-spots",
+    imageUrl: "/union-square-san-francisco.png",
+    imageAlt: "Union Square in San Francisco with shoppers and stores",
+  },
+]
+
+// San Francisco day trips trivia questions
+const dayTripsQuestions = [
+  {
+    id: "day-1",
+    question: "Which famous wine region is a popular day trip from San Francisco?",
+    options: ["Sonoma Valley", "Napa Valley", "Russian River Valley", "All of these"],
+    correctAnswer: 3,
+    explanation:
+      "Sonoma Valley, Napa Valley, and Russian River Valley are all popular wine regions for day trips from San Francisco.",
+    difficulty: "easy",
+    category: "day-trips",
+    imageUrl: "/napa-valley-vineyards.png",
+    imageAlt: "Vineyards in Napa Valley, California",
+  },
+  {
+    id: "day-2",
+    question: "Which coastal town north of San Francisco is known for its houseboats and views?",
+    options: ["Half Moon Bay", "Sausalito", "Tiburon", "Bolinas"],
+    correctAnswer: 1,
+    explanation: "Sausalito is known for its Richardson Bay houseboat community and beautiful views of San Francisco.",
+    difficulty: "medium",
+    category: "day-trips",
+    imageUrl: "/sausalito-day-trip.png",
+    imageAlt: "Houseboats and San Francisco view from Sausalito",
+  },
+  {
+    id: "day-3",
+    question: "Which national monument featuring redwood trees is close to San Francisco?",
+    options: ["Muir Woods", "Sequoia National Park", "Big Basin", "Armstrong Redwoods"],
+    correctAnswer: 0,
+    explanation:
+      "Muir Woods National Monument is located just north of San Francisco and features old-growth coast redwoods.",
+    difficulty: "easy",
+    category: "day-trips",
+    imageUrl: "/muir-woods-day-trip.png",
+    imageAlt: "Tall redwood trees in Muir Woods National Monument",
+  },
+  {
+    id: "day-4",
+    question: "Which famous aquarium is located about 2 hours south of San Francisco?",
+    options: ["Steinhart Aquarium", "Aquarium of the Bay", "Monterey Bay Aquarium", "Long Beach Aquarium"],
+    correctAnswer: 2,
+    explanation: "The Monterey Bay Aquarium is a world-renowned facility located about 2 hours south of San Francisco.",
+    difficulty: "medium",
+    category: "day-trips",
+    imageUrl: "/monterey-bay-aquarium-interior.png",
+    imageAlt: "Inside the Monterey Bay Aquarium with fish tanks",
+  },
+  {
+    id: "day-5",
+    question: "Which state park features dramatic coastal cliffs and is a popular day trip?",
+    options: ["Point Reyes", "Big Sur", "Mount Tamalpais", "Angel Island"],
+    correctAnswer: 0,
+    explanation:
+      "Point Reyes National Seashore features dramatic coastal cliffs and is a popular day trip from San Francisco.",
+    difficulty: "medium",
+    category: "day-trips",
+    imageUrl: "/muir-woods-day-trip.png",
+    imageAlt: "Coastal cliffs at Point Reyes National Seashore",
+  },
+]
+
+// Map game IDs to their respective question sets
+const gameQuestions = {
+  "sf-football": footballQuestions,
+  "sf-baseball": baseballQuestions,
+  "sf-basketball": basketballQuestions,
+  "sf-districts": districtsQuestions,
+  "sf-tourist-spots": touristSpotsQuestions,
+  "sf-day-trips": dayTripsQuestions,
 }
 
 // Add fallback images for any missing image paths
@@ -353,239 +450,47 @@ const ensureImageUrls = (questions) => {
 }
 
 export async function GET(req: Request) {
-  // Generate a unique request ID for tracking this request through logs
-  const requestId = uuidv4()
-
   try {
     const url = new URL(req.url)
     const count = Number.parseInt(url.searchParams.get("count") || "5", 10)
     const gameId = url.searchParams.get("gameId") || "sf-football"
 
-    // Log the incoming request
-    info("Trivia questions request received", {
-      component: "trivia-api",
-      action: "fetch-questions",
-      requestId,
-      gameId,
-      count,
-    })
-
-    // Try to fetch questions from the database first
-    const supabase = getServiceSupabase()
-    let dbQuestions = []
-    let dbError = null
-
-    try {
-      // Add timeout to the database query
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Database query timeout after 5 seconds")), 5000)
-      })
-
-      const queryPromise = supabase.from("trivia_questions").select("*").eq("game_id", gameId).order("id").limit(100)
-
-      // Race between the query and the timeout
-      const result = (await Promise.race([queryPromise, timeoutPromise])) as any
-
-      if (result.error) {
-        throw result.error
-      }
-
-      dbQuestions = result.data || []
-
-      // Log successful database fetch
-      info("Database questions fetched successfully", {
-        component: "trivia-api",
-        action: "db-fetch",
-        requestId,
-        gameId,
-        questionCount: dbQuestions.length,
-      })
-    } catch (error) {
-      dbError = error
-
-      // Log database error
-      warn(
-        "Failed to fetch questions from database",
-        {
-          component: "trivia-api",
-          action: "db-fetch",
-          requestId,
-          gameId,
-          error: error instanceof Error ? error.message : String(error),
-        },
-        error,
-      )
-    }
-
-    let questions = []
-    let source = "unknown"
-
-    // Determine which questions to use
-    if (dbError || !dbQuestions || dbQuestions.length === 0) {
-      // Log fallback to static questions
-      warn(`No questions found in database for ${gameId}, using fallback questions`, {
-        component: "trivia-api",
-        action: "fallback-questions",
-        requestId,
-        gameId,
-        error: dbError instanceof Error ? dbError.message : String(dbError),
-      })
-
-      // Use fallback questions if database fetch fails or returns no results
-      questions = fallbackQuestions[gameId] || []
-      source = "fallback"
-
-      // If no fallback questions exist for this game, create some generic ones
-      if (!questions || questions.length === 0) {
-        warn(`No fallback questions found for ${gameId}, creating generic questions`, {
-          component: "trivia-api",
-          action: "generic-questions",
-          requestId,
-          gameId,
-        })
-
-        questions = createGenericQuestions(gameId)
-        source = "generic"
-      }
-    } else {
-      // Map database questions to the expected format
-      questions = dbQuestions.map((q) => ({
-        id: q.id,
-        question: q.question,
-        options: q.options,
-        correctAnswer: q.correct_answer,
-        explanation: q.explanation,
-        difficulty: q.difficulty,
-        category: q.category,
-        imageUrl: q.image_url,
-        imageAlt: q.image_alt || `Image for ${q.question}`,
-      }))
-      source = "database"
-    }
-
-    // Ensure we have enough questions
-    if (questions.length === 0) {
-      // This is a critical error - we should always have at least some questions
-      error("No questions available after all fallbacks", {
-        component: "trivia-api",
-        action: "no-questions",
-        requestId,
-        gameId,
-      })
-
-      // Create emergency questions as a last resort
-      questions = createGenericQuestions("emergency")
-      source = "emergency"
-    }
+    // Get the appropriate question set for the requested game
+    const questionSet = gameQuestions[gameId] || footballQuestions
 
     // Ensure all questions have valid image URLs
-    const questionsWithImages = ensureImageUrls(questions)
+    const questionsWithImages = ensureImageUrls(questionSet)
 
     // Shuffle the questions and select the requested number
     const shuffled = [...questionsWithImages].sort(() => 0.5 - Math.random())
     const selected = shuffled.slice(0, Math.min(count, questionsWithImages.length))
 
-    // Log successful response
-    info("Trivia questions successfully prepared", {
-      component: "trivia-api",
-      action: "questions-prepared",
-      requestId,
-      gameId,
-      source,
-      questionCount: selected.length,
-      totalAvailable: questions.length,
-    })
+    // Generate a request ID for tracking
+    const requestId = uuidv4()
 
     // Return the selected questions as JSON
     return NextResponse.json({
       questions: selected,
-      source,
+      source: "optimized",
       requestId,
-      timestamp: new Date().toISOString(),
     })
   } catch (error) {
-    // Log the critical error
-    error(
-      "Critical error in trivia questions API",
-      {
-        component: "trivia-api",
-        action: "critical-error",
-        requestId,
-        error: error instanceof Error ? error.message : String(error),
-      },
-      error,
-    )
+    // Log the error without destructuring
+    console.error("Error in trivia game questions API:", error)
 
-    // Create some emergency questions to return
-    const emergencyQuestions = createGenericQuestions("emergency")
+    // Get fallback questions based on the game ID
+    const url = new URL(req.url)
+    const gameId = url.searchParams.get("gameId") || "sf-football"
+    const fallbackSet = gameQuestions[gameId] || footballQuestions
 
-    // Return a proper error response with emergency questions
+    // Return a proper error response with fallback questions
     return NextResponse.json(
       {
         error: "Failed to generate trivia questions",
-        errorMessage: error instanceof Error ? error.message : "Unknown error",
-        questions: emergencyQuestions,
-        source: "emergency",
-        requestId,
-        timestamp: new Date().toISOString(),
+        questions: ensureImageUrls(fallbackSet.slice(0, 5)),
+        source: "error-fallback",
       },
-      { status: 200 },
-    ) // Still return 200 to allow the client to display the emergency questions
+      { status: 500 },
+    )
   }
-}
-
-// Add this function to create generic questions if no fallback exists
-function createGenericQuestions(gameId: string) {
-  return [
-    {
-      id: `emergency-1`,
-      question: "Which famous bridge is located in San Francisco?",
-      options: ["Brooklyn Bridge", "Golden Gate Bridge", "London Bridge", "Sydney Harbour Bridge"],
-      correctAnswer: 1,
-      explanation: "The Golden Gate Bridge is San Francisco's most iconic landmark.",
-      difficulty: "easy",
-      category: "landmarks",
-      imageUrl: "/golden-gate-bridge.png",
-    },
-    {
-      id: `emergency-2`,
-      question: "What is the name of the famous prison located on an island in San Francisco Bay?",
-      options: ["Rikers Island", "Alcatraz", "San Quentin", "Folsom"],
-      correctAnswer: 1,
-      explanation: "Alcatraz Island in San Francisco Bay was home to the infamous federal prison from 1934 to 1963.",
-      difficulty: "easy",
-      category: "landmarks",
-      imageUrl: "/alcatraz-prison-san-francisco.png",
-    },
-    {
-      id: `emergency-3`,
-      question: "Which San Francisco neighborhood is known for its LGBTQ+ history?",
-      options: ["Mission District", "Castro District", "Chinatown", "Fisherman's Wharf"],
-      correctAnswer: 1,
-      explanation: "The Castro District is known for its LGBTQ+ history and culture.",
-      difficulty: "easy",
-      category: "neighborhoods",
-      imageUrl: "/castro-district-san-francisco.png",
-    },
-    {
-      id: `emergency-4`,
-      question: "What is the name of the famous crooked street in San Francisco?",
-      options: ["Market Street", "Lombard Street", "Van Ness Avenue", "Geary Boulevard"],
-      correctAnswer: 1,
-      explanation: "Lombard Street is known as the 'crookedest street in the world' with its eight hairpin turns.",
-      difficulty: "easy",
-      category: "landmarks",
-      imageUrl: "/lombard-street-crooked.png",
-    },
-    {
-      id: `emergency-5`,
-      question: "What is the name of San Francisco's Chinatown?",
-      options: ["San Francisco Chinatown", "Little China", "Asian District", "Oriental Quarter"],
-      correctAnswer: 0,
-      explanation: "San Francisco's Chinatown is the oldest Chinatown in North America.",
-      difficulty: "easy",
-      category: "neighborhoods",
-      imageUrl: "/san-francisco-chinatown-gate.png",
-    },
-  ]
 }

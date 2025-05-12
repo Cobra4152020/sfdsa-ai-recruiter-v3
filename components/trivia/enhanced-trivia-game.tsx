@@ -382,7 +382,10 @@ export function EnhancedTriviaGame({
       }
 
       // Check if it's a network error
-      if (!navigator.onLine || error.message.includes("offline") || error.message.includes("network")) {
+      if (
+        !navigator.onLine ||
+        (error.message && (error.message.includes("offline") || error.message.includes("network")))
+      ) {
         setShowNetworkError(true)
       }
 
