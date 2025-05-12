@@ -1,23 +1,29 @@
 import { NextResponse } from "next/server"
-import { getTodaysBriefing, generateTodaysBriefingIfNeeded } from "@/lib/daily-briefing-service"
+import { getTodaysBriefing } from "@/lib/daily-briefing-service"
 
 export async function GET() {
   try {
-    // First try to get today's briefing
-    let briefing = await getTodaysBriefing()
-
-    // If no briefing exists for today, generate one
-    if (!briefing) {
-      briefing = await generateTodaysBriefingIfNeeded()
-    }
+    const briefing = await getTodaysBriefing()
 
     if (!briefing) {
-      return NextResponse.json({ error: "Failed to retrieve or generate today's briefing" }, { status: 500 })
+      return NextResponse.json(
+        {
+          error: "No briefing available",
+          message: "No briefing is currently available. Please check back later.",
+        },
+        { status: 404 },
+      )
     }
 
     return NextResponse.json({ briefing })
   } catch (error) {
     console.error("Error in daily briefing API:", error)
-    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
+    return NextResponse.json(
+      {
+        error: "Failed to fetch briefing",
+        message: "An unexpected error occurred while fetching the briefing.",
+      },
+      { status: 500 },
+    )
   }
 }

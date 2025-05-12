@@ -1,16 +1,16 @@
 import { NextResponse } from "next/server"
-import { getRecentBriefings } from "@/lib/daily-briefing-service"
+import { getBriefingHistory } from "@/lib/daily-briefing-service"
 
-export async function GET(req: Request) {
+export async function GET(request: Request) {
   try {
-    const url = new URL(req.url)
-    const limit = Number.parseInt(url.searchParams.get("limit") || "7", 10)
+    const { searchParams } = new URL(request.url)
+    const limit = Number.parseInt(searchParams.get("limit") || "7", 10)
 
-    const briefings = await getRecentBriefings(limit)
+    const history = await getBriefingHistory(limit)
 
-    return NextResponse.json({ briefings })
+    return NextResponse.json({ history })
   } catch (error) {
     console.error("Error in briefing history API:", error)
-    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to fetch briefing history" }, { status: 500 })
   }
 }

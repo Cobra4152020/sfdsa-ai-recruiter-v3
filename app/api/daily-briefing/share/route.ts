@@ -1,26 +1,29 @@
 import { NextResponse } from "next/server"
 import { recordBriefingShare } from "@/lib/daily-briefing-service"
+import { createClient } from "@/lib/supabase-server"
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { userId, briefingId, platform } = await req.json()
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    if (!userId || !briefingId || !platform) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
 
-    const result = await recordBriefingShare(userId, briefingId, platform)
+    const { briefingId, platform } = await request.json()
 
-    if (!result.success) {
-      return NextResponse.json({ error: "Failed to record share" }, { status: 500 })
+    if (!briefingId || !platform) {
+      return NextResponse.json({ error: "Briefing ID and platform are required" }, { status: 400 })
     }
 
-    return NextResponse.json({
-      success: true,
-      pointsAwarded: result.pointsAwarded,
-    })
+    const result = await recordBriefingShare(user.id, briefingId, platform)
+
+    return NextResponse.json(result)
   } catch (error) {
-    console.error("Error in briefing share API:", error)
-    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
+    console.error("Error in share briefing API:", error)
+    return NextResponse.json({ error: "Failed to record share" }, { status: 500 })
   }
 }

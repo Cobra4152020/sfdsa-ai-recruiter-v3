@@ -1,37 +1,29 @@
 import { NextResponse } from "next/server"
-import { recordBriefingAttendance } from "@/lib/daily-briefing-service"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { markBriefingAttended } from "@/lib/daily-briefing-service"
+import { createClient } from "@/lib/supabase-server"
 
-export async function POST(req: Request) {
+export async function POST(request: Request) {
   try {
-    const { userId, briefingId } = await req.json()
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    if (!userId || !briefingId) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
 
-    // Verify user exists
-    const supabase = getServiceSupabase()
-    const { data: user, error: userError } = await supabase.from("users").select("id").eq("id", userId).single()
+    const { briefingId } = await request.json()
 
-    if (userError || !user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 })
+    if (!briefingId) {
+      return NextResponse.json({ error: "Briefing ID is required" }, { status: 400 })
     }
 
-    const result = await recordBriefingAttendance(userId, briefingId)
+    const result = await markBriefingAttended(user.id, briefingId)
 
-    if (!result.success) {
-      return NextResponse.json({ error: "Failed to record attendance" }, { status: 500 })
-    }
-
-    return NextResponse.json({
-      success: true,
-      pointsAwarded: result.pointsAwarded,
-      newStreak: result.newStreak,
-      alreadyAttended: result.alreadyAttended,
-    })
+    return NextResponse.json(result)
   } catch (error) {
-    console.error("Error in briefing attendance API:", error)
-    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
+    console.error("Error in attend briefing API:", error)
+    return NextResponse.json({ error: "Failed to record attendance" }, { status: 500 })
   }
 }

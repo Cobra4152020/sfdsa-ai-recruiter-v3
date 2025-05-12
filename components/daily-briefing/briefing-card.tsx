@@ -1,390 +1,208 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useUser } from "@/context/user-context"
-import { useToast } from "@/components/ui/use-toast"
+import { useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Skeleton } from "@/components/ui/skeleton"
-import { ThemeIcon, getThemeColor, getThemeTitle } from "./theme-icon"
-import { Calendar, Share2, Medal, Facebook, Twitter, Linkedin, LinkIcon, ThumbsUp, Trophy, Flame } from "lucide-react"
+import { ThemeIcon } from "./theme-icon"
+import { Check, Award } from "lucide-react"
 import type { DailyBriefing } from "@/lib/daily-briefing-service"
+import { formatDate } from "@/lib/utils"
 import confetti from "canvas-confetti"
 
-export function BriefingCard() {
-  const [briefing, setBriefing] = useState<DailyBriefing | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [showShareDialog, setShowShareDialog] = useState(false)
-  const [showRewardDialog, setShowRewardDialog] = useState(false)
-  const [pointsAwarded, setPointsAwarded] = useState(0)
-  const [streak, setStreak] = useState(0)
-  const [attendanceRecorded, setAttendanceRecorded] = useState(false)
+type BriefingCardProps = {
+  briefing: DailyBriefing
+  onAttend: (briefingId: string) => Promise<{
+    success: boolean
+    points: number
+    streak?: number
+    streakPoints?: number
+    alreadyAttended?: boolean
+  }>
+  onShare: (
+    briefingId: string,
+    platform: string,
+  ) => Promise<{
+    success: boolean
+    points: number
+    alreadyShared?: boolean
+  }>
+}
 
-  const { currentUser, isLoggedIn } = useUser()
-  const { toast } = useToast()
+export function BriefingCard({ briefing, onAttend, onShare }: BriefingCardProps) {
+  const [isAttending, setIsAttending] = useState(false)
+  const [isSharing, setIsSharing] = useState(false)
+  const [attended, setAttended] = useState(false)
+  const [shared, setShared] = useState(false)
+  const [pointsEarned, setPointsEarned] = useState(0)
+  const [showConfetti, setShowConfetti] = useState(false)
 
-  // Fetch today's briefing on component mount
-  useEffect(() => {
-    fetchTodaysBriefing()
-  }, [])
+  const handleAttend = async () => {
+    if (isAttending || attended) return
 
-  // Record attendance when logged in and briefing loads
-  useEffect(() => {
-    if (isLoggedIn && currentUser && briefing && !attendanceRecorded) {
-      recordAttendance()
-    }
-  }, [isLoggedIn, currentUser, briefing, attendanceRecorded])
-
-  const fetchTodaysBriefing = async () => {
+    setIsAttending(true)
     try {
-      setLoading(true)
-      setError(null)
+      const result = await onAttend(briefing.id)
 
-      const response = await fetch("/api/daily-briefing")
+      if (result.success) {
+        setAttended(true)
+        if (result.points > 0 && !result.alreadyAttended) {
+          setPointsEarned((prev) => prev + result.points)
+          setShowConfetti(true)
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch briefing: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-      setBriefing(data.briefing)
-    } catch (error) {
-      console.error("Error fetching briefing:", error)
-      setError("Could not load today's briefing. Please try again later.")
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const recordAttendance = async () => {
-    try {
-      if (!currentUser || !briefing) return
-
-      const response = await fetch("/api/daily-briefing/attend", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser.id,
-          briefingId: briefing.id,
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to record attendance: ${response.statusText}`)
-      }
-
-      const data = await response.json()
-
-      setAttendanceRecorded(true)
-
-      // Only show reward dialog for first-time attendance of this briefing
-      if (!data.alreadyAttended) {
-        setPointsAwarded(data.pointsAwarded)
-        setStreak(data.newStreak)
-
-        // Show confetti for streaks of 3 or more
-        if (data.newStreak >= 3) {
+          // Trigger confetti
           confetti({
             particleCount: 100,
             spread: 70,
             origin: { y: 0.6 },
           })
-        }
 
-        setShowRewardDialog(true)
+          setTimeout(() => setShowConfetti(false), 3000)
+        }
       }
     } catch (error) {
-      console.error("Error recording attendance:", error)
-      toast({
-        title: "Attendance Error",
-        description: "We couldn't record your attendance. Please try again.",
-        variant: "destructive",
-      })
+      console.error("Error attending briefing:", error)
+    } finally {
+      setIsAttending(false)
     }
   }
 
   const handleShare = async (platform: string) => {
-    if (!isLoggedIn || !currentUser || !briefing) {
-      setShowShareDialog(false)
-      return
-    }
+    if (isSharing || shared) return
 
+    setIsSharing(true)
     try {
-      // First record the share in our system
-      const response = await fetch("/api/daily-briefing/share", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser.id,
-          briefingId: briefing.id,
-          platform,
-        }),
-      })
+      const result = await onShare(briefing.id, platform)
 
-      if (!response.ok) {
-        throw new Error(`Failed to record share: ${response.statusText}`)
-      }
+      if (result.success) {
+        setShared(true)
+        if (result.points > 0 && !result.alreadyShared) {
+          setPointsEarned((prev) => prev + result.points)
+          setShowConfetti(true)
 
-      const data = await response.json()
-
-      // Show notification about points earned
-      toast({
-        title: "Points Awarded!",
-        description: `You earned ${data.pointsAwarded} points for sharing Sgt. Ken's briefing!`,
-        variant: "default",
-      })
-
-      // Generate share text
-      const shareText = `Sgt. Ken's Daily Briefing: "${briefing.quote}" Join me in learning what it takes to be a San Francisco Deputy Sheriff.`
-      const shareUrl = window.location.origin + "/daily-briefing"
-
-      // Perform the actual share based on platform
-      switch (platform) {
-        case "twitter":
-          window.open(
-            `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-            "_blank",
-          )
-          break
-        case "facebook":
-          window.open(
-            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
-            "_blank",
-          )
-          break
-        case "linkedin":
-          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, "_blank")
-          break
-        case "copy":
-          navigator.clipboard.writeText(`${shareText} ${shareUrl}`)
-          toast({
-            title: "Link Copied!",
-            description: "The briefing link has been copied to your clipboard.",
-            variant: "default",
+          // Trigger confetti
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
           })
-          break
-      }
 
-      setShowShareDialog(false)
+          setTimeout(() => setShowConfetti(false), 3000)
+        }
+      }
     } catch (error) {
       console.error("Error sharing briefing:", error)
-      toast({
-        title: "Sharing Error",
-        description: "We couldn't process your share. Please try again.",
-        variant: "destructive",
-      })
+    } finally {
+      setIsSharing(false)
     }
   }
 
-  const formatDate = (dateString: string) => {
-    const options: Intl.DateTimeFormatOptions = {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }
-    return new Date(dateString).toLocaleDateString(undefined, options)
+  const shareOnTwitter = () => {
+    const text = `"${briefing.quote}" - ${briefing.quote_author}\n\nSgt. Ken's take: ${briefing.sgt_ken_take.substring(0, 100)}...\n\n`
+    const url = `${window.location.origin}/daily-briefing`
+    const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`
+
+    window.open(shareUrl, "_blank")
+    handleShare("twitter")
   }
 
-  if (loading) {
-    return (
-      <Card className="w-full shadow-lg">
-        <CardHeader className="pb-2">
-          <Skeleton className="h-5 w-40 mb-2" />
-          <Skeleton className="h-7 w-60" />
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-28 w-full rounded-md" />
-          <Skeleton className="h-24 w-full rounded-md" />
-          <Skeleton className="h-20 w-full rounded-md" />
-        </CardContent>
-        <CardFooter>
-          <Skeleton className="h-10 w-full rounded-md" />
-        </CardFooter>
-      </Card>
-    )
+  const shareOnFacebook = () => {
+    const url = `${window.location.origin}/daily-briefing`
+    const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`
+
+    window.open(shareUrl, "_blank")
+    handleShare("facebook")
   }
 
-  if (error) {
-    return (
-      <Card className="w-full shadow-lg border-red-300">
-        <CardHeader className="pb-2">
-          <CardTitle>Daily Briefing Unavailable</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-red-600">{error}</p>
-          <Button onClick={fetchTodaysBriefing} className="mt-4">
-            Try Again
-          </Button>
-        </CardContent>
-      </Card>
-    )
-  }
+  const shareOnLinkedIn = () => {
+    const title = `Sgt. Ken's Daily Briefing: ${briefing.theme.charAt(0).toUpperCase() + briefing.theme.slice(1)}`
+    const summary = `"${briefing.quote}" - ${briefing.quote_author}\n\nSgt. Ken's take: ${briefing.sgt_ken_take.substring(0, 100)}...`
+    const url = `${window.location.origin}/daily-briefing`
+    const shareUrl = `https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(url)}&title=${encodeURIComponent(title)}&summary=${encodeURIComponent(summary)}`
 
-  if (!briefing) {
-    return null
+    window.open(shareUrl, "_blank")
+    handleShare("linkedin")
   }
-
-  const themeColors = getThemeColor(briefing.theme)
 
   return (
-    <>
-      <Card className="w-full shadow-lg">
-        <CardHeader className={`pb-4 border-b ${themeColors.border}`}>
-          <div className="flex justify-between items-center">
-            <div className="flex items-center gap-2">
-              <ThemeIcon theme={briefing.theme} className={themeColors.text} />
-              <Badge variant="outline" className={`${themeColors.bg} ${themeColors.text} border-none`}>
-                {getThemeTitle(briefing.theme)}
-              </Badge>
-            </div>
-            <div className="flex items-center text-sm text-gray-500">
-              <Calendar className="h-4 w-4 mr-1" />
-              {formatDate(briefing.date)}
-            </div>
+    <Card className="w-full max-w-3xl mx-auto">
+      <CardHeader className="relative">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <ThemeIcon theme={briefing.theme} size={28} className="text-blue-600" />
+            <CardTitle className="text-xl md:text-2xl capitalize">{briefing.theme} Briefing</CardTitle>
           </div>
-          <CardTitle className="mt-4 text-2xl font-bold">Sgt. Ken's Daily Briefing</CardTitle>
-        </CardHeader>
+          <div className="text-sm text-gray-500">{formatDate(new Date(briefing.date))}</div>
+        </div>
 
-        <CardContent className="pt-6 space-y-6">
-          {/* Quote section */}
-          <div className="border-l-4 border-gray-300 pl-4 italic">
-            <p className="text-xl font-serif mb-2">{briefing.quote}</p>
-            {briefing.quote_author && <p className="text-right text-gray-600">— {briefing.quote_author}</p>}
+        {showConfetti && (
+          <div className="absolute top-0 right-0 bg-green-100 text-green-800 px-3 py-1 rounded-bl-lg font-medium animate-pulse">
+            +{pointsEarned} points!
           </div>
+        )}
+      </CardHeader>
 
-          {/* Sgt. Ken's Take */}
-          <div className={`p-4 rounded-md ${themeColors.bg} border ${themeColors.border}`}>
-            <div className="font-bold mb-2 flex items-center gap-2">
-              <ThemeIcon theme={briefing.theme} size={18} className={themeColors.text} />
-              <span className={themeColors.text}>Sgt. Ken's Take:</span>
-            </div>
-            <p className="text-gray-800 dark:text-gray-200">{briefing.sgt_ken_take}</p>
-          </div>
+      <CardContent className="space-y-6">
+        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+          <blockquote className="text-xl italic font-semibold text-gray-800">"{briefing.quote}"</blockquote>
+          <div className="mt-2 text-right text-gray-600">— {briefing.quote_author}</div>
+        </div>
 
-          {/* Call to Action */}
-          <div className="bg-[#0A3C1F]/10 p-4 rounded-md">
-            <p className="font-bold text-[#0A3C1F] mb-2">Your Call to Action:</p>
-            <p className="text-gray-800 dark:text-gray-200">{briefing.call_to_action}</p>
-          </div>
-        </CardContent>
+        <div className="space-y-2">
+          <h3 className="text-lg font-bold text-gray-800">Sgt. Ken's Take:</h3>
+          <p className="text-gray-700 whitespace-pre-line">{briefing.sgt_ken_take}</p>
+        </div>
 
-        <CardFooter className="flex flex-col sm:flex-row gap-2 pt-2 border-t">
-          <Button
-            className="w-full sm:w-auto bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
-            onClick={() => setShowShareDialog(true)}
-          >
-            <Share2 className="h-4 w-4 mr-2" />
-            Share Briefing
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <h3 className="text-lg font-bold text-blue-800">Today's Call to Action:</h3>
+          <p className="text-blue-700">{briefing.call_to_action}</p>
+        </div>
+      </CardContent>
+
+      <CardFooter className="flex flex-col sm:flex-row gap-3 pt-2">
+        <Button
+          onClick={handleAttend}
+          disabled={isAttending || attended}
+          className="w-full sm:w-auto"
+          variant={attended ? "outline" : "default"}
+        >
+          {isAttending ? (
+            <>Loading...</>
+          ) : attended ? (
+            <>
+              <Check className="mr-2 h-4 w-4" />
+              Attended
+            </>
+          ) : (
+            <>
+              <Award className="mr-2 h-4 w-4" />
+              Mark as Attended
+            </>
+          )}
+        </Button>
+
+        <div className="flex gap-2 w-full sm:w-auto sm:ml-auto">
+          <Button onClick={shareOnTwitter} disabled={isSharing} variant="outline" className="flex-1">
+            <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+            </svg>
+            Share
           </Button>
 
-          {!isLoggedIn && (
-            <Button variant="outline" className="w-full sm:w-auto" onClick={() => (window.location.href = "/login")}>
-              <Medal className="h-4 w-4 mr-2" />
-              Sign In to Earn Points
-            </Button>
-          )}
-        </CardFooter>
-      </Card>
+          <Button onClick={shareOnFacebook} disabled={isSharing} variant="outline" className="flex-1">
+            <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+            </svg>
+            Share
+          </Button>
 
-      {/* Share Dialog */}
-      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Share Today's Briefing</DialogTitle>
-          </DialogHeader>
-
-          <div className="grid grid-cols-2 gap-4 py-4">
-            <Button
-              className="flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#1877F2]/90"
-              onClick={() => handleShare("facebook")}
-            >
-              <Facebook className="h-4 w-4" />
-              Facebook
-            </Button>
-
-            <Button
-              className="flex items-center justify-center gap-2 bg-[#1DA1F2] hover:bg-[#1DA1F2]/90"
-              onClick={() => handleShare("twitter")}
-            >
-              <Twitter className="h-4 w-4" />
-              Twitter
-            </Button>
-
-            <Button
-              className="flex items-center justify-center gap-2 bg-[#0A66C2] hover:bg-[#0A66C2]/90"
-              onClick={() => handleShare("linkedin")}
-            >
-              <Linkedin className="h-4 w-4" />
-              LinkedIn
-            </Button>
-
-            <Button
-              variant="outline"
-              className="flex items-center justify-center gap-2"
-              onClick={() => handleShare("copy")}
-            >
-              <LinkIcon className="h-4 w-4" />
-              Copy Link
-            </Button>
-          </div>
-
-          <div className={isLoggedIn ? "bg-green-50 p-3 rounded-md border border-green-200" : "hidden"}>
-            <p className="text-sm text-green-800 flex items-center">
-              <ThumbsUp className="h-4 w-4 mr-2" />
-              Share to earn 50 participation points!
-            </p>
-          </div>
-
-          <DialogFooter className="sm:justify-start">
-            <Button type="button" variant="secondary" onClick={() => setShowShareDialog(false)}>
-              Close
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
-      {/* Reward Dialog */}
-      <Dialog open={showRewardDialog} onOpenChange={setShowRewardDialog}>
-        <DialogContent className="sm:max-w-md">
-          <div className="text-center py-6">
-            <div className="w-16 h-16 bg-[#0A3C1F]/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Trophy className="h-8 w-8 text-[#0A3C1F]" />
-            </div>
-
-            <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">Briefing Attendance Recorded!</h3>
-
-            <p className="mb-4">
-              You've earned <span className="font-bold">{pointsAwarded} points</span> for attending Sgt. Ken's Daily
-              Briefing.
-            </p>
-
-            {streak > 1 && (
-              <div className="bg-amber-50 border border-amber-200 rounded-md p-3 mb-4 flex items-center">
-                <Flame className="h-5 w-5 text-amber-500 mr-2 flex-shrink-0" />
-                <div className="text-left">
-                  <p className="font-semibold text-amber-800">{streak}-Day Streak!</p>
-                  <p className="text-sm text-amber-700">
-                    Keep checking in daily to increase your streak and earn bonus points!
-                  </p>
-                </div>
-              </div>
-            )}
-
-            <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 mt-2" onClick={() => setShowShareDialog(true)}>
-              <Share2 className="h-4 w-4 mr-2" />
-              Share for More Points
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-    </>
+          <Button onClick={shareOnLinkedIn} disabled={isSharing} variant="outline" className="flex-1">
+            <svg className="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+            </svg>
+            Share
+          </Button>
+        </div>
+      </CardFooter>
+    </Card>
   )
 }

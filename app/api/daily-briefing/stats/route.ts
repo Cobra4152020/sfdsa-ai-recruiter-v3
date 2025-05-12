@@ -1,20 +1,23 @@
 import { NextResponse } from "next/server"
 import { getUserBriefingStats } from "@/lib/daily-briefing-service"
+import { createClient } from "@/lib/supabase-server"
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const url = new URL(req.url)
-    const userId = url.searchParams.get("userId")
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    if (!userId) {
-      return NextResponse.json({ error: "Missing userId parameter" }, { status: 400 })
+    if (!user) {
+      return NextResponse.json({ error: "Authentication required" }, { status: 401 })
     }
 
-    const stats = await getUserBriefingStats(userId)
+    const stats = await getUserBriefingStats(user.id)
 
     return NextResponse.json({ stats })
   } catch (error) {
     console.error("Error in briefing stats API:", error)
-    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to fetch briefing stats" }, { status: 500 })
   }
 }

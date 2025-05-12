@@ -1,40 +1,68 @@
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { BriefingCard } from "@/components/daily-briefing/briefing-card"
-import { BriefingStats } from "@/components/daily-briefing/briefing-stats"
-import { BriefingHistory } from "@/components/daily-briefing/briefing-history"
+import { Suspense } from "react"
+import { DailyBriefingContent } from "./content"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export const metadata = {
-  title: "Sgt. Ken's Daily Briefing | SF Deputy Sheriff Recruitment",
-  description:
-    "Get your daily dose of wisdom and motivation from Sgt. Ken, veteran Sheriff Sergeant. Attend daily briefings to earn points and track your progress.",
+  title: "Sgt. Ken's Daily Briefing",
+  description: "Get your daily dose of wisdom and motivation from Sgt. Ken.",
 }
 
 export default function DailyBriefingPage() {
   return (
-    <>
-      <ImprovedHeader showOptInForm={() => {}} />
+    <div className="container py-8">
+      <h1 className="text-3xl font-bold text-center mb-8">Sgt. Ken's Daily Briefing</h1>
 
-      <main className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2 text-center">Sgt. Ken's Daily Briefing</h1>
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto text-center mb-8">
-          Start your day with insights from a veteran Sheriff Sergeant. Check in daily to earn points and rise through
-          the ranks.
-        </p>
+      <Suspense fallback={<BriefingSkeletonLoader />}>
+        <DailyBriefingContent />
+      </Suspense>
+    </div>
+  )
+}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <BriefingCard />
+function BriefingSkeletonLoader() {
+  return (
+    <div className="space-y-6">
+      <div className="w-full max-w-3xl mx-auto">
+        <div className="rounded-lg border p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="h-8 w-40" />
+            </div>
+            <Skeleton className="h-6 w-24" />
           </div>
 
-          <div className="space-y-6">
-            <BriefingStats />
-            <BriefingHistory />
+          <div className="space-y-4">
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <div className="space-y-2">
+              <Skeleton className="h-6 w-40" />
+              <Skeleton className="h-20 w-full" />
+            </div>
+            <Skeleton className="h-24 w-full rounded-lg" />
+          </div>
+
+          <div className="flex gap-3 pt-2">
+            <Skeleton className="h-10 w-40" />
+            <div className="flex gap-2 ml-auto">
+              <Skeleton className="h-10 w-20" />
+              <Skeleton className="h-10 w-20" />
+              <Skeleton className="h-10 w-20" />
+            </div>
           </div>
         </div>
-      </main>
+      </div>
 
-      <ImprovedFooter />
-    </>
+      <div className="w-full max-w-3xl mx-auto">
+        <div className="rounded-lg border p-6">
+          <Skeleton className="h-8 w-40 mb-4" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+            <Skeleton className="h-24 w-full rounded-lg" />
+          </div>
+        </div>
+      </div>
+    </div>
   )
 }

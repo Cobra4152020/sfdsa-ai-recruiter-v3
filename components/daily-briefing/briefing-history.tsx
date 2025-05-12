@@ -2,160 +2,111 @@
 
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Skeleton } from "@/components/ui/skeleton"
-import { ThemeIcon, getThemeColor, getThemeTitle } from "./theme-icon"
-import { History, Calendar } from "lucide-react"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
+import { ThemeIcon } from "./theme-icon"
 import type { DailyBriefing } from "@/lib/daily-briefing-service"
+import { formatDate } from "@/lib/utils"
+import { Loader2 } from "lucide-react"
 
 export function BriefingHistory() {
-  const [briefings, setBriefings] = useState<DailyBriefing[]>([])
+  const [history, setHistory] = useState<DailyBriefing[]>([])
   const [loading, setLoading] = useState(true)
-  const [selectedBriefing, setSelectedBriefing] = useState<DailyBriefing | null>(null)
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchBriefings()
-  }, [])
+    const fetchHistory = async () => {
+      try {
+        const response = await fetch("/api/daily-briefing/history")
 
-  // Select the first briefing as default when they load
-  useEffect(() => {
-    if (briefings.length > 0 && !selectedBriefing) {
-      setSelectedBriefing(briefings[0])
-    }
-  }, [briefings, selectedBriefing])
+        if (!response.ok) {
+          throw new Error("Failed to fetch briefing history")
+        }
 
-  const fetchBriefings = async () => {
-    try {
-      setLoading(true)
-
-      const response = await fetch("/api/daily-briefing/history?limit=7")
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch briefing history: ${response.statusText}`)
+        const data = await response.json()
+        setHistory(data.history || [])
+      } catch (err) {
+        console.error("Error fetching briefing history:", err)
+        setError("Failed to load briefing history")
+      } finally {
+        setLoading(false)
       }
-
-      const data = await response.json()
-      setBriefings(data.briefings || [])
-    } catch (error) {
-      console.error("Error fetching briefing history:", error)
-    } finally {
-      setLoading(false)
     }
-  }
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString(undefined, {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    })
-  }
+    fetchHistory()
+  }, [])
 
   if (loading) {
     return (
-      <Card>
-        <CardHeader className="pb-2">
-          <Skeleton className="h-6 w-40" />
+      <Card className="w-full max-w-3xl mx-auto mt-6">
+        <CardHeader>
+          <CardTitle className="text-xl">Previous Briefings</CardTitle>
         </CardHeader>
-        <CardContent className="p-6">
-          <Skeleton className="h-72" />
+        <CardContent className="flex justify-center py-8">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
         </CardContent>
       </Card>
     )
   }
 
-  if (briefings.length === 0) {
+  if (error) {
     return (
-      <Card>
-        <CardContent className="p-6 text-center">
-          <p className="text-gray-500">No previous briefings found</p>
+      <Card className="w-full max-w-3xl mx-auto mt-6">
+        <CardHeader>
+          <CardTitle className="text-xl">Previous Briefings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-red-500">{error}</div>
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (history.length === 0) {
+    return (
+      <Card className="w-full max-w-3xl mx-auto mt-6">
+        <CardHeader>
+          <CardTitle className="text-xl">Previous Briefings</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-center text-gray-500">No previous briefings available</div>
         </CardContent>
       </Card>
     )
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <History className="h-5 w-5 text-[#0A3C1F]" />
-          Previous Briefings
-        </CardTitle>
+    <Card className="w-full max-w-3xl mx-auto mt-6">
+      <CardHeader>
+        <CardTitle className="text-xl">Previous Briefings</CardTitle>
       </CardHeader>
-      <CardContent className="p-6">
-        <Tabs defaultValue={briefings[0].id}>
-          <TabsList className="grid grid-cols-7 h-auto">
-            {briefings.map((briefing) => (
-              <TabsTrigger
-                key={briefing.id}
-                value={briefing.id}
-                onClick={() => setSelectedBriefing(briefing)}
-                className="flex flex-col py-2 h-auto text-xs"
-              >
-                <Calendar className="h-4 w-4 mb-1" />
-                {formatDate(briefing.date)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
+      <CardContent>
+        <Accordion type="single" collapsible className="w-full">
+          {history.map((briefing) => (
+            <AccordionItem key={briefing.id} value={briefing.id}>
+              <AccordionTrigger className="hover:no-underline">
+                <div className="flex items-center gap-2 text-left">
+                  <ThemeIcon theme={briefing.theme} size={20} className="text-blue-600" />
+                  <span className="font-medium capitalize">{briefing.theme} Briefing</span>
+                  <span className="text-sm text-gray-500 ml-2">{formatDate(new Date(briefing.date))}</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-4 pt-2">
+                  <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <blockquote className="text-gray-800 italic">"{briefing.quote}"</blockquote>
+                    <div className="mt-1 text-right text-gray-600 text-sm">— {briefing.quote_author}</div>
+                  </div>
 
-          {briefings.map((briefing) => (
-            <TabsContent key={briefing.id} value={briefing.id} className="mt-4">
-              {selectedBriefing && selectedBriefing.id === briefing.id && (
-                <BriefingHistoryItem briefing={selectedBriefing} />
-              )}
-            </TabsContent>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700">Sgt. Ken's Take:</h4>
+                    <p className="text-gray-600 text-sm mt-1">{briefing.sgt_ken_take}</p>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
           ))}
-        </Tabs>
+        </Accordion>
       </CardContent>
     </Card>
-  )
-}
-
-interface BriefingHistoryItemProps {
-  briefing: DailyBriefing
-}
-
-function BriefingHistoryItem({ briefing }: BriefingHistoryItemProps) {
-  const themeColors = getThemeColor(briefing.theme)
-
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <ThemeIcon theme={briefing.theme} className={themeColors.text} />
-          <Badge variant="outline" className={`${themeColors.bg} ${themeColors.text} border-none`}>
-            {getThemeTitle(briefing.theme)}
-          </Badge>
-        </div>
-        <div className="text-sm text-gray-500">
-          {new Date(briefing.date).toLocaleDateString(undefined, {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
-        </div>
-      </div>
-
-      {/* Quote section */}
-      <div className="border-l-4 border-gray-300 pl-4 italic">
-        <p className="text-lg font-serif mb-2">{briefing.quote}</p>
-        {briefing.quote_author && <p className="text-right text-gray-600">— {briefing.quote_author}</p>}
-      </div>
-
-      {/* Sgt. Ken's Take */}
-      <div className={`p-4 rounded-md ${themeColors.bg} border ${themeColors.border}`}>
-        <div className="font-bold mb-2">Sgt. Ken's Take:</div>
-        <p className="text-gray-800 dark:text-gray-200">{briefing.sgt_ken_take}</p>
-      </div>
-
-      {/* Call to Action */}
-      <div className="bg-[#0A3C1F]/10 p-4 rounded-md">
-        <p className="font-bold text-[#0A3C1F] mb-2">Call to Action:</p>
-        <p className="text-gray-800 dark:text-gray-200">{briefing.call_to_action}</p>
-      </div>
-    </div>
   )
 }
