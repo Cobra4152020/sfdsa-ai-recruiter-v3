@@ -1,59 +1,52 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-server"
+import { NextResponse } from "next/server"
+import { getServiceSupabase } from "@/lib/supabase-clients"
 
-export async function POST(request: NextRequest) {
+export async function POST(req: Request) {
   try {
-    const body = await request.json()
-    const { userId, gameId, platform, questionId } = body
+    const { userId, gameId, platform, questionId } = await req.json()
 
-    if (!userId || !gameId || !platform) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+    if (!userId) {
+      return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
     }
 
-    // Create Supabase client
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
-    // Record the share
-    const { data: shareData, error: shareError } = await supabase
-      .from("trivia_shares")
-      .insert({
-        user_id: userId,
-        game_id: gameId,
-        platform,
-        question_id: questionId,
-        shared_at: new Date().toISOString(),
-      })
-      .select()
+    // Record the share in the social_shares table
+    const { error: shareError } = await supabase.from("social_shares").insert({
+      user_id: userId,
+      platform: platform || "unknown",
+      content_type: "trivia",
+      content_id: gameId || "general",
+      question_id: questionId ? questionId.toString() : null,
+    })
 
     if (shareError) {
-      console.error("Error recording trivia share:", shareError)
-      return NextResponse.json({ error: "Failed to record trivia share", details: shareError.message }, { status: 500 })
+      console.error("Error recording share:", shareError)
+      return NextResponse.json({ success: false, message: "Failed to record share" }, { status: 500 })
     }
 
-    // Award points for sharing
-    const pointsForSharing = 15
-    const { error: pointsError } = await supabase.rpc("add_points", {
-      p_user_id: userId,
-      p_points: pointsForSharing,
-      p_source: `${gameId}_share`,
-      p_description: `Earned ${pointsForSharing} points for sharing ${gameId} trivia`,
+    // Award points to the user (15 points for sharing)
+    const pointsToAward = 15
+
+    const { error: pointsError } = await supabase.from("user_points").insert({
+      user_id: userId,
+      points: pointsToAward,
+      activity: "social_share",
+      description: `Shared ${gameId} trivia game on ${platform}`,
     })
 
     if (pointsError) {
-      console.error("Error awarding points for sharing:", pointsError)
-      // Continue execution even if points award fails
+      console.error("Error awarding points:", pointsError)
+      return NextResponse.json({ success: false, message: "Failed to award points" }, { status: 500 })
     }
 
     return NextResponse.json({
       success: true,
-      pointsAwarded: pointsForSharing,
-      shareId: shareData?.[0]?.id,
+      message: `You earned ${pointsToAward} points for sharing!`,
+      pointsAwarded: pointsToAward,
     })
   } catch (error) {
-    console.error("Unexpected error in trivia share API:", error)
-    return NextResponse.json(
-      { error: "An unexpected error occurred", details: error instanceof Error ? error.message : String(error) },
-      { status: 500 },
-    )
+    console.error("Error in share API:", error)
+    return NextResponse.json({ success: false, message: "An error occurred" }, { status: 500 })
   }
 }

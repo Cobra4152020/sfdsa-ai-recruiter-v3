@@ -1,69 +1,48 @@
--- Create trivia_questions table if it doesn't exist
+-- Create trivia_games table
+CREATE TABLE IF NOT EXISTS trivia_games (
+  id VARCHAR(255) PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  image_url TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Create trivia_questions table
 CREATE TABLE IF NOT EXISTS trivia_questions (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  game_id TEXT NOT NULL,
+  id VARCHAR(255) PRIMARY KEY,
+  game_id VARCHAR(255) REFERENCES trivia_games(id),
   question TEXT NOT NULL,
   options JSONB NOT NULL,
   correct_answer INTEGER NOT NULL,
   explanation TEXT,
-  difficulty TEXT,
-  category TEXT,
+  difficulty VARCHAR(50) NOT NULL,
+  category VARCHAR(100),
   image_url TEXT,
   image_alt TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create trivia_attempts table if it doesn't exist
+-- Create trivia_attempts table
 CREATE TABLE IF NOT EXISTS trivia_attempts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  game_id TEXT NOT NULL,
-  score INTEGER NOT NULL DEFAULT 0,
-  total_questions INTEGER NOT NULL DEFAULT 0,
-  correct_answers INTEGER NOT NULL DEFAULT 0,
+  game_id VARCHAR(255) REFERENCES trivia_games(id),
+  score INTEGER NOT NULL,
+  total_questions INTEGER NOT NULL,
+  correct_answers INTEGER,
   time_spent INTEGER,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- Create trivia_shares table if it doesn't exist
-CREATE TABLE IF NOT EXISTS trivia_shares (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  game_id TEXT NOT NULL,
-  platform TEXT NOT NULL,
-  question_id TEXT,
-  shared_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-);
-
--- Create indexes for better performance
-CREATE INDEX IF NOT EXISTS idx_trivia_questions_game_id ON trivia_questions(game_id);
-CREATE INDEX IF NOT EXISTS idx_trivia_attempts_user_id ON trivia_attempts(user_id);
-CREATE INDEX IF NOT EXISTS idx_trivia_attempts_game_id ON trivia_attempts(game_id);
-CREATE INDEX IF NOT EXISTS idx_trivia_shares_user_id ON trivia_shares(user_id);
-CREATE INDEX IF NOT EXISTS idx_trivia_shares_game_id ON trivia_shares(game_id);
-
--- Create function to add points if it doesn't exist
-CREATE OR REPLACE FUNCTION add_points(
-  p_user_id UUID,
-  p_points INTEGER,
-  p_source TEXT,
-  p_description TEXT
-) RETURNS VOID AS $$
-BEGIN
-  -- Insert into user_points table
-  INSERT INTO user_points (user_id, points, source, description)
-  VALUES (p_user_id, p_points, p_source, p_description);
-  
-  -- Update total points in users table if it exists
-  BEGIN
-    UPDATE users
-    SET total_points = COALESCE(total_points, 0) + p_points
-    WHERE id = p_user_id;
-  EXCEPTION
-    WHEN undefined_column THEN
-      -- Column doesn't exist, ignore
-      NULL;
-  END;
-END;
-$$ LANGUAGE plpgsql;
+-- Insert the six trivia games
+INSERT INTO trivia_games (id, name, description, image_url)
+VALUES
+  ('sf-football', 'SF Football Trivia', 'Test your knowledge about San Francisco football history and the 49ers.', '/placeholder.svg?height=300&width=500&query=San Francisco 49ers football'),
+  ('sf-baseball', 'SF Baseball Trivia', 'How much do you know about the San Francisco Giants and baseball in the Bay Area?', '/placeholder.svg?height=300&width=500&query=San Francisco Giants baseball'),
+  ('sf-basketball', 'SF Basketball Trivia', 'Challenge yourself with questions about the Golden State Warriors and basketball in San Francisco.', '/placeholder.svg?height=300&width=500&query=Golden State Warriors basketball'),
+  ('sf-districts', 'SF District Trivia', 'Test your knowledge of San Francisco''s unique and diverse neighborhoods and districts.', '/placeholder.svg?height=300&width=500&query=San Francisco neighborhoods districts'),
+  ('sf-tourist-spots', 'SF Most Popular Tourist Spots', 'How well do you know San Francisco''s famous landmarks and tourist attractions?', '/placeholder.svg?height=300&width=500&query=San Francisco tourist attractions'),
+  ('sf-day-trips', 'SF Best Places to Visit', 'Test your knowledge about the best day trips and places to visit around San Francisco.', '/placeholder.svg?height=300&width=500&query=San Francisco day trips')
+ON CONFLICT (id) DO NOTHING;

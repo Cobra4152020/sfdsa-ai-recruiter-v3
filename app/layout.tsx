@@ -2,7 +2,8 @@ import type React from "react"
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
-import { ErrorBoundary } from "@/components/error-boundary"
+import PerformanceMonitor from "@/components/performance-monitor"
+import { createPerformanceMetricsTable } from "@/lib/database-setup"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -17,18 +18,18 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  // Note: We're removing the direct call to createPerformanceMetricsTable here
-  // It will be handled in a client component instead
+  // Try to create the performance metrics table, but don't wait for it
+  if (process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === "true") {
+    createPerformanceMetricsTable().catch(console.error)
+  }
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ErrorBoundary fallback={<div className="p-4">Something went wrong. Please try refreshing the page.</div>}>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-            {children}
-            {/* Performance monitoring will be loaded in a client component */}
-          </ThemeProvider>
-        </ErrorBoundary>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          {children}
+          <PerformanceMonitor />
+        </ThemeProvider>
       </body>
     </html>
   )

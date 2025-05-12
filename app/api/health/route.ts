@@ -11,18 +11,7 @@ export async function GET() {
   // Check database connection
   try {
     const supabase = getSupabaseClient()
-
-    if (!supabase) {
-      throw new Error("Failed to initialize Supabase client")
-    }
-
-    // Use a simple query with a timeout
-    const controller = new AbortController()
-    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
-
-    const { data, error } = await supabase.from("health_check").select("*").limit(1).abortSignal(controller.signal)
-
-    clearTimeout(timeoutId)
+    const { data, error } = await supabase.from("health_check").select("*").limit(1)
 
     if (error) throw error
 
@@ -39,7 +28,12 @@ export async function GET() {
   }
 
   // Check required environment variables
-  const requiredEnvVars = ["NEXT_PUBLIC_SUPABASE_URL", "NEXT_PUBLIC_SUPABASE_ANON_KEY"]
+  const requiredEnvVars = [
+    "NEXT_PUBLIC_SUPABASE_URL",
+    "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+    "SUPABASE_SERVICE_ROLE_KEY",
+    "RESEND_API_KEY",
+  ]
 
   const missingEnvVars = requiredEnvVars.filter((varName) => !process.env[varName])
 
