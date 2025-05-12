@@ -86,9 +86,6 @@ export default function DailyBriefingPage() {
   }, [])
 
   // Create a handler function that updates state instead of passing the function directly
-  const handleShowOptInForm = () => {
-    setShowOptInFormState(true)
-  }
 
   useEffect(() => {
     const fetchBriefing = async () => {
@@ -439,7 +436,11 @@ export default function DailyBriefingPage() {
   return (
     <>
       {/* Use a boolean flag instead of passing the function directly */}
-      <ImprovedHeader showOptInForm={handleShowOptInForm} isScrolled={isScrolled} />
+      <ImprovedHeader
+        showOptInFormState={showOptInFormState}
+        setShowOptInFormState={setShowOptInFormState}
+        isScrolled={isScrolled}
+      />
       <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-8 pb-16">
         <div className="container mx-auto px-4">
           <div className="max-w-7xl mx-auto">

@@ -30,11 +30,16 @@ import { NotificationBell } from "@/components/notification-bell"
 import { useUser } from "@/context/user-context"
 
 interface ImprovedHeaderProps {
-  showOptInForm?: () => void
+  showOptInFormState?: boolean
+  setShowOptInFormState?: (state: boolean) => void
   isScrolled?: boolean
 }
 
-export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: ImprovedHeaderProps) {
+export function ImprovedHeader({
+  showOptInFormState,
+  setShowOptInFormState,
+  isScrolled: propIsScrolled,
+}: ImprovedHeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(propIsScrolled || false)
   const { theme, setTheme } = useTheme()
@@ -64,8 +69,8 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
 
   // Create a safe handler function that checks if showOptInForm exists before calling it
   const handleOptInClick = () => {
-    if (typeof showOptInForm === "function") {
-      showOptInForm()
+    if (typeof setShowOptInFormState === "function") {
+      setShowOptInFormState(true)
     }
   }
 
@@ -388,8 +393,8 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
           <div className="px-5 py-4 border-t border-white/10 flex space-x-3">
             <Button
               onClick={() => {
-                if (typeof showOptInForm === "function") {
-                  showOptInForm()
+                if (typeof setShowOptInFormState === "function") {
+                  setShowOptInFormState(true)
                 }
                 setIsMobileMenuOpen(false)
               }}
