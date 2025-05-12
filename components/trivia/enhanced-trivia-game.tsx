@@ -92,6 +92,13 @@ export function EnhancedTriviaGame({
   const [pointsAwarded, setPointsAwarded] = useState(0)
   const [hasSharedMidGame, setHasSharedMidGame] = useState(false)
   const [imageLoadError, setImageLoadError] = useState<Record<number, boolean>>({})
+  const [showFeedback, setShowFeedback] = useState(false)
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState(false)
+
+  // Create refs for audio elements
+  const correctAudioRef = useRef<HTMLAudioElement | null>(null)
+  const wrongAudioRef = useRef<HTMLAudioElement | null>(null)
+
   const sharePromptShown = useRef(false)
   const imageRetries = useRef<Record<number, number>>({})
   const [fetchError, setFetchError] = useState<string | null>(null)
@@ -99,6 +106,24 @@ export function EnhancedTriviaGame({
 
   const { currentUser, isLoggedIn } = useUser()
   const { toast } = useToast()
+
+  // Initialize audio elements
+  useEffect(() => {
+    correctAudioRef.current = new Audio("/sounds/correct-answer.mp3")
+    wrongAudioRef.current = new Audio("/sounds/wrong-answer.mp3")
+
+    // Cleanup function
+    return () => {
+      if (correctAudioRef.current) {
+        correctAudioRef.current.pause()
+        correctAudioRef.current = null
+      }
+      if (wrongAudioRef.current) {
+        wrongAudioRef.current.pause()
+        wrongAudioRef.current = null
+      }
+    }
+  }, [])
 
   // Fetch trivia questions
   useEffect(() => {
@@ -137,6 +162,17 @@ export function EnhancedTriviaGame({
       setShowMidGameShareDialog(true)
     }
   }, [currentQuestionIndex, isAnswerSubmitted, hasSharedMidGame])
+
+  // Hide feedback after 2 seconds
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+    if (showFeedback) {
+      timer = setTimeout(() => {
+        setShowFeedback(false)
+      }, 2000)
+    }
+    return () => clearTimeout(timer)
+  }, [showFeedback])
 
   const fetchQuestions = async () => {
     setIsLoading(true)
@@ -186,19 +222,32 @@ export function EnhancedTriviaGame({
   const handleAnswerSelect = (answerIndex: number) => {
     if (!isAnswerSubmitted) {
       setSelectedAnswer(answerIndex)
+      handleAnswerSubmit(answerIndex)
     }
   }
 
-  const handleAnswerSubmit = async () => {
+  const handleAnswerSubmit = async (selectedIdx: number = selectedAnswer) => {
+    if (selectedIdx === null) return
+
     setIsTimerRunning(false)
     setIsAnswerSubmitted(true)
 
     const currentQuestion = questions[currentQuestionIndex]
     if (!currentQuestion) return // Safety check
 
-    const isCorrect = selectedAnswer === currentQuestion.correctAnswer
+    const isCorrect = selectedIdx === currentQuestion.correctAnswer
 
+    // Show visual feedback
+    setIsCorrectAnswer(isCorrect)
+    setShowFeedback(true)
+
+    // Play appropriate sound
     if (isCorrect) {
+      if (correctAudioRef.current) {
+        correctAudioRef.current.currentTime = 0
+        correctAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
+      }
+
       setScore((prev) => prev + 1)
       setCorrectAnswers((prev) => prev + 1)
 
@@ -209,6 +258,11 @@ export function EnhancedTriviaGame({
         origin: { y: 0.6 },
         colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
       })
+    } else {
+      if (wrongAudioRef.current) {
+        wrongAudioRef.current.currentTime = 0
+        wrongAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
+      }
     }
 
     // Track this answer in analytics
@@ -247,15 +301,26 @@ export function EnhancedTriviaGame({
             // If a badge was awarded, show the badge dialog
             if (result.badgeAwarded) {
               setEarnedBadge(result.badgeAwarded)
-              setShowBadgeDialog(true)
+              setTimeout(() => {
+                setShowBadgeDialog(true)
+              }, 2000) // Show after feedback disappears
+            } else {
+              setTimeout(() => {
+                setIsGameOver(true)
+              }, 2000) // Show after feedback disappears
             }
           }
         } catch (error) {
           console.error(`Error submitting ${gameId} trivia results:`, error)
+          setTimeout(() => {
+            setIsGameOver(true)
+          }, 2000) // Show after feedback disappears
         }
+      } else {
+        setTimeout(() => {
+          setIsGameOver(true)
+        }, 2000) // Show after feedback disappears
       }
-
-      setIsGameOver(true)
     }
   }
 
@@ -561,6 +626,10 @@ export function EnhancedTriviaGame({
 
   return (
     <>
+      {/* Hidden audio elements for sounds */}
+      <audio ref={correctAudioRef} src="/sounds/correct-answer.mp3" preload="auto" />
+      <audio ref={wrongAudioRef} src="/sounds/wrong-answer.mp3" preload="auto" />
+
       <Card className="shadow-md">
         <CardContent className="p-6">
           {/* Progress bar */}
@@ -587,32 +656,58 @@ export function EnhancedTriviaGame({
             </div>
           </div>
 
-          {/* Question Image */}
-          {currentQuestion.imageUrl && (
-            <div className="mb-4 rounded-lg overflow-hidden relative w-full h-48 md:h-64 bg-gray-100">
-              {!imageLoadError[currentQuestionIndex] ? (
-                <Image
-                  src={currentQuestion.imageUrl || "/placeholder.svg"}
-                  alt={currentQuestion.imageAlt || `Image for question about ${currentQuestion.category}`}
-                  fill
-                  className="object-cover"
-                  onError={() => handleImageError(currentQuestionIndex)}
-                  priority
-                  sizes="(max-width: 768px) 100vw, 768px"
-                  crossOrigin="anonymous"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                  <div className="text-center">
-                    <ImageIcon className="h-12 w-12 mx-auto text-gray-400" />
-                    <p className="text-sm text-gray-500 mt-2">
-                      {currentQuestion.category ? `Image related to ${currentQuestion.category}` : "Image unavailable"}
-                    </p>
-                  </div>
+          {/* Question Image with Feedback Overlay */}
+          <div className="mb-4 rounded-lg overflow-hidden relative w-full h-48 md:h-64 bg-gray-100">
+            {!imageLoadError[currentQuestionIndex] ? (
+              <Image
+                src={currentQuestion.imageUrl || "/placeholder.svg"}
+                alt={currentQuestion.imageAlt || `Image for question about ${currentQuestion.category}`}
+                fill
+                className="object-cover"
+                onError={() => handleImageError(currentQuestionIndex)}
+                priority
+                sizes="(max-width: 768px) 100vw, 768px"
+                crossOrigin="anonymous"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                <div className="text-center">
+                  <ImageIcon className="h-12 w-12 mx-auto text-gray-400" />
+                  <p className="text-sm text-gray-500 mt-2">
+                    {currentQuestion.category ? `Image related to ${currentQuestion.category}` : "Image unavailable"}
+                  </p>
                 </div>
+              </div>
+            )}
+
+            {/* Feedback overlay */}
+            <AnimatePresence>
+              {showFeedback && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10"
+                >
+                  <motion.div
+                    initial={{ scale: 0.5, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", damping: 10 }}
+                  >
+                    {isCorrectAnswer ? (
+                      <div className="text-6xl font-bold text-white text-center drop-shadow-[0_0_10px_rgba(0,255,0,0.5)]">
+                        CORRECT
+                      </div>
+                    ) : (
+                      <div className="text-6xl font-bold text-white text-center drop-shadow-[0_0_10px_rgba(255,0,0,0.5)]">
+                        INCORRECT
+                      </div>
+                    )}
+                  </motion.div>
+                </motion.div>
               )}
-            </div>
-          )}
+            </AnimatePresence>
+          </div>
 
           {/* Question */}
           <h3 className="text-xl font-semibold mb-6">{currentQuestion.question}</h3>
@@ -662,7 +757,7 @@ export function EnhancedTriviaGame({
 
           {/* Explanation (shown after answering) */}
           <AnimatePresence>
-            {isAnswerSubmitted && (
+            {isAnswerSubmitted && !showFeedback && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: "auto" }}
