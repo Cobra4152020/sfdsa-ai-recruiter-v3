@@ -11,6 +11,7 @@ import { Loader2, Search, Eye, ChevronLeft, ChevronRight } from "lucide-react"
 import { ThemeIcon } from "@/components/daily-briefing/theme-icon"
 import { formatDate } from "@/lib/utils"
 import type { DailyBriefing } from "@/lib/daily-briefing-service"
+import { createBrowserClient } from "@/lib/supabase-browser"
 
 export function BriefingsTable() {
   const [briefings, setBriefings] = useState<DailyBriefing[]>([])
@@ -26,11 +27,7 @@ export function BriefingsTable() {
     setError(null)
 
     try {
-      const supabase = (window as any).supabase
-
-      if (!supabase) {
-        throw new Error("Supabase client not available")
-      }
+      const supabase = createBrowserClient()
 
       let query = supabase.from("daily_briefings").select("*", { count: "exact" }).order("date", { ascending: false })
 

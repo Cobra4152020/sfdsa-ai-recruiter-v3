@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, Check, Loader2, Plus } from "lucide-react"
+import { createBrowserClient } from "@/lib/supabase-browser"
+import { useRouter } from "next/navigation"
 
 export function CreateDefaultBriefingButton() {
   const [loading, setLoading] = useState(false)
@@ -13,6 +15,7 @@ export function CreateDefaultBriefingButton() {
     message?: string
     error?: string
   } | null>(null)
+  const router = useRouter()
 
   const handleCreate = async () => {
     setLoading(true)
@@ -20,11 +23,7 @@ export function CreateDefaultBriefingButton() {
 
     try {
       // Create a default briefing for today
-      const supabase = (window as any).supabase
-
-      if (!supabase) {
-        throw new Error("Supabase client not available")
-      }
+      const supabase = createBrowserClient()
 
       const today = new Date().toISOString().split("T")[0]
 
@@ -53,6 +52,9 @@ export function CreateDefaultBriefingButton() {
         success: true,
         message: "Default briefing created successfully.",
       })
+
+      // Refresh the page to show the new briefing
+      router.refresh()
     } catch (error) {
       setResult({
         success: false,

@@ -19,7 +19,14 @@ export function BriefingHistory() {
         const response = await fetch("/api/daily-briefing/history")
 
         if (!response.ok) {
+          console.error("Error fetching history: Server returned status", response.status)
           throw new Error("Failed to fetch briefing history")
+        }
+
+        const contentType = response.headers.get("content-type")
+        if (!contentType || !contentType.includes("application/json")) {
+          console.error("Error fetching history: Response is not JSON", contentType)
+          throw new Error("Invalid response format")
         }
 
         const data = await response.json()

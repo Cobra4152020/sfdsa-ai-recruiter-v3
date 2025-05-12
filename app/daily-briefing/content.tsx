@@ -43,7 +43,10 @@ export function DailyBriefingContent() {
       const response = await fetch(url)
 
       if (!response.ok) {
-        const data = await response.json()
+        const data = await response.json().catch(() => ({
+          error: "Failed to fetch briefing",
+          message: "Server returned status " + response.status,
+        }))
         console.error("Error response from API:", data)
         setError(data.error || "Failed to fetch briefing")
         setErrorMessage(data.message || "Please try again later")
@@ -77,14 +80,30 @@ export function DailyBriefingContent() {
     if (dateParam) return
 
     try {
+      console.log("Fetching stats from API")
       const response = await fetch("/api/daily-briefing/stats")
 
-      if (response.ok) {
-        const data = await response.json()
+      if (!response.ok) {
+        console.error("Error fetching stats: Server returned status", response.status)
+        return
+      }
+
+      const contentType = response.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error("Error fetching stats: Response is not JSON", contentType)
+        return
+      }
+
+      const data = await response.json()
+      console.log("Stats data received:", data)
+
+      if (data.stats) {
         setStats(data.stats)
       }
     } catch (err) {
       console.error("Error fetching stats:", err)
+      // Don't set an error state here, just log it
+      // Stats are not critical for the page to function
     }
   }
 
@@ -113,7 +132,9 @@ export function DailyBriefingContent() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to record attendance")
+        const errorData = await response.json().catch(() => ({ error: "Failed to record attendance" }))
+        console.error("Error attending briefing:", errorData)
+        return { success: false, points: 0, error: errorData.message || "Failed to record attendance" }
       }
 
       const result = await response.json()
@@ -139,7 +160,9 @@ export function DailyBriefingContent() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to record share")
+        const errorData = await response.json().catch(() => ({ error: "Failed to record share" }))
+        console.error("Error sharing briefing:", errorData)
+        return { success: false, points: 0, error: errorData.message || "Failed to record share" }
       }
 
       const result = await response.json()
