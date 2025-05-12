@@ -221,6 +221,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                     href: "/deputy-launchpad",
                   },
                   { label: "Play Trivia w/ Sgt. Ken", href: "/trivia" },
+                  { label: "Sgt. Ken's Daily Briefing", href: "/daily-briefing" },
                 ]}
               />
               <Link href="/chat-with-sgt-ken" className="text-white hover:text-[#FFD700] transition-colors">
@@ -356,6 +357,9 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
                   </Link>
                   <Link href="/trivia" className="block text-white hover:text-[#FFD700]">
                     Play Trivia w/ Sgt. Ken
+                  </Link>
+                  <Link href="/daily-briefing" className="block text-white hover:text-[#FFD700]">
+                    Sgt. Ken's Daily Briefing
                   </Link>
                 </div>
               )}

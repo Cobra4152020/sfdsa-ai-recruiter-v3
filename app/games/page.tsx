@@ -1,8 +1,8 @@
 import Link from "next/link"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { GameLayout } from "@/components/game-layout"
-import { ArrowRight } from "lucide-react"
+import { ArrowRight, Calendar } from "lucide-react"
 
 export default function GamesPage() {
   const games = [
@@ -17,6 +17,28 @@ export default function GamesPage() {
     >
       {games.length > 0 ? (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <Link href="/daily-briefing" className="group">
+            <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
+              <CardHeader className="bg-[#0A3C1F] dark:bg-[#121212] text-white p-4">
+                <CardTitle className="text-xl text-[#FFD700]">Sgt. Ken's Daily Briefing</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <div className="aspect-video bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center bg-[#0A3C1F]/10 dark:bg-[#FFD700]/10">
+                    <Calendar className="h-16 w-16 text-[#0A3C1F] dark:text-[#FFD700] opacity-50 group-hover:scale-110 transition-transform duration-300" />
+                  </div>
+                </div>
+              </CardContent>
+              <CardFooter className="p-4 bg-white dark:bg-gray-800">
+                <div>
+                  <h3 className="font-medium text-[#0A3C1F] dark:text-[#FFD700] mb-1">Daily Motivation & Points</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Get your daily dose of motivation from Sgt. Ken and earn points by sharing with others.
+                  </p>
+                </div>
+              </CardFooter>
+            </Card>
+          </Link>
           {games.map((game, i) => (
             <Card
               key={i}
