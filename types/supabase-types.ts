@@ -25,7 +25,7 @@ export interface Database {
           id?: number
           title: string
           description: string
-          instructions: string
+          instructions?: string
           hashtags?: string[]
           badge_reward?: string
           example_video_url?: string
@@ -109,6 +109,7 @@ export interface Database {
           shared_at: string
           click_count: number
           share_url: string
+          count: number
         }
         Insert: {
           id?: string
@@ -118,6 +119,7 @@ export interface Database {
           shared_at?: string
           click_count?: number
           share_url?: string
+          count?: number
         }
         Update: {
           id?: string
@@ -127,6 +129,7 @@ export interface Database {
           shared_at?: string
           click_count?: number
           share_url?: string
+          count?: number
         }
       }
       daily_briefings: {
@@ -181,6 +184,15 @@ export interface Database {
           updated_at?: string
         }
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
     }
   }
 }

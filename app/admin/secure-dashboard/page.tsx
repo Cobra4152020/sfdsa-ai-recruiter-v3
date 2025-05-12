@@ -1,5 +1,5 @@
 import { Suspense } from "react"
-import { getServerSupabase } from "@/lib/supabase-client-safe"
+import { getServerSupabase } from "@/lib/supabase-server"
 import { DashboardStats } from "@/components/dashboard/dashboard-stats"
 import { TiktokChallengesList } from "@/components/dashboard/tiktok-challenges-list"
 import { RecentApplicants } from "@/components/dashboard/recent-applicants"
@@ -77,75 +77,100 @@ export default async function SecureDashboardPage() {
 
 // Server Components for data fetching
 async function DashboardStatsWrapper() {
-  const supabase = getServerSupabase()
+  try {
+    const supabase = getServerSupabase()
 
-  // Get counts from different tables
-  const [
-    { count: challengesCount },
-    { count: applicantsCount },
-    { count: badgeSharesCount },
-    { count: briefingsCount },
-  ] = await Promise.all([
-    supabase.from("active_tiktok_challenges").select("*", { count: "exact", head: true }),
-    supabase.from("applicants").select("*", { count: "exact", head: true }),
-    supabase.from("badge_shares").select("*", { count: "exact", head: true }),
-    supabase.from("daily_briefings").select("*", { count: "exact", head: true }),
-  ])
+    // Get counts from different tables
+    const [
+      { count: challengesCount },
+      { count: applicantsCount },
+      { count: badgeSharesCount },
+      { count: briefingsCount },
+    ] = await Promise.all([
+      supabase.from("active_tiktok_challenges").select("*", { count: "exact", head: true }),
+      supabase.from("applicants").select("*", { count: "exact", head: true }),
+      supabase.from("badge_shares").select("*", { count: "exact", head: true }),
+      supabase.from("daily_briefings").select("*", { count: "exact", head: true }),
+    ])
 
-  return (
-    <DashboardStats
-      challengesCount={challengesCount || 0}
-      applicantsCount={applicantsCount || 0}
-      badgeSharesCount={badgeSharesCount || 0}
-      briefingsCount={briefingsCount || 0}
-    />
-  )
+    return (
+      <DashboardStats
+        challengesCount={challengesCount || 0}
+        applicantsCount={applicantsCount || 0}
+        badgeSharesCount={badgeSharesCount || 0}
+        briefingsCount={briefingsCount || 0}
+      />
+    )
+  } catch (error) {
+    console.error("Error fetching dashboard stats:", error)
+    return <DashboardStats challengesCount={0} applicantsCount={0} badgeSharesCount={0} briefingsCount={0} />
+  }
 }
 
 async function TiktokChallengesWrapper() {
-  const supabase = getServerSupabase()
+  try {
+    const supabase = getServerSupabase()
 
-  const { data: challenges } = await supabase
-    .from("active_tiktok_challenges")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(5)
+    const { data: challenges } = await supabase
+      .from("active_tiktok_challenges")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5)
 
-  return <TiktokChallengesList challenges={challenges || []} />
+    return <TiktokChallengesList challenges={challenges || []} />
+  } catch (error) {
+    console.error("Error fetching challenges:", error)
+    return <TiktokChallengesList challenges={[]} />
+  }
 }
 
 async function RecentApplicantsWrapper() {
-  const supabase = getServerSupabase()
+  try {
+    const supabase = getServerSupabase()
 
-  const { data: applicants } = await supabase
-    .from("applicants")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(5)
+    const { data: applicants } = await supabase
+      .from("applicants")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(5)
 
-  return <RecentApplicants applicants={applicants || []} />
+    return <RecentApplicants applicants={applicants || []} />
+  } catch (error) {
+    console.error("Error fetching applicants:", error)
+    return <RecentApplicants applicants={[]} />
+  }
 }
 
 async function BadgeShareStatsWrapper() {
-  const supabase = getServerSupabase()
+  try {
+    const supabase = getServerSupabase()
 
-  const { data: shares } = await supabase
-    .from("badge_shares")
-    .select("platform, count")
-    .order("count", { ascending: false })
-    .limit(5)
+    const { data: shares } = await supabase
+      .from("badge_shares")
+      .select("platform, count")
+      .order("count", { ascending: false })
+      .limit(5)
 
-  return <BadgeShareStats shares={shares || []} />
+    return <BadgeShareStats shares={shares || []} />
+  } catch (error) {
+    console.error("Error fetching badge shares:", error)
+    return <BadgeShareStats shares={[]} />
+  }
 }
 
 async function DailyBriefingsWrapper() {
-  const supabase = getServerSupabase()
+  try {
+    const supabase = getServerSupabase()
 
-  const { data: briefings } = await supabase
-    .from("daily_briefings")
-    .select("*")
-    .order("date", { ascending: false })
-    .limit(5)
+    const { data: briefings } = await supabase
+      .from("daily_briefings")
+      .select("*")
+      .order("date", { ascending: false })
+      .limit(5)
 
-  return <DailyBriefingsList briefings={briefings || []} />
+    return <DailyBriefingsList briefings={briefings || []} />
+  } catch (error) {
+    console.error("Error fetching briefings:", error)
+    return <DailyBriefingsList briefings={[]} />
+  }
 }

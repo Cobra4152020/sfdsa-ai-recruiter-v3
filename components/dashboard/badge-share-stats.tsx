@@ -1,5 +1,3 @@
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts"
-
 interface ShareData {
   platform: string
   count: number
@@ -9,42 +7,45 @@ interface BadgeShareStatsProps {
   shares: ShareData[]
 }
 
-const COLORS = ["#0A3C1F", "#2E7D32", "#43A047", "#66BB6A", "#81C784"]
-
 export function BadgeShareStats({ shares }: BadgeShareStatsProps) {
   if (shares.length === 0) {
     return <div className="text-center py-4">No badge shares found</div>
   }
 
-  // Format data for the chart
-  const data = shares.map((share, index) => ({
-    name: share.platform,
-    value: share.count,
-    color: COLORS[index % COLORS.length],
-  }))
+  // Calculate total for percentages
+  const total = shares.reduce((sum, share) => sum + share.count, 0)
 
   return (
-    <div className="h-[300px] w-full">
-      <ResponsiveContainer width="100%" height="100%">
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            outerRadius={80}
-            fill="#8884d8"
-            dataKey="value"
-            label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
-          <Tooltip />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+    <div className="space-y-4">
+      {shares.map((share, index) => {
+        const percentage = total > 0 ? Math.round((share.count / total) * 100) : 0
+
+        return (
+          <div key={index} className="flex items-center justify-between">
+            <div className="flex items-center">
+              <div className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: getColorForIndex(index) }}></div>
+              <span>{share.platform}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-sm font-medium">{share.count}</span>
+              <span className="text-xs text-gray-500 ml-2">({percentage}%)</span>
+            </div>
+          </div>
+        )
+      })}
+
+      <div className="pt-4 mt-4 border-t">
+        <div className="flex justify-between text-sm font-medium">
+          <span>Total Shares</span>
+          <span>{total}</span>
+        </div>
+      </div>
     </div>
   )
+}
+
+// Helper function to get colors
+function getColorForIndex(index: number): string {
+  const colors = ["#0A3C1F", "#2E7D32", "#43A047", "#66BB6A", "#81C784"]
+  return colors[index % colors.length]
 }
