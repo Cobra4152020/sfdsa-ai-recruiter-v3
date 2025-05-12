@@ -1,90 +1,74 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { Bell } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { NotificationPanel } from "@/components/notification-panel"
-import { useNotifications } from "@/hooks/use-notifications"
-import { useOnClickOutside } from "@/hooks/use-click-outside"
-import { motion, AnimatePresence } from "framer-motion"
+import { NotificationPanel } from "./notification-panel"
+import { useClickOutside } from "@/hooks/use-click-outside"
 
 interface NotificationBellProps {
-  userId?: string | null
+  userId: string
 }
 
 export function NotificationBell({ userId }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
-  const { notifications, unreadCount, markAllAsRead } = useNotifications(userId)
+  const [unreadCount, setUnreadCount] = useState(0)
+  const ref = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
 
-  // Close panel when clicking outside
-  useOnClickOutside(ref, () => setIsOpen(false))
-
-  // Handle escape key
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsOpen(false)
+    // Only try to fetch notifications if we have a userId
+    if (!userId) return
+
+    const fetchUnreadCount = async () => {
+      try {
+        // Import dynamically to avoid issues during SSR
+        const { supabase } = await import("@/lib/supabase-client-singleton")
+
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("id")
+          .eq("user_id", userId)
+          .eq("read", false)
+          .limit(100)
+
+        if (error) {
+          console.warn("Error fetching unread count:", error)
+          return
+        }
+
+        setUnreadCount(data?.length || 0)
+      } catch (error) {
+        console.warn("Exception fetching unread count:", error)
+      }
     }
 
-    document.addEventListener("keydown", handleEscape)
-    return () => document.removeEventListener("keydown", handleEscape)
-  }, [])
+    fetchUnreadCount()
+
+    // Set up a polling interval to check for new notifications
+    const interval = setInterval(fetchUnreadCount, 30000)
+
+    return () => clearInterval(interval)
+  }, [userId])
 
   const togglePanel = () => {
     setIsOpen(!isOpen)
   }
 
-  const handleMarkAllAsRead = async (e: React.MouseEvent) => {
-    e.stopPropagation()
-    await markAllAsRead()
-  }
-
   return (
     <div className="relative" ref={ref}>
-      <Button
-        variant="ghost"
-        size="icon"
-        className="relative"
+      <button
         onClick={togglePanel}
+        className="relative p-1 rounded-full hover:bg-white/10 transition-colors"
         aria-label={`Notifications ${unreadCount > 0 ? `(${unreadCount} unread)` : ""}`}
       >
-        <Bell className="h-5 w-5" />
-
-        {/* Notification badge */}
-        <AnimatePresence>
-          {unreadCount > 0 && (
-            <motion.div
-              initial={{ scale: 0.5, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.5, opacity: 0 }}
-              className="absolute -top-1 -right-1 bg-[#FFD700] text-[#0A3C1F] text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center"
-            >
-              {unreadCount > 9 ? "9+" : unreadCount}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </Button>
-
-      {/* Notification panel */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 10, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 10, scale: 0.95 }}
-            transition={{ duration: 0.15 }}
-            className="absolute right-0 mt-2 w-80 sm:w-96 z-50"
-          >
-            <NotificationPanel
-              notifications={notifications}
-              onMarkAllAsRead={handleMarkAllAsRead}
-              onClose={() => setIsOpen(false)}
-            />
-          </motion.div>
+        <Bell className="h-5 w-5 text-white" />
+        {unreadCount > 0 && (
+          <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-red-500 rounded-full">
+            {unreadCount > 9 ? "9+" : unreadCount}
+          </span>
         )}
-      </AnimatePresence>
+      </button>
+
+      {isOpen && <NotificationPanel userId={userId} onClose={() => setIsOpen(false)} />}
     </div>
   )
 }

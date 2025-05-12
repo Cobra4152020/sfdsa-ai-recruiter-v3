@@ -1,104 +1,127 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
-import { Check, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { NotificationItem } from "@/components/notification-item"
-import type { Notification } from "@/lib/notification-service"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { useState, useEffect } from "react"
+import { NotificationItem } from "./notification-item"
+import { Loader2 } from "lucide-react"
 
 interface NotificationPanelProps {
-  notifications: Notification[]
-  onMarkAllAsRead: (e: React.MouseEvent) => void
+  userId: string
   onClose: () => void
 }
 
-export function NotificationPanel({ notifications, onMarkAllAsRead, onClose }: NotificationPanelProps) {
-  const [activeTab, setActiveTab] = useState("all")
-
-  const unreadNotifications = notifications.filter((n) => !n.is_read)
-  const hasUnread = unreadNotifications.length > 0
-
-  const filteredNotifications = activeTab === "unread" ? unreadNotifications : notifications
-
-  const badgeNotifications = notifications.filter((n) => n.type === "badge")
-  const donationNotifications = notifications.filter((n) => n.type === "donation")
-
-  return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-      <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
-        <h3 className="font-semibold text-lg">Notifications</h3>
-        <div className="flex items-center space-x-2">
-          {hasUnread && (
-            <Button variant="ghost" size="sm" onClick={onMarkAllAsRead} className="text-xs flex items-center">
-              <Check className="h-3.5 w-3.5 mr-1" />
-              Mark all read
-            </Button>
-          )}
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </Button>
-        </div>
-      </div>
-
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-        <div className="px-4 pt-2">
-          <TabsList className="w-full">
-            <TabsTrigger value="all" className="flex-1">
-              All
-              <span className="ml-1 text-xs text-gray-500">({notifications.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="unread" className="flex-1">
-              Unread
-              <span className="ml-1 text-xs text-gray-500">({unreadNotifications.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="badges" className="flex-1">
-              Badges
-              <span className="ml-1 text-xs text-gray-500">({badgeNotifications.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="donations" className="flex-1">
-              Donations
-              <span className="ml-1 text-xs text-gray-500">({donationNotifications.length})</span>
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="all" className="mt-0">
-          <NotificationList notifications={notifications} />
-        </TabsContent>
-
-        <TabsContent value="unread" className="mt-0">
-          <NotificationList notifications={unreadNotifications} />
-        </TabsContent>
-
-        <TabsContent value="badges" className="mt-0">
-          <NotificationList notifications={badgeNotifications} />
-        </TabsContent>
-
-        <TabsContent value="donations" className="mt-0">
-          <NotificationList notifications={donationNotifications} />
-        </TabsContent>
-      </Tabs>
-    </div>
-  )
+interface Notification {
+  id: string
+  title: string
+  message: string
+  type: string
+  created_at: string
+  read: boolean
+  action_url?: string
+  icon?: string
 }
 
-function NotificationList({ notifications }: { notifications: Notification[] }) {
-  if (notifications.length === 0) {
-    return <div className="py-8 px-4 text-center text-gray-500 dark:text-gray-400">No notifications to display</div>
+export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
+  const [notifications, setNotifications] = useState<Notification[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        setLoading(true)
+        setError(null)
+
+        // Import dynamically to avoid issues during SSR
+        const { supabase } = await import("@/lib/supabase-client-singleton")
+
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("*")
+          .eq("user_id", userId)
+          .order("created_at", { ascending: false })
+          .limit(10)
+
+        if (error) {
+          console.warn("Error fetching notifications:", error)
+          setError("Failed to load notifications")
+          return
+        }
+
+        setNotifications(data || [])
+      } catch (error) {
+        console.warn("Exception fetching notifications:", error)
+        setError("Failed to load notifications")
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchNotifications()
+  }, [userId])
+
+  const markAsRead = async (notificationId: string) => {
+    try {
+      // Import dynamically to avoid issues during SSR
+      const { supabase } = await import("@/lib/supabase-client-singleton")
+
+      await supabase.from("notifications").update({ read: true }).eq("id", notificationId)
+
+      // Update local state
+      setNotifications(
+        notifications.map((notification) =>
+          notification.id === notificationId ? { ...notification, read: true } : notification,
+        ),
+      )
+    } catch (error) {
+      console.warn("Error marking notification as read:", error)
+    }
+  }
+
+  const markAllAsRead = async () => {
+    try {
+      // Import dynamically to avoid issues during SSR
+      const { supabase } = await import("@/lib/supabase-client-singleton")
+
+      await supabase.from("notifications").update({ read: true }).eq("user_id", userId).eq("read", false)
+
+      // Update local state
+      setNotifications(notifications.map((notification) => ({ ...notification, read: true })))
+    } catch (error) {
+      console.warn("Error marking all notifications as read:", error)
+    }
   }
 
   return (
-    <ScrollArea className="h-[350px]">
-      <div className="divide-y divide-gray-200 dark:divide-gray-700">
-        {notifications.map((notification) => (
-          <NotificationItem key={notification.id} notification={notification} />
-        ))}
+    <div className="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-md shadow-lg overflow-hidden z-50">
+      <div className="p-3 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+        <h3 className="font-medium text-gray-800 dark:text-white">Notifications</h3>
+        {notifications.length > 0 && (
+          <button onClick={markAllAsRead} className="text-xs text-blue-600 dark:text-blue-400 hover:underline">
+            Mark all as read
+          </button>
+        )}
       </div>
-    </ScrollArea>
+
+      <div className="max-h-96 overflow-y-auto">
+        {loading ? (
+          <div className="flex justify-center items-center p-4">
+            <Loader2 className="h-6 w-6 text-gray-400 animate-spin" />
+          </div>
+        ) : error ? (
+          <div className="p-4 text-center text-gray-500 dark:text-gray-400">{error}</div>
+        ) : notifications.length === 0 ? (
+          <div className="p-4 text-center text-gray-500 dark:text-gray-400">No notifications yet</div>
+        ) : (
+          notifications.map((notification) => (
+            <NotificationItem
+              key={notification.id}
+              notification={notification}
+              onRead={() => markAsRead(notification.id)}
+              onClick={onClose}
+            />
+          ))
+        )}
+      </div>
+    </div>
   )
 }

@@ -1,123 +1,104 @@
 "use client"
 
-import type React from "react"
-
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
-import { supabase } from "@/lib/supabase-client"
 
+// Define the user type
 interface User {
   id: string
-  name: string
-  email?: string
-  participation_count?: number
-  has_applied?: boolean
-  first_name?: string
-  last_name?: string
+  email: string
+  name?: string
+  avatarUrl?: string
+  userType?: string
 }
 
+// Define the context type
 interface UserContextType {
   currentUser: User | null
-  isLoggedIn: boolean
-  login: (user: User) => void
-  logout: () => void
-  incrementParticipation: (points: number) => Promise<boolean>
-  setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>
+  isLoading: boolean
+  error: string | null
+  setCurrentUser: (user: User | null) => void
 }
 
+// Create the context with default values
 const UserContext = createContext<UserContextType>({
   currentUser: null,
-  isLoggedIn: false,
-  login: () => {},
-  logout: () => {},
-  incrementParticipation: async () => false,
+  isLoading: true,
+  error: null,
   setCurrentUser: () => {},
 })
 
+// Hook to use the user context
 export const useUser = () => useContext(UserContext)
-export const useUserContext = () => useContext(UserContext)
 
+// Add the missing export as an alias to maintain backward compatibility
+export const useUserContext = useUser
+
+// Provider component
 export function UserProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
-  // Check for existing session on mount
   useEffect(() => {
-    const checkSession = async () => {
+    const fetchUser = async () => {
       try {
+        // Import dynamically to avoid issues during SSR
+        const { supabase } = await import("@/lib/supabase-client-singleton")
+
         const {
           data: { session },
+          error: sessionError,
         } = await supabase.auth.getSession()
 
-        if (session?.user) {
-          // Get user profile data
-          const { data: userData, error } = await supabase
-            .from("user_profiles")
-            .select("*")
-            .eq("user_id", session.user.id)
-            .single()
-
-          if (!error && userData) {
-            setCurrentUser({
-              id: userData.user_id,
-              name: userData.first_name + " " + userData.last_name,
-              email: userData.email,
-              participation_count: userData.points,
-              has_applied: userData.application_status !== "new",
-              first_name: userData.first_name,
-              last_name: userData.last_name,
-            })
-          } else {
-            // For demo purposes, create a mock user
-            setCurrentUser({
-              id: "demo-user-id",
-              name: "Demo User",
-              participation_count: 1500,
-              has_applied: false,
-            })
-          }
+        if (sessionError) {
+          console.warn("Error fetching session:", sessionError)
+          setError("Failed to authenticate")
+          setIsLoading(false)
+          return
         }
+
+        if (!session) {
+          setCurrentUser(null)
+          setIsLoading(false)
+          return
+        }
+
+        // Get user profile based on user type
+        const { data: userTypeData, error: userTypeError } = await supabase
+          .from("user_types")
+          .select("user_type")
+          .eq("user_id", session.user.id)
+          .maybeSingle()
+
+        if (userTypeError) {
+          console.warn("Error fetching user type:", userTypeError)
+          setError("Failed to load user profile")
+          setIsLoading(false)
+          return
+        }
+
+        const userType = userTypeData?.user_type || "recruit"
+
+        // Set user data
+        setCurrentUser({
+          id: session.user.id,
+          email: session.user.email || "",
+          name: session.user.user_metadata?.name || session.user.email?.split("@")[0] || "User",
+          avatarUrl: session.user.user_metadata?.avatar_url,
+          userType,
+        })
       } catch (error) {
-        console.error("Error checking session:", error)
+        console.warn("Error in user context:", error)
+        setError("An unexpected error occurred")
+      } finally {
+        setIsLoading(false)
       }
     }
 
-    checkSession()
+    fetchUser()
   }, [])
 
-  const login = (user: User) => {
-    setCurrentUser(user)
-  }
-
-  const logout = () => {
-    setCurrentUser(null)
-    supabase.auth.signOut().catch(console.error)
-  }
-
-  const incrementParticipation = async (points: number) => {
-    if (!currentUser?.id) return false
-    try {
-      const { error } = await supabase
-        .from("users")
-        .update({ participation_count: currentUser.participation_count + points })
-        .eq("id", currentUser.id)
-      if (error) throw error
-      setCurrentUser((prev) => ({ ...prev, participation_count: (prev?.participation_count || 0) + points }))
-      return true
-    } catch (error) {
-      console.error("Error incrementing participation:", error)
-      return false
-    }
-  }
-
-  const contextValue = {
-    currentUser,
-    isLoggedIn: !!currentUser,
-    login,
-    logout,
-    incrementParticipation,
-    setCurrentUser,
-  }
-
-  return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>
+  return (
+    <UserContext.Provider value={{ currentUser, isLoading, error, setCurrentUser }}>{children}</UserContext.Provider>
+  )
 }
-
-export const UserContextProvider = UserProvider

@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -74,6 +76,38 @@ export function ImprovedHeader({
     }
   }
 
+  // Handle link clicks to prevent default behavior if needed
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    // If the link is not ready or has issues, prevent default behavior
+    const href = e.currentTarget.getAttribute("href")
+    if (href && (href.includes("#") || href === "/")) {
+      // Allow these to work normally
+      return
+    }
+
+    // For other links, check if they're ready
+    try {
+      // If we're in development or testing, let the links work
+      if (process.env.NODE_ENV === "development") {
+        return
+      }
+
+      // For production, check if the page exists
+      // This is a simplified check - in reality you might want to check if the route exists
+      const isReady = true // Set to false if you want to disable all links temporarily
+
+      if (!isReady) {
+        e.preventDefault()
+        console.log("This feature is coming soon!")
+        // Optionally show a toast or message to the user
+      }
+    } catch (error) {
+      // If there's an error, prevent navigation
+      e.preventDefault()
+      console.warn("Navigation error:", error)
+    }
+  }
+
   return (
     <header
       className={`bg-[#0A3C1F] dark:bg-[#121212] text-white sticky top-0 z-50 transition-all duration-300 ${
@@ -89,6 +123,7 @@ export function ImprovedHeader({
             href="/"
             className="flex items-center hover:opacity-90 transition-opacity"
             aria-label="SF Deputy Sheriff AI Recruitment - Home"
+            onClick={handleLinkClick}
           >
             <Shield className="h-8 w-8 text-[#FFD700] mr-2" aria-hidden="true" />
             <div>
@@ -101,6 +136,7 @@ export function ImprovedHeader({
           <Link
             href="/donate"
             className="hidden md:flex items-center bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold py-2 px-4 rounded-md transition-colors shadow-md"
+            onClick={handleLinkClick}
           >
             <Heart className="h-5 w-5 mr-2" />
             Donate Now
@@ -108,7 +144,7 @@ export function ImprovedHeader({
 
           {/* Social Icons and Theme Toggle - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
-            {/* Notification Bell */}
+            {/* Notification Bell - Only show if user is logged in */}
             {currentUser && <NotificationBell userId={currentUser.id} />}
 
             <a
@@ -196,9 +232,9 @@ export function ImprovedHeader({
                   </span>
                 }
                 items={[
-                  { label: "Overview", href: "/mission-briefing" },
-                  { label: "G.I. Bill", href: "/gi-bill" },
-                  { label: "Discounted Housing", href: "/discounted-housing" },
+                  { label: "Overview", href: "/mission-briefing", onClick: handleLinkClick },
+                  { label: "G.I. Bill", href: "/gi-bill", onClick: handleLinkClick },
+                  { label: "Discounted Housing", href: "/discounted-housing", onClick: handleLinkClick },
                 ]}
               />
               <DropdownNav
@@ -209,10 +245,10 @@ export function ImprovedHeader({
                   </span>
                 }
                 items={[
-                  { label: "Top Recruits", href: "/awards" },
-                  { label: "Leaderboard", href: "/awards#leaderboard" },
-                  { label: "Badge Gallery", href: "/badges" },
-                  { label: "NFT Awards", href: "/nft-awards/coming-soon" },
+                  { label: "Top Recruits", href: "/awards", onClick: handleLinkClick },
+                  { label: "Leaderboard", href: "/awards#leaderboard", onClick: handleLinkClick },
+                  { label: "Badge Gallery", href: "/badges", onClick: handleLinkClick },
+                  { label: "NFT Awards", href: "/nft-awards/coming-soon", onClick: handleLinkClick },
                 ]}
               />
               <DropdownNav
@@ -231,12 +267,17 @@ export function ImprovedHeader({
                       </span>
                     ),
                     href: "/deputy-launchpad",
+                    onClick: handleLinkClick,
                   },
-                  { label: "Play Trivia w/ Sgt. Ken", href: "/trivia" },
-                  { label: "Sgt. Ken's Daily Briefing", href: "/daily-briefing" },
+                  { label: "Play Trivia w/ Sgt. Ken", href: "/trivia", onClick: handleLinkClick },
+                  { label: "Sgt. Ken's Daily Briefing", href: "/daily-briefing", onClick: handleLinkClick },
                 ]}
               />
-              <Link href="/chat-with-sgt-ken" className="text-white hover:text-[#FFD700] transition-colors">
+              <Link
+                href="/chat-with-sgt-ken"
+                className="text-white hover:text-[#FFD700] transition-colors"
+                onClick={handleLinkClick}
+              >
                 <span className="flex items-center">
                   <MessageSquare className="h-4 w-4 mr-1" />
                   Ask Sgt. Ken
@@ -252,7 +293,7 @@ export function ImprovedHeader({
               >
                 Apply Now
               </Button>
-              <Link href="/login">
+              <Link href="/login" onClick={handleLinkClick}>
                 <Button className="bg-[#FFD700]/80 hover:bg-[#FFD700] text-[#0A3C1F] dark:text-[#121212] font-medium">
                   Login
                 </Button>
@@ -277,6 +318,7 @@ export function ImprovedHeader({
             <Link
               href="/donate"
               className="flex items-center justify-center bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold py-3 px-4 rounded-md transition-colors shadow-md mb-4"
+              onClick={handleLinkClick}
             >
               <Heart className="h-5 w-5 mr-2" />
               Donate Now
@@ -299,13 +341,21 @@ export function ImprovedHeader({
 
               {mobileDropdowns.missionBriefing && (
                 <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link href="/mission-briefing" className="block text-white hover:text-[#FFD700]">
+                  <Link
+                    href="/mission-briefing"
+                    className="block text-white hover:text-[#FFD700]"
+                    onClick={handleLinkClick}
+                  >
                     Overview
                   </Link>
-                  <Link href="/gi-bill" className="block text-white hover:text-[#FFD700]">
+                  <Link href="/gi-bill" className="block text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
                     G.I. Bill
                   </Link>
-                  <Link href="/discounted-housing" className="block text-white hover:text-[#FFD700]">
+                  <Link
+                    href="/discounted-housing"
+                    className="block text-white hover:text-[#FFD700]"
+                    onClick={handleLinkClick}
+                  >
                     Discounted Housing
                   </Link>
                 </div>
@@ -329,16 +379,24 @@ export function ImprovedHeader({
 
               {mobileDropdowns.topRecruits && (
                 <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link href="/awards" className="block text-white hover:text-[#FFD700]">
+                  <Link href="/awards" className="block text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
                     Top Recruits
                   </Link>
-                  <Link href="/awards#leaderboard" className="block text-white hover:text-[#FFD700]">
+                  <Link
+                    href="/awards#leaderboard"
+                    className="block text-white hover:text-[#FFD700]"
+                    onClick={handleLinkClick}
+                  >
                     Leaderboard
                   </Link>
-                  <Link href="/badges" className="block text-white hover:text-[#FFD700]">
+                  <Link href="/badges" className="block text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
                     Badge Gallery
                   </Link>
-                  <Link href="/nft-awards/coming-soon" className="block text-white hover:text-[#FFD700]">
+                  <Link
+                    href="/nft-awards/coming-soon"
+                    className="block text-white hover:text-[#FFD700]"
+                    onClick={handleLinkClick}
+                  >
                     NFT Awards{" "}
                     <span className="ml-1 px-1 py-0.5 text-xs bg-[#FFD700] text-[#0A3C1F] rounded-full">Soon</span>
                   </Link>
@@ -363,14 +421,22 @@ export function ImprovedHeader({
 
               {mobileDropdowns.playTheGame && (
                 <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link href="/deputy-launchpad" className="block text-white hover:text-[#FFD700] flex items-center">
+                  <Link
+                    href="/deputy-launchpad"
+                    className="block text-white hover:text-[#FFD700] flex items-center"
+                    onClick={handleLinkClick}
+                  >
                     <Rocket className="h-4 w-4 mr-1" />
                     Deputy Launchpad
                   </Link>
-                  <Link href="/trivia" className="block text-white hover:text-[#FFD700]">
+                  <Link href="/trivia" className="block text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
                     Play Trivia w/ Sgt. Ken
                   </Link>
-                  <Link href="/daily-briefing" className="block text-white hover:text-[#FFD700]">
+                  <Link
+                    href="/daily-briefing"
+                    className="block text-white hover:text-[#FFD700]"
+                    onClick={handleLinkClick}
+                  >
                     Sgt. Ken's Daily Briefing
                   </Link>
                 </div>
@@ -380,11 +446,12 @@ export function ImprovedHeader({
             <Link
               href="/chat-with-sgt-ken"
               className="block px-3 py-2 text-white hover:text-[#FFD700] flex items-center"
+              onClick={handleLinkClick}
             >
               <MessageSquare className="h-4 w-4 mr-2" />
               Ask Sgt. Ken
             </Link>
-            <Link href="/login" className="block px-3 py-2 text-white hover:text-[#FFD700]">
+            <Link href="/login" className="block px-3 py-2 text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
               Login
             </Link>
           </div>
@@ -402,7 +469,7 @@ export function ImprovedHeader({
             >
               Apply Now
             </Button>
-            <Link href="/login" className="flex-1">
+            <Link href="/login" className="flex-1" onClick={handleLinkClick}>
               <Button
                 className="w-full bg-[#FFD700]/80 hover:bg-[#FFD700] text-[#0A3C1F] dark:text-[#121212] font-medium"
                 onClick={() => setIsMobileMenuOpen(false)}

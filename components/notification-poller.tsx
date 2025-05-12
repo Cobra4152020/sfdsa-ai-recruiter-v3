@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useRef } from "react"
-import { supabase } from "@/lib/supabase-client"
 
 interface NotificationPollerProps {
   userId: string
@@ -17,6 +16,9 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
     // Function to check for new notifications
     const checkNotifications = async () => {
       try {
+        // Import dynamically to avoid issues during SSR
+        const { supabase } = await import("@/lib/supabase-client-singleton")
+
         // Get pending notifications from the queue
         const { data: notifications, error } = await supabase
           .from("push_notification_queue")
@@ -31,7 +33,7 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
           .limit(5)
 
         if (error) {
-          console.error("Error fetching notifications:", error)
+          console.warn("Error fetching notifications:", error)
           return
         }
 
@@ -43,7 +45,7 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
         for (const notification of notifications) {
           try {
             // Show the notification
-            if (Notification.permission === "granted") {
+            if (Notification && Notification.permission === "granted") {
               const payload = notification.payload
 
               // Display the notification
@@ -67,7 +69,7 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
                 .eq("id", notification.id)
             }
           } catch (notifError) {
-            console.error("Error processing notification:", notifError)
+            console.warn("Error processing notification:", notifError)
 
             // Mark the notification as failed
             await supabase
@@ -81,7 +83,7 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
           }
         }
       } catch (error) {
-        console.error("Error in notification poller:", error)
+        console.warn("Error in notification poller:", error)
       }
     }
 

@@ -24,3 +24,6 @@ export function useOnClickOutside<T extends HTMLElement = HTMLElement>(ref: RefO
     }
   }, [ref, handler])
 }
+
+// Add the missing export as an alias to maintain backward compatibility
+export const useClickOutside = useOnClickOutside
