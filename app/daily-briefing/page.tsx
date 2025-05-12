@@ -90,18 +90,7 @@ export default function DailyBriefingPage() {
           <div className="lg:col-span-2">
             <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
               <ErrorBoundary fallback={<StaticBriefingCard />}>
-                {/* Attempt to load dynamic content first */}
-                <iframe
-                  src="/daily-briefing-static"
-                  className="w-full h-[600px] border-0 rounded-lg"
-                  style={{ display: "none" }}
-                  onError={() => {
-                    // This will never execute in SSR
-                    document.getElementById("static-content")?.style.display = "block"
-                  }}
-                />
-
-                {/* Fallback static content */}
+                {/* Use static content directly instead of iframe with error handling */}
                 <div id="static-content">
                   <StaticBriefingCard />
                 </div>

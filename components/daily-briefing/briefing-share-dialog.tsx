@@ -79,6 +79,14 @@ export function BriefingShareDialog({
     }
   }
 
+  // Safe check for includes method
+  const isPlatformShared = (platformId: string) => {
+    if (!sharedPlatforms || !Array.isArray(sharedPlatforms)) {
+      return false
+    }
+    return sharedPlatforms.includes(platformId)
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
@@ -89,7 +97,7 @@ export function BriefingShareDialog({
 
         <div className="grid grid-cols-2 gap-4 py-4">
           {platforms.map((platform) => {
-            const isShared = sharedPlatforms?.includes?.(platform.id) || false
+            const isShared = isPlatformShared(platform.id)
             const isCurrentSuccess = shareSuccess === platform.id
 
             return (
@@ -119,7 +127,9 @@ export function BriefingShareDialog({
 
         <DialogFooter className="sm:justify-between">
           <div className="text-sm text-gray-500">
-            {sharedPlatforms?.length ? `Shared on ${sharedPlatforms.length} platform(s)` : ""}
+            {sharedPlatforms && Array.isArray(sharedPlatforms) && sharedPlatforms.length
+              ? `Shared on ${sharedPlatforms.length} platform(s)`
+              : ""}
           </div>
 
           <Button variant="ghost" onClick={() => onOpenChange(false)}>

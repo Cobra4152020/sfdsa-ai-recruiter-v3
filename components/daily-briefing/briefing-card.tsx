@@ -84,6 +84,13 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
             Share Briefing
           </Button>
         </CardFooter>
+
+        <BriefingShareDialog
+          open={isShareOpen}
+          onOpenChange={setIsShareOpen}
+          briefingId="default-briefing"
+          briefingTitle="Daily Briefing"
+        />
       </Card>
     )
   }
