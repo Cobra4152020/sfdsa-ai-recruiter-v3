@@ -3,93 +3,102 @@
 import { useState } from "react"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Share2, Calendar, Clock } from "lucide-react"
 import { BriefingShareDialog } from "./briefing-share-dialog"
 import { BriefingStreakBadge } from "./briefing-streak-badge"
-import { useRouter } from "next/navigation"
+import { useUser } from "@/context/user-context"
+import { useToast } from "@/components/ui/use-toast"
+import ReactMarkdown from "react-markdown"
+import { format } from "date-fns"
 
 interface BriefingCardProps {
-  briefing: any
+  briefing: {
+    id: string
+    title: string
+    content: string
+    date: string
+    theme: string
+    created_at: string
+    updated_at: string
+  }
 }
 
 export function BriefingCard({ briefing }: BriefingCardProps) {
-  const [isAttended, setIsAttended] = useState(false)
-  const [isShareOpen, setIsShareOpen] = useState(false)
-  const router = useRouter()
+  const [showShareDialog, setShowShareDialog] = useState(false)
+  const { isLoggedIn } = useUser()
+  const { toast } = useToast()
 
-  const handleAttend = async () => {
-    if (isAttended) return
-
+  // Safely format the date
+  const formattedDate = (() => {
     try {
-      const response = await fetch("/api/daily-briefing/attend", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ briefingId: briefing?.id }),
-      })
-
-      if (response.ok) {
-        setIsAttended(true)
-        router.refresh()
-      }
+      return format(new Date(briefing.date), "MMMM d, yyyy")
     } catch (error) {
-      console.error("Error marking attendance:", error)
+      console.error("Error formatting date:", error)
+      return "Today"
+    }
+  })()
+
+  // Handle share button click
+  const handleShare = () => {
+    if (isLoggedIn) {
+      setShowShareDialog(true)
+    } else {
+      toast({
+        title: "Login Required",
+        description: "Please log in to share the daily briefing.",
+        variant: "default",
+      })
     }
   }
 
-  if (!briefing) {
-    return (
-      <Card className="h-full">
-        <CardHeader>
-          <CardTitle>No Briefing Available</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p>There is no briefing scheduled for today. Please check back later.</p>
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
-    <Card className="h-full">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle>{briefing.title}</CardTitle>
-          <BriefingStreakBadge streak={briefing.userStreak || 0} />
-        </div>
-        <p className="text-sm text-gray-500">
-          {new Date(briefing.date).toLocaleDateString()} • {briefing.location || "Department HQ"}
-        </p>
-      </CardHeader>
-      <CardContent className="pt-4">
-        <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: briefing.content }} />
-
-        {briefing.keyPoints && briefing.keyPoints.length > 0 && (
-          <div className="mt-6">
-            <h3 className="font-semibold mb-2">Key Points:</h3>
-            <ul className="list-disc pl-5 space-y-1">
-              {briefing.keyPoints.map((point: string, index: number) => (
-                <li key={index}>{point}</li>
-              ))}
-            </ul>
+    <>
+      <Card className="h-full">
+        <CardHeader className="pb-3">
+          <div className="flex justify-between items-start">
+            <CardTitle className="text-2xl">{briefing.title || "Daily Briefing"}</CardTitle>
+            <Badge variant="outline" className="ml-2">
+              {briefing.theme || "General"}
+            </Badge>
           </div>
-        )}
-      </CardContent>
-      <CardFooter className="flex justify-between border-t pt-4">
-        <Button onClick={handleAttend} disabled={isAttended} variant={isAttended ? "outline" : "default"}>
-          {isAttended ? "Attended ✓" : "Mark as Attended"}
-        </Button>
-        <Button variant="outline" onClick={() => setIsShareOpen(true)}>
-          Share Briefing
-        </Button>
-      </CardFooter>
+          <div className="flex items-center text-sm text-muted-foreground mt-1">
+            <Calendar className="h-4 w-4 mr-1" />
+            <span>{formattedDate}</span>
+            <Clock className="h-4 w-4 ml-4 mr-1" />
+            <span>
+              {(() => {
+                try {
+                  return format(new Date(briefing.created_at), "h:mm a")
+                } catch (error) {
+                  return "Updated recently"
+                }
+              })()}
+            </span>
+          </div>
+        </CardHeader>
+        <CardContent className="prose prose-sm dark:prose-invert max-w-none">
+          {briefing.content ? (
+            <ReactMarkdown>{briefing.content}</ReactMarkdown>
+          ) : (
+            <p>No briefing content available for today. Please check back later.</p>
+          )}
+        </CardContent>
+        <CardFooter className="pt-3 flex justify-between">
+          <Button variant="outline" onClick={handleShare}>
+            <Share2 className="h-4 w-4 mr-2" />
+            Share Briefing
+          </Button>
+          {isLoggedIn && <BriefingStreakBadge />}
+        </CardFooter>
+      </Card>
 
       <BriefingShareDialog
-        open={isShareOpen}
-        onOpenChange={setIsShareOpen}
+        open={showShareDialog}
+        onOpenChange={setShowShareDialog}
         briefingId={briefing.id}
         briefingTitle={briefing.title}
       />
-    </Card>
+    </>
   )
 }

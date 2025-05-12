@@ -68,6 +68,67 @@ interface EnhancedTriviaGameProps {
   pointsForSharing?: number
 }
 
+// Fallback questions in case API fails
+const fallbackQuestions = [
+  {
+    id: "fallback-1",
+    question: "What year was the Golden Gate Bridge completed?",
+    options: ["1937", "1927", "1947", "1957"],
+    correctAnswer: 0,
+    explanation: "The Golden Gate Bridge was completed in 1937 after four years of construction.",
+    difficulty: "easy",
+    category: "landmarks",
+    imageUrl: "/golden-gate-bridge.png",
+    imageAlt: "The Golden Gate Bridge in San Francisco",
+  },
+  {
+    id: "fallback-2",
+    question: "Which famous prison is located on an island in San Francisco Bay?",
+    options: ["Rikers Island", "San Quentin", "Alcatraz", "Folsom"],
+    correctAnswer: 2,
+    explanation: "Alcatraz Federal Penitentiary operated from 1934 to 1963 on Alcatraz Island in San Francisco Bay.",
+    difficulty: "easy",
+    category: "landmarks",
+    imageUrl: "/alcatraz-prison-san-francisco.png",
+    imageAlt: "Alcatraz prison on its island in San Francisco Bay",
+  },
+  {
+    id: "fallback-3",
+    question: "What was the name of the 1906 natural disaster that devastated San Francisco?",
+    options: ["Great Quake", "San Francisco Tremor", "Golden Gate Disaster", "California Shaker"],
+    correctAnswer: 0,
+    explanation: "The Great Quake of 1906 caused devastating fires and destroyed over 80% of the city.",
+    difficulty: "medium",
+    category: "history",
+    imageUrl: "/1906-san-francisco-earthquake.png",
+    imageAlt: "Aftermath of the 1906 San Francisco earthquake",
+  },
+  {
+    id: "fallback-4",
+    question: "Which famous San Francisco neighborhood is known for its LGBT history and activism?",
+    options: ["Haight-Ashbury", "Mission District", "Castro", "North Beach"],
+    correctAnswer: 2,
+    explanation:
+      "The Castro District has been the center of LGBT activism and culture in San Francisco since the 1960s.",
+    difficulty: "medium",
+    category: "culture",
+    imageUrl: "/castro-district-san-francisco.png",
+    imageAlt: "The iconic Castro Theater in San Francisco's Castro District",
+  },
+  {
+    id: "fallback-5",
+    question: "What is the name of San Francisco's famous cable car system?",
+    options: ["Market Street Railway", "Muni Metro", "BART", "San Francisco Municipal Railway"],
+    correctAnswer: 3,
+    explanation:
+      "San Francisco Municipal Railway (Muni) operates the historic cable car system, which is the last manually operated cable car system in the world.",
+    difficulty: "easy",
+    category: "transportation",
+    imageUrl: "/san-francisco-cable-car.png",
+    imageAlt: "A San Francisco cable car climbing up a hill",
+  },
+]
+
 export function EnhancedTriviaGame({
   gameId,
   gameName,
@@ -154,8 +215,12 @@ export function EnhancedTriviaGame({
 
   // Initialize audio elements
   useEffect(() => {
-    correctAudioRef.current = new Audio("/sounds/correct-answer.mp3")
-    wrongAudioRef.current = new Audio("/sounds/wrong-answer.mp3")
+    try {
+      correctAudioRef.current = new Audio("/sounds/correct-answer.mp3")
+      wrongAudioRef.current = new Audio("/sounds/wrong-answer.mp3")
+    } catch (error) {
+      console.error("Error initializing audio:", error)
+    }
 
     // Cleanup function
     return () => {
@@ -231,51 +296,63 @@ export function EnhancedTriviaGame({
 
   // Initialize volume from localStorage and set up event listeners
   useEffect(() => {
-    // Load volume settings from localStorage
-    const savedVolume = localStorage.getItem("triviaGameVolume")
-    const savedMuted = localStorage.getItem("triviaGameMuted")
+    try {
+      // Load volume settings from localStorage
+      const savedVolume = localStorage.getItem("triviaGameVolume")
+      const savedMuted = localStorage.getItem("triviaGameMuted")
 
-    if (savedVolume !== null) {
-      setVolume(Number.parseFloat(savedVolume))
-    }
+      if (savedVolume !== null) {
+        setVolume(Number.parseFloat(savedVolume))
+      }
 
-    if (savedMuted !== null) {
-      setIsMuted(savedMuted === "true")
-    }
+      if (savedMuted !== null) {
+        setIsMuted(savedMuted === "true")
+      }
 
-    // Apply initial volume settings to audio elements
-    if (correctAudioRef.current) {
-      correctAudioRef.current.volume = isMuted ? 0 : volume
-    }
-    if (wrongAudioRef.current) {
-      wrongAudioRef.current.volume = isMuted ? 0 : volume
+      // Apply initial volume settings to audio elements
+      if (correctAudioRef.current) {
+        correctAudioRef.current.volume = isMuted ? 0 : volume
+      }
+      if (wrongAudioRef.current) {
+        wrongAudioRef.current.volume = isMuted ? 0 : volume
+      }
+    } catch (error) {
+      console.error("Error initializing volume settings:", error)
     }
   }, [])
 
   const handleVolumeChange = (newVolume: number) => {
-    setVolume(newVolume)
-    localStorage.setItem("triviaGameVolume", newVolume.toString())
+    try {
+      setVolume(newVolume)
+      localStorage.setItem("triviaGameVolume", newVolume.toString())
 
-    // Apply volume to audio elements
-    if (correctAudioRef.current) {
-      correctAudioRef.current.volume = isMuted ? 0 : newVolume
-    }
-    if (wrongAudioRef.current) {
-      wrongAudioRef.current.volume = isMuted ? 0 : newVolume
+      // Apply volume to audio elements
+      if (correctAudioRef.current) {
+        correctAudioRef.current.volume = isMuted ? 0 : newVolume
+      }
+      if (wrongAudioRef.current) {
+        wrongAudioRef.current.volume = isMuted ? 0 : newVolume
+      }
+    } catch (error) {
+      console.error("Error changing volume:", error)
     }
   }
 
   const toggleMute = () => {
-    const newMuted = !isMuted
-    setIsMuted(newMuted)
-    localStorage.setItem("triviaGameMuted", newMuted.toString())
+    try {
+      const newMuted = !isMuted
+      setIsMuted(newMuted)
+      localStorage.setItem("triviaGameMuted", newMuted.toString())
 
-    // Apply mute state to audio elements
-    if (correctAudioRef.current) {
-      correctAudioRef.current.volume = newMuted ? 0 : volume
-    }
-    if (wrongAudioRef.current) {
-      wrongAudioRef.current.volume = newMuted ? 0 : volume
+      // Apply mute state to audio elements
+      if (correctAudioRef.current) {
+        correctAudioRef.current.volume = newMuted ? 0 : volume
+      }
+      if (wrongAudioRef.current) {
+        wrongAudioRef.current.volume = newMuted ? 0 : volume
+      }
+    } catch (error) {
+      console.error("Error toggling mute:", error)
     }
   }
 
@@ -351,9 +428,13 @@ export function EnhancedTriviaGame({
       // Pre-load images to avoid loading delays during gameplay
       data.questions.forEach((question: TriviaQuestion) => {
         if (question.imageUrl && !question.imageUrl.startsWith("data:")) {
-          const img = new Image()
-          img.src = question.imageUrl
-          img.crossOrigin = "anonymous"
+          try {
+            const img = new Image()
+            img.src = question.imageUrl
+            img.crossOrigin = "anonymous"
+          } catch (error) {
+            console.error("Error preloading image:", error)
+          }
         }
       })
 
@@ -364,12 +445,16 @@ export function EnhancedTriviaGame({
       setRetryCount(0)
 
       // Track successful question load
-      trackEngagement("trivia_questions_loaded", {
-        gameId,
-        source: data.source,
-        questionCount: data.questions.length,
-        requestId: data.requestId,
-      })
+      try {
+        trackEngagement("trivia_questions_loaded", {
+          gameId,
+          source: data.source,
+          questionCount: data.questions.length,
+          requestId: data.requestId,
+        })
+      } catch (error) {
+        console.error("Error tracking engagement:", error)
+      }
     } catch (error) {
       // Clear the timeout if there was an error
       clearTimeout(fetchTimeout)
@@ -378,6 +463,9 @@ export function EnhancedTriviaGame({
       // Handle abort errors differently
       if (error.name === "AbortError") {
         setFetchError("Request was cancelled. Please try again.")
+        // Use fallback questions
+        setQuestions(fallbackQuestions)
+        setQuestionSource("fallback-abort")
         return
       }
 
@@ -394,29 +482,37 @@ export function EnhancedTriviaGame({
       console.error(`Error fetching ${gameId} trivia questions:`, error)
       setFetchError(`We're having trouble loading ${gameName} questions. ${errorMessage}`)
 
+      // Use fallback questions
+      setQuestions(fallbackQuestions)
+      setQuestionSource("fallback-error")
+
       // Increment retry count
       setRetryCount((prev) => prev + 1)
 
       // Track failed question load
-      trackEngagement("trivia_questions_error", {
-        gameId,
-        error: errorMessage,
-        retryCount: retryCount + 1,
-      })
+      try {
+        trackEngagement("trivia_questions_error", {
+          gameId,
+          error: errorMessage,
+          retryCount: retryCount + 1,
+        })
+      } catch (trackError) {
+        console.error("Error tracking engagement:", trackError)
+      }
 
       toast({
-        title: "Error loading questions",
-        description: "We're having trouble connecting to our servers. Please try again later.",
-        variant: "destructive",
+        title: "Using backup questions",
+        description: "We're having trouble connecting to our servers. Using local questions instead.",
+        variant: "default",
       })
     } finally {
       setIsLoading(false)
-      setIsTimerRunning(questions.length > 0)
+      setIsTimerRunning(true)
 
       // Clear the abort controller reference
       abortControllerRef.current = null
     }
-  }, [fetchQuestionsEndpoint, gameId, gameName, questions.length, retryCount, toast])
+  }, [fetchQuestionsEndpoint, gameId, gameName, retryCount, toast])
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (!isAnswerSubmitted) {
@@ -442,10 +538,14 @@ export function EnhancedTriviaGame({
 
     // Play sound effects
     if (isCorrect) {
-      if (correctAudioRef.current) {
-        correctAudioRef.current.volume = isMuted ? 0 : volume
-        correctAudioRef.current.currentTime = 0
-        correctAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
+      try {
+        if (correctAudioRef.current) {
+          correctAudioRef.current.volume = isMuted ? 0 : volume
+          correctAudioRef.current.currentTime = 0
+          correctAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
+        }
+      } catch (error) {
+        console.error("Error playing correct sound:", error)
       }
 
       // Rest of the isCorrect code remains the same
@@ -453,29 +553,41 @@ export function EnhancedTriviaGame({
       setCorrectAnswers((prev) => prev + 1)
 
       // Show confetti for correct answers
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
-      })
+      try {
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { y: 0.6 },
+          colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
+        })
+      } catch (error) {
+        console.error("Error showing confetti:", error)
+      }
     } else {
-      if (wrongAudioRef.current) {
-        wrongAudioRef.current.volume = isMuted ? 0 : volume
-        wrongAudioRef.current.currentTime = 0
-        wrongAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
+      try {
+        if (wrongAudioRef.current) {
+          wrongAudioRef.current.volume = isMuted ? 0 : volume
+          wrongAudioRef.current.currentTime = 0
+          wrongAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
+        }
+      } catch (error) {
+        console.error("Error playing wrong sound:", error)
       }
     }
 
     // Track this answer in analytics
-    trackEngagement("trivia_answer", {
-      gameId,
-      questionId: currentQuestion.id,
-      isCorrect,
-      timeSpent: 30 - timeLeft,
-      difficulty: currentQuestion.difficulty,
-      requestId,
-    })
+    try {
+      trackEngagement("trivia_answer", {
+        gameId,
+        questionId: currentQuestion.id,
+        isCorrect,
+        timeSpent: 30 - timeLeft,
+        difficulty: currentQuestion.difficulty,
+        requestId,
+      })
+    } catch (error) {
+      console.error("Error tracking answer:", error)
+    }
 
     // If this is the last question, end the game
     if (currentQuestionIndex === questions.length - 1) {
@@ -513,6 +625,10 @@ export function EnhancedTriviaGame({
                 setIsGameOver(true)
               }, 2000) // Show after feedback disappears
             }
+          } else {
+            setTimeout(() => {
+              setIsGameOver(true)
+            }, 2000)
           }
         } catch (error) {
           console.error(`Error submitting ${gameId} trivia results:`, error)
@@ -580,11 +696,21 @@ export function EnhancedTriviaGame({
         break
       default:
         // Copy to clipboard
-        navigator.clipboard.writeText(`${shareText} ${shareUrl}`)
-        toast({
-          title: "Link copied!",
-          description: "Share link copied to clipboard",
-        })
+        try {
+          navigator.clipboard.writeText(`${shareText} ${shareUrl}`)
+          toast({
+            title: "Link copied!",
+            description: "Share link copied to clipboard",
+          })
+        } catch (error) {
+          console.error("Error copying to clipboard:", error)
+          toast({
+            title: "Couldn't copy link",
+            description: "Please try another sharing method",
+            variant: "destructive",
+          })
+        }
+
         if (isMidGameShare) {
           setShowMidGameShareDialog(false)
           setIsTimerRunning(true)
@@ -601,7 +727,16 @@ export function EnhancedTriviaGame({
     }
 
     // Open share link in new window
-    window.open(shareLink, "_blank")
+    try {
+      window.open(shareLink, "_blank")
+    } catch (error) {
+      console.error("Error opening share link:", error)
+      toast({
+        title: "Couldn't open sharing page",
+        description: "Please try another sharing method",
+        variant: "destructive",
+      })
+    }
 
     if (isMidGameShare) {
       setShowMidGameShareDialog(false)
@@ -665,29 +800,33 @@ export function EnhancedTriviaGame({
       // Try to reload with a cache buster
       const question = questions[index]
       if (question && question.imageUrl) {
-        // Add timestamp to bust cache
-        const cacheBuster = new Date().getTime()
-        let newUrl = question.imageUrl
+        try {
+          // Add timestamp to bust cache
+          const cacheBuster = new Date().getTime()
+          let newUrl = question.imageUrl
 
-        // If it's a placeholder.svg URL, regenerate it
-        if (question.imageUrl.includes("placeholder.svg")) {
-          newUrl = `/placeholder.svg?height=300&width=500&query=${encodeURIComponent(question.question)}&_=${cacheBuster}`
-        } else if (!question.imageUrl.includes("?")) {
-          newUrl = `${question.imageUrl}?_=${cacheBuster}`
-        } else {
-          newUrl = `${question.imageUrl}&_=${cacheBuster}`
+          // If it's a placeholder.svg URL, regenerate it
+          if (question.imageUrl.includes("placeholder.svg")) {
+            newUrl = `/placeholder.svg?height=300&width=500&query=${encodeURIComponent(question.question)}&_=${cacheBuster}`
+          } else if (!question.imageUrl.includes("?")) {
+            newUrl = `${question.imageUrl}?_=${cacheBuster}`
+          } else {
+            newUrl = `${question.imageUrl}&_=${cacheBuster}`
+          }
+
+          // Update the image URL
+          const updatedQuestions = [...questions]
+          updatedQuestions[index] = {
+            ...question,
+            imageUrl: newUrl,
+          }
+          setQuestions(updatedQuestions)
+
+          // Don't mark as error yet
+          return
+        } catch (error) {
+          console.error("Error updating image URL:", error)
         }
-
-        // Update the image URL
-        const updatedQuestions = [...questions]
-        updatedQuestions[index] = {
-          ...question,
-          imageUrl: newUrl,
-        }
-        setQuestions(updatedQuestions)
-
-        // Don't mark as error yet
-        return
       }
     }
 
@@ -856,8 +995,8 @@ export function EnhancedTriviaGame({
   return (
     <>
       {/* Hidden audio elements for sounds */}
-      <audio ref={correctAudioRef} src="/sounds/correct-answer.mp3" preload="auto" volume={isMuted ? 0 : volume} />
-      <audio ref={wrongAudioRef} src="/sounds/wrong-answer.mp3" preload="auto" volume={isMuted ? 0 : volume} />
+      <audio ref={correctAudioRef} src="/sounds/correct-answer.mp3" preload="auto" />
+      <audio ref={wrongAudioRef} src="/sounds/wrong-answer.mp3" preload="auto" />
 
       <Card className="shadow-md">
         <CardContent className="p-6">
