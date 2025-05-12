@@ -30,7 +30,7 @@ import { NotificationBell } from "@/components/notification-bell"
 import { useUser } from "@/context/user-context"
 
 interface ImprovedHeaderProps {
-  showOptInForm?: (isApplying?: boolean) => void
+  showOptInForm?: () => void
   isScrolled?: boolean
 }
 
@@ -60,6 +60,13 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen)
     setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
+  // Create a safe handler function that checks if showOptInForm exists before calling it
+  const handleOptInClick = () => {
+    if (typeof showOptInForm === "function") {
+      showOptInForm()
+    }
   }
 
   return (
@@ -235,7 +242,7 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
             {/* Right side buttons */}
             <div className="hidden md:flex items-center space-x-4 mt-4 md:mt-0">
               <Button
-                onClick={() => showOptInForm && showOptInForm(true)}
+                onClick={handleOptInClick}
                 className="bg-white hover:bg-white/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
               >
                 Apply Now
@@ -381,7 +388,9 @@ export function ImprovedHeader({ showOptInForm, isScrolled: propIsScrolled }: Im
           <div className="px-5 py-4 border-t border-white/10 flex space-x-3">
             <Button
               onClick={() => {
-                showOptInForm && showOptInForm(true)
+                if (typeof showOptInForm === "function") {
+                  showOptInForm()
+                }
                 setIsMobileMenuOpen(false)
               }}
               className="flex-1 bg-white hover:bg-white/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
