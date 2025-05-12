@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import PerformanceMonitor from "@/components/performance-monitor"
 import { createPerformanceMetricsTable } from "@/lib/database-setup"
+import { ErrorBoundary } from "@/components/error-boundary"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -20,16 +21,26 @@ export default function RootLayout({
 }) {
   // Try to create the performance metrics table, but don't wait for it
   if (process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === "true") {
-    createPerformanceMetricsTable().catch(console.error)
+    // Use a try-catch to prevent initialization errors from breaking the app
+    try {
+      createPerformanceMetricsTable().catch((error) => {
+        console.error("Failed to create performance metrics table:", error)
+      })
+    } catch (error) {
+      console.error("Error initializing performance monitoring:", error)
+    }
   }
 
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          {children}
-          <PerformanceMonitor />
-        </ThemeProvider>
+        <ErrorBoundary fallback={<div className="p-4">Something went wrong. Please try refreshing the page.</div>}>
+          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+            {children}
+            {(process.env.NODE_ENV === "production" ||
+              process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === "true") && <PerformanceMonitor />}
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   )
