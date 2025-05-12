@@ -22,7 +22,7 @@ const triviaGames = [
     name: "SF Football Trivia",
     description: "Test your knowledge about San Francisco football history and the 49ers.",
     icon: <Football className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco 49ers football",
+    image: "/levis-stadium-49ers.png",
     color: "bg-red-50 border-red-200",
     textColor: "text-red-800",
   },
@@ -31,7 +31,7 @@ const triviaGames = [
     name: "SF Baseball Trivia",
     description: "How much do you know about the San Francisco Giants and baseball in the Bay Area?",
     icon: <Baseball className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco Giants baseball",
+    image: "/oracle-park-giants.png",
     color: "bg-orange-50 border-orange-200",
     textColor: "text-orange-800",
   },
@@ -40,7 +40,7 @@ const triviaGames = [
     name: "SF Basketball Trivia",
     description: "Challenge yourself with questions about the Golden State Warriors and basketball in San Francisco.",
     icon: <Basketball className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=Golden State Warriors basketball",
+    image: "/chase-center-gsw.png",
     color: "bg-blue-50 border-blue-200",
     textColor: "text-blue-800",
   },
@@ -49,7 +49,7 @@ const triviaGames = [
     name: "SF District Trivia",
     description: "Test your knowledge of San Francisco's unique and diverse neighborhoods and districts.",
     icon: <MapPin className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco neighborhoods districts",
+    image: "/mission-district-sf.png",
     color: "bg-purple-50 border-purple-200",
     textColor: "text-purple-800",
   },
@@ -58,7 +58,7 @@ const triviaGames = [
     name: "SF Most Popular Tourist Spots",
     description: "How well do you know San Francisco's famous landmarks and tourist attractions?",
     icon: <Landmark className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco tourist attractions",
+    image: "/golden-gate-bridge.png",
     color: "bg-green-50 border-green-200",
     textColor: "text-green-800",
   },
@@ -67,7 +67,7 @@ const triviaGames = [
     name: "SF Best Places to Visit",
     description: "Test your knowledge about the best day trips and places to visit around San Francisco.",
     icon: <Compass className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco day trips",
+    image: "/muir-woods-day-trip.png",
     color: "bg-amber-50 border-amber-200",
     textColor: "text-amber-800",
   },
@@ -96,6 +96,7 @@ export default function TriviaHubPage() {
                   fill
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  priority={game.id === "sf-football" || game.id === "sf-baseball"}
                 />
               </div>
               <CardHeader className="pb-2">
