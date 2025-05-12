@@ -30,7 +30,7 @@ export function PageWrapper({ children }: PageWrapperProps) {
     <UserProvider>
       <div className="min-h-screen flex flex-col">
         <ImprovedHeader showOptInForm={showOptInForm} />
-        <main id="main-content" className="flex-1 pt-40 pb-12 bg-[#F8F5EE] dark:bg-[#121212]">
+        <main id="main-content" className="flex-1 pt-40 pb-12 bg-background dark:bg-[#121212]">
           {children}
         </main>
         <ImprovedFooter />

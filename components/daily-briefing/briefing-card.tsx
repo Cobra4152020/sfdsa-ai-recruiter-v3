@@ -71,7 +71,7 @@ export function BriefingCard({ briefing, stats, onShare }: BriefingCardProps) {
     : ["There is no briefing content available for today."]
 
   return (
-    <Card className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow-lg overflow-hidden">
+    <Card className="w-full max-w-3xl mx-auto bg-card dark:bg-gray-800 shadow-lg overflow-hidden">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         <CardHeader className="bg-[#0A3C1F] dark:bg-[#121212] text-white rounded-t-lg">
           <div className="flex justify-between items-center">
@@ -140,7 +140,7 @@ export function BriefingCard({ briefing, stats, onShare }: BriefingCardProps) {
           </AnimatePresence>
         </CardContent>
 
-        <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-gray-50 dark:bg-gray-800/50 rounded-b-lg p-4">
+        <CardFooter className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-accent dark:bg-gray-800/50 rounded-b-lg p-4">
           <motion.div
             className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300"
             initial={{ opacity: 0 }}

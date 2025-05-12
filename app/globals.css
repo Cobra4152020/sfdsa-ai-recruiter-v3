@@ -7,10 +7,10 @@
   --background: 48 33% 94%; /* Light tan */
   --foreground: 142 69% 14%; /* Sheriff green */
 
-  --card: 0 0% 100%;
+  --card: 48 33% 94%; /* Changed from white to light tan */
   --card-foreground: 142 69% 14%;
 
-  --popover: 0 0% 100%;
+  --popover: 48 33% 94%; /* Changed from white to light tan */
   --popover-foreground: 142 69% 14%;
 
   --primary: 142 69% 14%; /* Sheriff green */
