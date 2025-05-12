@@ -11,6 +11,7 @@ export async function approveVolunteerRecruiter(userId: string) {
     const supabaseAdmin = createServerClient()
 
     // Update the volunteer.recruiters table to set is_active to true
+    // Fixed: removed "public." prefix from the table name
     const { error } = await supabaseAdmin
       .from("volunteer.recruiters")
       .update({
@@ -57,6 +58,7 @@ export async function rejectVolunteerRecruiter(userId: string) {
     const supabaseAdmin = createServerClient()
 
     // Delete the volunteer.recruiters record
+    // Fixed: removed "public." prefix from the table name
     const { error: deleteError } = await supabaseAdmin.from("volunteer.recruiters").delete().eq("id", userId)
 
     if (deleteError) {
@@ -96,6 +98,7 @@ export async function getPendingVolunteerRecruiters() {
     const supabaseAdmin = createServerClient()
 
     // Modified query to avoid the foreign key relationship error
+    // Fixed: removed "public." prefix from the table name
     const { data: recruiters, error: recruitersError } = await supabaseAdmin
       .from("volunteer.recruiters")
       .select("*")

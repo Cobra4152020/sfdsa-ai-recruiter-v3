@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import { JourneyPerformanceDashboard } from "@/components/journey-performance-dashboard"
-import { supabase } from "@/lib/supabase-client"
+import { createServerClient } from "@/lib/supabase-server"
 import { Skeleton } from "@/components/ui/skeleton"
 
 export const metadata = {
@@ -9,34 +9,41 @@ export const metadata = {
 }
 
 async function getJourneyData() {
-  // Fetch journey summaries
-  const { data: summaries, error: summariesError } = await supabase.from("journey_performance_summary").select("*")
+  try {
+    const supabase = createServerClient()
 
-  if (summariesError) {
-    console.error("Error fetching journey summaries:", summariesError)
+    // Fetch journey summaries
+    const { data: summaries, error: summariesError } = await supabase.from("journey_performance_summary").select("*")
+
+    if (summariesError) {
+      console.error("Error fetching journey summaries:", summariesError)
+      return { summaries: [], steps: [], funnels: [] }
+    }
+
+    // Fetch journey steps
+    const { data: steps, error: stepsError } = await supabase.from("journey_step_performance").select("*")
+
+    if (stepsError) {
+      console.error("Error fetching journey steps:", stepsError)
+      return { summaries: summaries || [], steps: [], funnels: [] }
+    }
+
+    // Fetch journey funnels
+    const { data: funnels, error: funnelsError } = await supabase.from("journey_funnel_analysis").select("*")
+
+    if (funnelsError) {
+      console.error("Error fetching journey funnels:", funnelsError)
+      return { summaries: summaries || [], steps: steps || [], funnels: [] }
+    }
+
+    return {
+      summaries: summaries || [],
+      steps: steps || [],
+      funnels: funnels || [],
+    }
+  } catch (error) {
+    console.error("Error in getJourneyData:", error)
     return { summaries: [], steps: [], funnels: [] }
-  }
-
-  // Fetch journey steps
-  const { data: steps, error: stepsError } = await supabase.from("journey_step_performance").select("*")
-
-  if (stepsError) {
-    console.error("Error fetching journey steps:", stepsError)
-    return { summaries: summaries || [], steps: [], funnels: [] }
-  }
-
-  // Fetch journey funnels
-  const { data: funnels, error: funnelsError } = await supabase.from("journey_funnel_analysis").select("*")
-
-  if (funnelsError) {
-    console.error("Error fetching journey funnels:", funnelsError)
-    return { summaries: summaries || [], steps: steps || [], funnels: [] }
-  }
-
-  return {
-    summaries: summaries || [],
-    steps: steps || [],
-    funnels: funnels || [],
   }
 }
 
