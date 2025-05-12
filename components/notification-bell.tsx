@@ -23,19 +23,35 @@ export function NotificationBell({ userId }: NotificationBellProps) {
         // Import dynamically to avoid issues during SSR
         const { supabase } = await import("@/lib/supabase-client-singleton")
 
-        const { data, error } = await supabase
+        // Try with is_read first (this appears to be the correct column name)
+        const { data: isReadData, error: isReadError } = await supabase
           .from("notifications")
           .select("id")
           .eq("user_id", userId)
-          .eq("read", false)
+          .eq("is_read", false)
           .limit(100)
 
-        if (error) {
-          console.warn("Error fetching unread count:", error)
+        // If that fails, try with read column
+        if (isReadError) {
+          console.warn("Error fetching notifications with is_read, trying read column:", isReadError)
+
+          const { data: readData, error: readError } = await supabase
+            .from("notifications")
+            .select("id")
+            .eq("user_id", userId)
+            .eq("read", false)
+            .limit(100)
+
+          if (readError) {
+            console.warn("Error fetching unread count:", readError)
+            return
+          }
+
+          setUnreadCount(readData?.length || 0)
           return
         }
 
-        setUnreadCount(data?.length || 0)
+        setUnreadCount(isReadData?.length || 0)
       } catch (error) {
         console.warn("Exception fetching unread count:", error)
       }

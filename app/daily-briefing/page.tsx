@@ -5,7 +5,7 @@ import { AlertCircle } from "lucide-react"
 import { BriefingCard } from "@/components/daily-briefing/briefing-card"
 import { BriefingStats } from "@/components/daily-briefing/briefing-stats"
 import { BriefingLeaderboard } from "@/components/daily-briefing/briefing-leaderboard"
-import { createClient } from "@/lib/supabase-clients"
+import { getServerSupabase } from "@/lib/supabase-server"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 3600 // Revalidate every hour
@@ -54,16 +54,16 @@ const fallbackBriefing = {
 // Function to fetch today's briefing from the database
 async function getTodaysBriefing() {
   try {
-    const supabase = createClient()
+    const supabase = getServerSupabase()
 
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split("T")[0]
 
     // Query the daily_briefings table for today's briefing
-    const { data, error } = await supabase.from("daily_briefings").select("*").eq("date", today).single()
+    const { data, error } = await supabase.from("daily_briefings").select("*").eq("date", today).limit(1).single()
 
     if (error) {
-      console.error("Error fetching today's briefing:", error)
+      console.warn("Error fetching today's briefing:", error)
 
       // If no briefing for today, get the most recent one
       const { data: recentData, error: recentError } = await supabase
@@ -74,7 +74,7 @@ async function getTodaysBriefing() {
         .single()
 
       if (recentError) {
-        console.error("Error fetching recent briefing:", recentError)
+        console.warn("Error fetching recent briefing:", recentError)
         return { briefing: fallbackBriefing, error: "Failed to load briefing from database" }
       }
 
@@ -88,57 +88,19 @@ async function getTodaysBriefing() {
   }
 }
 
-// Function to get user's briefing stats
-async function getBriefingStats(briefingId) {
-  try {
-    const supabase = createClient()
-
-    // Get total attendees
-    const { count: totalAttendees, error: attendeesError } = await supabase
-      .from("briefing_attendance")
-      .select("id", { count: "exact", head: true })
-      .eq("briefing_id", briefingId)
-
-    // Get total shares
-    const { count: totalShares, error: sharesError } = await supabase
-      .from("briefing_shares")
-      .select("id", { count: "exact", head: true })
-      .eq("briefing_id", briefingId)
-
-    return {
-      total_attendees: totalAttendees || 0,
-      total_shares: totalShares || 0,
-      user_attended: false,
-      user_shared: false,
-      user_platforms_shared: [],
-    }
-  } catch (error) {
-    console.error("Error fetching briefing stats:", error)
-    return {
-      total_attendees: 0,
-      total_shares: 0,
-      user_attended: false,
-      user_shared: false,
-      user_platforms_shared: [],
-    }
-  }
-}
-
 // Main page component
 export default async function DailyBriefingPage() {
   // Fetch the briefing data from the database
   const { briefing, error } = await getTodaysBriefing()
 
-  // Get stats for the briefing
-  const stats = briefing
-    ? await getBriefingStats(briefing.id)
-    : {
-        total_attendees: 0,
-        total_shares: 0,
-        user_attended: false,
-        user_shared: false,
-        user_platforms_shared: [],
-      }
+  // Default stats when database fetch fails
+  const stats = {
+    total_attendees: 0,
+    total_shares: 0,
+    user_attended: false,
+    user_shared: false,
+    user_platforms_shared: [],
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
