@@ -9,15 +9,15 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null
 
 export const supabase = (() => {
-  if (!supabaseInstance) {
+  if (!supabaseInstance && typeof window !== "undefined") {
     supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
-        autoRefreshToken: true,
+        storageKey: "sfdsa-auth-storage",
       },
     })
   }
-  return supabaseInstance
+  return supabaseInstance || createClient<Database>(supabaseUrl, supabaseAnonKey)
 })()
 
 // For server components

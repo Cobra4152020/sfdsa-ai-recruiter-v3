@@ -21,6 +21,17 @@ export function BriefingCard({ briefing, stats, onShare }: BriefingCardProps) {
   const [shareError, setShareError] = useState<string | null>(null)
   const { currentUser } = useUser()
 
+  // Ensure briefing has all required properties with fallbacks
+  const safeBriefing = {
+    id: briefing?.id || "",
+    title: briefing?.title || "No Briefing Available",
+    content: briefing?.content || "There is no briefing content available for today.",
+    date: briefing?.date || new Date().toISOString(),
+    theme: briefing?.theme || "None",
+    created_at: briefing?.created_at || new Date().toISOString(),
+    updated_at: briefing?.updated_at || new Date().toISOString(),
+  }
+
   const handleShare = async (platform: string) => {
     if (!currentUser) {
       setShareError("You must be logged in to share")
@@ -46,12 +57,17 @@ export function BriefingCard({ briefing, stats, onShare }: BriefingCardProps) {
   }
 
   // Format the date for display
-  const formattedDate = new Date(briefing.date).toLocaleDateString("en-US", {
+  const formattedDate = new Date(safeBriefing.date).toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
   })
+
+  // Safely split content
+  const contentParagraphs = safeBriefing.content
+    ? safeBriefing.content.split("\n\n")
+    : ["There is no briefing content available for today."]
 
   return (
     <Card className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-800 shadow-lg">
@@ -61,23 +77,19 @@ export function BriefingCard({ briefing, stats, onShare }: BriefingCardProps) {
           <BriefingStreakBadge />
         </div>
         <CardDescription className="text-white/80">
-          {formattedDate} • Theme: {briefing.theme}
+          {formattedDate} • Theme: {safeBriefing.theme}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="pt-6 pb-4">
-        <h2 className="text-xl font-semibold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">{briefing.title}</h2>
+        <h2 className="text-xl font-semibold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">{safeBriefing.title}</h2>
 
         <div className="prose dark:prose-invert max-w-none">
-          {briefing.content ? (
-            briefing.content.split("\n\n").map((paragraph, index) => (
-              <p key={index} className="mb-4">
-                {paragraph}
-              </p>
-            ))
-          ) : (
-            <p className="mb-4">No content available for today's briefing.</p>
-          )}
+          {contentParagraphs.map((paragraph, index) => (
+            <p key={index} className="mb-4">
+              {paragraph}
+            </p>
+          ))}
         </div>
 
         {shareError && (
@@ -115,7 +127,7 @@ export function BriefingCard({ briefing, stats, onShare }: BriefingCardProps) {
         isOpen={isShareDialogOpen}
         onClose={() => setIsShareDialogOpen(false)}
         onShare={handleShare}
-        briefing={briefing}
+        briefing={safeBriefing}
         sharedPlatforms={stats.user_platforms_shared}
         isSharing={isSharing}
       />
