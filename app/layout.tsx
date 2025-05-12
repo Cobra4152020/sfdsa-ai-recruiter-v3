@@ -3,6 +3,8 @@ import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import PerformanceMonitor from "@/components/performance-monitor"
+import { ErrorMonitor } from "@/components/error-monitor"
+import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
 import { createPerformanceMetricsTable } from "@/lib/database-setup"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -29,6 +31,8 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           {children}
           <PerformanceMonitor />
+          <ErrorMonitor />
+          <WebSocketErrorHandler />
         </ThemeProvider>
       </body>
     </html>
