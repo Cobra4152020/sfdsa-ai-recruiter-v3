@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-service"
+import { createServerClient } from "@/lib/supabase-server"
 import { API_CACHE_HEADERS } from "@/lib/cache-utils"
 
 export const dynamic = "force-dynamic"
@@ -14,7 +14,7 @@ interface TableCheckResult {
 export async function GET() {
   const startTime = Date.now()
   try {
-    const supabase = getServiceSupabase()
+    const supabase = createServerClient()
     const connectionTime = Date.now() - startTime
 
     // Test database connection with a simple query
