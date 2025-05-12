@@ -3,121 +3,206 @@ export type Json = string | number | boolean | null | { [key: string]: Json | un
 export interface Database {
   public: {
     Tables: {
-      // ... existing tables
-
-      daily_briefings: {
+      users: {
         Row: {
           id: string
-          date: string
-          theme: string
-          quote: string
-          quote_author: string
-          sgt_ken_take: string
-          call_to_action: string
+          name: string
+          email: string
+          avatar_url: string | null
           created_at: string
-          active: boolean
-        }
-        Insert: {
-          id?: string
-          date: string
-          theme: string
-          quote: string
-          quote_author: string
-          sgt_ken_take: string
-          call_to_action: string
-          created_at?: string
-          active?: boolean
-        }
-        Update: {
-          id?: string
-          date?: string
-          theme?: string
-          quote?: string
-          quote_author?: string
-          sgt_ken_take?: string
-          call_to_action?: string
-          created_at?: string
-          active?: boolean
-        }
-      }
-
-      briefing_attendance: {
-        Row: {
-          id: string
-          user_id: string
-          briefing_id: string
-          attended_at: string
-          points_awarded: number
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          briefing_id: string
-          attended_at?: string
-          points_awarded?: number
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          briefing_id?: string
-          attended_at?: string
-          points_awarded?: number
-        }
-      }
-
-      briefing_shares: {
-        Row: {
-          id: string
-          user_id: string
-          briefing_id: string
-          platform: string
-          shared_at: string
-          points_awarded: number
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          briefing_id: string
-          platform: string
-          shared_at?: string
-          points_awarded?: number
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          briefing_id?: string
-          platform?: string
-          shared_at?: string
-          points_awarded?: number
-        }
-      }
-
-      briefing_streaks: {
-        Row: {
-          user_id: string
-          current_streak: number
-          longest_streak: number
-          last_briefing_date: string | null
           updated_at: string
         }
         Insert: {
-          user_id: string
-          current_streak?: number
-          longest_streak?: number
-          last_briefing_date?: string | null
+          id?: string
+          name: string
+          email: string
+          avatar_url?: string | null
+          created_at?: string
           updated_at?: string
         }
         Update: {
-          user_id?: string
-          current_streak?: number
-          longest_streak?: number
-          last_briefing_date?: string | null
+          id?: string
+          name?: string
+          email?: string
+          avatar_url?: string | null
+          created_at?: string
           updated_at?: string
         }
       }
-
-      // You may have other tables here
+      badges: {
+        Row: {
+          id: string
+          name: string
+          description: string
+          image_url: string
+          criteria: string
+          points: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description: string
+          image_url: string
+          criteria: string
+          points: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string
+          image_url?: string
+          criteria?: string
+          points?: number
+          created_at?: string
+        }
+      }
+      user_badges: {
+        Row: {
+          id: string
+          user_id: string
+          badge_id: string
+          awarded_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          badge_id: string
+          awarded_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          badge_id?: string
+          awarded_at?: string
+        }
+      }
+      nft_awards: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          description: string
+          image_url: string
+          token_id: string
+          blockchain: string
+          contract_address: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          description: string
+          image_url: string
+          token_id: string
+          blockchain: string
+          contract_address: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          description?: string
+          image_url?: string
+          token_id?: string
+          blockchain?: string
+          contract_address?: string
+          created_at?: string
+        }
+      }
+      user_activities: {
+        Row: {
+          id: string
+          user_id: string
+          activity_type: string
+          description: string
+          points: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          activity_type: string
+          description: string
+          points: number
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          activity_type?: string
+          description?: string
+          points?: number
+          created_at?: string
+        }
+      }
+      applicants: {
+        Row: {
+          id: string
+          user_id: string
+          name: string
+          email: string
+          status: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          name: string
+          email: string
+          status: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          name?: string
+          email?: string
+          status?: string
+          created_at?: string
+        }
+      }
     }
-    // You may have other schema elements here
+    Views: {
+      leaderboard_view: {
+        Row: {
+          user_id: string
+          name: string
+          email: string
+          avatar_url: string | null
+          participation_count: number
+          badge_count: number
+          nft_count: number
+          applicant_count: number
+          created_at: string
+        }
+      }
+    }
+    Functions: {
+      get_leaderboard: {
+        Args: {
+          timeframe: string
+          category: string
+          limit_val: number
+          offset_val: number
+          search_term: string
+        }
+        Returns: {
+          user_id: string
+          name: string
+          email: string
+          avatar_url: string | null
+          participation_count: number
+          badge_count: number
+          nft_count: number
+          applicant_count: number
+          rank: number
+          created_at: string
+        }[]
+      }
+    }
   }
 }
