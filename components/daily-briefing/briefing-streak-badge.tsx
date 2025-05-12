@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Badge } from "@/components/ui/badge"
+import { useState, useEffect } from "react"
+import { motion } from "framer-motion"
 import { Flame } from "lucide-react"
-import { createClient } from "@/lib/supabase-clients"
 import { useUser } from "@/context/user-context"
+import { createClient } from "@/lib/supabase-clients"
 
 export function BriefingStreakBadge() {
   const [streak, setStreak] = useState(0)
@@ -21,69 +21,24 @@ export function BriefingStreakBadge() {
       try {
         const supabase = createClient()
 
-        // Get the user's attendance records, ordered by date
+        // This is a placeholder - you would need to implement the actual streak calculation
+        // in your database, possibly via a function like get_user_briefing_streak
         const { data, error } = await supabase
-          .from("briefing_attendance")
-          .select("attended_at")
+          .from("user_briefing_stats")
+          .select("streak")
           .eq("user_id", currentUser.id)
-          .order("attended_at", { ascending: false })
+          .single()
 
         if (error) {
-          console.error("Error fetching attendance:", error)
-          setIsLoading(false)
+          console.error("Error fetching streak:", error)
           return
         }
 
-        if (!data || data.length === 0) {
-          setStreak(0)
-          setIsLoading(false)
-          return
+        if (data) {
+          setStreak(data.streak || 0)
         }
-
-        // Calculate streak
-        let currentStreak = 1
-        const today = new Date()
-        today.setHours(0, 0, 0, 0)
-
-        const yesterday = new Date(today)
-        yesterday.setDate(yesterday.getDate() - 1)
-
-        // Check if the most recent attendance is from today or yesterday
-        const mostRecent = new Date(data[0].attended_at)
-        mostRecent.setHours(0, 0, 0, 0)
-
-        const isToday = mostRecent.getTime() === today.getTime()
-        const isYesterday = mostRecent.getTime() === yesterday.getTime()
-
-        if (!isToday && !isYesterday) {
-          // Streak broken
-          setStreak(0)
-          setIsLoading(false)
-          return
-        }
-
-        // Calculate consecutive days
-        for (let i = 1; i < data.length; i++) {
-          const current = new Date(data[i - 1].attended_at)
-          current.setHours(0, 0, 0, 0)
-
-          const previous = new Date(data[i].attended_at)
-          previous.setHours(0, 0, 0, 0)
-
-          // Check if dates are consecutive
-          const diffTime = Math.abs(current.getTime() - previous.getTime())
-          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-
-          if (diffDays === 1) {
-            currentStreak++
-          } else {
-            break
-          }
-        }
-
-        setStreak(currentStreak)
       } catch (error) {
-        console.error("Error calculating streak:", error)
+        console.error("Exception in fetchStreak:", error)
       } finally {
         setIsLoading(false)
       }
@@ -92,17 +47,49 @@ export function BriefingStreakBadge() {
     fetchStreak()
   }, [currentUser])
 
-  if (isLoading || streak === 0) {
+  if (isLoading || !currentUser || streak === 0) {
     return null
   }
 
+  // Determine badge color based on streak length
+  let badgeColor = "bg-blue-500"
+  if (streak >= 30) {
+    badgeColor = "bg-purple-600"
+  } else if (streak >= 14) {
+    badgeColor = "bg-red-500"
+  } else if (streak >= 7) {
+    badgeColor = "bg-orange-500"
+  }
+
   return (
-    <Badge
-      variant="outline"
-      className="bg-[#FFD700]/20 text-[#FFD700] border-[#FFD700]/50 flex items-center gap-1 px-2 py-1"
+    <motion.div
+      className={`${badgeColor} text-white text-xs font-bold px-2 py-1 rounded-full flex items-center`}
+      initial={{ scale: 0, rotate: -10 }}
+      animate={{ scale: 1, rotate: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 260,
+        damping: 20,
+        delay: 0.5,
+      }}
+      whileHover={{
+        scale: 1.1,
+        transition: { duration: 0.2 },
+      }}
     >
-      <Flame className="h-4 w-4 text-orange-500" />
-      <span>{streak} day streak</span>
-    </Badge>
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+        }}
+        transition={{
+          duration: 1.5,
+          repeat: Number.POSITIVE_INFINITY,
+          repeatType: "loop",
+        }}
+      >
+        <Flame className="h-3 w-3 mr-1 inline" />
+      </motion.div>
+      {streak} day streak
+    </motion.div>
   )
 }
