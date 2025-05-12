@@ -13,9 +13,61 @@ import {
   MapPin,
   Landmark,
   Compass,
+  Flame,
+  MessageSquare,
+  Building2,
+  Castle,
+  Trees,
 } from "lucide-react"
 import Image from "next/image"
 import { useState } from "react"
+import { CategoryLegend } from "@/components/trivia/category-legend"
+
+type Category = {
+  name: string
+  icon: JSX.Element
+  bgColor: string
+  textColor: string
+}
+
+const categories: Record<string, Category> = {
+  sports: {
+    name: "Sports",
+    icon: <Flame className="h-3 w-3" />,
+    bgColor: "bg-red-500",
+    textColor: "text-white",
+  },
+  geography: {
+    name: "Geography",
+    icon: <MapPin className="h-3 w-3" />,
+    bgColor: "bg-purple-500",
+    textColor: "text-white",
+  },
+  landmarks: {
+    name: "Landmarks",
+    icon: <Castle className="h-3 w-3" />,
+    bgColor: "bg-green-500",
+    textColor: "text-white",
+  },
+  culture: {
+    name: "Culture",
+    icon: <MessageSquare className="h-3 w-3" />,
+    bgColor: "bg-blue-500",
+    textColor: "text-white",
+  },
+  urban: {
+    name: "Urban",
+    icon: <Building2 className="h-3 w-3" />,
+    bgColor: "bg-slate-500",
+    textColor: "text-white",
+  },
+  nature: {
+    name: "Nature",
+    icon: <Trees className="h-3 w-3" />,
+    bgColor: "bg-emerald-500",
+    textColor: "text-white",
+  },
+}
 
 const triviaGames = [
   {
@@ -27,6 +79,7 @@ const triviaGames = [
     color: "bg-red-50 border-red-200",
     textColor: "text-red-800",
     hoverColor: "shadow-red-300/50",
+    categories: ["sports"],
   },
   {
     id: "sf-baseball",
@@ -37,6 +90,7 @@ const triviaGames = [
     color: "bg-orange-50 border-orange-200",
     textColor: "text-orange-800",
     hoverColor: "shadow-orange-300/50",
+    categories: ["sports"],
   },
   {
     id: "sf-basketball",
@@ -47,6 +101,7 @@ const triviaGames = [
     color: "bg-blue-50 border-blue-200",
     textColor: "text-blue-800",
     hoverColor: "shadow-blue-300/50",
+    categories: ["sports"],
   },
   {
     id: "sf-districts",
@@ -57,6 +112,7 @@ const triviaGames = [
     color: "bg-purple-50 border-purple-200",
     textColor: "text-purple-800",
     hoverColor: "shadow-purple-300/50",
+    categories: ["geography", "urban"],
   },
   {
     id: "sf-tourist-spots",
@@ -67,6 +123,7 @@ const triviaGames = [
     color: "bg-green-50 border-green-200",
     textColor: "text-green-800",
     hoverColor: "shadow-green-300/50",
+    categories: ["landmarks", "culture"],
   },
   {
     id: "sf-day-trips",
@@ -77,6 +134,7 @@ const triviaGames = [
     color: "bg-amber-50 border-amber-200",
     textColor: "text-amber-800",
     hoverColor: "shadow-amber-300/50",
+    categories: ["geography", "nature", "landmarks"],
   },
 ]
 
@@ -87,9 +145,12 @@ export default function TriviaHubPage() {
     <>
       <ImprovedHeader showOptInForm={() => {}} />
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">San Francisco Trivia Games</h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-4">
+            <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2 md:mb-0">San Francisco Trivia Games</h1>
+            <CategoryLegend />
+          </div>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto text-center">
             Test your knowledge about San Francisco with these fun trivia games hosted by Sgt. Ken. Earn points, badges,
             and climb the leaderboard!
           </p>
@@ -118,6 +179,24 @@ export default function TriviaHubPage() {
                   className={`absolute inset-0 bg-black opacity-0 transition-opacity duration-300
                   ${hoveredCard === game.id ? "opacity-10" : ""}`}
                 ></div>
+
+                {/* Category Badges */}
+                <div className="absolute top-2 right-2 flex flex-wrap justify-end gap-1 max-w-[70%]">
+                  {game.categories.map((categoryId) => {
+                    const category = categories[categoryId]
+                    return (
+                      <div
+                        key={categoryId}
+                        className={`flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${category.bgColor} ${category.textColor} 
+                          shadow-sm transition-transform duration-300 ${hoveredCard === game.id ? "scale-110" : ""}`}
+                        title={`Category: ${category.name}`}
+                      >
+                        {category.icon}
+                        <span>{category.name}</span>
+                      </div>
+                    )
+                  })}
+                </div>
               </div>
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
