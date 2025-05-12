@@ -16,9 +16,9 @@ export default function Error({
     console.error("Application error:", error)
   }, [error])
 
-  // Don't show errors for redirects
+  // Check if the error is a redirect error, which we can safely ignore
   if (error.message === "NEXT_REDIRECT" || error.message.includes("Redirect")) {
-    return null
+    return null // Don't show an error for redirects
   }
 
   return (

@@ -16,8 +16,9 @@ export default function GlobalError({
     console.error("Global error:", error)
   }, [error])
 
-  // Handle redirects silently
+  // Check if the error is a redirect error, which we can safely ignore
   if (error.message === "NEXT_REDIRECT" || error.message.includes("Redirect")) {
+    // For redirects in global error, we need to provide a minimal UI
     return (
       <html lang="en">
         <body>
