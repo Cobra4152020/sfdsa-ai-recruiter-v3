@@ -63,37 +63,53 @@ export async function reportPerformanceMetric(metric: PerformanceMetric): Promis
     const controller = new AbortController()
     const timeoutId = setTimeout(() => controller.abort(), 3000) // 3 second timeout
 
-    const response = await fetch("/api/performance/report", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(metric),
-      // Use keepalive to ensure the request completes even if the page is unloading
-      keepalive: true,
-      signal: controller.signal,
-    })
+    try {
+      const response = await fetch("/api/performance/report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(metric),
+        // Use keepalive to ensure the request completes even if the page is unloading
+        keepalive: true,
+        signal: controller.signal,
+      })
 
-    clearTimeout(timeoutId)
+      clearTimeout(timeoutId)
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.warn(`Performance metric reporting failed (${response.status}): ${errorText}`)
+      if (!response.ok) {
+        const errorText = await response.text()
+        // Don't log RLS errors as they're expected with anonymous users
+        if (!errorText.includes("violates row-level security policy")) {
+          console.warn(`Performance metric reporting failed (${response.status}): ${errorText}`)
+        }
+        // Still log the metric to console as fallback
+        logMetricToConsole(metric)
+      }
+    } catch (fetchError) {
+      // Don't log AbortError as it's expected when the request times out
+      if (fetchError instanceof Error && fetchError.name !== "AbortError") {
+        console.warn("Error reporting performance metric:", fetchError)
+      }
+      // Log the metric to console as fallback
+      logMetricToConsole(metric)
     }
   } catch (error) {
-    // Don't log AbortError as it's expected when the request times out
-    if (error instanceof Error && error.name !== "AbortError") {
-      console.warn("Error reporting performance metric:", error)
-    }
-
+    // Catch any other errors that might occur
+    console.warn("Unexpected error in performance monitoring:", error)
     // Log the metric to console as fallback
-    console.log("Performance metric (fallback):", {
-      name: metric.name,
-      value: metric.value,
-      rating: metric.rating,
-      path: metric.path,
-    })
+    logMetricToConsole(metric)
   }
+}
+
+// Helper function to log metrics to console
+function logMetricToConsole(metric: PerformanceMetric): void {
+  console.log("Performance metric (fallback):", {
+    name: metric.name,
+    value: metric.value,
+    rating: metric.rating,
+    path: metric.path,
+  })
 }
 
 // Function to track custom performance metrics
