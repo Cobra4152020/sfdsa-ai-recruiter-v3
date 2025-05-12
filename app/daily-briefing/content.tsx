@@ -12,7 +12,7 @@ import { useSearchParams } from "next/navigation"
 
 export function DailyBriefingContent() {
   const searchParams = useSearchParams()
-  const dateParam = searchParams.get("date")
+  const dateParam = searchParams?.get("date")
 
   const [briefing, setBriefing] = useState<DailyBriefing | null>(null)
   const [stats, setStats] = useState({
