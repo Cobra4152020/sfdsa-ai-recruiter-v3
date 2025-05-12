@@ -1,12 +1,19 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
 import { SetupLoggingButton } from "@/components/admin/setup-logging-button"
 
 export default function SetupLoggingPage() {
+  const handleShowOptInForm = () => {
+    // This is an empty function since this admin page doesn't need the opt-in form
+    // But we need to provide a function to satisfy the component props
+  }
+
   return (
     <>
-      <ImprovedHeader showOptInForm={() => {}} />
+      <ImprovedHeader showOptInForm={handleShowOptInForm} />
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Setup Logging System</h1>
 
