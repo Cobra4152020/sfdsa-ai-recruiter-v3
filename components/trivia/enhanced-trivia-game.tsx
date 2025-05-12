@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useUser } from "@/context/user-context"
 import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent } from "@/components/ui/card"
@@ -26,6 +26,8 @@ import {
   ImageIcon,
   Volume2,
   VolumeX,
+  Info,
+  WifiOff,
 } from "lucide-react"
 import confetti from "canvas-confetti"
 import Image from "next/image"
@@ -96,9 +98,15 @@ export function EnhancedTriviaGame({
   const [imageLoadError, setImageLoadError] = useState<Record<number, boolean>>({})
   const [showFeedback, setShowFeedback] = useState(false)
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false)
-  // Add these with the other state variables
   const [volume, setVolume] = useState<number>(0.7) // Default volume: 70%
   const [isMuted, setIsMuted] = useState<boolean>(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
+  const [correctAnswers, setCorrectAnswers] = useState(0)
+  const [retryCount, setRetryCount] = useState(0)
+  const [isOnline, setIsOnline] = useState<boolean>(true)
+  const [showNetworkError, setShowNetworkError] = useState<boolean>(false)
+  const [questionSource, setQuestionSource] = useState<string>("loading")
+  const [requestId, setRequestId] = useState<string | null>(null)
 
   // Create refs for audio elements
   const correctAudioRef = useRef<HTMLAudioElement | null>(null)
@@ -106,11 +114,43 @@ export function EnhancedTriviaGame({
 
   const sharePromptShown = useRef(false)
   const imageRetries = useRef<Record<number, number>>({})
-  const [fetchError, setFetchError] = useState<string | null>(null)
-  const [correctAnswers, setCorrectAnswers] = useState(0)
+  const abortControllerRef = useRef<AbortController | null>(null)
+  const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const { currentUser, isLoggedIn } = useUser()
   const { toast } = useToast()
+
+  // Network status monitoring
+  useEffect(() => {
+    const handleOnline = () => {
+      setIsOnline(true)
+      toast({
+        title: "You're back online!",
+        description: "Reconnected to the network. Game functionality restored.",
+        variant: "default",
+      })
+    }
+
+    const handleOffline = () => {
+      setIsOnline(false)
+      toast({
+        title: "You're offline",
+        description: "Some game features may be limited until you reconnect.",
+        variant: "destructive",
+      })
+    }
+
+    window.addEventListener("online", handleOnline)
+    window.addEventListener("offline", handleOffline)
+
+    // Set initial online status
+    setIsOnline(navigator.onLine)
+
+    return () => {
+      window.removeEventListener("online", handleOnline)
+      window.removeEventListener("offline", handleOffline)
+    }
+  }, [toast])
 
   // Initialize audio elements
   useEffect(() => {
@@ -133,6 +173,16 @@ export function EnhancedTriviaGame({
   // Fetch trivia questions
   useEffect(() => {
     fetchQuestions()
+
+    // Cleanup function to abort any in-progress fetches when component unmounts
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+      if (fetchTimeoutRef.current) {
+        clearTimeout(fetchTimeoutRef.current)
+      }
+    }
   }, [])
 
   // Timer logic
@@ -179,7 +229,6 @@ export function EnhancedTriviaGame({
     return () => clearTimeout(timer)
   }, [showFeedback])
 
-  // Add to the top of the component, after other useEffects
   // Initialize volume from localStorage and set up event listeners
   useEffect(() => {
     // Load volume settings from localStorage
@@ -230,14 +279,56 @@ export function EnhancedTriviaGame({
     }
   }
 
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
+    // Reset state for a new fetch
     setIsLoading(true)
     setFetchError(null)
+    setShowNetworkError(false)
+
+    // Cancel any previous fetch
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+
+    // Clear any existing timeout
+    if (fetchTimeoutRef.current) {
+      clearTimeout(fetchTimeoutRef.current)
+    }
+
+    // Create a new abort controller for this fetch
+    abortControllerRef.current = new AbortController()
+
+    // Set a timeout for the fetch operation
+    const fetchTimeout = setTimeout(() => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+        setFetchError(`Request timed out after 10 seconds. Please check your connection and try again.`)
+        setIsLoading(false)
+      }
+    }, 10000)
+
+    fetchTimeoutRef.current = fetchTimeout
 
     try {
+      // Check if we're online before attempting to fetch
+      if (!navigator.onLine) {
+        throw new Error("You appear to be offline. Please check your internet connection and try again.")
+      }
+
       // Add cache busting parameter to avoid cached responses
       const cacheBuster = new Date().getTime()
-      const response = await fetch(`${fetchQuestionsEndpoint}?count=5&gameId=${gameId}&_=${cacheBuster}`)
+      const response = await fetch(`${fetchQuestionsEndpoint}?count=5&gameId=${gameId}&_=${cacheBuster}`, {
+        signal: abortControllerRef.current.signal,
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          Pragma: "no-cache",
+          Expires: "0",
+        },
+      })
+
+      // Clear the timeout since we got a response
+      clearTimeout(fetchTimeout)
+      fetchTimeoutRef.current = null
 
       if (!response.ok) {
         throw new Error(`API returned status: ${response.status}`)
@@ -245,24 +336,70 @@ export function EnhancedTriviaGame({
 
       const data = await response.json()
 
-      if (data.questions && data.questions.length > 0) {
-        // Pre-load images to avoid loading delays during gameplay
-        data.questions.forEach((question: TriviaQuestion) => {
-          if (question.imageUrl && !question.imageUrl.startsWith("data:")) {
-            const img = new Image()
-            img.src = question.imageUrl
-            img.crossOrigin = "anonymous"
-          }
-        })
-
-        setQuestions(data.questions)
-      } else {
-        console.warn(`No questions returned from API for ${gameId}, using fallback questions`)
-        setFetchError(`Unable to load ${gameName} questions. Please try again later.`)
+      if (data.error) {
+        throw new Error(data.error)
       }
+
+      if (!data.questions || data.questions.length === 0) {
+        throw new Error(`No questions returned for ${gameName}`)
+      }
+
+      // Store the request ID and source for diagnostics
+      setRequestId(data.requestId || null)
+      setQuestionSource(data.source || "unknown")
+
+      // Pre-load images to avoid loading delays during gameplay
+      data.questions.forEach((question: TriviaQuestion) => {
+        if (question.imageUrl && !question.imageUrl.startsWith("data:")) {
+          const img = new Image()
+          img.src = question.imageUrl
+          img.crossOrigin = "anonymous"
+        }
+      })
+
+      setQuestions(data.questions)
+      console.log(`Loaded ${data.questions.length} questions for ${gameId} from ${data.source}`)
+
+      // Reset retry count on successful fetch
+      setRetryCount(0)
+
+      // Track successful question load
+      trackEngagement("trivia_questions_loaded", {
+        gameId,
+        source: data.source,
+        questionCount: data.questions.length,
+        requestId: data.requestId,
+      })
     } catch (error) {
+      // Clear the timeout if there was an error
+      clearTimeout(fetchTimeout)
+      fetchTimeoutRef.current = null
+
+      // Handle abort errors differently
+      if (error.name === "AbortError") {
+        setFetchError("Request was cancelled. Please try again.")
+        return
+      }
+
+      // Check if it's a network error
+      if (!navigator.onLine || error.message.includes("offline") || error.message.includes("network")) {
+        setShowNetworkError(true)
+      }
+
+      // Safely handle the error without destructuring
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
       console.error(`Error fetching ${gameId} trivia questions:`, error)
-      setFetchError(`We're having trouble loading ${gameName} questions. Please try again later.`)
+      setFetchError(`We're having trouble loading ${gameName} questions. ${errorMessage}`)
+
+      // Increment retry count
+      setRetryCount((prev) => prev + 1)
+
+      // Track failed question load
+      trackEngagement("trivia_questions_error", {
+        gameId,
+        error: errorMessage,
+        retryCount: retryCount + 1,
+      })
 
       toast({
         title: "Error loading questions",
@@ -271,9 +408,12 @@ export function EnhancedTriviaGame({
       })
     } finally {
       setIsLoading(false)
-      setIsTimerRunning(true)
+      setIsTimerRunning(questions.length > 0)
+
+      // Clear the abort controller reference
+      abortControllerRef.current = null
     }
-  }
+  }, [fetchQuestionsEndpoint, gameId, gameName, questions.length, retryCount, toast])
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (!isAnswerSubmitted) {
@@ -297,7 +437,7 @@ export function EnhancedTriviaGame({
     setIsCorrectAnswer(isCorrect)
     setShowFeedback(true)
 
-    // Replace the existing audio play code in handleAnswerSubmit
+    // Play sound effects
     if (isCorrect) {
       if (correctAudioRef.current) {
         correctAudioRef.current.volume = isMuted ? 0 : volume
@@ -331,6 +471,7 @@ export function EnhancedTriviaGame({
       isCorrect,
       timeSpent: 30 - timeLeft,
       difficulty: currentQuestion.difficulty,
+      requestId,
     })
 
     // If this is the last question, end the game
@@ -349,6 +490,7 @@ export function EnhancedTriviaGame({
               totalQuestions: questions.length,
               correctAnswers: isCorrect ? correctAnswers + 1 : correctAnswers,
               timeSpent: questions.length * 30 - timeLeft,
+              requestId,
             }),
           })
 
@@ -486,6 +628,7 @@ export function EnhancedTriviaGame({
           gameId: gameId,
           platform,
           questionId: currentQuestion,
+          requestId,
         }),
       })
 
@@ -666,16 +809,40 @@ export function EnhancedTriviaGame({
           </h2>
 
           {fetchError && (
-            <div className="mb-4 p-4 bg-amber-50 border border-amber-200 rounded-md text-amber-800">
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-md text-amber-800">
               <AlertCircle className="h-5 w-5 inline-block mr-2" />
               {fetchError}
             </div>
           )}
 
-          <Button onClick={fetchQuestions} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-            <RefreshCw className="h-4 w-4 mr-2" />
-            {fetchError ? "Try Again" : "Retry Loading Questions"}
+          {showNetworkError && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-800">
+              <WifiOff className="h-5 w-5 inline-block mr-2" />
+              <p className="font-medium">Network connection issue detected</p>
+              <p className="text-sm mt-1">Please check your internet connection and try again.</p>
+            </div>
+          )}
+
+          <Button onClick={fetchQuestions} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
+            {isLoading ? (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                Loading...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                {fetchError ? "Try Again" : "Retry Loading Questions"}
+              </>
+            )}
           </Button>
+
+          {retryCount > 2 && (
+            <div className="mt-4 text-sm text-gray-600">
+              <Info className="h-4 w-4 inline-block mr-1" />
+              Still having trouble? Try refreshing the page or coming back later.
+            </div>
+          )}
         </CardContent>
       </Card>
     )
@@ -715,7 +882,6 @@ export function EnhancedTriviaGame({
             </div>
           </div>
 
-          {/* Add this after the Timer section in the Card component */}
           {/* Volume Control */}
           <div className="mb-4 flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg">
             <button
@@ -891,6 +1057,15 @@ export function EnhancedTriviaGame({
               Restart
             </Button>
           </div>
+
+          {/* Question source indicator (for debugging) */}
+          {process.env.NODE_ENV !== "production" && (
+            <div className="mt-4 text-xs text-gray-400 flex items-center">
+              <Info className="h-3 w-3 mr-1" />
+              Source: {questionSource}
+              {requestId && <span className="ml-1">| ID: {requestId.substring(0, 8)}</span>}
+            </div>
+          )}
         </CardContent>
       </Card>
 
