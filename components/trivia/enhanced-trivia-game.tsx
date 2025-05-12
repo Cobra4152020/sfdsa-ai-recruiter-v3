@@ -24,6 +24,8 @@ import {
   Linkedin,
   Mail,
   ImageIcon,
+  Volume2,
+  VolumeX,
 } from "lucide-react"
 import confetti from "canvas-confetti"
 import Image from "next/image"
@@ -94,6 +96,9 @@ export function EnhancedTriviaGame({
   const [imageLoadError, setImageLoadError] = useState<Record<number, boolean>>({})
   const [showFeedback, setShowFeedback] = useState(false)
   const [isCorrectAnswer, setIsCorrectAnswer] = useState(false)
+  // Add these with the other state variables
+  const [volume, setVolume] = useState<number>(0.7) // Default volume: 70%
+  const [isMuted, setIsMuted] = useState<boolean>(false)
 
   // Create refs for audio elements
   const correctAudioRef = useRef<HTMLAudioElement | null>(null)
@@ -174,6 +179,57 @@ export function EnhancedTriviaGame({
     return () => clearTimeout(timer)
   }, [showFeedback])
 
+  // Add to the top of the component, after other useEffects
+  // Initialize volume from localStorage and set up event listeners
+  useEffect(() => {
+    // Load volume settings from localStorage
+    const savedVolume = localStorage.getItem("triviaGameVolume")
+    const savedMuted = localStorage.getItem("triviaGameMuted")
+
+    if (savedVolume !== null) {
+      setVolume(Number.parseFloat(savedVolume))
+    }
+
+    if (savedMuted !== null) {
+      setIsMuted(savedMuted === "true")
+    }
+
+    // Apply initial volume settings to audio elements
+    if (correctAudioRef.current) {
+      correctAudioRef.current.volume = isMuted ? 0 : volume
+    }
+    if (wrongAudioRef.current) {
+      wrongAudioRef.current.volume = isMuted ? 0 : volume
+    }
+  }, [])
+
+  const handleVolumeChange = (newVolume: number) => {
+    setVolume(newVolume)
+    localStorage.setItem("triviaGameVolume", newVolume.toString())
+
+    // Apply volume to audio elements
+    if (correctAudioRef.current) {
+      correctAudioRef.current.volume = isMuted ? 0 : newVolume
+    }
+    if (wrongAudioRef.current) {
+      wrongAudioRef.current.volume = isMuted ? 0 : newVolume
+    }
+  }
+
+  const toggleMute = () => {
+    const newMuted = !isMuted
+    setIsMuted(newMuted)
+    localStorage.setItem("triviaGameMuted", newMuted.toString())
+
+    // Apply mute state to audio elements
+    if (correctAudioRef.current) {
+      correctAudioRef.current.volume = newMuted ? 0 : volume
+    }
+    if (wrongAudioRef.current) {
+      wrongAudioRef.current.volume = newMuted ? 0 : volume
+    }
+  }
+
   const fetchQuestions = async () => {
     setIsLoading(true)
     setFetchError(null)
@@ -241,13 +297,15 @@ export function EnhancedTriviaGame({
     setIsCorrectAnswer(isCorrect)
     setShowFeedback(true)
 
-    // Play appropriate sound
+    // Replace the existing audio play code in handleAnswerSubmit
     if (isCorrect) {
       if (correctAudioRef.current) {
+        correctAudioRef.current.volume = isMuted ? 0 : volume
         correctAudioRef.current.currentTime = 0
         correctAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
       }
 
+      // Rest of the isCorrect code remains the same
       setScore((prev) => prev + 1)
       setCorrectAnswers((prev) => prev + 1)
 
@@ -260,6 +318,7 @@ export function EnhancedTriviaGame({
       })
     } else {
       if (wrongAudioRef.current) {
+        wrongAudioRef.current.volume = isMuted ? 0 : volume
         wrongAudioRef.current.currentTime = 0
         wrongAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
       }
@@ -627,8 +686,8 @@ export function EnhancedTriviaGame({
   return (
     <>
       {/* Hidden audio elements for sounds */}
-      <audio ref={correctAudioRef} src="/sounds/correct-answer.mp3" preload="auto" />
-      <audio ref={wrongAudioRef} src="/sounds/wrong-answer.mp3" preload="auto" />
+      <audio ref={correctAudioRef} src="/sounds/correct-answer.mp3" preload="auto" volume={isMuted ? 0 : volume} />
+      <audio ref={wrongAudioRef} src="/sounds/wrong-answer.mp3" preload="auto" volume={isMuted ? 0 : volume} />
 
       <Card className="shadow-md">
         <CardContent className="p-6">
@@ -654,6 +713,42 @@ export function EnhancedTriviaGame({
               <Clock className="h-4 w-4" />
               <span className="font-mono">{timeLeft}s</span>
             </div>
+          </div>
+
+          {/* Add this after the Timer section in the Card component */}
+          {/* Volume Control */}
+          <div className="mb-4 flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg">
+            <button
+              onClick={toggleMute}
+              className="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              aria-label={isMuted ? "Unmute sound effects" : "Mute sound effects"}
+            >
+              {isMuted ? (
+                <VolumeX className="h-5 w-5 text-gray-500" />
+              ) : (
+                <Volume2 className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+              )}
+            </button>
+
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              value={volume}
+              onChange={(e) => handleVolumeChange(Number.parseFloat(e.target.value))}
+              className="w-24 h-2 bg-gray-300 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"
+              aria-label="Volume control"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(volume * 100)}
+              aria-valuetext={`Volume ${Math.round(volume * 100)}%`}
+              disabled={isMuted}
+            />
+
+            <span className="text-xs text-gray-500 dark:text-gray-400 min-w-[40px]">
+              {isMuted ? "Muted" : `${Math.round(volume * 100)}%`}
+            </span>
           </div>
 
           {/* Question Image with Feedback Overlay */}
