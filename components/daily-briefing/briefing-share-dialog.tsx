@@ -19,8 +19,8 @@ export function BriefingShareDialog({
   isOpen,
   onClose,
   onShare,
-  briefing,
-  sharedPlatforms,
+  briefing = {} as DailyBriefing, // Add default empty object
+  sharedPlatforms = [], // Add default empty array here
   isSharing,
 }: BriefingShareDialogProps) {
   const handleShare = async (platform: string) => {
@@ -87,7 +87,7 @@ export function BriefingShareDialog({
           <div className="grid grid-cols-1 gap-3">
             <AnimatePresence>
               {platforms.map((platform, index) => {
-                const isShared = sharedPlatforms.includes(platform.id)
+                const isShared = sharedPlatforms?.includes(platform.id)
                 const Icon = platform.icon
 
                 return (
