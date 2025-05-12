@@ -69,11 +69,15 @@ export function BriefingCard({ briefing, stats, onShare }: BriefingCardProps) {
         <h2 className="text-xl font-semibold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">{briefing.title}</h2>
 
         <div className="prose dark:prose-invert max-w-none">
-          {briefing.content.split("\n\n").map((paragraph, index) => (
-            <p key={index} className="mb-4">
-              {paragraph}
-            </p>
-          ))}
+          {briefing.content ? (
+            briefing.content.split("\n\n").map((paragraph, index) => (
+              <p key={index} className="mb-4">
+                {paragraph}
+              </p>
+            ))
+          ) : (
+            <p className="mb-4">No content available for today's briefing.</p>
+          )}
         </div>
 
         {shareError && (
