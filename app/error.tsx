@@ -16,11 +16,6 @@ export default function Error({
     console.error("Application error:", error)
   }, [error])
 
-  // Check if the error is a redirect error, which we can safely ignore
-  if (error.message === "NEXT_REDIRECT" || error.message.includes("Redirect")) {
-    return null // Don't show an error for redirects
-  }
-
   return (
     <div className="container flex flex-col items-center justify-center min-h-[calc(100vh-8rem)] py-8 text-center">
       <div className="flex items-center justify-center w-16 h-16 rounded-full bg-red-100 mb-6">
