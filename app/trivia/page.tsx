@@ -1,127 +1,179 @@
 "use client"
-
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import Link from "next/link"
 import Image from "next/image"
-import { Loader2 } from "lucide-react"
+import { ImprovedHeader } from "@/components/improved-header"
+import { ImprovedFooter } from "@/components/improved-footer"
+import { Card, CardContent } from "@/components/ui/card"
+import { Trophy, MapPin, Landmark, Building } from "lucide-react"
 
-interface TriviaGame {
-  id: string
-  name: string
-  description: string
-  image_url?: string
-  question_count: number
-}
-
-export default function TriviaGamesPage() {
-  const [games, setGames] = useState<TriviaGame[]>([])
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
-
-  useEffect(() => {
-    const fetchGames = async () => {
-      try {
-        // In a real app, this would be an API call to fetch games
-        // For demo purposes, we'll use sample data
-        const sampleGames: TriviaGame[] = [
-          {
-            id: "sf-baseball",
-            name: "SF Baseball Trivia",
-            description: "Test your knowledge of San Francisco baseball history and the Giants!",
-            question_count: 100,
-          },
-          {
-            id: "sf-basketball",
-            name: "SF Basketball Trivia",
-            description: "How much do you know about the Golden State Warriors?",
-            question_count: 100,
-          },
-          {
-            id: "sf-day-trips",
-            name: "SF Day Trips",
-            description: "Explore the best day trips from San Francisco!",
-            question_count: 100,
-          },
-          {
-            id: "sf-districts",
-            name: "SF Districts",
-            description: "Test your knowledge of San Francisco neighborhoods and districts!",
-            question_count: 100,
-          },
-          {
-            id: "sf-football",
-            name: "SF Football Trivia",
-            description: "How much do you know about the 49ers?",
-            question_count: 120,
-          },
-          {
-            id: "sf-tourist-spots",
-            name: "SF Tourist Spots",
-            description: "Test your knowledge of San Francisco's most famous attractions!",
-            question_count: 100,
-          },
-        ]
-
-        setGames(sampleGames)
-      } catch (error) {
-        console.error("Error fetching games:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchGames()
-  }, [])
-
-  const playGame = (gameId: string) => {
-    router.push(`/trivia/${gameId}/kahoot`)
-  }
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
-        <Loader2 className="h-12 w-12 animate-spin mb-4 text-purple-600" />
-        <p className="text-xl">Loading trivia games...</p>
-      </div>
-    )
-  }
-
+export default function TriviaMainPage() {
   return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-8 text-center">San Francisco Trivia Games</h1>
-      <p className="text-center mb-8 text-gray-600">Choose a game category to play in Kahoot-style mode!</p>
+    <>
+      <ImprovedHeader showOptInForm={() => {}} />
+      <main className="container mx-auto px-4 py-8">
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">San Francisco Trivia Games</h1>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            Test your knowledge about San Francisco with our collection of trivia games. Earn badges and compete on the
+            leaderboard!
+          </p>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {games.map((game) => (
-          <Card key={game.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {/* SF Football Trivia */}
+          <Card className="overflow-hidden hover:shadow-lg transition-shadow">
             <div className="relative h-48">
               <Image
-                src={
-                  game.image_url ||
-                  `/placeholder.svg?height=300&width=500&query=San Francisco ${game.id.replace("sf-", "")}`
-                }
-                alt={game.name}
+                src="/levis-stadium-49ers.png"
+                alt="Levi's Stadium - Home of the 49ers"
                 fill
                 className="object-cover"
               />
             </div>
-            <CardHeader>
-              <CardTitle>{game.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-600">{game.description}</p>
-              <p className="mt-2 text-sm text-gray-500">{game.question_count} questions</p>
-            </CardContent>
-            <CardFooter>
-              <Button onClick={() => playGame(game.id)} className="w-full bg-purple-600 hover:bg-purple-700">
+            <CardContent className="p-6">
+              <div className="flex items-center mb-2">
+                <Trophy className="h-5 w-5 text-[#0A3C1F] mr-2" />
+                <h2 className="text-xl font-bold text-[#0A3C1F]">SF Football Trivia</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Test your knowledge about San Francisco football history and the 49ers.
+              </p>
+              <Link
+                href="/trivia/sf-football"
+                className="inline-block bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white py-2 px-4 rounded-md transition-colors"
+              >
                 Play Now
-              </Button>
-            </CardFooter>
+              </Link>
+            </CardContent>
           </Card>
-        ))}
-      </div>
-    </div>
+
+          {/* SF Baseball Trivia */}
+          <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="relative h-48">
+              <Image
+                src="/oracle-park-giants.png"
+                alt="Oracle Park - Home of the SF Giants"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <CardContent className="p-6">
+              <div className="flex items-center mb-2">
+                <Trophy className="h-5 w-5 text-[#0A3C1F] mr-2" />
+                <h2 className="text-xl font-bold text-[#0A3C1F]">SF Baseball Trivia</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                How much do you know about the San Francisco Giants and baseball in the Bay Area?
+              </p>
+              <Link
+                href="/trivia/sf-baseball"
+                className="inline-block bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white py-2 px-4 rounded-md transition-colors"
+              >
+                Play Now
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* SF Basketball Trivia */}
+          <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="relative h-48">
+              <Image
+                src="/chase-center-gsw.png"
+                alt="Chase Center - Home of the Golden State Warriors"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <CardContent className="p-6">
+              <div className="flex items-center mb-2">
+                <Trophy className="h-5 w-5 text-[#0A3C1F] mr-2" />
+                <h2 className="text-xl font-bold text-[#0A3C1F]">SF Basketball Trivia</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Challenge yourself with questions about the Golden State Warriors and basketball in San Francisco.
+              </p>
+              <Link
+                href="/trivia/sf-basketball"
+                className="inline-block bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white py-2 px-4 rounded-md transition-colors"
+              >
+                Play Now
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* SF Districts Trivia */}
+          <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="relative h-48">
+              <Image src="/san-francisco-cityscape.png" alt="San Francisco Cityscape" fill className="object-cover" />
+            </div>
+            <CardContent className="p-6">
+              <div className="flex items-center mb-2">
+                <Building className="h-5 w-5 text-[#0A3C1F] mr-2" />
+                <h2 className="text-xl font-bold text-[#0A3C1F]">SF District Trivia</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Test your knowledge of San Francisco's unique and diverse neighborhoods and districts.
+              </p>
+              <Link
+                href="/trivia/sf-districts"
+                className="inline-block bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white py-2 px-4 rounded-md transition-colors"
+              >
+                Play Now
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* SF Tourist Spots Trivia */}
+          <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="relative h-48">
+              <Image src="/golden-gate-bridge.png" alt="Golden Gate Bridge" fill className="object-cover" />
+            </div>
+            <CardContent className="p-6">
+              <div className="flex items-center mb-2">
+                <Landmark className="h-5 w-5 text-[#0A3C1F] mr-2" />
+                <h2 className="text-xl font-bold text-[#0A3C1F]">SF Tourist Spots Trivia</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                How well do you know San Francisco's famous landmarks and tourist attractions?
+              </p>
+              <Link
+                href="/trivia/sf-tourist-spots"
+                className="inline-block bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white py-2 px-4 rounded-md transition-colors"
+              >
+                Play Now
+              </Link>
+            </CardContent>
+          </Card>
+
+          {/* SF Day Trips Trivia */}
+          <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="relative h-48">
+              <Image
+                src="/lombard-street-crooked.png"
+                alt="Lombard Street - The Crooked Street"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <CardContent className="p-6">
+              <div className="flex items-center mb-2">
+                <MapPin className="h-5 w-5 text-[#0A3C1F] mr-2" />
+                <h2 className="text-xl font-bold text-[#0A3C1F]">SF Best Places to Visit</h2>
+              </div>
+              <p className="text-gray-600 mb-4">
+                Test your knowledge about the best day trips and places to visit around San Francisco.
+              </p>
+              <Link
+                href="/trivia/sf-day-trips"
+                className="inline-block bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white py-2 px-4 rounded-md transition-colors"
+              >
+                Play Now
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </main>
+      <ImprovedFooter />
+    </>
   )
 }

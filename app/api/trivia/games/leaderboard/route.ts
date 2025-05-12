@@ -1,109 +1,68 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase-server"
 
-export async function GET(req: Request) {
+export async function GET(request: NextRequest) {
   try {
-    const url = new URL(req.url)
-    const gameId = url.searchParams.get("gameId") || "sf-football"
+    const searchParams = request.nextUrl.searchParams
+    const gameId = searchParams.get("gameId") || ""
+    const limit = Number.parseInt(searchParams.get("limit") || "10", 10)
 
-    const supabase = getServiceSupabase()
-
-    // Query to get leaderboard data for a specific game
-    const { data, error } = await supabase
-      .from("users")
-      .select(`
-        id,
-        name,
-        avatar_url,
-        trivia_attempts:trivia_attempts(
-          id,
-          score,
-          total_questions,
-          correct_answers,
-          time_spent,
-          created_at
-        )
-      `)
-      .eq("trivia_attempts.game_id", gameId)
-      .limit(10)
-
-    if (error) {
-      throw error
+    if (!gameId) {
+      return NextResponse.json({ error: "Missing gameId parameter" }, { status: 400 })
     }
 
-    // Process the data to match the expected format
-    const leaderboard = data.map((user) => {
-      const attempts = user.trivia_attempts || []
-      const attemptsCount = attempts.length
-      const totalCorrectAnswers = attempts.reduce((sum, attempt) => sum + (attempt.correct_answers || attempt.score), 0)
-      const totalQuestions = attempts.reduce((sum, attempt) => sum + attempt.total_questions, 0)
-      const accuracyPercent = totalQuestions > 0 ? (totalCorrectAnswers / totalQuestions) * 100 : 0
-      const perfectGames = attempts.filter((attempt) => attempt.score === attempt.total_questions).length
-      const lastAttemptAt =
-        attempts.length > 0
-          ? attempts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
-          : null
+    // Create Supabase client
+    const supabase = createClient()
 
-      return {
-        user_id: user.id,
-        name: user.name,
-        avatar_url: user.avatar_url,
-        attempts_count: attemptsCount,
-        total_correct_answers: totalCorrectAnswers,
-        total_questions: totalQuestions,
-        accuracy_percent: Number.parseFloat(accuracyPercent.toFixed(1)),
-        perfect_games: perfectGames,
-        last_attempt_at: lastAttemptAt,
-      }
-    })
+    // Get top scores for this game
+    const { data: leaderboardData, error: leaderboardError } = await supabase
+      .from("trivia_attempts")
+      .select(`
+        id,
+        score,
+        correct_answers,
+        total_questions,
+        created_at,
+        users (
+          id,
+          username,
+          display_name,
+          avatar_url
+        )
+      `)
+      .eq("game_id", gameId)
+      .order("score", { ascending: false })
+      .order("created_at", { ascending: false })
+      .limit(limit)
 
-    // Sort by total correct answers descending
-    leaderboard.sort((a, b) => b.total_correct_answers - a.total_correct_answers)
+    if (leaderboardError) {
+      console.error("Error fetching trivia leaderboard:", leaderboardError)
+      return NextResponse.json(
+        { error: "Failed to fetch leaderboard", details: leaderboardError.message },
+        { status: 500 },
+      )
+    }
 
-    return NextResponse.json({ leaderboard: leaderboard || [] })
+    // Format the leaderboard data
+    const formattedLeaderboard = leaderboardData.map((entry) => ({
+      id: entry.id,
+      userId: entry.users?.id,
+      username: entry.users?.username || "Anonymous Player",
+      displayName: entry.users?.display_name || entry.users?.username || "Anonymous Player",
+      avatarUrl: entry.users?.avatar_url || null,
+      score: entry.score,
+      correctAnswers: entry.correct_answers,
+      totalQuestions: entry.total_questions,
+      accuracy: entry.total_questions > 0 ? (entry.correct_answers / entry.total_questions) * 100 : 0,
+      date: entry.created_at,
+    }))
+
+    return NextResponse.json({ leaderboard: formattedLeaderboard })
   } catch (error) {
-    console.error("Error fetching trivia leaderboard:", error)
-
-    // Generate mock data as fallback
-    const mockLeaderboard = getMockLeaderboard()
-
-    return NextResponse.json({
-      leaderboard: mockLeaderboard,
-      isMock: true,
-    })
+    console.error("Unexpected error in trivia leaderboard API:", error)
+    return NextResponse.json(
+      { error: "An unexpected error occurred", details: error instanceof Error ? error.message : String(error) },
+      { status: 500 },
+    )
   }
-}
-
-function getMockLeaderboard() {
-  const names = [
-    "John Smith",
-    "Maria Garcia",
-    "James Johnson",
-    "David Williams",
-    "Sarah Brown",
-    "Michael Jones",
-    "Jessica Miller",
-    "Robert Davis",
-    "Jennifer Wilson",
-    "Thomas Moore",
-  ]
-
-  return names
-    .map((name, index) => {
-      const totalQuestions = Math.floor(Math.random() * 50) + 10
-      const correctAnswers = Math.floor(Math.random() * totalQuestions)
-
-      return {
-        user_id: `mock-${index}`,
-        name,
-        avatar_url: `/placeholder.svg?height=40&width=40&query=avatar ${index + 1}`,
-        attempts_count: Math.floor(Math.random() * 20) + 1,
-        total_correct_answers: correctAnswers,
-        total_questions: totalQuestions,
-        accuracy_percent: Number.parseFloat(((correctAnswers / totalQuestions) * 100).toFixed(1)),
-        perfect_games: Math.floor(Math.random() * 3),
-        last_attempt_at: new Date().toISOString(),
-      }
-    })
-    .sort((a, b) => b.total_correct_answers - a.total_correct_answers)
 }

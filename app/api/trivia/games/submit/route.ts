@@ -1,83 +1,50 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { type NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase-server"
 
-// Badge types for each game
-const gameBadgeTypes = {
-  "sf-football": {
-    participant: "sf-football-participant",
-    enthusiast: "sf-football-enthusiast",
-    master: "sf-football-master",
-  },
-  "sf-baseball": {
-    participant: "sf-baseball-participant",
-    enthusiast: "sf-baseball-enthusiast",
-    master: "sf-baseball-master",
-  },
-  "sf-basketball": {
-    participant: "sf-basketball-participant",
-    enthusiast: "sf-basketball-enthusiast",
-    master: "sf-basketball-master",
-  },
-  "sf-districts": {
-    participant: "sf-districts-participant",
-    enthusiast: "sf-districts-enthusiast",
-    master: "sf-districts-master",
-  },
-  "sf-tourist-spots": {
-    participant: "sf-tourist-spots-participant",
-    enthusiast: "sf-tourist-spots-enthusiast",
-    master: "sf-tourist-spots-master",
-  },
-  "sf-day-trips": {
-    participant: "sf-day-trips-participant",
-    enthusiast: "sf-day-trips-enthusiast",
-    master: "sf-day-trips-master",
-  },
-}
-
-export async function POST(req: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { userId, gameId, score, totalQuestions, correctAnswers, timeSpent } = await req.json()
+    const body = await request.json()
+    const { userId, gameId, score, totalQuestions, correctAnswers, timeSpent } = body
 
-    if (!userId) {
-      return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
+    if (!userId || !gameId) {
+      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    if (!gameId) {
-      return NextResponse.json({ success: false, message: "Game ID is required" }, { status: 400 })
-    }
+    // Create Supabase client
+    const supabase = createClient()
 
-    const supabase = getServiceSupabase()
-
-    // Record the attempt in the trivia_attempts table
-    const { error: attemptError } = await supabase.from("trivia_attempts").insert({
-      user_id: userId,
-      game_id: gameId,
-      score: score,
-      total_questions: totalQuestions,
-      correct_answers: correctAnswers || score,
-      time_spent: timeSpent || 0,
-    })
+    // Record the trivia attempt
+    const { data: attemptData, error: attemptError } = await supabase
+      .from("trivia_attempts")
+      .insert({
+        user_id: userId,
+        game_id: gameId,
+        score,
+        total_questions: totalQuestions,
+        correct_answers: correctAnswers,
+        time_spent: timeSpent,
+      })
+      .select()
 
     if (attemptError) {
       console.error("Error recording trivia attempt:", attemptError)
-      return NextResponse.json({ success: false, message: "Failed to record attempt" }, { status: 500 })
+      return NextResponse.json(
+        { error: "Failed to record trivia attempt", details: attemptError.message },
+        { status: 500 },
+      )
     }
 
     // Calculate points to award
-    // Base points for each correct answer
     const pointsPerQuestion = 10
-    // Bonus points for completing the game
     const completionBonus = 50
-    // Total points
-    const pointsToAward = score * pointsPerQuestion + completionBonus
+    const pointsAwarded = correctAnswers * pointsPerQuestion + completionBonus
 
     // Award points to the user
-    const { error: pointsError } = await supabase.from("user_points").insert({
-      user_id: userId,
-      points: pointsToAward,
-      activity: "trivia_game",
-      description: `Completed ${gameId} trivia game with score ${score}/${totalQuestions}`,
+    const { error: pointsError } = await supabase.rpc("add_points", {
+      p_user_id: userId,
+      p_points: pointsAwarded,
+      p_source: `${gameId}_trivia`,
+      p_description: `Earned ${pointsAwarded} points playing ${gameId} trivia`,
     })
 
     if (pointsError) {
@@ -85,125 +52,68 @@ export async function POST(req: Request) {
       // Continue execution even if points award fails
     }
 
-    // Check if user should earn any badges
+    // Check if user should earn a badge
     let badgeAwarded = null
 
     // Get user's previous attempts for this game
-    const { data: attempts, error: attemptsError } = await supabase
+    const { data: previousAttempts, error: attemptsError } = await supabase
       .from("trivia_attempts")
       .select("*")
       .eq("user_id", userId)
       .eq("game_id", gameId)
 
     if (attemptsError) {
-      console.error("Error fetching user attempts:", attemptsError)
+      console.error("Error fetching previous attempts:", attemptsError)
     } else {
-      // Check for participant badge (first attempt)
-      if (attempts.length === 1) {
-        // This is their first attempt, award participant badge
-        const badgeType = gameBadgeTypes[gameId]?.participant
+      // Determine which badge to award
+      const totalAttempts = previousAttempts?.length || 0
+      const perfectScores = previousAttempts?.filter((a) => a.correct_answers === a.total_questions)?.length || 0
 
-        if (badgeType) {
-          const { data: existingBadge, error: badgeCheckError } = await supabase
-            .from("badges")
-            .select("*")
-            .eq("user_id", userId)
-            .eq("badge_type", badgeType)
-            .single()
+      let badgeType = null
 
-          if (!badgeCheckError && !existingBadge) {
-            // User doesn't have this badge yet, award it
-            const { data: newBadge, error: badgeError } = await supabase
-              .from("badges")
-              .insert({
-                user_id: userId,
-                badge_type: badgeType,
-                earned_at: new Date().toISOString(),
-              })
-              .select()
-              .single()
-
-            if (!badgeError && newBadge) {
-              badgeAwarded = {
-                id: newBadge.id,
-                badge_type: badgeType,
-                earned_at: newBadge.earned_at,
-              }
-            }
-          }
-        }
+      // First time playing - Participant badge
+      if (totalAttempts <= 1) {
+        badgeType = `${gameId}-participant`
+      }
+      // 5+ attempts - Enthusiast badge
+      else if (totalAttempts >= 5) {
+        badgeType = `${gameId}-enthusiast`
+      }
+      // 3+ perfect scores - Master badge
+      else if (perfectScores >= 3 || (correctAnswers === totalQuestions && perfectScores >= 2)) {
+        badgeType = `${gameId}-master`
       }
 
-      // Check for enthusiast badge (5 attempts)
-      else if (attempts.length === 5) {
-        // This is their fifth attempt, award enthusiast badge
-        const badgeType = gameBadgeTypes[gameId]?.enthusiast
+      if (badgeType) {
+        // Check if user already has this badge
+        const { data: existingBadge, error: badgeCheckError } = await supabase
+          .from("user_badges")
+          .select("*")
+          .eq("user_id", userId)
+          .eq("badge_type", badgeType)
+          .single()
 
-        if (badgeType) {
-          const { data: existingBadge, error: badgeCheckError } = await supabase
-            .from("badges")
-            .select("*")
-            .eq("user_id", userId)
-            .eq("badge_type", badgeType)
-            .single()
-
-          if (!badgeCheckError && !existingBadge) {
-            // User doesn't have this badge yet, award it
-            const { data: newBadge, error: badgeError } = await supabase
-              .from("badges")
-              .insert({
-                user_id: userId,
-                badge_type: badgeType,
-                earned_at: new Date().toISOString(),
-              })
-              .select()
-              .single()
-
-            if (!badgeError && newBadge) {
-              badgeAwarded = {
-                id: newBadge.id,
-                badge_type: badgeType,
-                earned_at: newBadge.earned_at,
-              }
-            }
-          }
+        if (badgeCheckError && badgeCheckError.code !== "PGRST116") {
+          // PGRST116 is "no rows returned" which is expected if user doesn't have the badge
+          console.error("Error checking existing badge:", badgeCheckError)
         }
-      }
 
-      // Check for master badge (3 perfect scores)
-      const perfectScores = attempts.filter((a) => a.score === a.total_questions).length
-
-      if (score === totalQuestions && perfectScores === 3) {
-        // This is their third perfect score, award master badge
-        const badgeType = gameBadgeTypes[gameId]?.master
-
-        if (badgeType) {
-          const { data: existingBadge, error: badgeCheckError } = await supabase
-            .from("badges")
-            .select("*")
-            .eq("user_id", userId)
-            .eq("badge_type", badgeType)
+        // Award badge if user doesn't have it yet
+        if (!existingBadge) {
+          const { data: newBadge, error: badgeError } = await supabase
+            .from("user_badges")
+            .insert({
+              user_id: userId,
+              badge_type: badgeType,
+              earned_at: new Date().toISOString(),
+            })
+            .select()
             .single()
 
-          if (!badgeCheckError && !existingBadge) {
-            // User doesn't have this badge yet, award it
-            const { data: newBadge, error: badgeError } = await supabase
-              .from("badges")
-              .insert({
-                user_id: userId,
-                badge_type: badgeType,
-                earned_at: new Date().toISOString(),
-              })
-              .select()
-              .single()
-
-            if (!badgeError && newBadge) {
-              badgeAwarded = {
-                id: newBadge.id,
-                badge_type: badgeType,
-                earned_at: newBadge.earned_at,
-              }
-            }
+          if (badgeError) {
+            console.error("Error awarding badge:", badgeError)
+          } else if (newBadge) {
+            badgeAwarded = newBadge
           }
         }
       }
@@ -211,12 +121,15 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Trivia attempt recorded successfully",
-      pointsAwarded: pointsToAward,
-      badgeAwarded: badgeAwarded,
+      pointsAwarded,
+      badgeAwarded,
+      attemptId: attemptData?.[0]?.id,
     })
   } catch (error) {
-    console.error("Error in trivia submit API:", error)
-    return NextResponse.json({ success: false, message: "An error occurred" }, { status: 500 })
+    console.error("Unexpected error in trivia submit API:", error)
+    return NextResponse.json(
+      { error: "An unexpected error occurred", details: error instanceof Error ? error.message : String(error) },
+      { status: 500 },
+    )
   }
 }

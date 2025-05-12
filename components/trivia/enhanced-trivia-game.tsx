@@ -145,15 +145,21 @@ export function EnhancedTriviaGame({
     try {
       // Add cache busting parameter to avoid cached responses
       const cacheBuster = new Date().getTime()
+      console.log(`Fetching questions from: ${fetchQuestionsEndpoint}?count=5&gameId=${gameId}&_=${cacheBuster}`)
+
       const response = await fetch(`${fetchQuestionsEndpoint}?count=5&gameId=${gameId}&_=${cacheBuster}`)
 
       if (!response.ok) {
+        console.error(`API returned non-OK status: ${response.status}`)
         throw new Error(`API returned status: ${response.status}`)
       }
 
       const data = await response.json()
+      console.log(`Received data:`, data)
 
       if (data.questions && data.questions.length > 0) {
+        console.log(`Successfully loaded ${data.questions.length} questions for ${gameId}`)
+
         // Pre-load images to avoid loading delays during gameplay
         data.questions.forEach((question: TriviaQuestion) => {
           if (question.imageUrl && !question.imageUrl.startsWith("data:")) {
@@ -179,7 +185,7 @@ export function EnhancedTriviaGame({
       })
     } finally {
       setIsLoading(false)
-      setIsTimerRunning(true)
+      setIsTimerRunning(questions.length > 0)
     }
   }
 
@@ -547,6 +553,11 @@ export function EnhancedTriviaGame({
               {fetchError}
             </div>
           )}
+
+          <p className="text-gray-600 mb-4">
+            We're preparing some challenging questions about {gameName.replace("Trivia", "")}.
+            {!fetchError && " This should only take a moment..."}
+          </p>
 
           <Button onClick={fetchQuestions} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
             <RefreshCw className="h-4 w-4 mr-2" />
