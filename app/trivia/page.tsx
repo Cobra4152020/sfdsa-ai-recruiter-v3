@@ -15,6 +15,7 @@ import {
   Compass,
 } from "lucide-react"
 import Image from "next/image"
+import { useState } from "react"
 
 const triviaGames = [
   {
@@ -25,6 +26,7 @@ const triviaGames = [
     image: "/levis-stadium-49ers.png",
     color: "bg-red-50 border-red-200",
     textColor: "text-red-800",
+    hoverColor: "shadow-red-300/50",
   },
   {
     id: "sf-baseball",
@@ -34,6 +36,7 @@ const triviaGames = [
     image: "/oracle-park-giants.png",
     color: "bg-orange-50 border-orange-200",
     textColor: "text-orange-800",
+    hoverColor: "shadow-orange-300/50",
   },
   {
     id: "sf-basketball",
@@ -43,6 +46,7 @@ const triviaGames = [
     image: "/chase-center-gsw.png",
     color: "bg-blue-50 border-blue-200",
     textColor: "text-blue-800",
+    hoverColor: "shadow-blue-300/50",
   },
   {
     id: "sf-districts",
@@ -52,6 +56,7 @@ const triviaGames = [
     image: "/mission-district-sf.png",
     color: "bg-purple-50 border-purple-200",
     textColor: "text-purple-800",
+    hoverColor: "shadow-purple-300/50",
   },
   {
     id: "sf-tourist-spots",
@@ -61,6 +66,7 @@ const triviaGames = [
     image: "/golden-gate-bridge.png",
     color: "bg-green-50 border-green-200",
     textColor: "text-green-800",
+    hoverColor: "shadow-green-300/50",
   },
   {
     id: "sf-day-trips",
@@ -70,10 +76,13 @@ const triviaGames = [
     image: "/muir-woods-day-trip.png",
     color: "bg-amber-50 border-amber-200",
     textColor: "text-amber-800",
+    hoverColor: "shadow-amber-300/50",
   },
 ]
 
 export default function TriviaHubPage() {
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
+
   return (
     <>
       <ImprovedHeader showOptInForm={() => {}} />
@@ -88,28 +97,52 @@ export default function TriviaHubPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {triviaGames.map((game) => (
-            <Card key={game.id} className={`overflow-hidden border ${game.color} hover:shadow-md transition-shadow`}>
-              <div className="relative h-48">
+            <Card
+              key={game.id}
+              className={`overflow-hidden border ${game.color} transition-all duration-300 ease-in-out
+                ${hoveredCard === game.id ? `shadow-lg ${game.hoverColor} scale-[1.02] z-10` : "hover:shadow-md"}`}
+              onMouseEnter={() => setHoveredCard(game.id)}
+              onMouseLeave={() => setHoveredCard(null)}
+            >
+              <div className="relative h-48 overflow-hidden">
                 <Image
                   src={game.image || "/placeholder.svg"}
                   alt={game.name}
                   fill
-                  className="object-cover"
+                  className={`object-cover transition-transform duration-500 ease-in-out
+                    ${hoveredCard === game.id ? "scale-110" : ""}`}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   priority={game.id === "sf-football" || game.id === "sf-baseball"}
                 />
+                <div
+                  className={`absolute inset-0 bg-black opacity-0 transition-opacity duration-300
+                  ${hoveredCard === game.id ? "opacity-10" : ""}`}
+                ></div>
               </div>
               <CardHeader className="pb-2">
                 <div className="flex items-center gap-2">
-                  {game.icon}
-                  <CardTitle className={`text-xl ${game.textColor}`}>{game.name}</CardTitle>
+                  <div className={`transition-transform duration-300 ${hoveredCard === game.id ? "scale-110" : ""}`}>
+                    {game.icon}
+                  </div>
+                  <CardTitle
+                    className={`text-xl ${game.textColor} transition-all duration-300
+                    ${hoveredCard === game.id ? "font-bold" : ""}`}
+                  >
+                    {game.name}
+                  </CardTitle>
                 </div>
                 <CardDescription>{game.description}</CardDescription>
               </CardHeader>
               <CardFooter className="pt-2">
                 <Link href={`/trivia/${game.id}`} className="w-full">
-                  <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-                    <Trophy className="h-4 w-4 mr-2" />
+                  <Button
+                    className={`w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 transition-all duration-300
+                      ${hoveredCard === game.id ? "shadow-md" : ""}`}
+                  >
+                    <Trophy
+                      className={`h-4 w-4 mr-2 transition-transform duration-300
+                      ${hoveredCard === game.id ? "scale-125" : ""}`}
+                    />
                     Play Now
                   </Button>
                 </Link>
