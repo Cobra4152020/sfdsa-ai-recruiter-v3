@@ -2,149 +2,135 @@ import { Suspense } from "react"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
+import { BriefingCard } from "@/components/daily-briefing/briefing-card"
+import { BriefingStats } from "@/components/daily-briefing/briefing-stats"
+import { BriefingLeaderboard } from "@/components/daily-briefing/briefing-leaderboard"
 
-// Static, guaranteed to render content
-const FallbackBriefingUI = () => (
-  <div className="container mx-auto px-4 py-8">
-    <h1 className="text-3xl font-bold text-center mb-8">Daily Briefing</h1>
+export const dynamic = "force-dynamic"
+export const revalidate = 3600 // Revalidate every hour
 
-    <Alert variant="warning" className="mb-6">
-      <AlertCircle className="h-4 w-4" />
-      <AlertTitle>Temporary Service Interruption</AlertTitle>
-      <AlertDescription>
-        We're currently experiencing issues loading the daily briefing. Our team has been notified and is working on a
-        fix. Please try again later.
-      </AlertDescription>
-    </Alert>
-
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-semibold mb-4">Today's Briefing Highlights</h2>
-      <p className="mb-4">While we're resolving the technical difficulties, here are some important reminders:</p>
-      <ul className="list-disc pl-5 space-y-2">
-        <li>Remember to check your equipment at the beginning of each shift</li>
-        <li>Community engagement remains a top priority for the department</li>
-        <li>Report any safety concerns through the appropriate channels</li>
-        <li>Upcoming training sessions are posted on the internal bulletin board</li>
-      </ul>
-
-      <div className="mt-6 pt-6 border-t">
-        <h3 className="text-xl font-medium mb-3">Contact Information</h3>
-        <p>If you need immediate assistance, please contact the department at the non-emergency line.</p>
-      </div>
-    </div>
-  </div>
-)
-
-// Simplified BriefingCard component with minimal dependencies
-function StaticBriefingCard() {
+// Static fallback content component - this is a Server Component
+function FallbackBriefingUI() {
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="mb-4">
-        <h2 className="text-2xl font-bold">San Francisco Deputy Sheriff's Daily Briefing</h2>
-        <p className="text-sm text-gray-500 mt-1">{new Date().toLocaleDateString()} • Department HQ</p>
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-center mb-8">Daily Briefing</h1>
 
-      <div className="prose max-w-none">
-        <h3>Today's Focus: Community Safety</h3>
-        <p>
-          Welcome to today's briefing. We continue our commitment to serving the San Francisco community with dedication
-          and integrity.
-        </p>
+      <Alert variant="warning" className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Temporary Service Interruption</AlertTitle>
+        <AlertDescription>
+          We're currently experiencing issues loading the daily briefing. Our team has been notified and is working on a
+          fix. Please try again later.
+        </AlertDescription>
+      </Alert>
 
-        <h4>Safety Reminders:</h4>
-        <ul>
-          <li>Always be aware of your surroundings</li>
-          <li>Check your equipment before starting your shift</li>
-          <li>Report any safety concerns immediately</li>
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <h2 className="text-2xl font-semibold mb-4">Today's Briefing Highlights</h2>
+        <p className="mb-4">While we're resolving the technical difficulties, here are some important reminders:</p>
+        <ul className="list-disc pl-5 space-y-2">
+          <li>Remember to check your equipment at the beginning of each shift</li>
+          <li>Community engagement remains a top priority for the department</li>
+          <li>Report any safety concerns through the appropriate channels</li>
+          <li>Upcoming training sessions are posted on the internal bulletin board</li>
         </ul>
 
-        <h4>Community Engagement:</h4>
-        <p>
-          Our presence in the community is vital for building trust and ensuring safety. Remember to engage positively
-          with community members and be a visible presence in your assigned areas.
-        </p>
-
-        <h4>Department Updates:</h4>
-        <p>
-          Regular training sessions continue next week. Please ensure all required documentation is completed properly
-          and promptly.
-        </p>
-      </div>
-
-      <div className="mt-6 pt-4 border-t flex justify-between">
-        <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Mark as Attended</button>
-        <button className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">Share Briefing</button>
+        <div className="mt-6 pt-6 border-t">
+          <h3 className="text-xl font-medium mb-3">Contact Information</h3>
+          <p>If you need immediate assistance, please contact the department at the non-emergency line.</p>
+        </div>
       </div>
     </div>
   )
 }
 
-// Main component with multiple fallback strategies
+// Fallback briefing data - static data that doesn't require API calls
+const fallbackBriefing = {
+  id: "fallback-briefing",
+  title: "San Francisco Deputy Sheriff's Daily Briefing",
+  content: `
+    <h3>Today's Focus: Community Safety</h3>
+    <p>
+      Welcome to today's briefing. We continue our commitment to serving the San Francisco 
+      community with dedication and integrity.
+    </p>
+    
+    <h4>Safety Reminders:</h4>
+    <ul>
+      <li>Always be aware of your surroundings</li>
+      <li>Check your equipment before starting your shift</li>
+      <li>Report any safety concerns immediately</li>
+    </ul>
+    
+    <h4>Community Engagement:</h4>
+    <p>
+      Our presence in the community is vital for building trust and ensuring safety. 
+      Remember to engage positively with community members and be a visible presence 
+      in your assigned areas.
+    </p>
+    
+    <h4>Department Updates:</h4>
+    <p>
+      Regular training sessions continue next week. Please ensure all required documentation 
+      is completed properly and promptly.
+    </p>
+  `,
+  date: new Date().toISOString(),
+  location: "Department HQ",
+  keyPoints: [
+    "Always be aware of your surroundings",
+    "Check your equipment before starting your shift",
+    "Report any safety concerns immediately",
+    "Complete all required documentation promptly",
+  ],
+}
+
+// Main page component
 export default function DailyBriefingPage() {
+  // Render the fallback UI directly instead of passing it as a prop
+  const fallbackUI = <FallbackBriefingUI />
+
   return (
-    <ErrorBoundary fallback={<FallbackBriefingUI />}>
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-center mb-8">Daily Briefing</h1>
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold text-center mb-8">Daily Briefing</h1>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2">
+          <ErrorBoundary fallback={fallbackUI}>
             <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
-              <ErrorBoundary fallback={<StaticBriefingCard />}>
-                {/* Use static content directly instead of iframe with error handling */}
-                <div id="static-content">
-                  <StaticBriefingCard />
-                </div>
-              </ErrorBoundary>
+              {/* Use the static fallback briefing data directly */}
+              <BriefingCard briefing={fallbackBriefing} />
             </Suspense>
-          </div>
+          </ErrorBoundary>
+        </div>
 
-          <div className="space-y-8">
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4">Briefing Statistics</h3>
-              <div className="space-y-3">
-                <div>
-                  <span className="text-gray-600">Attendance Today:</span>
-                  <span className="float-right font-medium">25 Deputies</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Your Attendance Streak:</span>
-                  <span className="float-right font-medium">5 days</span>
-                </div>
-                <div>
-                  <span className="text-gray-600">Department Engagement:</span>
-                  <span className="float-right font-medium">87%</span>
-                </div>
+        <div className="space-y-8">
+          <ErrorBoundary
+            fallback={
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-semibold mb-4">Briefing Statistics</h3>
+                <p className="text-gray-500">Statistics temporarily unavailable</p>
               </div>
-            </div>
+            }
+          >
+            <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
+              <BriefingStats />
+            </Suspense>
+          </ErrorBoundary>
 
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h3 className="text-xl font-semibold mb-4">Attendance Leaders</h3>
-              <ul className="space-y-3">
-                <li className="flex justify-between">
-                  <span>Michael Chen</span>
-                  <span className="font-medium">21 days</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Sarah Johnson</span>
-                  <span className="font-medium">19 days</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>David Rodriguez</span>
-                  <span className="font-medium">18 days</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Jessica Williams</span>
-                  <span className="font-medium">16 days</span>
-                </li>
-                <li className="flex justify-between">
-                  <span>Robert Kim</span>
-                  <span className="font-medium">15 days</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+          <ErrorBoundary
+            fallback={
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="text-xl font-semibold mb-4">Attendance Leaders</h3>
+                <p className="text-gray-500">Leaderboard temporarily unavailable</p>
+              </div>
+            }
+          >
+            <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
+              <BriefingLeaderboard />
+            </Suspense>
+          </ErrorBoundary>
         </div>
       </div>
-    </ErrorBoundary>
+    </div>
   )
 }
