@@ -1,5 +1,10 @@
-import { createClient } from "@supabase/supabase-js"
+import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import type { Database } from "../types/database"
+
+// For backward compatibility with existing code
+export function createClient() {
+  return createServerClient()
+}
 
 /**
  * Creates a Supabase client with service role privileges for server-side use.
@@ -13,7 +18,7 @@ export const createServerClient = () => {
     throw new Error("Missing Supabase environment variables for service role")
   }
 
-  return createClient<Database>(supabaseUrl, supabaseServiceKey, {
+  return createSupabaseClient<Database>(supabaseUrl, supabaseServiceKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,
@@ -32,7 +37,7 @@ export const createServerAnonClient = () => {
     throw new Error("Missing Supabase environment variables")
   }
 
-  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
       persistSession: false,
       autoRefreshToken: false,

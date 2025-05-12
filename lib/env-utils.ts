@@ -37,6 +37,29 @@ export function clientEnv(key: string, fallback = ""): string {
   return process.env[key] || fallback
 }
 
+// For backward compatibility
+export function env(key: string, fallback = ""): string {
+  if (typeof window !== "undefined" && !key.startsWith("NEXT_PUBLIC_")) {
+    console.warn(`Using env() with '${key}' on client side. This may not work as expected.`)
+  }
+  return process.env[key] || fallback
+}
+
+/**
+ * Checks if the application is running in development mode
+ */
+export function isDevelopment(): boolean {
+  return process.env.NODE_ENV === "development"
+}
+
+/**
+ * Checks if the Supabase service role key is set (for admin operations)
+ * Should only be used server-side
+ */
+export function isSupabaseServiceConfigured(): boolean {
+  return !!process.env.SUPABASE_SERVICE_ROLE_KEY
+}
+
 /**
  * Server-side only environment utilities
  * These functions should NEVER be imported in client components

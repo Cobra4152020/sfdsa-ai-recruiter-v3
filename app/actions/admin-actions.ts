@@ -1,6 +1,6 @@
 "use server"
 
-import { supabaseAdmin } from "@/lib/supabase-service"
+import { createServerClient } from "@/lib/supabase-server"
 import { revalidatePath } from "next/cache"
 
 /**
@@ -8,6 +8,8 @@ import { revalidatePath } from "next/cache"
  */
 export async function approveVolunteerRecruiter(userId: string) {
   try {
+    const supabaseAdmin = createServerClient()
+
     // Update the volunteer.recruiters table to set is_active to true
     const { error } = await supabaseAdmin
       .from("volunteer.recruiters")
@@ -21,6 +23,17 @@ export async function approveVolunteerRecruiter(userId: string) {
     if (error) {
       console.error("Error approving volunteer recruiter:", error)
       return { success: false, error: error.message }
+    }
+
+    // Update user_type separately since there's no foreign key relationship
+    const { error: userTypeError } = await supabaseAdmin
+      .from("user_types")
+      .update({ user_type: "volunteer_active" })
+      .eq("user_id", userId)
+
+    if (userTypeError) {
+      console.error("Error updating user type:", userTypeError)
+      // Continue anyway since the main update succeeded
     }
 
     // Revalidate relevant paths
@@ -41,6 +54,8 @@ export async function approveVolunteerRecruiter(userId: string) {
  */
 export async function rejectVolunteerRecruiter(userId: string) {
   try {
+    const supabaseAdmin = createServerClient()
+
     // Delete the volunteer.recruiters record
     const { error: deleteError } = await supabaseAdmin.from("volunteer.recruiters").delete().eq("id", userId)
 
@@ -78,18 +93,47 @@ export async function rejectVolunteerRecruiter(userId: string) {
  */
 export async function getPendingVolunteerRecruiters() {
   try {
-    const { data, error } = await supabaseAdmin
-      .from("volunteer.recruiters")
-      .select("*, user_types!inner(user_type)")
-      .eq("is_active", false)
-      .eq("user_types.user_type", "volunteer")
+    const supabaseAdmin = createServerClient()
 
-    if (error) {
-      console.error("Error fetching pending volunteers:", error)
-      return { success: false, error: error.message, data: [] }
+    // Modified query to avoid the foreign key relationship error
+    const { data: recruiters, error: recruitersError } = await supabaseAdmin
+      .from("volunteer.recruiters")
+      .select("*")
+      .eq("is_active", false)
+
+    if (recruitersError) {
+      console.error("Error fetching pending volunteers:", recruitersError)
+      return { success: false, error: recruitersError.message, data: [] }
     }
 
-    return { success: true, data }
+    // Get user types separately
+    if (recruiters && recruiters.length > 0) {
+      const userIds = recruiters.map((recruiter) => recruiter.id)
+
+      const { data: userTypes, error: userTypesError } = await supabaseAdmin
+        .from("user_types")
+        .select("*")
+        .in("user_id", userIds)
+        .eq("user_type", "volunteer")
+
+      if (userTypesError) {
+        console.error("Error fetching user types:", userTypesError)
+        // Continue anyway with just the recruiters data
+      }
+
+      // Combine the data
+      const combinedData = recruiters.map((recruiter) => {
+        const userType = userTypes?.find((ut) => ut.user_id === recruiter.id)
+        return {
+          ...recruiter,
+          user_types: userType ? { user_type: userType.user_type } : { user_type: "unknown" },
+        }
+      })
+
+      return { success: true, data: combinedData }
+    }
+
+    return { success: true, data: recruiters || [] }
   } catch (error) {
     console.error("Unexpected error fetching pending volunteers:", error)
     return {

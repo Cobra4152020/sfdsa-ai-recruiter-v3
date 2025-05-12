@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { createClient } from "@/lib/supabase-client"
+import { createServerClient } from "@/lib/supabase-server"
 
 export const metadata: Metadata = {
   title: "Donation Management | Admin Dashboard",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 }
 
 export default async function DonationsAdminPage() {
-  const supabase = createClient()
+  const supabase = createServerClient()
 
   // Get recent donations
   const { data: recentDonations } = await supabase
