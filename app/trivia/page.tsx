@@ -1,123 +1,127 @@
 "use client"
 
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import {
-  Trophy,
-  ClubIcon as Football,
-  BeerIcon as Baseball,
-  ShoppingBasketIcon as Basketball,
-  MapPin,
-  Landmark,
-  Compass,
-} from "lucide-react"
 import Image from "next/image"
+import { Loader2 } from "lucide-react"
 
-const triviaGames = [
-  {
-    id: "sf-football",
-    name: "SF Football Trivia",
-    description: "Test your knowledge about San Francisco football history and the 49ers.",
-    icon: <Football className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco 49ers football",
-    color: "bg-red-50 border-red-200",
-    textColor: "text-red-800",
-  },
-  {
-    id: "sf-baseball",
-    name: "SF Baseball Trivia",
-    description: "How much do you know about the San Francisco Giants and baseball in the Bay Area?",
-    icon: <Baseball className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco Giants baseball",
-    color: "bg-orange-50 border-orange-200",
-    textColor: "text-orange-800",
-  },
-  {
-    id: "sf-basketball",
-    name: "SF Basketball Trivia",
-    description: "Challenge yourself with questions about the Golden State Warriors and basketball in San Francisco.",
-    icon: <Basketball className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=Golden State Warriors basketball",
-    color: "bg-blue-50 border-blue-200",
-    textColor: "text-blue-800",
-  },
-  {
-    id: "sf-districts",
-    name: "SF District Trivia",
-    description: "Test your knowledge of San Francisco's unique and diverse neighborhoods and districts.",
-    icon: <MapPin className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco neighborhoods districts",
-    color: "bg-purple-50 border-purple-200",
-    textColor: "text-purple-800",
-  },
-  {
-    id: "sf-tourist-spots",
-    name: "SF Most Popular Tourist Spots",
-    description: "How well do you know San Francisco's famous landmarks and tourist attractions?",
-    icon: <Landmark className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco tourist attractions",
-    color: "bg-green-50 border-green-200",
-    textColor: "text-green-800",
-  },
-  {
-    id: "sf-day-trips",
-    name: "SF Best Places to Visit",
-    description: "Test your knowledge about the best day trips and places to visit around San Francisco.",
-    icon: <Compass className="h-6 w-6 text-[#0A3C1F]" />,
-    image: "/placeholder.svg?height=300&width=500&query=San Francisco day trips",
-    color: "bg-amber-50 border-amber-200",
-    textColor: "text-amber-800",
-  },
-]
+interface TriviaGame {
+  id: string
+  name: string
+  description: string
+  image_url?: string
+  question_count: number
+}
 
-export default function TriviaHubPage() {
+export default function TriviaGamesPage() {
+  const [games, setGames] = useState<TriviaGame[]>([])
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
+
+  useEffect(() => {
+    const fetchGames = async () => {
+      try {
+        // In a real app, this would be an API call to fetch games
+        // For demo purposes, we'll use sample data
+        const sampleGames: TriviaGame[] = [
+          {
+            id: "sf-baseball",
+            name: "SF Baseball Trivia",
+            description: "Test your knowledge of San Francisco baseball history and the Giants!",
+            question_count: 100,
+          },
+          {
+            id: "sf-basketball",
+            name: "SF Basketball Trivia",
+            description: "How much do you know about the Golden State Warriors?",
+            question_count: 100,
+          },
+          {
+            id: "sf-day-trips",
+            name: "SF Day Trips",
+            description: "Explore the best day trips from San Francisco!",
+            question_count: 100,
+          },
+          {
+            id: "sf-districts",
+            name: "SF Districts",
+            description: "Test your knowledge of San Francisco neighborhoods and districts!",
+            question_count: 100,
+          },
+          {
+            id: "sf-football",
+            name: "SF Football Trivia",
+            description: "How much do you know about the 49ers?",
+            question_count: 120,
+          },
+          {
+            id: "sf-tourist-spots",
+            name: "SF Tourist Spots",
+            description: "Test your knowledge of San Francisco's most famous attractions!",
+            question_count: 100,
+          },
+        ]
+
+        setGames(sampleGames)
+      } catch (error) {
+        console.error("Error fetching games:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchGames()
+  }, [])
+
+  const playGame = (gameId: string) => {
+    router.push(`/trivia/${gameId}/kahoot`)
+  }
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-100">
+        <Loader2 className="h-12 w-12 animate-spin mb-4 text-purple-600" />
+        <p className="text-xl">Loading trivia games...</p>
+      </div>
+    )
+  }
+
   return (
-    <>
-      <ImprovedHeader showOptInForm={() => {}} />
-      <main className="container mx-auto px-4 py-8">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">San Francisco Trivia Games</h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Test your knowledge about San Francisco with these fun trivia games hosted by Sgt. Ken. Earn points, badges,
-            and climb the leaderboard!
-          </p>
-        </div>
+    <div className="container mx-auto py-8 px-4">
+      <h1 className="text-3xl font-bold mb-8 text-center">San Francisco Trivia Games</h1>
+      <p className="text-center mb-8 text-gray-600">Choose a game category to play in Kahoot-style mode!</p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {triviaGames.map((game) => (
-            <Card key={game.id} className={`overflow-hidden border ${game.color} hover:shadow-md transition-shadow`}>
-              <div className="relative h-48">
-                <Image
-                  src={game.image || "/placeholder.svg"}
-                  alt={game.name}
-                  fill
-                  className="object-cover"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                />
-              </div>
-              <CardHeader className="pb-2">
-                <div className="flex items-center gap-2">
-                  {game.icon}
-                  <CardTitle className={`text-xl ${game.textColor}`}>{game.name}</CardTitle>
-                </div>
-                <CardDescription>{game.description}</CardDescription>
-              </CardHeader>
-              <CardFooter className="pt-2">
-                <Link href={`/trivia/${game.id}`} className="w-full">
-                  <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-                    <Trophy className="h-4 w-4 mr-2" />
-                    Play Now
-                  </Button>
-                </Link>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </main>
-      <ImprovedFooter />
-    </>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {games.map((game) => (
+          <Card key={game.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+            <div className="relative h-48">
+              <Image
+                src={
+                  game.image_url ||
+                  `/placeholder.svg?height=300&width=500&query=San Francisco ${game.id.replace("sf-", "")}`
+                }
+                alt={game.name}
+                fill
+                className="object-cover"
+              />
+            </div>
+            <CardHeader>
+              <CardTitle>{game.name}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-600">{game.description}</p>
+              <p className="mt-2 text-sm text-gray-500">{game.question_count} questions</p>
+            </CardContent>
+            <CardFooter>
+              <Button onClick={() => playGame(game.id)} className="w-full bg-purple-600 hover:bg-purple-700">
+                Play Now
+              </Button>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
+    </div>
   )
 }
