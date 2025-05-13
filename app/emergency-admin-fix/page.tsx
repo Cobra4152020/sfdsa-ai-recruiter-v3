@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { publicFixAdminProfile } from "@/app/actions/public-fix-admin"
+import { publicFixAdminProfile } from "@/app/actions/public-fix-admin-alt"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -13,16 +13,22 @@ export default function EmergencyAdminFixPage() {
   const [email, setEmail] = useState("")
   const [securityCode, setSecurityCode] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [result, setResult] = useState<{ success: boolean; message: string; userId?: string; email?: string } | null>(
+    null,
+  )
+  const [error, setError] = useState<string | null>(null)
 
   const handleFix = async () => {
     if (!userId || !email || !securityCode) return
 
     setIsLoading(true)
+    setError(null)
+
     try {
       const result = await publicFixAdminProfile(userId, email, securityCode)
       setResult(result)
     } catch (error) {
+      setError(error instanceof Error ? error.message : "An unexpected error occurred")
       setResult({
         success: false,
         message: error instanceof Error ? error.message : "An unexpected error occurred",
@@ -30,6 +36,11 @@ export default function EmergencyAdminFixPage() {
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Direct SQL execution alternative for Supabase client issues
+  const handleManualFix = async () => {
+    // Implementation removed - using the main fix instead
   }
 
   return (
@@ -52,6 +63,14 @@ export default function EmergencyAdminFixPage() {
               {result.success ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
               <AlertTitle>{result.success ? "Success" : "Error"}</AlertTitle>
               <AlertDescription>{result.message}</AlertDescription>
+            </Alert>
+          )}
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
@@ -129,6 +148,7 @@ export default function EmergencyAdminFixPage() {
               setEmail("")
               setSecurityCode("")
               setResult(null)
+              setError(null)
             }}
           >
             Reset Form

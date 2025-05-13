@@ -1,12 +1,20 @@
--- Function to execute raw SQL queries
--- This is useful for operations that can't be done through the Supabase API
-CREATE OR REPLACE FUNCTION exec_sql(sql_query TEXT)
-RETURNS VOID AS $$
+-- Function to execute SQL safely with params from service role only
+CREATE OR REPLACE FUNCTION public.exec_sql(sql_query TEXT, params_array TEXT[] DEFAULT '{}')
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
 BEGIN
-  EXECUTE sql_query;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+  -- This function can only be executed by service role
+  IF NOT (current_setting('request.jwt.claims', true)::json->>'role' = 'service_role') THEN
+    RAISE EXCEPTION 'Permission denied: only service_role can execute this function';
+  END IF;
 
--- Grant execute permission to authenticated users
-GRANT EXECUTE ON FUNCTION exec_sql(TEXT) TO authenticated;
-GRANT EXECUTE ON FUNCTION exec_sql(TEXT) TO service_role;
+  -- Execute the SQL dynamically with the params
+  EXECUTE sql_query USING params_array;
+END;
+$$;
+
+-- Grant execute permission to authenticated users (the check is inside the function)
+GRANT EXECUTE ON FUNCTION public.exec_sql TO authenticated;
+GRANT EXECUTE ON FUNCTION public.exec_sql TO service_role;
