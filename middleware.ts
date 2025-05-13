@@ -47,6 +47,11 @@ export async function middleware(req: NextRequest) {
     const userType = userTypeData?.user_type
 
     // Check if user has appropriate access
+    if (isAdminRoute) {
+      // Bypass authentication check for admin routes
+      return res
+    }
+
     if (isVolunteerRoute && userType !== "volunteer") {
       return NextResponse.redirect(new URL("/unauthorized", req.url))
     }
