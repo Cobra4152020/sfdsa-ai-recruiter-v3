@@ -18,7 +18,7 @@ export function PointsGateWrapper({ children, requiredPoints, actionName, fallba
   const handleAction = () => {
     if (!currentUser) {
       openRegistrationPopup({ points: requiredPoints, action: actionName })
-      return
+      return null
     }
 
     // If user doesn't have enough points, show fallback or message
@@ -39,5 +39,5 @@ export function PointsGateWrapper({ children, requiredPoints, actionName, fallba
     return children
   }
 
-  return handleAction()
+  return <>{handleAction()}</>
 }

@@ -10,9 +10,8 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
-import { Eye, EyeOff, Mail, Lock, User, Facebook, Twitter } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, User, Facebook, Twitter, Apple } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
-import { authService } from "@/lib/unified-auth-service"
 import { useUser } from "@/context/user-context"
 import { v4 as uuidv4 } from "uuid"
 
@@ -23,6 +22,11 @@ interface UnifiedRegistrationPopupProps {
   referralCode?: string
   requiredPoints?: number
   actionName?: string
+  initialTab?: "signin" | "signup" | "optin"
+  userType?: "recruit" | "volunteer" | "admin"
+  callbackUrl?: string
+  title?: string
+  description?: string
 }
 
 export function UnifiedRegistrationPopup({
@@ -32,17 +36,27 @@ export function UnifiedRegistrationPopup({
   referralCode,
   requiredPoints,
   actionName,
+  initialTab = "signin",
+  userType = "recruit",
+  callbackUrl,
+  title,
+  description,
 }: UnifiedRegistrationPopupProps) {
-  const [activeTab, setActiveTab] = useState<"signin" | "signup" | "optin">("signin")
+  const [activeTab, setActiveTab] = useState<"signin" | "signup" | "optin">(initialTab)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [confirmPassword, setConfirmPassword] = useState("")
   const [name, setName] = useState("")
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [phone, setPhone] = useState("")
   const [zipCode, setZipCode] = useState("")
+  const [organization, setOrganization] = useState("")
+  const [position, setPosition] = useState("")
+  const [location, setLocation] = useState("")
   const [referralSource, setReferralSource] = useState("website")
   const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -63,18 +77,27 @@ export function UnifiedRegistrationPopup({
     }
   }, [activeTab, referralCode])
 
+  // Set initial tab
+  useEffect(() => {
+    setActiveTab(initialTab)
+  }, [initialTab])
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
 
     try {
       if (resetPassword) {
-        const result = await authService.resetPassword(email)
+        const { supabase } = await import("@/lib/supabase-client-singleton")
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        })
+
+        if (error) throw error
 
         toast({
-          title: result.success ? "Password reset email sent" : "Error",
-          description: result.message,
-          variant: result.success ? "default" : "destructive",
+          title: "Password reset email sent",
+          description: "Check your email for a link to reset your password",
         })
 
         setResetPassword(false)
@@ -82,29 +105,93 @@ export function UnifiedRegistrationPopup({
         return
       }
 
-      const result = await authService.signInWithPassword(email, password)
-
-      if (!result.success) {
-        throw new Error(result.message)
-      }
-
-      toast({
-        title: "Sign in successful",
-        description: "Welcome back!",
+      // Use the appropriate auth service based on user type
+      const { supabase } = await import("@/lib/supabase-client-singleton")
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
       })
 
-      // Login the user in the context
-      if (result.userId) {
-        login({
-          id: result.userId,
-          name: result.name || email.split("@")[0] || "User",
-          email: result.email || email,
-          participation_count: 0,
-          has_applied: false,
-        })
-      }
+      if (error) throw error
 
-      onClose()
+      if (data.user) {
+        // Get user profile data
+        let userData
+
+        // Check user type based on the tables
+        if (userType === "volunteer") {
+          const { data: volunteerData, error: volunteerError } = await supabase
+            .from("volunteer.recruiters")
+            .select("*")
+            .eq("id", data.user.id)
+            .single()
+
+          if (volunteerError) {
+            console.error("Error fetching volunteer profile:", volunteerError)
+            throw new Error("Failed to fetch user profile")
+          }
+
+          userData = volunteerData
+
+          // Check if volunteer is active
+          if (!userData?.is_active) {
+            window.location.href = "/volunteer-pending"
+            return
+          }
+        } else if (userType === "admin") {
+          const { data: adminData, error: adminError } = await supabase
+            .from("admin.users")
+            .select("*")
+            .eq("id", data.user.id)
+            .single()
+
+          if (adminError) {
+            console.error("Error fetching admin profile:", adminError)
+            throw new Error("Failed to fetch user profile")
+          }
+
+          userData = adminData
+        } else {
+          // Default to recruit
+          const { data: recruitData, error: recruitError } = await supabase
+            .from("recruit.users")
+            .select("*")
+            .eq("id", data.user.id)
+            .single()
+
+          if (recruitError) {
+            console.error("Error fetching recruit profile:", recruitError)
+            throw new Error("Failed to fetch user profile")
+          }
+
+          userData = recruitData
+        }
+
+        // Login the user in the context
+        login({
+          id: data.user.id,
+          name: userData?.name || data.user.email?.split("@")[0] || "User",
+          email: data.user.email,
+          participation_count: userData?.points || 0,
+          has_applied: userData?.has_applied || false,
+        })
+
+        toast({
+          title: "Sign in successful",
+          description: "Welcome back!",
+        })
+
+        // Redirect based on user type
+        if (callbackUrl) {
+          window.location.href = callbackUrl
+        } else if (userType === "volunteer") {
+          window.location.href = "/volunteer-dashboard"
+        } else if (userType === "admin") {
+          window.location.href = "/admin/dashboard"
+        } else {
+          window.location.href = "/dashboard"
+        }
+      }
     } catch (error) {
       console.error("Sign in error:", error)
       toast({
@@ -123,33 +210,117 @@ export function UnifiedRegistrationPopup({
 
     try {
       // Validate inputs
-      if (!name.trim()) {
-        throw new Error("Please enter your name")
+      if (!agreeToTerms) {
+        throw new Error("You must agree to the Terms of Service and Privacy Policy")
       }
 
-      const result = await authService.registerRecruit(email, password, name)
-
-      if (!result.success) {
-        throw new Error(result.message || "Failed to create account")
+      if (password !== confirmPassword) {
+        throw new Error("Passwords do not match")
       }
 
-      toast({
-        title: "Sign up successful",
-        description: "Your account has been created with 50 points!",
-      })
+      if (password.length < 8) {
+        throw new Error("Password must be at least 8 characters long")
+      }
 
-      // Login the user in the context
-      if (result.userId) {
-        login({
-          id: result.userId,
-          name: result.name || name,
-          email: result.email || email,
-          participation_count: 50, // Initial points
-          has_applied: false,
+      const { supabase } = await import("@/lib/supabase-client-singleton")
+
+      if (userType === "volunteer") {
+        // Register volunteer recruiter
+        if (!firstName || !lastName) {
+          throw new Error("Please enter your first and last name")
+        }
+
+        // Use the API endpoint instead of direct Supabase calls
+        const response = await fetch("/api/auth/register-volunteer", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+            firstName,
+            lastName,
+            phone,
+            organization,
+            position,
+            location,
+          }),
         })
-      }
 
-      onClose()
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to create volunteer account")
+        }
+
+        toast({
+          title: "Sign up successful",
+          description: "Please check your email to verify your account. Your account requires approval.",
+        })
+
+        // Redirect to pending page
+        window.location.href = "/volunteer-pending"
+        return
+      } else {
+        // Register recruit user
+        if (!name.trim()) {
+          throw new Error("Please enter your name")
+        }
+
+        // Use the API endpoint instead of direct Supabase calls
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to create account")
+        }
+
+        // Get user ID from response if available
+        const userId = data.userId || data.id
+
+        if (userId) {
+          // Login the user in the context
+          login({
+            id: userId,
+            name: name,
+            email: email,
+            participation_count: 50, // Initial points
+            has_applied: false,
+          })
+
+          toast({
+            title: "Sign up successful",
+            description: "Your account has been created with 50 points!",
+          })
+
+          // Redirect to appropriate page
+          if (callbackUrl) {
+            window.location.href = callbackUrl
+          } else {
+            window.location.href = "/dashboard"
+          }
+        } else {
+          toast({
+            title: "Sign up successful",
+            description: "Please check your email to verify your account",
+          })
+
+          // Switch to sign in tab
+          setActiveTab("signin")
+        }
+      }
     } catch (error) {
       console.error("Sign up error:", error)
       toast({
@@ -167,6 +338,11 @@ export function UnifiedRegistrationPopup({
     setIsLoading(true)
 
     try {
+      // Validate inputs
+      if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+        throw new Error("Please fill in all required fields")
+      }
+
       // Save to database
       const { supabase } = await import("@/lib/supabase-service")
       const { error } = await supabase.from("applicants").insert({
@@ -185,13 +361,7 @@ export function UnifiedRegistrationPopup({
 
       if (error) {
         console.error("Error submitting form:", error)
-        toast({
-          title: "Submission Error",
-          description: "There was a problem submitting your information. Please try again.",
-          variant: "destructive",
-        })
-        setIsLoading(false)
-        return
+        throw new Error("There was a problem submitting your information. Please try again.")
       }
 
       // Show success message
@@ -209,7 +379,7 @@ export function UnifiedRegistrationPopup({
       console.error("Error submitting form:", error)
       toast({
         title: "Submission Error",
-        description: "There was a problem submitting your information. Please try again.",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       })
     } finally {
@@ -217,18 +387,39 @@ export function UnifiedRegistrationPopup({
     }
   }
 
-  const handleSocialAuth = async (provider: "facebook" | "twitter" | "google") => {
+  const handleSocialAuth = async (provider: "google" | "facebook" | "twitter" | "linkedin" | "apple") => {
     setSocialLoading(provider)
 
     try {
-      const result = await authService.signInWithSocialProvider(provider)
+      const { supabase } = await import("@/lib/supabase-client-singleton")
 
-      if (!result.success) {
-        throw new Error(result.message)
+      // Set appropriate redirect URL based on user type
+      let redirectTo = `${window.location.origin}/auth/callback`
+      if (userType === "volunteer") {
+        redirectTo = `${window.location.origin}/auth/callback?userType=volunteer`
+      } else if (userType === "admin") {
+        redirectTo = `${window.location.origin}/auth/callback?userType=admin`
       }
 
-      if (result.redirectUrl) {
-        window.location.href = result.redirectUrl
+      if (callbackUrl) {
+        redirectTo += `&callbackUrl=${encodeURIComponent(callbackUrl)}`
+      }
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
+        },
+      })
+
+      if (error) throw error
+
+      if (data.url) {
+        window.location.href = data.url
       }
     } catch (error) {
       console.error(`${provider} auth error:`, error)
@@ -238,6 +429,58 @@ export function UnifiedRegistrationPopup({
         variant: "destructive",
       })
       setSocialLoading(null)
+    }
+  }
+
+  const handleMagicLinkAuth = async () => {
+    if (!email) {
+      toast({
+        title: "Email required",
+        description: "Please enter your email address",
+        variant: "destructive",
+      })
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const { supabase } = await import("@/lib/supabase-client-singleton")
+
+      // Set appropriate redirect URL based on user type
+      let redirectTo = `${window.location.origin}/dashboard`
+      if (userType === "volunteer") {
+        redirectTo = `${window.location.origin}/volunteer-dashboard`
+      } else if (userType === "admin") {
+        redirectTo = `${window.location.origin}/admin/dashboard`
+      }
+
+      if (callbackUrl) {
+        redirectTo = callbackUrl
+      }
+
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: redirectTo,
+        },
+      })
+
+      if (error) throw error
+
+      toast({
+        title: "Magic link sent",
+        description: "Check your email for a link to sign in",
+      })
+    } catch (error) {
+      console.error("Magic link error:", error)
+      toast({
+        title: "Error sending magic link",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -254,30 +497,44 @@ export function UnifiedRegistrationPopup({
     )
   }
 
+  const getDialogTitle = () => {
+    if (title) return title
+
+    if (activeTab === "optin") {
+      return isApplying ? "Start Your Deputy Sheriff Application" : "Sign up for Recruitment Updates"
+    } else if (activeTab === "signin") {
+      return userType === "volunteer" ? "Volunteer Recruiter Login" : "Welcome Back"
+    } else {
+      return userType === "volunteer" ? "Register as a Volunteer Recruiter" : "Create Account"
+    }
+  }
+
+  const getDialogDescription = () => {
+    if (description) return description
+
+    if (activeTab === "optin") {
+      return isApplying
+        ? "Take the first step toward a rewarding career with the San Francisco Sheriff's Office."
+        : "Get the latest information about the SF Deputy Sheriff recruitment process, events, and opportunities."
+    } else if (activeTab === "signin") {
+      return userType === "volunteer"
+        ? "Sign in to access your volunteer recruiter dashboard"
+        : "Sign in to your account to continue"
+    } else {
+      return userType === "volunteer"
+        ? "Register to become a volunteer recruiter for the SF Deputy Sheriff's Office"
+        : "Create a new account to get started"
+    }
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         {!isSubmitted ? (
           <>
             <DialogHeader>
-              <DialogTitle className="text-center text-xl">
-                {activeTab === "optin"
-                  ? isApplying
-                    ? "Start Your Deputy Sheriff Application"
-                    : "Sign up for Recruitment Updates"
-                  : activeTab === "signin"
-                    ? "Sign In"
-                    : "Create Account"}
-              </DialogTitle>
-              <DialogDescription className="text-center">
-                {activeTab === "optin"
-                  ? isApplying
-                    ? "Take the first step toward a rewarding career with the San Francisco Sheriff's Office."
-                    : "Get the latest information about the SF Deputy Sheriff recruitment process, events, and opportunities."
-                  : activeTab === "signin"
-                    ? "Sign in to your account to continue"
-                    : "Create a new account to get started"}
-              </DialogDescription>
+              <DialogTitle className="text-center text-xl">{getDialogTitle()}</DialogTitle>
+              <DialogDescription className="text-center">{getDialogDescription()}</DialogDescription>
             </DialogHeader>
 
             {renderPointsMessage()}
@@ -286,7 +543,7 @@ export function UnifiedRegistrationPopup({
               <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="signin">Sign In</TabsTrigger>
                 <TabsTrigger value="signup">Sign Up</TabsTrigger>
-                <TabsTrigger value="optin">Opt-In</TabsTrigger>
+                {userType === "recruit" && <TabsTrigger value="optin">Opt-In</TabsTrigger>}
               </TabsList>
 
               <TabsContent value="signin">
@@ -405,7 +662,7 @@ export function UnifiedRegistrationPopup({
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <Button
                         type="button"
                         variant="outline"
@@ -416,7 +673,7 @@ export function UnifiedRegistrationPopup({
                         {socialLoading === "google" ? (
                           <span className="animate-spin">⟳</span>
                         ) : (
-                          <svg className="h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                          <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path
                               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                               fill="#4285F4"
@@ -435,73 +692,192 @@ export function UnifiedRegistrationPopup({
                             />
                           </svg>
                         )}
-                        <span className="sr-only">Google</span>
+                        Google
                       </Button>
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() => handleSocialAuth("facebook")}
                         disabled={!!socialLoading}
-                        className="flex items-center justify-center text-[#1877F2]"
+                        className="flex items-center justify-center"
                       >
                         {socialLoading === "facebook" ? (
                           <span className="animate-spin">⟳</span>
                         ) : (
-                          <Facebook className="h-4 w-4" />
+                          <Facebook className="h-4 w-4 mr-2" />
                         )}
-                        <span className="sr-only">Facebook</span>
+                        Facebook
                       </Button>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-2 mt-2">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() => handleSocialAuth("twitter")}
                         disabled={!!socialLoading}
-                        className="flex items-center justify-center text-[#1DA1F2]"
+                        className="flex items-center justify-center"
                       >
                         {socialLoading === "twitter" ? (
                           <span className="animate-spin">⟳</span>
                         ) : (
-                          <Twitter className="h-4 w-4" />
+                          <Twitter className="h-4 w-4 mr-2" />
                         )}
-                        <span className="sr-only">Twitter</span>
+                        Twitter
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => handleSocialAuth("apple")}
+                        disabled={!!socialLoading}
+                        className="flex items-center justify-center"
+                      >
+                        {socialLoading === "apple" ? (
+                          <span className="animate-spin">⟳</span>
+                        ) : (
+                          <Apple className="h-4 w-4 mr-2" />
+                        )}
+                        Apple
                       </Button>
                     </div>
+
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleMagicLinkAuth}
+                      disabled={isLoading || !email}
+                      className="w-full mt-2"
+                    >
+                      Sign in with Magic Link
+                    </Button>
                   </div>
                 </form>
               </TabsContent>
 
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="name"
-                        placeholder="John Doe"
-                        className="pl-10"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </div>
+                  {userType === "volunteer" ? (
+                    // Volunteer recruiter signup form
+                    <>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="firstName">First Name</Label>
+                          <Input
+                            id="firstName"
+                            placeholder="John"
+                            value={firstName}
+                            onChange={(e) => setFirstName(e.target.value)}
+                            required
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="lastName">Last Name</Label>
+                          <Input
+                            id="lastName"
+                            placeholder="Doe"
+                            value={lastName}
+                            onChange={(e) => setLastName(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="email-signup">Email</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="email-signup"
-                        type="email"
-                        placeholder="name@example.com"
-                        className="pl-10"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                      />
+                      <div className="space-y-2">
+                        <Label htmlFor="email-signup">Email</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                          <Input
+                            id="email-signup"
+                            type="email"
+                            placeholder="name@example.com"
+                            className="pl-10"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                          />
+                        </div>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="phone">Phone Number</Label>
+                        <Input
+                          id="phone"
+                          type="tel"
+                          placeholder="(415) 555-1234"
+                          value={phone}
+                          onChange={(e) => setPhone(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="organization">Organization</Label>
+                        <Input
+                          id="organization"
+                          placeholder="Your organization"
+                          value={organization}
+                          onChange={(e) => setOrganization(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="position">Position</Label>
+                        <Input
+                          id="position"
+                          placeholder="Your position"
+                          value={position}
+                          onChange={(e) => setPosition(e.target.value)}
+                          required
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="location">Location</Label>
+                        <Input
+                          id="location"
+                          placeholder="San Francisco, CA"
+                          value={location}
+                          onChange={(e) => setLocation(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </>
+                  ) : (
+                    // Regular recruit signup form
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name</Label>
+                      <div className="relative">
+                        <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="name"
+                          placeholder="John Doe"
+                          className="pl-10"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                        />
+                      </div>
                     </div>
-                  </div>
+                  )}
+
+                  {userType !== "volunteer" && (
+                    <div className="space-y-2">
+                      <Label htmlFor="email-signup">Email</Label>
+                      <div className="relative">
+                        <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                        <Input
+                          id="email-signup"
+                          type="email"
+                          placeholder="name@example.com"
+                          className="pl-10"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                    </div>
+                  )}
 
                   <div className="space-y-2">
                     <Label htmlFor="password-signup">Password</Label>
@@ -534,6 +910,36 @@ export function UnifiedRegistrationPopup({
                     <p className="text-xs text-muted-foreground">
                       Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.
                     </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="confirm-password">Confirm Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="confirm-password"
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="••••••••"
+                        className="pl-10 pr-10"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        required
+                      />
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="absolute right-1 top-1"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      >
+                        {showConfirmPassword ? (
+                          <EyeOff className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <Eye className="h-4 w-4 text-muted-foreground" />
+                        )}
+                        <span className="sr-only">{showConfirmPassword ? "Hide password" : "Show password"}</span>
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="flex items-center space-x-2">
@@ -570,163 +976,201 @@ export function UnifiedRegistrationPopup({
                     )}
                   </Button>
 
-                  <div className="relative my-4">
-                    <div className="absolute inset-0 flex items-center">
-                      <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-                    </div>
-                    <div className="relative flex justify-center text-xs">
-                      <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
-                    </div>
-                  </div>
+                  {userType !== "volunteer" && (
+                    <>
+                      <div className="relative my-4">
+                        <div className="absolute inset-0 flex items-center">
+                          <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+                        </div>
+                        <div className="relative flex justify-center text-xs">
+                          <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                        </div>
+                      </div>
 
-                  <div className="grid grid-cols-3 gap-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleSocialAuth("google")}
-                      disabled={!!socialLoading}
-                      className="flex items-center justify-center"
-                    >
-                      {socialLoading === "google" ? (
-                        <span className="animate-spin">⟳</span>
-                      ) : (
-                        <svg className="h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                          <path
-                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                            fill="#4285F4"
-                          />
-                          <path
-                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                            fill="#34A853"
-                          />
-                          <path
-                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                            fill="#FBBC05"
-                          />
-                          <path
-                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                            fill="#EA4335"
-                          />
-                        </svg>
-                      )}
-                      <span className="sr-only">Google</span>
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleSocialAuth("facebook")}
-                      disabled={!!socialLoading}
-                      className="flex items-center justify-center text-[#1877F2]"
-                    >
-                      {socialLoading === "facebook" ? (
-                        <span className="animate-spin">⟳</span>
-                      ) : (
-                        <Facebook className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">Facebook</span>
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => handleSocialAuth("twitter")}
-                      disabled={!!socialLoading}
-                      className="flex items-center justify-center text-[#1DA1F2]"
-                    >
-                      {socialLoading === "twitter" ? (
-                        <span className="animate-spin">⟳</span>
-                      ) : (
-                        <Twitter className="h-4 w-4" />
-                      )}
-                      <span className="sr-only">Twitter</span>
-                    </Button>
-                  </div>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleSocialAuth("google")}
+                          disabled={!!socialLoading}
+                          className="flex items-center justify-center"
+                        >
+                          {socialLoading === "google" ? (
+                            <span className="animate-spin">⟳</span>
+                          ) : (
+                            <svg className="h-4 w-4 mr-2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                                fill="#4285F4"
+                              />
+                              <path
+                                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                                fill="#34A853"
+                              />
+                              <path
+                                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                                fill="#FBBC05"
+                              />
+                              <path
+                                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                                fill="#EA4335"
+                              />
+                            </svg>
+                          )}
+                          Google
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleSocialAuth("facebook")}
+                          disabled={!!socialLoading}
+                          className="flex items-center justify-center"
+                        >
+                          {socialLoading === "facebook" ? (
+                            <span className="animate-spin">⟳</span>
+                          ) : (
+                            <Facebook className="h-4 w-4 mr-2" />
+                          )}
+                          Facebook
+                        </Button>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2 mt-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleSocialAuth("twitter")}
+                          disabled={!!socialLoading}
+                          className="flex items-center justify-center"
+                        >
+                          {socialLoading === "twitter" ? (
+                            <span className="animate-spin">⟳</span>
+                          ) : (
+                            <Twitter className="h-4 w-4 mr-2" />
+                          )}
+                          Twitter
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => handleSocialAuth("apple")}
+                          disabled={!!socialLoading}
+                          className="flex items-center justify-center"
+                        >
+                          {socialLoading === "apple" ? (
+                            <span className="animate-spin">⟳</span>
+                          ) : (
+                            <Apple className="h-4 w-4 mr-2" />
+                          )}
+                          Apple
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </form>
               </TabsContent>
 
-              <TabsContent value="optin">
-                <form onSubmit={handleOptIn} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
+              {userType === "recruit" && (
+                <TabsContent value="optin">
+                  <form onSubmit={handleOptIn} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="firstName">First Name</Label>
+                        <Input
+                          id="firstName"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          placeholder="Enter your first name"
+                          required
+                          className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="lastName">Last Name</Label>
+                        <Input
+                          id="lastName"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          placeholder="Enter your last name"
+                          required
+                          className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                        />
+                      </div>
+                    </div>
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="email-optin">Email</Label>
                       <Input
-                        id="firstName"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="Enter your first name"
+                        id="email-optin"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Enter your email address"
                         required
                         className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="phone">Phone Number</Label>
                       <Input
-                        id="lastName"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        placeholder="Enter your last name"
-                        required
+                        id="phone"
+                        type="tel"
+                        value={phone}
+                        onChange={(e) => setPhone(e.target.value)}
+                        placeholder="(415) 555-1234"
                         className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
                       />
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email-optin">Email</Label>
-                    <Input
-                      id="email-optin"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email address"
-                      required
-                      className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      placeholder="(415) 555-1234"
-                      className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="zipCode">ZIP Code</Label>
-                    <Input
-                      id="zipCode"
-                      value={zipCode}
-                      onChange={(e) => setZipCode(e.target.value)}
-                      placeholder="94102"
-                      className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
-                    />
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="optin-terms"
-                      checked={agreeToTerms}
-                      onCheckedChange={(checked) => setAgreeToTerms(!!checked)}
-                      required
-                    />
-                    <Label htmlFor="optin-terms" className="text-sm">
-                      I agree to receive communications about the San Francisco Sheriff's Office recruitment process.
-                    </Label>
-                  </div>
-                  <div className="flex justify-end gap-2 pt-2">
-                    <Button type="button" variant="outline" onClick={onClose}>
-                      Cancel
-                    </Button>
-                    <Button
-                      type="submit"
-                      disabled={isLoading || !agreeToTerms}
-                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
-                    >
-                      {isLoading ? "Submitting..." : isApplying ? "Start Application" : "Sign Up"}
-                    </Button>
-                  </div>
-                </form>
-              </TabsContent>
+                    <div className="space-y-2">
+                      <Label htmlFor="zipCode">ZIP Code</Label>
+                      <Input
+                        id="zipCode"
+                        value={zipCode}
+                        onChange={(e) => setZipCode(e.target.value)}
+                        placeholder="94102"
+                        className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="referralSource">How did you hear about us?</Label>
+                      <select
+                        id="referralSource"
+                        value={referralSource}
+                        onChange={(e) => setReferralSource(e.target.value)}
+                        className="w-full border border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F] rounded-md p-2"
+                      >
+                        <option value="website">Website</option>
+                        <option value="social_media">Social Media</option>
+                        <option value="friend">Friend or Family</option>
+                        <option value="event">Recruitment Event</option>
+                        <option value="other">Other</option>
+                      </select>
+                    </div>
+                    <div className="flex items-center space-x-2">
+                      <Checkbox
+                        id="optin-terms"
+                        checked={agreeToTerms}
+                        onCheckedChange={(checked) => setAgreeToTerms(!!checked)}
+                        required
+                      />
+                      <Label htmlFor="optin-terms" className="text-sm">
+                        I agree to receive communications about the San Francisco Sheriff's Office recruitment process.
+                      </Label>
+                    </div>
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button type="button" variant="outline" onClick={onClose}>
+                        Cancel
+                      </Button>
+                      <Button
+                        type="submit"
+                        disabled={isLoading || !agreeToTerms}
+                        className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                      >
+                        {isLoading ? "Submitting..." : isApplying ? "Start Application" : "Sign Up"}
+                      </Button>
+                    </div>
+                  </form>
+                </TabsContent>
+              )}
             </Tabs>
 
             <div className="mt-4 text-center text-sm text-muted-foreground">

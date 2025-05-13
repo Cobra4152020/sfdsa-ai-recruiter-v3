@@ -1,6 +1,4 @@
 "use client"
-
-import { useState } from "react"
 import { useUser } from "@/context/user-context"
 import { HeroSection } from "@/components/hero-section"
 import { BenefitsSection } from "@/components/benefits-section"
@@ -15,12 +13,14 @@ import { PointsIntroduction } from "@/components/points-introduction"
 import { useRegistration } from "@/context/registration-context"
 
 export default function Home() {
-  const [isApplying, setIsApplying] = useState(false)
   const { isLoggedIn = false } = useUser()
   const { openRegistrationPopup } = useRegistration()
 
   const showOptInForm = (applying = false) => {
-    openRegistrationPopup({ applying })
+    openRegistrationPopup({
+      applying,
+      initialTab: applying ? "optin" : "signin",
+    })
   }
 
   return (

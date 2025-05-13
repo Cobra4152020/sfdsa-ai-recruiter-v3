@@ -3,10 +3,10 @@ import { supabaseAdmin } from "@/lib/supabase-service"
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json()
+    const { firstName, lastName, email, password, phone, organization, position, location } = await request.json()
 
     // Validate inputs
-    if (!name || !email || !password) {
+    if (!firstName || !lastName || !email || !password) {
       return NextResponse.json({ message: "Missing required fields" }, { status: 400 })
     }
 
@@ -30,7 +30,12 @@ export async function POST(request: Request) {
       password,
       email_confirm: true,
       user_metadata: {
-        name,
+        first_name: firstName,
+        last_name: lastName,
+        phone,
+        organization,
+        position,
+        location,
       },
     })
 
@@ -43,25 +48,30 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "Failed to create user" }, { status: 500 })
     }
 
-    // Create the user profile in the database
-    const { error: insertError } = await supabaseAdmin.from("recruit.users").insert({
+    // Create the volunteer profile in the database
+    const { error: insertError } = await supabaseAdmin.from("volunteer.recruiters").insert({
       id: data.user.id,
       email: data.user.email,
-      name: name,
-      points: 50, // Initial points
+      first_name: firstName,
+      last_name: lastName,
+      phone,
+      organization,
+      position,
+      location,
+      is_active: false, // Requires verification
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     })
 
     if (insertError) {
-      console.error("Error creating user profile:", insertError)
+      console.error("Error creating volunteer profile:", insertError)
       return NextResponse.json({ message: "User created but profile setup failed" }, { status: 500 })
     }
 
     // Set user type
     const { error: typeError } = await supabaseAdmin.from("user_types").insert({
       user_id: data.user.id,
-      user_type: "recruit",
+      user_type: "volunteer",
       email: data.user.email,
     })
 
@@ -70,27 +80,32 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: "User created but type setup failed" }, { status: 500 })
     }
 
-    // Log the initial points
+    // Send email notification to admins about new volunteer recruiter
     try {
-      await supabaseAdmin.from("user_point_logs").insert([
-        {
-          user_id: data.user.id,
-          points: 50,
-          action: "Initial signup bonus",
-          created_at: new Date().toISOString(),
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL}/api/admin/notify-volunteer-signup`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      ])
-    } catch (logError) {
-      console.error("Error logging initial points:", logError)
+        body: JSON.stringify({
+          userId: data.user.id,
+          firstName,
+          lastName,
+          email,
+          organization,
+        }),
+      })
+    } catch (emailError) {
+      console.error("Error sending admin notification:", emailError)
     }
 
     return NextResponse.json({
       success: true,
-      message: "User registered successfully",
+      message: "Volunteer registered successfully. Your account requires approval.",
       userId: data.user.id,
-      userType: "recruit",
+      userType: "volunteer",
       email: data.user.email,
-      name: name,
+      name: `${firstName} ${lastName}`,
     })
   } catch (error) {
     console.error("Registration error:", error)
