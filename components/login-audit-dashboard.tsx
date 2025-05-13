@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/components/ui/spinner"
 import { Badge } from "@/components/ui/badge"
-import { createClient } from "@/lib/supabase-clients"
 import { AlertTriangle, UserCheck, RefreshCw, Clock, Users, ShieldAlert, BarChart3 } from "lucide-react"
 
 type UserRole = "recruit" | "volunteer" | "admin"
@@ -36,82 +35,40 @@ export default function LoginAuditDashboard() {
   const [metrics, setMetrics] = useState<LoginMetrics | null>(null)
   const [loading, setLoading] = useState<boolean>(true)
   const [timeRange, setTimeRange] = useState<string>("7d")
+  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const fetchMetrics = async () => {
-      setLoading(true)
-      try {
-        const supabase = createClient()
-
-        // These would be actual API calls to get the metrics
-        // For this example, we'll simulate the data
-
-        // Simulate a delay
-        await new Promise((resolve) => setTimeout(resolve, 800))
-
-        // Mock data
-        const mockMetrics: LoginMetrics = {
-          total_logins: 1268,
-          successful_logins: 1187,
-          failed_logins: 81,
-          avg_response_time_ms: 428,
-          unique_users: 342,
-          by_role: {
-            recruit: 876,
-            volunteer: 276,
-            admin: 35,
-          },
-          by_method: {
-            password: 732,
-            social: 416,
-            magic_link: 120,
-            sso: 0,
-          },
-          recent_errors: [
-            {
-              created_at: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-              error_type: "auth/invalid-credential",
-              error_message: "Email or password is incorrect",
-            },
-            {
-              created_at: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
-              error_type: "auth/network-error",
-              error_message: "Network connection failed",
-            },
-            {
-              created_at: new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString(),
-              error_type: "auth/too-many-requests",
-              error_message: "Too many requests. Try again later",
-            },
-          ],
-          by_day: [
-            { day: "Mon", count: 168, success_rate: 92.3 },
-            { day: "Tue", count: 203, success_rate: 94.1 },
-            { day: "Wed", count: 187, success_rate: 96.8 },
-            { day: "Thu", count: 192, success_rate: 93.2 },
-            { day: "Fri", count: 176, success_rate: 91.5 },
-            { day: "Sat", count: 145, success_rate: 97.2 },
-            { day: "Sun", count: 197, success_rate: 95.4 },
-          ],
-        }
-
-        setMetrics(mockMetrics)
-      } catch (error) {
-        console.error("Error fetching login metrics:", error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     fetchMetrics()
   }, [timeRange])
 
-  const handleRefresh = () => {
+  const fetchMetrics = async () => {
     setLoading(true)
-    // Re-fetch the data
-    setTimeout(() => {
+    setError(null)
+
+    try {
+      const response = await fetch(`/api/auth/login-audit?timeRange=${timeRange}`)
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch login metrics: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+
+      if (!result.success) {
+        throw new Error(result.message || "Failed to fetch login metrics")
+      }
+
+      setMetrics(result.data)
+    } catch (err) {
+      console.error("Error fetching login metrics:", err)
+      setError(err instanceof Error ? err.message : "An unexpected error occurred")
+    } finally {
       setLoading(false)
-    }, 1000)
+    }
+  }
+
+  const handleRefresh = () => {
+    fetchMetrics()
   }
 
   if (loading) {
@@ -123,11 +80,22 @@ export default function LoginAuditDashboard() {
     )
   }
 
-  if (!metrics) {
+  if (error) {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <AlertTriangle className="h-12 w-12 text-yellow-500 mb-2" />
         <h3 className="text-lg font-medium">Failed to load metrics</h3>
+        <p className="text-muted-foreground mb-4">{error}</p>
+        <Button onClick={handleRefresh}>Try Again</Button>
+      </div>
+    )
+  }
+
+  if (!metrics) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <AlertTriangle className="h-12 w-12 text-yellow-500 mb-2" />
+        <h3 className="text-lg font-medium">No data available</h3>
         <p className="text-muted-foreground mb-4">Could not load login audit metrics</p>
         <Button onClick={handleRefresh}>Try Again</Button>
       </div>
@@ -228,7 +196,7 @@ export default function LoginAuditDashboard() {
                 <div key={method} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <Badge
-                      variant={method === "password" ? "default" : method === "social" ? "info" : "secondary"}
+                      variant={method === "password" ? "default" : method === "social" ? "secondary" : "outline"}
                       className="mr-2"
                     >
                       {method.charAt(0).toUpperCase() + method.slice(1)}
@@ -252,7 +220,7 @@ export default function LoginAuditDashboard() {
                 <div key={role} className="flex items-center justify-between">
                   <div className="flex items-center">
                     <Badge
-                      variant={role === "recruit" ? "default" : role === "volunteer" ? "secondary" : "info"}
+                      variant={role === "recruit" ? "default" : role === "volunteer" ? "secondary" : "outline"}
                       className="mr-2"
                     >
                       {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -276,18 +244,22 @@ export default function LoginAuditDashboard() {
             <Badge variant="destructive">{metrics.failed_logins} Errors</Badge>
           </div>
           <div className="space-y-4">
-            {metrics.recent_errors.map((error, index) => (
-              <div key={index} className="flex items-start p-3 rounded-md bg-red-50 border border-red-100">
-                <ShieldAlert className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-red-700">{error.error_type}</span>
-                    <span className="text-xs text-gray-500">{new Date(error.created_at).toLocaleString()}</span>
+            {metrics.recent_errors.length > 0 ? (
+              metrics.recent_errors.map((error, index) => (
+                <div key={index} className="flex items-start p-3 rounded-md bg-red-50 border border-red-100">
+                  <ShieldAlert className="h-5 w-5 text-red-500 mr-3 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-red-700">{error.error_type}</span>
+                      <span className="text-xs text-gray-500">{new Date(error.created_at).toLocaleString()}</span>
+                    </div>
+                    <p className="text-sm text-red-600 mt-1">{error.error_message}</p>
                   </div>
-                  <p className="text-sm text-red-600 mt-1">{error.error_message}</p>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div className="text-center py-4 text-muted-foreground">No login errors recorded in this time period</div>
+            )}
           </div>
         </CardContent>
       </Card>

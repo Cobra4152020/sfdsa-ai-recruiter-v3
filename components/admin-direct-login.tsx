@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/components/ui/use-toast"
 import { Shield, ArrowRight } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
+import { createClient } from "@/lib/supabase-clients"
 
 export function AdminDirectLogin() {
   const [isLoading, setIsLoading] = useState(false)
@@ -17,24 +18,57 @@ export function AdminDirectLogin() {
     setIsLoading(true)
 
     try {
-      // In a real implementation, this would verify the user has admin privileges
-      // For now, we'll just simulate a delay and redirect
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      // Check if the user is already authenticated
+      const supabase = createClient()
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
 
+      if (session) {
+        // Check if the user has admin role
+        const { data: userTypeData } = await supabase
+          .from("user_types")
+          .select("user_type")
+          .eq("user_id", session.user.id)
+          .single()
+
+        if (userTypeData?.user_type === "admin") {
+          // Log the admin access
+          await supabase.from("login_audit_logs").insert({
+            user_id: session.user.id,
+            event_type: "admin_direct_access",
+            details: {
+              email: session.user.email,
+              method: "direct_access",
+            },
+            created_at: new Date().toISOString(),
+          })
+
+          toast({
+            title: "Admin access granted",
+            description: "Welcome to the admin dashboard",
+          })
+
+          router.push("/admin/dashboard")
+          return
+        }
+      }
+
+      // If not authenticated or not an admin, show error
       toast({
-        title: "Admin access granted",
-        description: "Welcome to the admin dashboard",
+        variant: "destructive",
+        title: "Access denied",
+        description: "You need to authenticate as an admin",
       })
 
-      router.push("/admin/dashboard")
+      setIsLoading(false)
     } catch (error) {
       console.error("Admin access error:", error)
       toast({
         variant: "destructive",
         title: "Access denied",
-        description: "You do not have permission to access the admin dashboard",
+        description: "An error occurred while verifying your access",
       })
-    } finally {
       setIsLoading(false)
     }
   }
@@ -59,7 +93,7 @@ export function AdminDirectLogin() {
         >
           {isLoading ? (
             <span className="flex items-center">
-              <Spinner size="sm" variant="white" className="mr-2" />
+              <Spinner size="sm" className="mr-2" />
               Verifying...
             </span>
           ) : (
