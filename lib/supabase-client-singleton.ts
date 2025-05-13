@@ -1,69 +1,29 @@
 import { createClient } from "@supabase/supabase-js"
 import type { Database } from "../types/database"
 
-// Create a singleton instance for client-side usage
-let supabaseClient: ReturnType<typeof createClient> | null = null
+// Create a single instance of the Supabase client to be used throughout the app
+let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null
 
-export function createClientSupabase() {
-  // If we already have a client, return it
-  if (supabaseClient) return supabaseClient
+export function getSupabaseClient() {
+  if (supabaseInstance) return supabaseInstance
 
-  try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    // Check if environment variables are available
-    if (!supabaseUrl || !supabaseKey) {
-      console.warn("Missing Supabase environment variables for client, using mock client")
-      // Return a mock client that won't throw errors
-      return createMockClient()
-    }
-
-    supabaseClient = createClient<Database>(supabaseUrl, supabaseKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-    })
-
-    return supabaseClient
-  } catch (error) {
-    console.error("Error creating Supabase client:", error)
-    return createMockClient()
+  if (!supabaseUrl || !supabaseAnonKey) {
+    throw new Error("Missing Supabase environment variables")
   }
-}
 
-// Create a mock client that won't throw errors
-function createMockClient() {
-  // This mock client implements the basic interface but doesn't make actual API calls
-  return {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          single: () => Promise.resolve({ data: null, error: null }),
-          maybeSingle: () => Promise.resolve({ data: null, error: null }),
-          limit: () => Promise.resolve({ data: [], error: null }),
-          order: () => Promise.resolve({ data: [], error: null }),
-        }),
-        limit: () => Promise.resolve({ data: [], error: null }),
-        order: () => Promise.resolve({ data: [], error: null }),
-      }),
-      insert: () => Promise.resolve({ data: null, error: null }),
-      update: () => Promise.resolve({ data: null, error: null }),
-      delete: () => Promise.resolve({ data: null, error: null }),
-      upsert: () => Promise.resolve({ data: null, error: null }),
-    }),
+  supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
-      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-      getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-      signInWithPassword: () => Promise.resolve({ data: { user: null, session: null }, error: null }),
-      signOut: () => Promise.resolve({ error: null }),
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
     },
-    channel: () => ({
-      on: () => ({ subscribe: () => ({ unsubscribe: () => {} }) }),
-    }),
-  } as any
+  })
+
+  return supabaseInstance
 }
 
-// Export the singleton instance for convenience
-export const supabase = createClientSupabase()
+// Export the singleton instance
+export const supabase = getSupabaseClient()

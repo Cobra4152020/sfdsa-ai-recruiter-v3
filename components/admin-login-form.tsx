@@ -4,195 +4,169 @@ import type React from "react"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/components/ui/use-toast"
-import { Mail, Lock, Eye, EyeOff, AlertCircle, Shield } from "lucide-react"
-import { authService } from "@/lib/unified-auth-service"
+import { ArrowRight } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
+import { supabase } from "@/lib/supabase-client-singleton"
 
 export function AdminLoginForm() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const { toast } = useToast()
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
     setError(null)
 
     try {
-      const result = await authService.signInWithPassword(email, password)
+      // Sign in with email and password
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-      if (!result.success) {
-        throw new Error(result.message)
+      if (signInError) {
+        setError(signInError.message)
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: signInError.message,
+        })
+        return
       }
 
-      // Verify this is an admin account
-      if (result.userType !== "admin") {
-        throw new Error("This account does not have administrative privileges.")
+      if (!data.user) {
+        setError("Login failed. Please try again.")
+        return
       }
+
+      // Check if the user has admin role
+      const { data: userTypeData, error: userTypeError } = await supabase
+        .from("user_types")
+        .select("user_type")
+        .eq("user_id", data.user.id)
+        .single()
+
+      if (userTypeError) {
+        setError("Failed to verify your access level.")
+        toast({
+          variant: "destructive",
+          title: "Verification Error",
+          description: "Could not verify your admin status.",
+        })
+        return
+      }
+
+      if (!userTypeData || userTypeData.user_type !== "admin") {
+        setError("You do not have admin privileges.")
+        toast({
+          variant: "destructive",
+          title: "Access Denied",
+          description: "Your account does not have admin privileges.",
+        })
+
+        // Sign out since this is not an admin
+        await supabase.auth.signOut()
+        return
+      }
+
+      // Log the admin login
+      await supabase.from("login_audit_logs").insert({
+        user_id: data.user.id,
+        event_type: "admin_login",
+        details: {
+          email: data.user.email,
+          method: "password",
+        },
+        created_at: new Date().toISOString(),
+      })
+
+      // Record login metrics
+      await supabase.from("login_metrics").insert({
+        user_role: "admin",
+        login_method: "password",
+        success: true,
+        created_at: new Date().toISOString(),
+      })
 
       toast({
-        title: "Admin login successful",
-        description: `Welcome back${result.name ? ", " + result.name : ""}!`,
+        title: "Login Successful",
+        description: "Welcome to the admin dashboard",
       })
 
       // Redirect to admin dashboard
-      router.push(result.redirectUrl || "/admin/dashboard")
+      router.push("/admin/dashboard")
     } catch (error) {
-      console.error("Admin login error:", error)
-      setError(error instanceof Error ? error.message : "Failed to sign in")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleMagicLinkLogin = async () => {
-    if (!email) {
-      setError("Please enter your email address")
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const result = await authService.signInWithMagicLink(email, "/admin/dashboard")
-
-      if (!result.success) {
-        throw new Error(result.message)
-      }
-
+      console.error("Login error:", error)
+      setError("An unexpected error occurred. Please try again.")
       toast({
-        title: "Magic link sent",
-        description: "Check your email for a secure login link",
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : "An unexpected error occurred",
       })
-    } catch (error) {
-      console.error("Magic link error:", error)
-      setError(error instanceof Error ? error.message : "Failed to send magic link")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <div className="space-y-6">
-      {error && (
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{error}</AlertDescription>
-        </Alert>
-      )}
+    <Card className="border-t-4 border-t-[#0A3C1F] shadow-lg">
+      <CardHeader className="space-y-1">
+        <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">Admin Login</CardTitle>
+        <CardDescription className="text-center">Enter your credentials to access the admin area</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">{error}</div>
+          )}
 
-      <div className="flex justify-center mb-6">
-        <div className="bg-[#0A3C1F]/10 p-3 rounded-full">
-          <Shield className="h-8 w-8 text-[#0A3C1F]" />
-        </div>
-      </div>
-
-      <form onSubmit={handleLogin} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
-              placeholder="admin@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="pl-10"
+              placeholder="admin@example.com"
               required
             />
           </div>
-        </div>
 
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
+          <div className="space-y-2">
             <Label htmlFor="password">Password</Label>
-            <Link href="/admin-reset-password" className="text-sm text-[#0A3C1F] hover:underline">
-              Forgot password?
-            </Link>
-          </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input
               id="password"
-              type={showPassword ? "text" : "password"}
-              placeholder="••••••••"
+              type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 pr-10"
               required
             />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="absolute right-1 top-1"
-              onClick={() => setShowPassword(!showPassword)}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
-            </Button>
           </div>
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <Checkbox id="remember" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(!!checked)} />
-          <Label htmlFor="remember" className="text-sm">
-            Remember me
-          </Label>
-        </div>
-
-        <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" disabled={isLoading}>
-          {isLoading ? (
-            <span className="flex items-center">
-              <span className="animate-spin mr-2">⟳</span>
-              Signing in...
-            </span>
-          ) : (
-            "Sign In as Administrator"
-          )}
-        </Button>
-      </form>
-
-      <div className="relative my-4">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-300"></div>
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-white px-2 text-gray-500">Or</span>
-        </div>
-      </div>
-
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10"
-        onClick={handleMagicLinkLogin}
-        disabled={isLoading}
-      >
-        Sign in with Magic Link
-      </Button>
-
-      <div className="text-center text-sm text-gray-500 mt-6">
-        <p>
-          Return to{" "}
-          <Link href="/" className="text-[#0A3C1F] hover:underline">
-            main site
-          </Link>
-        </p>
-      </div>
-    </div>
+          <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" disabled={isLoading}>
+            {isLoading ? (
+              <span className="flex items-center">
+                <Spinner size="sm" className="mr-2" />
+                Logging in...
+              </span>
+            ) : (
+              <span className="flex items-center">
+                Login to Admin
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </span>
+            )}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
