@@ -1,24 +1,13 @@
 "use client"
-
-import { useState } from "react"
 import { ImprovedHeader } from "./improved-header"
-import { OptInForm } from "./opt-in-form"
+import { useRegistration } from "@/context/registration-context"
 
 export function HeaderWrapper() {
-  const [isOptInFormOpen, setIsOptInFormOpen] = useState(false)
-  const [isApplying, setIsApplying] = useState(false)
+  const { openRegistrationPopup } = useRegistration()
 
   const showOptInForm = (applying = false) => {
-    setIsApplying(applying)
-    setIsOptInFormOpen(true)
+    openRegistrationPopup({ applying })
   }
 
-  return (
-    <>
-      <ImprovedHeader showOptInForm={showOptInForm} />
-      {isOptInFormOpen && (
-        <OptInForm isOpen={isOptInFormOpen} onClose={() => setIsOptInFormOpen(false)} isApplying={isApplying} />
-      )}
-    </>
-  )
+  return <ImprovedHeader showOptInForm={showOptInForm} />
 }

@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useUser } from "@/context/user-context"
-import { OptInForm } from "@/components/opt-in-form"
 import { HeroSection } from "@/components/hero-section"
 import { BenefitsSection } from "@/components/benefits-section"
 import { TestimonialsSection } from "@/components/testimonials-section"
@@ -13,15 +12,15 @@ import { TopRecruitsScroll } from "@/components/top-recruits-scroll"
 import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
 import { ApplicationProgressGamification } from "@/components/application-progress-gamification"
 import { PointsIntroduction } from "@/components/points-introduction"
+import { useRegistration } from "@/context/registration-context"
 
 export default function Home() {
-  const [isOptInFormOpen, setIsOptInFormOpen] = useState(false)
   const [isApplying, setIsApplying] = useState(false)
   const { isLoggedIn = false } = useUser()
+  const { openRegistrationPopup } = useRegistration()
 
   const showOptInForm = (applying = false) => {
-    setIsApplying(applying)
-    setIsOptInFormOpen(true)
+    openRegistrationPopup({ applying })
   }
 
   return (
@@ -66,17 +65,6 @@ export default function Home() {
 
         <CTASection showOptInForm={showOptInForm} />
       </main>
-
-      {isOptInFormOpen && (
-        <OptInForm
-          onClose={() => {
-            setIsOptInFormOpen(false)
-            setIsApplying(false)
-          }}
-          isApplying={isApplying}
-          isOpen={isOptInFormOpen}
-        />
-      )}
 
       {/* Only show debug component in development or when explicitly enabled */}
       {process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true" ? <DebugUser /> : null}

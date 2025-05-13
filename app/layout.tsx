@@ -6,6 +6,7 @@ import PerformanceMonitor from "@/components/performance-monitor"
 import { ErrorMonitor } from "@/components/error-monitor"
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
 import { createPerformanceMetricsTable } from "@/lib/database-setup"
+import { RegistrationProvider } from "@/context/registration-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -29,7 +30,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          {children}
+          <RegistrationProvider>{children}</RegistrationProvider>
           <PerformanceMonitor />
           <ErrorMonitor />
           <WebSocketErrorHandler />
