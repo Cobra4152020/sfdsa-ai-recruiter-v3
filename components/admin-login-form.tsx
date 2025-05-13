@@ -5,15 +5,17 @@ import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { ArrowRight } from "lucide-react"
+import { createClient } from "@/lib/supabase-clients"
 import { Spinner } from "@/components/ui/spinner"
-import { supabase } from "@/lib/supabase-client-singleton"
 
-export function AdminLoginForm() {
+interface AdminLoginFormProps {
+  redirectTo?: string
+}
+
+export function AdminLoginForm({ redirectTo = "/admin/dashboard" }: AdminLoginFormProps) {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
@@ -27,6 +29,8 @@ export function AdminLoginForm() {
     setError(null)
 
     try {
+      const supabase = createClient()
+
       // Sign in with email and password
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -37,18 +41,18 @@ export function AdminLoginForm() {
         setError(signInError.message)
         toast({
           variant: "destructive",
-          title: "Login Failed",
+          title: "Login failed",
           description: signInError.message,
         })
         return
       }
 
       if (!data.user) {
-        setError("Login failed. Please try again.")
+        setError("No user returned from authentication")
         return
       }
 
-      // Check if the user has admin role
+      // Check if user has admin role
       const { data: userTypeData, error: userTypeError } = await supabase
         .from("user_types")
         .select("user_type")
@@ -56,29 +60,17 @@ export function AdminLoginForm() {
         .single()
 
       if (userTypeError) {
-        setError("Failed to verify your access level.")
-        toast({
-          variant: "destructive",
-          title: "Verification Error",
-          description: "Could not verify your admin status.",
-        })
+        setError("Failed to verify admin status")
         return
       }
 
       if (!userTypeData || userTypeData.user_type !== "admin") {
-        setError("You do not have admin privileges.")
-        toast({
-          variant: "destructive",
-          title: "Access Denied",
-          description: "Your account does not have admin privileges.",
-        })
-
-        // Sign out since this is not an admin
+        setError("You do not have admin privileges")
         await supabase.auth.signOut()
         return
       }
 
-      // Log the admin login
+      // Log the successful login
       await supabase.from("login_audit_logs").insert({
         user_id: data.user.id,
         event_type: "admin_login",
@@ -89,84 +81,53 @@ export function AdminLoginForm() {
         created_at: new Date().toISOString(),
       })
 
-      // Record login metrics
-      await supabase.from("login_metrics").insert({
-        user_role: "admin",
-        login_method: "password",
-        success: true,
-        created_at: new Date().toISOString(),
-      })
-
       toast({
-        title: "Login Successful",
+        title: "Login successful",
         description: "Welcome to the admin dashboard",
       })
 
-      // Redirect to admin dashboard
-      router.push("/admin/dashboard")
-    } catch (error) {
-      console.error("Login error:", error)
-      setError("An unexpected error occurred. Please try again.")
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-      })
+      router.push(redirectTo)
+    } catch (err) {
+      console.error("Login error:", err)
+      setError("An unexpected error occurred")
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <Card className="border-t-4 border-t-[#0A3C1F] shadow-lg">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">Admin Login</CardTitle>
-        <CardDescription className="text-center">Enter your credentials to access the admin area</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">{error}</div>
-          )}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md text-sm">{error}</div>
+      )}
 
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@example.com"
-              required
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="email">Email</Label>
+        <Input
+          id="email"
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          placeholder="admin@example.com"
+        />
+      </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
+      <div className="space-y-2">
+        <Label htmlFor="password">Password</Label>
+        <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+      </div>
 
-          <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" disabled={isLoading}>
-            {isLoading ? (
-              <span className="flex items-center">
-                <Spinner size="sm" className="mr-2" />
-                Logging in...
-              </span>
-            ) : (
-              <span className="flex items-center">
-                Login to Admin
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </span>
-            )}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+      <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
+        {isLoading ? (
+          <span className="flex items-center">
+            <Spinner size="sm" className="mr-2" />
+            Logging in...
+          </span>
+        ) : (
+          "Login"
+        )}
+      </Button>
+    </form>
   )
 }
