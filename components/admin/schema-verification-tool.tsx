@@ -15,8 +15,9 @@ import {
   runCustomFix,
 } from "@/app/actions/database-schema-verification"
 import type { SchemaVerificationResult } from "@/lib/schema-verification"
-import { AlertCircle, CheckCircle, XCircle, Database, Table, RefreshCw, Code, Wrench } from "lucide-react"
+import { AlertCircle, CheckCircle, XCircle, Database, Table, RefreshCw, Code, Wrench, FileText } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
+import { SchemaDiagram } from "./schema-diagram"
 
 export function SchemaVerificationTool() {
   const [verificationResult, setVerificationResult] = useState<SchemaVerificationResult | null>(null)
@@ -272,10 +273,14 @@ export function SchemaVerificationTool() {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="verification">Verification Results</TabsTrigger>
           <TabsTrigger value="fixes">Fix Issues</TabsTrigger>
           <TabsTrigger value="custom">Custom SQL</TabsTrigger>
+          <TabsTrigger value="diagram">
+            <FileText className="mr-2 h-4 w-4" />
+            Schema Diagram
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="verification" className="space-y-4">
@@ -592,6 +597,10 @@ CHECK (role IN ('recruit', 'volunteer', 'admin'));"
               </Button>
             </CardFooter>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="diagram" className="space-y-4">
+          <SchemaDiagram />
         </TabsContent>
       </Tabs>
     </div>
