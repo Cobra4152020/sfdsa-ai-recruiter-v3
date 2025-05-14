@@ -22,9 +22,12 @@ export default function SFDistrictsTriviaPage() {
     master: "sf-districts-master",
   }
 
+  // Create a dummy function for showOptInForm since we're using the auth modal context instead
+  const showOptInForm = () => {}
+
   return (
     <>
-      <ImprovedHeader showOptInForm={() => {}} />
+      <ImprovedHeader showOptInForm={showOptInForm} />
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">{gameName}</h1>

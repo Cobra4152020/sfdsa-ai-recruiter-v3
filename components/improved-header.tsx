@@ -1,462 +1,244 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
 import Link from "next/link"
+import { useState } from "react"
 import { usePathname } from "next/navigation"
-import {
-  Menu,
-  X,
-  Shield,
-  Facebook,
-  Twitter,
-  Youtube,
-  Instagram,
-  Linkedin,
-  Moon,
-  Sun,
-  ChevronDown,
-  Heart,
-  Rocket,
-  FileText,
-  GamepadIcon,
-  MessageSquare,
-  Trophy,
-} from "lucide-react"
+import { Menu, X, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useTheme } from "@/components/theme-provider"
-import { DropdownNav } from "@/components/ui/dropdown-nav"
-import { cn } from "@/lib/utils"
-import { NotificationBell } from "@/components/notification-bell"
-import { useUser } from "@/context/user-context"
+import { AuthTriggerButton } from "@/components/auth-trigger-button"
 import { UserAuthStatus } from "@/components/user-auth-status"
+import { useMobile } from "@/hooks/use-mobile"
+import { useClickOutside } from "@/hooks/use-click-outside"
 import { useAuthModal } from "@/context/auth-modal-context"
 
-interface ImprovedHeaderProps {
-  showOptInFormState?: boolean
-  setShowOptInFormState?: (state: boolean) => void
-  isScrolled?: boolean
+interface NavItem {
+  label: string
+  href: string
+  children?: NavItem[]
 }
 
-export function ImprovedHeader({
-  showOptInFormState,
-  setShowOptInFormState,
-  isScrolled: propIsScrolled,
-}: ImprovedHeaderProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(propIsScrolled || false)
-  const { theme, setTheme } = useTheme()
+interface ImprovedHeaderProps {
+  showOptInForm: () => void
+}
+
+const mainNavItems: NavItem[] = [
+  { label: "Home", href: "/" },
+  {
+    label: "Resources",
+    href: "#",
+    children: [
+      { label: "GI Bill Benefits", href: "/gi-bill" },
+      { label: "Discounted Housing", href: "/discounted-housing" },
+      { label: "Gamification", href: "/gamification" },
+      { label: "Mission Briefing", href: "/mission-briefing" },
+      { label: "Deputy Launchpad", href: "/deputy-launchpad" },
+    ],
+  },
+  {
+    label: "Trivia Games",
+    href: "#",
+    children: [
+      { label: "All Trivia Games", href: "/trivia" },
+      { label: "SF Football", href: "/trivia/sf-football" },
+      { label: "SF Baseball", href: "/trivia/sf-baseball" },
+      { label: "SF Basketball", href: "/trivia/sf-basketball" },
+      { label: "SF Districts", href: "/trivia/sf-districts" },
+      { label: "SF Tourist Spots", href: "/trivia/sf-tourist-spots" },
+      { label: "SF Day Trips", href: "/sf-day-trips" },
+    ],
+  },
+  {
+    label: "Community",
+    href: "#",
+    children: [
+      { label: "Awards", href: "/awards" },
+      { label: "Badges", href: "/badges" },
+      { label: "Chat with Sgt. Ken", href: "/chat-with-sgt-ken" },
+      { label: "Daily Briefing", href: "/daily-briefing" },
+      { label: "TikTok Challenges", href: "/tiktok-challenges" },
+    ],
+  },
+  { label: "Donate", href: "/donate" },
+  { label: "Contact", href: "/contact" },
+]
+
+export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
   const pathname = usePathname()
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [mobileDropdowns, setMobileDropdowns] = useState({
-    topRecruits: false,
-    playTheGame: false,
-    missionBriefing: false,
-  })
-  const { currentUser } = useUser()
-  const { openModal } = useAuthModal()
+  const isMobile = useMobile()
+  const mobileMenuRef = useClickOutside<HTMLDivElement>(() => setMobileMenuOpen(false))
 
-  // Handle scroll effect for header
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50)
+  // Safely access the auth modal context
+  const { openModal: contextOpenModal } = useAuthModal()
+  const openModal =
+    contextOpenModal ||
+    (() => {
+      console.warn("Auth modal context not available")
+      showOptInForm()
+    })
+
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
+
+  const toggleSubmenu = (label: string) => {
+    if (activeSubmenu === label) {
+      setActiveSubmenu(null)
+    } else {
+      setActiveSubmenu(label)
     }
-
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
-
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen)
-    setIsMobileMenuOpen(!isMobileMenuOpen)
   }
 
-  // Create a safe handler function that checks if showOptInForm exists before calling it
-  const handleOptInClick = () => {
-    // Use the new auth modal instead of the old opt-in form
-    openModal("register", "recruit")
-  }
-
-  // Handle link clicks to prevent default behavior if needed
-  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    // If the link is not ready or has issues, prevent default behavior
-    const href = e.currentTarget.getAttribute("href")
-    if (href && (href.includes("#") || href === "/")) {
-      // Allow these to work normally
-      return
-    }
-
-    // For other links, check if they're ready
-    try {
-      // If we're in development or testing, let the links work
-      if (process.env.NODE_ENV === "development") {
-        return
-      }
-
-      // For production, check if the page exists
-      // This is a simplified check - in reality you might want to check if the route exists
-      const isReady = true // Set to false if you want to disable all links temporarily
-
-      if (!isReady) {
-        e.preventDefault()
-        console.log("This feature is coming soon!")
-        // Optionally show a toast or message to the user
-      }
-    } catch (error) {
-      // If there's an error, prevent navigation
-      e.preventDefault()
-      console.warn("Navigation error:", error)
+  const handleRegisterClick = () => {
+    if (typeof openModal === "function") {
+      openModal("signup", "recruit")
+    } else {
+      showOptInForm()
     }
   }
 
   return (
-    <header
-      className={`bg-[#0A3C1F] dark:bg-[#121212] text-white sticky top-0 z-50 transition-all duration-300 ${
-        isScrolled ? "shadow-md py-2" : "py-4"
-      }`}
-      role="banner"
-    >
-      <div className="max-w-7xl mx-auto px-4">
-        {/* Top row with logo and social icons */}
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center hover:opacity-90 transition-opacity"
-            aria-label="SF Deputy Sheriff AI Recruitment - Home"
-            onClick={handleLinkClick}
-          >
-            <Shield className="h-8 w-8 text-[#FFD700] mr-2" aria-hidden="true" />
-            <div>
-              <span className="font-bold text-white text-lg">SF Deputy Sheriff</span>
-              <span className="text-[#FFD700] text-xs block -mt-1">AI Recruitment</span>
-            </div>
-          </Link>
+    <header className="bg-white shadow-sm sticky top-0 z-50">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Link href="/" className="text-xl font-bold text-[#0A3C1F] mr-8">
+              SFDSA AI Recruiter
+            </Link>
 
-          {/* Donation Button - Desktop */}
-          <Link
-            href="/donate"
-            className="hidden md:flex items-center bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold py-2 px-4 rounded-md transition-colors shadow-md"
-            onClick={handleLinkClick}
-          >
-            <Heart className="h-5 w-5 mr-2" />
-            Donate Now
-          </Link>
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex space-x-6">
+              {mainNavItems.map((item) => (
+                <div key={item.label} className="relative group">
+                  {item.children ? (
+                    <button
+                      className={`flex items-center text-gray-600 hover:text-[#0A3C1F] px-1 py-2 ${
+                        item.children.some((child) => child.href === pathname) ? "text-[#0A3C1F] font-medium" : ""
+                      }`}
+                      onClick={() => toggleSubmenu(item.label)}
+                    >
+                      {item.label}
+                      <ChevronDown className="ml-1 h-4 w-4" />
+                    </button>
+                  ) : (
+                    <Link
+                      href={item.href}
+                      className={`text-gray-600 hover:text-[#0A3C1F] px-1 py-2 ${
+                        pathname === item.href ? "text-[#0A3C1F] font-medium" : ""
+                      }`}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
 
-          {/* Social Icons and Theme Toggle - Desktop */}
+                  {/* Desktop Dropdown */}
+                  {item.children && (
+                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-10 hidden group-hover:block">
+                      <div className="py-1">
+                        {item.children.map((child) => (
+                          <Link
+                            key={child.label}
+                            href={child.href}
+                            className={`block px-4 py-2 text-sm hover:bg-gray-100 ${
+                              pathname === child.href ? "bg-gray-50 text-[#0A3C1F] font-medium" : "text-gray-700"
+                            }`}
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+          </div>
+
           <div className="hidden md:flex items-center space-x-4">
-            {/* Notification Bell - Only show if user is logged in */}
-            {currentUser && <NotificationBell userId={currentUser.id} />}
-
-            <a
-              href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Follow us on Facebook"
-              className="text-white hover:text-[#FFD700] transition-colors"
-            >
-              <Facebook className="h-5 w-5" />
-            </a>
-            <a
-              href="https://twitter.com/sanfranciscodsa"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Follow us on Twitter"
-              className="text-white hover:text-[#FFD700] transition-colors"
-            >
-              <Twitter className="h-5 w-5" />
-            </a>
-            <a
-              href="https://www.youtube.com/channel/UCgyW7q86c-Mua4bS1a9wBWA"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Subscribe to our YouTube channel"
-              className="text-white hover:text-[#FFD700] transition-colors"
-            >
-              <Youtube className="h-5 w-5" />
-            </a>
-            <a
-              href="https://www.instagram.com/sfdeputysheriffsassociation/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Follow us on Instagram"
-              className="text-white hover:text-[#FFD700] transition-colors"
-            >
-              <Instagram className="h-5 w-5" />
-            </a>
-            <a
-              href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs%E2%80%99-association/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Connect with us on LinkedIn"
-              className="text-white hover:text-[#FFD700] transition-colors"
-            >
-              <Linkedin className="h-5 w-5" />
-            </a>
-            <button
-              onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-              aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
-              className="text-white hover:text-[#FFD700] transition-colors p-1 rounded-full hover:bg-white/10"
-            >
-              {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-            </button>
+            <UserAuthStatus />
+            <AuthTriggerButton mode="signin" userType="recruit" label="Sign In" />
+            <Button onClick={handleRegisterClick} className="bg-[#0A3C1F] hover:bg-[#0D4D28] text-white">
+              Join Now
+            </Button>
           </div>
 
           {/* Mobile menu button */}
-          <div className="md:hidden">
-            <button
-              onClick={toggleMenu}
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
-              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={isMenuOpen}
-              aria-controls="mobile-menu"
-            >
-              {isMenuOpen ? (
-                <X className="h-6 w-6" aria-hidden="true" />
-              ) : (
-                <Menu className="h-6 w-6" aria-hidden="true" />
-              )}
-            </button>
-          </div>
-        </div>
-
-        {/* Bottom row with navigation and buttons */}
-        <div className="border-t border-white/10 pt-4 mt-4 hidden md:block">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6" aria-label="Main Navigation">
-              <DropdownNav
-                label={
-                  <span className="flex items-center">
-                    <FileText className="h-4 w-4 mr-1" />
-                    Mission Briefing
-                  </span>
-                }
-                items={[
-                  { label: "Overview", href: "/mission-briefing", onClick: handleLinkClick },
-                  { label: "G.I. Bill", href: "/gi-bill", onClick: handleLinkClick },
-                  { label: "Discounted Housing", href: "/discounted-housing", onClick: handleLinkClick },
-                ]}
-              />
-              <DropdownNav
-                label={
-                  <span className="flex items-center">
-                    <Trophy className="h-4 w-4 mr-1" />
-                    Top Recruits
-                  </span>
-                }
-                items={[
-                  { label: "Top Recruits", href: "/awards", onClick: handleLinkClick },
-                  { label: "Leaderboard", href: "/awards#leaderboard", onClick: handleLinkClick },
-                  { label: "Badge Gallery", href: "/badges", onClick: handleLinkClick },
-                  { label: "NFT Awards", href: "/nft-awards/coming-soon", onClick: handleLinkClick },
-                ]}
-              />
-              <DropdownNav
-                label={
-                  <span className="flex items-center">
-                    <GamepadIcon className="h-4 w-4 mr-1" />
-                    Play the Game
-                  </span>
-                }
-                items={[
-                  {
-                    label: (
-                      <span className="flex items-center">
-                        <Rocket className="h-4 w-4 mr-1" />
-                        Deputy Launchpad
-                      </span>
-                    ),
-                    href: "/deputy-launchpad",
-                    onClick: handleLinkClick,
-                  },
-                  { label: "Play Trivia w/ Sgt. Ken", href: "/trivia", onClick: handleLinkClick },
-                  { label: "Sgt. Ken's Daily Briefing", href: "/daily-briefing", onClick: handleLinkClick },
-                ]}
-              />
-              <Link
-                href="/chat-with-sgt-ken"
-                className="text-white hover:text-[#FFD700] transition-colors"
-                onClick={handleLinkClick}
-              >
-                <span className="flex items-center">
-                  <MessageSquare className="h-4 w-4 mr-1" />
-                  Ask Sgt. Ken
-                </span>
-              </Link>
-            </nav>
-
-            {/* Right side buttons - Now using UserAuthStatus */}
-            <div className="hidden md:flex items-center space-x-4 mt-4 md:mt-0">
-              <UserAuthStatus />
-            </div>
-          </div>
+          <button
+            type="button"
+            className="md:hidden text-gray-700"
+            onClick={toggleMobileMenu}
+            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
       </div>
 
-      {/* Mobile menu dropdown */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
-          <div className="px-2 pt-2 pb-3 space-y-1 bg-[#0A3C1F] border-t border-white/10">
-            {/* Mobile notification bell */}
-            {currentUser && (
-              <div className="px-3 py-2">
-                <NotificationBell userId={currentUser.id} />
+      {/* Mobile menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden bg-white py-2 px-4 shadow-lg absolute top-16 left-0 right-0 z-50" ref={mobileMenuRef}>
+          <nav className="flex flex-col space-y-3">
+            {mainNavItems.map((item) => (
+              <div key={item.label} className="py-1">
+                {item.children ? (
+                  <>
+                    <button
+                      className={`flex items-center justify-between w-full text-left text-gray-600 px-1 py-2 ${
+                        item.children.some((child) => child.href === pathname) ? "text-[#0A3C1F] font-medium" : ""
+                      }`}
+                      onClick={() => toggleSubmenu(item.label)}
+                    >
+                      {item.label}
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform ${activeSubmenu === item.label ? "rotate-180" : ""}`}
+                      />
+                    </button>
+
+                    {/* Mobile Dropdown */}
+                    {activeSubmenu === item.label && (
+                      <div className="pl-4 mt-1 space-y-1 border-l-2 border-gray-200">
+                        {item.children.map((child) => (
+                          <Link
+                            key={child.label}
+                            href={child.href}
+                            className={`block py-2 text-sm ${
+                              pathname === child.href ? "text-[#0A3C1F] font-medium" : "text-gray-600"
+                            }`}
+                            onClick={() => setMobileMenuOpen(false)}
+                          >
+                            {child.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <Link
+                    href={item.href}
+                    className={`block px-1 py-2 ${
+                      pathname === item.href ? "text-[#0A3C1F] font-medium" : "text-gray-600"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                )}
               </div>
-            )}
+            ))}
 
-            {/* Donation Button - Mobile */}
-            <Link
-              href="/donate"
-              className="flex items-center justify-center bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold py-3 px-4 rounded-md transition-colors shadow-md mb-4"
-              onClick={handleLinkClick}
-            >
-              <Heart className="h-5 w-5 mr-2" />
-              Donate Now
-            </Link>
-
-            {/* Mobile Mission Briefing dropdown */}
-            <div className="block px-3 py-2">
-              <button
-                onClick={() => setMobileDropdowns((prev) => ({ ...prev, missionBriefing: !prev.missionBriefing }))}
-                className="flex items-center w-full text-white hover:text-[#FFD700]"
+            <div className="pt-4 mt-2 border-t border-gray-200 space-y-3">
+              <UserAuthStatus />
+              <AuthTriggerButton mode="signin" userType="recruit" label="Sign In" className="w-full" />
+              <Button
+                onClick={() => {
+                  handleRegisterClick()
+                  setMobileMenuOpen(false)
+                }}
+                className="w-full bg-[#0A3C1F] hover:bg-[#0D4D28] text-white"
               >
-                <FileText className="h-4 w-4 mr-2" />
-                Mission Briefing
-                <ChevronDown
-                  className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
-                    "transform rotate-180": mobileDropdowns.missionBriefing,
-                  })}
-                />
-              </button>
-
-              {mobileDropdowns.missionBriefing && (
-                <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link
-                    href="/mission-briefing"
-                    className="block text-white hover:text-[#FFD700]"
-                    onClick={handleLinkClick}
-                  >
-                    Overview
-                  </Link>
-                  <Link href="/gi-bill" className="block text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
-                    G.I. Bill
-                  </Link>
-                  <Link
-                    href="/discounted-housing"
-                    className="block text-white hover:text-[#FFD700]"
-                    onClick={handleLinkClick}
-                  >
-                    Discounted Housing
-                  </Link>
-                </div>
-              )}
+                Join Now
+              </Button>
             </div>
-
-            {/* Mobile Top Recruits dropdown */}
-            <div className="block px-3 py-2">
-              <button
-                onClick={() => setMobileDropdowns((prev) => ({ ...prev, topRecruits: !prev.topRecruits }))}
-                className="flex items-center w-full text-white hover:text-[#FFD700]"
-              >
-                <Trophy className="h-4 w-4 mr-2" />
-                Top Recruits
-                <ChevronDown
-                  className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
-                    "transform rotate-180": mobileDropdowns.topRecruits,
-                  })}
-                />
-              </button>
-
-              {mobileDropdowns.topRecruits && (
-                <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link href="/awards" className="block text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
-                    Top Recruits
-                  </Link>
-                  <Link
-                    href="/awards#leaderboard"
-                    className="block text-white hover:text-[#FFD700]"
-                    onClick={handleLinkClick}
-                  >
-                    Leaderboard
-                  </Link>
-                  <Link href="/badges" className="block text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
-                    Badge Gallery
-                  </Link>
-                  <Link
-                    href="/nft-awards/coming-soon"
-                    className="block text-white hover:text-[#FFD700]"
-                    onClick={handleLinkClick}
-                  >
-                    NFT Awards{" "}
-                    <span className="ml-1 px-1 py-0.5 text-xs bg-[#FFD700] text-[#0A3C1F] rounded-full">Soon</span>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Play the Game dropdown */}
-            <div className="block px-3 py-2">
-              <button
-                onClick={() => setMobileDropdowns((prev) => ({ ...prev, playTheGame: !prev.playTheGame }))}
-                className="flex items-center w-full text-white hover:text-[#FFD700]"
-              >
-                <GamepadIcon className="h-4 w-4 mr-2" />
-                Play the Game
-                <ChevronDown
-                  className={cn("ml-1 h-4 w-4 transition-transform duration-200", {
-                    "transform rotate-180": mobileDropdowns.playTheGame,
-                  })}
-                />
-              </button>
-
-              {mobileDropdowns.playTheGame && (
-                <div className="pl-4 mt-2 space-y-2 animate-in fade-in slide-in-from-top-1 duration-150">
-                  <Link
-                    href="/deputy-launchpad"
-                    className="block text-white hover:text-[#FFD700] flex items-center"
-                    onClick={handleLinkClick}
-                  >
-                    <Rocket className="h-4 w-4 mr-1" />
-                    Deputy Launchpad
-                  </Link>
-                  <Link href="/trivia" className="block text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
-                    Play Trivia w/ Sgt. Ken
-                  </Link>
-                  <Link
-                    href="/daily-briefing"
-                    className="block text-white hover:text-[#FFD700]"
-                    onClick={handleLinkClick}
-                  >
-                    Sgt. Ken's Daily Briefing
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <Link
-              href="/chat-with-sgt-ken"
-              className="block px-3 py-2 text-white hover:text-[#FFD700] flex items-center"
-              onClick={handleLinkClick}
-            >
-              <MessageSquare className="h-4 w-4 mr-2" />
-              Ask Sgt. Ken
-            </Link>
-            <Link href="/login" className="block px-3 py-2 text-white hover:text-[#FFD700]" onClick={handleLinkClick}>
-              Login
-            </Link>
-          </div>
-
-          {/* Mobile buttons */}
-          <div className="px-5 py-4 border-t border-white/10 flex space-x-3">
-            <Button
-              onClick={handleOptInClick}
-              className="flex-1 bg-white hover:bg-white/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
-            >
-              Apply Now
-            </Button>
-          </div>
+          </nav>
         </div>
       )}
     </header>
