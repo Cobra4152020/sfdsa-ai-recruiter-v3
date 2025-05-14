@@ -1,115 +1,64 @@
-import { NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase-service"
-import { createClient } from "@/lib/supabase-clients"
-import { addParticipationPoints } from "@/lib/points-service"
+import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers"
+import { type NextRequest, NextResponse } from "next/server"
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get("code")
-  const userType = requestUrl.searchParams.get("userType") || "recruit"
-  const callbackUrl = requestUrl.searchParams.get("callbackUrl")
+  const userType = requestUrl.searchParams.get("user_type") || "recruit"
 
-  // Redirect URL based on user type
-  let redirectTo = "/"
-  if (userType === "volunteer") {
-    redirectTo = "/volunteer-dashboard"
-  } else if (userType === "admin") {
-    redirectTo = "/admin/dashboard"
-  } else {
-    redirectTo = "/dashboard"
-  }
-
-  // Use callback URL if provided
-  if (callbackUrl) {
-    redirectTo = callbackUrl
-  }
-
-  try {
-    if (!code) {
-      return NextResponse.redirect(`${requestUrl.origin}${redirectTo}?error=missing_code`)
-    }
-
-    // Create a supabase client with the provided code
-    const supabase = createClient()
+  if (code) {
+    const cookieStore = cookies()
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore })
 
     // Exchange code for session
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+    await supabase.auth.exchangeCodeForSession(code)
 
-    if (error || !data.user) {
-      console.error("Error exchanging code for session:", error)
-      return NextResponse.redirect(`${requestUrl.origin}${redirectTo}?error=auth_error`)
-    }
+    // Get the current user
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
 
-    // Check if user exists in our database
-    const { data: userTypeData } = await supabaseAdmin
-      .from("user_types")
-      .select("user_type")
-      .eq("user_id", data.user.id)
-      .maybeSingle()
+    if (user) {
+      // Check if user profile exists
+      const { data: existingProfile, error: profileCheckError } = await supabase
+        .from(userType === "volunteer" ? "volunteer_users" : userType === "admin" ? "admin_users" : "recruit_users")
+        .select("user_id")
+        .eq("user_id", user.id)
+        .maybeSingle()
 
-    const isNewUser = !userTypeData
+      // If profile doesn't exist, create it
+      if (!existingProfile && !profileCheckError) {
+        // Get user metadata
+        const fullName =
+          user.user_metadata?.full_name ||
+          `${user.user_metadata?.name || ""} ${user.user_metadata?.family_name || ""}`.trim() ||
+          user.user_metadata?.name ||
+          "User"
 
-    if (isNewUser) {
-      // Create new user profile for social login
-      const { id, email, user_metadata } = data.user
+        // Create profile in appropriate table
+        await supabase
+          .from(userType === "volunteer" ? "volunteer_users" : userType === "admin" ? "admin_users" : "recruit_users")
+          .insert({
+            user_id: user.id,
+            email: user.email,
+            full_name: fullName,
+            created_at: new Date().toISOString(),
+          })
 
-      if (!email) {
-        return NextResponse.redirect(`${requestUrl.origin}${redirectTo}?error=missing_email`)
-      }
-
-      // Extract name from metadata
-      const name = user_metadata?.name || user_metadata?.full_name || email.split("@")[0]
-      const avatarUrl = user_metadata?.avatar_url || user_metadata?.picture
-
-      // Create user in recruit.users table
-      await supabaseAdmin.from("recruit.users").insert({
-        id,
-        email,
-        name,
-        avatar_url: avatarUrl,
-        points: 50, // Initial points
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      })
-
-      // Set user type
-      await supabaseAdmin.from("user_types").insert({
-        user_id: id,
-        user_type: "recruit",
-        email,
-      })
-
-      // Log the initial points
-      await supabaseAdmin.from("user_point_logs").insert([
-        {
-          user_id: id,
-          points: 50,
-          action: "Initial signup bonus via social login",
-          created_at: new Date().toISOString(),
-        },
-      ])
-
-      // Award initial points
-      await addParticipationPoints(id, 50, "sign_up", "Initial signup bonus via social login")
-    }
-
-    // If user is a volunteer, check if active
-    if (userType === "volunteer" && !isNewUser) {
-      const { data: volunteerData } = await supabaseAdmin
-        .from("volunteer.recruiters")
-        .select("is_active")
-        .eq("id", data.user.id)
-        .single()
-
-      if (!volunteerData?.is_active) {
-        return NextResponse.redirect(`${requestUrl.origin}/volunteer-pending`)
+        // Award 50 points to new recruit users
+        if (userType === "recruit") {
+          await supabase.from("user_points").insert({
+            user_id: user.id,
+            points: 50,
+            reason: "Welcome bonus",
+            created_at: new Date().toISOString(),
+          })
+        }
       }
     }
-
-    // Redirect to the appropriate page
-    return NextResponse.redirect(`${requestUrl.origin}${redirectTo}${isNewUser ? "?newUser=true" : ""}`)
-  } catch (error) {
-    console.error("Auth callback error:", error)
-    return NextResponse.redirect(`${requestUrl.origin}${redirectTo}?error=unexpected`)
   }
+
+  // Redirect to the home page
+  return NextResponse.redirect(new URL("/", request.url))
 }

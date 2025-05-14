@@ -1,17 +1,32 @@
 "use client"
 
-import { MessageSquare } from "lucide-react"
+import type React from "react"
+
 import { Button } from "@/components/ui/button"
 import { useApply } from "@/context/apply-context"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
 
-export default function GlobalChatButton() {
+interface ApplyButtonProps {
+  className?: string
+  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
+  size?: "default" | "sm" | "lg"
+  userType?: "recruit" | "volunteer" | "admin"
+  redirectUrl?: string
+  children?: React.ReactNode
+}
+
+export default function ApplyButton({
+  className,
+  variant = "default",
+  size = "default",
+  userType = "recruit",
+  redirectUrl,
+  children = "Apply Now",
+}: ApplyButtonProps) {
   const { openApplyPopup } = useApply()
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const supabase = createClientComponentClient()
-  const router = useRouter()
 
   useEffect(() => {
     async function checkAuth() {
@@ -27,21 +42,18 @@ export default function GlobalChatButton() {
   const handleClick = () => {
     if (!isAuthenticated) {
       openApplyPopup({
-        actionName: "chat with Sgt. Ken",
-        redirectUrl: "/chat-with-sgt-ken",
+        userType,
+        redirectUrl,
+        actionName: "apply",
       })
-    } else {
-      router.push("/chat-with-sgt-ken")
+    } else if (redirectUrl) {
+      window.location.href = redirectUrl
     }
   }
 
   return (
-    <Button
-      onClick={handleClick}
-      className="fixed z-40 flex items-center gap-2 px-4 py-2 text-white bg-blue-600 rounded-full shadow-lg bottom-6 right-6 hover:bg-blue-700"
-    >
-      <MessageSquare className="w-5 h-5" />
-      <span>Ask Sgt. Ken</span>
+    <Button className={className} variant={variant} size={size} onClick={handleClick}>
+      {children}
     </Button>
   )
 }

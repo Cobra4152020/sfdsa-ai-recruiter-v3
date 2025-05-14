@@ -1,41 +1,30 @@
 "use client"
 
 import { useEffect } from "react"
-import { useRegistration } from "@/context/registration-context"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
+import { useRouter } from "next/navigation"
+import { useApply } from "@/context/apply-context"
 
 export default function VolunteerLoginPage() {
-  const { openRegistrationPopup } = useRegistration()
+  const router = useRouter()
+  const { openApplyPopup } = useApply()
 
   useEffect(() => {
-    // Open the registration popup automatically with volunteer settings
-    openRegistrationPopup({
+    // Open the apply popup with volunteer user type
+    openApplyPopup({
       userType: "volunteer",
-      initialTab: "signin",
-      title: "Volunteer Recruiter Login",
-      description: "Sign in to access your volunteer recruiter dashboard",
     })
-  }, [openRegistrationPopup])
+
+    // Redirect to home after a short delay
+    const timeout = setTimeout(() => {
+      router.push("/")
+    }, 100)
+
+    return () => clearTimeout(timeout)
+  }, [openApplyPopup, router])
 
   return (
-    <>
-      <ImprovedHeader />
-      <main className="container mx-auto px-4 py-8 md:py-12 min-h-[60vh] flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold mb-4">Volunteer Recruiter Login</h1>
-          <p className="mb-6">
-            The login form should appear automatically. If it doesn't, please click the button below.
-          </p>
-          <button
-            onClick={() => openRegistrationPopup({ userType: "volunteer", initialTab: "signin" })}
-            className="bg-[#0A3C1F] text-white py-2 px-4 rounded hover:bg-[#0A3C1F]/90"
-          >
-            Open Login Form
-          </button>
-        </div>
-      </main>
-      <ImprovedFooter />
-    </>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="w-8 h-8 border-4 border-t-blue-500 border-b-blue-500 border-l-transparent border-r-transparent rounded-full animate-spin"></div>
+    </div>
   )
 }
