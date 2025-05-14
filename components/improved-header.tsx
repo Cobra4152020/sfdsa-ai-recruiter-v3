@@ -30,6 +30,8 @@ import { DropdownNav } from "@/components/ui/dropdown-nav"
 import { cn } from "@/lib/utils"
 import { NotificationBell } from "@/components/notification-bell"
 import { useUser } from "@/context/user-context"
+import { UserAuthStatus } from "@/components/user-auth-status"
+import { useAuthModal } from "@/context/auth-modal-context"
 
 interface ImprovedHeaderProps {
   showOptInFormState?: boolean
@@ -53,6 +55,7 @@ export function ImprovedHeader({
     missionBriefing: false,
   })
   const { currentUser } = useUser()
+  const { openModal } = useAuthModal()
 
   // Handle scroll effect for header
   useEffect(() => {
@@ -71,9 +74,8 @@ export function ImprovedHeader({
 
   // Create a safe handler function that checks if showOptInForm exists before calling it
   const handleOptInClick = () => {
-    if (typeof setShowOptInFormState === "function") {
-      setShowOptInFormState(true)
-    }
+    // Use the new auth modal instead of the old opt-in form
+    openModal("register", "recruit")
   }
 
   // Handle link clicks to prevent default behavior if needed
@@ -285,19 +287,9 @@ export function ImprovedHeader({
               </Link>
             </nav>
 
-            {/* Right side buttons */}
+            {/* Right side buttons - Now using UserAuthStatus */}
             <div className="hidden md:flex items-center space-x-4 mt-4 md:mt-0">
-              <Button
-                onClick={handleOptInClick}
-                className="bg-white hover:bg-white/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
-              >
-                Apply Now
-              </Button>
-              <Link href="/login" onClick={handleLinkClick}>
-                <Button className="bg-[#FFD700]/80 hover:bg-[#FFD700] text-[#0A3C1F] dark:text-[#121212] font-medium">
-                  Login
-                </Button>
-              </Link>
+              <UserAuthStatus />
             </div>
           </div>
         </div>
@@ -459,24 +451,11 @@ export function ImprovedHeader({
           {/* Mobile buttons */}
           <div className="px-5 py-4 border-t border-white/10 flex space-x-3">
             <Button
-              onClick={() => {
-                if (typeof setShowOptInFormState === "function") {
-                  setShowOptInFormState(true)
-                }
-                setIsMobileMenuOpen(false)
-              }}
+              onClick={handleOptInClick}
               className="flex-1 bg-white hover:bg-white/90 text-[#0A3C1F] dark:text-[#121212] font-medium"
             >
               Apply Now
             </Button>
-            <Link href="/login" className="flex-1" onClick={handleLinkClick}>
-              <Button
-                className="w-full bg-[#FFD700]/80 hover:bg-[#FFD700] text-[#0A3C1F] dark:text-[#121212] font-medium"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                Login
-              </Button>
-            </Link>
           </div>
         </div>
       )}

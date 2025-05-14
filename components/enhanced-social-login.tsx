@@ -6,7 +6,7 @@ import { enhancedAuthService } from "@/lib/enhanced-auth-service"
 import { useToast } from "@/components/ui/use-toast"
 import { Spinner } from "@/components/ui/spinner"
 import type { Provider } from "@supabase/supabase-js"
-import { Facebook, Twitter, Github, Linkedin } from "lucide-react"
+import { Facebook, Twitter, Linkedin } from "lucide-react"
 
 interface EnhancedSocialLoginProps {
   onLoginStart?: () => void
@@ -136,22 +136,6 @@ export function EnhancedSocialLogin({
           <Twitter className="mr-2 h-4 w-4" />
         )}
         {isLoading === "twitter" ? "Connecting..." : "Continue with Twitter"}
-      </Button>
-
-      <Button
-        type="button"
-        variant={variant}
-        size={buttonSize}
-        className="w-full flex items-center justify-center bg-[#333] hover:bg-[#333]/90 text-white"
-        onClick={() => handleSocialLogin("github")}
-        disabled={isLoading !== null}
-      >
-        {isLoading === "github" ? (
-          <Spinner size="sm" variant="white" className="mr-2" />
-        ) : (
-          <Github className="mr-2 h-4 w-4" />
-        )}
-        {isLoading === "github" ? "Connecting..." : "Continue with GitHub"}
       </Button>
 
       {showLinkedin && (

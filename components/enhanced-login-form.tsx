@@ -57,34 +57,6 @@ export function EnhancedLoginForm() {
     }
   }
 
-  const handleMagicLinkLogin = async () => {
-    if (!email) {
-      setError("Please enter your email address")
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const result = await enhancedAuthService.signInWithMagicLink(email)
-
-      if (!result.success) {
-        throw new Error(result.message)
-      }
-
-      toast({
-        title: "Magic link sent",
-        description: "Check your email for a link to sign in",
-      })
-    } catch (error) {
-      console.error("Magic link error:", error)
-      setError(error instanceof Error ? error.message : "Failed to send magic link")
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   return (
     <>
       {needsConfirmation && (
@@ -189,23 +161,6 @@ export function EnhancedLoginForm() {
           <span className="bg-white px-2 text-gray-500">Or</span>
         </div>
       </div>
-
-      <Button
-        type="button"
-        variant="outline"
-        className="w-full border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10"
-        onClick={handleMagicLinkLogin}
-        disabled={isLoading}
-      >
-        {isLoading ? (
-          <span className="flex items-center">
-            <Spinner size="sm" className="mr-2" />
-            Sending...
-          </span>
-        ) : (
-          "Sign in with Magic Link"
-        )}
-      </Button>
 
       <div className="text-center space-y-2 mt-4">
         <p className="text-sm text-gray-600">
