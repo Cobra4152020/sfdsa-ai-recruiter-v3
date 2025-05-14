@@ -3,7 +3,7 @@ import PointsSummary from "@/components/user-dashboard/points-summary"
 import Leaderboard from "@/components/user-dashboard/leaderboard"
 import ActiveChallenges from "@/components/user-dashboard/active-challenges"
 import BadgeShowcase from "@/components/user-dashboard/badge-showcase"
-import ImprovedHeader from "@/components/improved-header"
+import DashboardHeader from "@/components/user-dashboard/dashboard-header"
 
 export const metadata: Metadata = {
   title: "User Dashboard | SF Deputy Sheriff's Association",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function UserDashboardPage() {
   return (
     <>
-      <ImprovedHeader />
+      <DashboardHeader />
       <main className="container px-4 py-8 mx-auto">
         <h1 className="mb-6 text-3xl font-bold">Your Dashboard</h1>
 
