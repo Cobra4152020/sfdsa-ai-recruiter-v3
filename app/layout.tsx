@@ -1,28 +1,39 @@
 import type React from "react"
-import type { Metadata } from "next"
-import { Inter } from "next/font/google"
 import "./globals.css"
-import { ApplyProvider } from "@/context/apply-context"
+import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
+import PerformanceMonitor from "@/components/performance-monitor"
+import { ErrorMonitor } from "@/components/error-monitor"
+import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
+import { createPerformanceMetricsTable } from "@/lib/database-setup"
+import { RegistrationProvider } from "@/context/registration-context"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
-  title: "SF Deputy Sheriff's Association",
-  description: "Join the San Francisco Deputy Sheriff's Association",
+export const metadata = {
+  title: "SFDSA AI Recruiter",
+  description: "San Francisco Deputy Sheriffs' Association AI Recruiter",
     generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
+  // Try to create the performance metrics table, but don't wait for it
+  if (process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === "true") {
+    createPerformanceMetricsTable().catch(console.error)
+  }
+
   return (
     <html lang="en">
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <ApplyProvider>{children}</ApplyProvider>
+          <RegistrationProvider>{children}</RegistrationProvider>
+          <PerformanceMonitor />
+          <ErrorMonitor />
+          <WebSocketErrorHandler />
         </ThemeProvider>
       </body>
     </html>
