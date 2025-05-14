@@ -4,56 +4,41 @@ import type React from "react"
 
 import { Button } from "@/components/ui/button"
 import { useApply } from "@/context/apply-context"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { useEffect, useState } from "react"
+import { cn } from "@/lib/utils"
 
-interface ApplyButtonProps {
-  className?: string
+interface ApplyButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
-  size?: "default" | "sm" | "lg"
-  userType?: "recruit" | "volunteer" | "admin"
+  size?: "default" | "sm" | "lg" | "icon"
+  requiredPoints?: number
+  actionName?: string
   redirectUrl?: string
-  children?: React.ReactNode
+  userType?: "recruit" | "volunteer" | "admin"
 }
 
 export default function ApplyButton({
   className,
   variant = "default",
   size = "default",
-  userType = "recruit",
+  requiredPoints,
+  actionName = "apply now",
   redirectUrl,
-  children = "Apply Now",
+  userType = "recruit",
+  ...props
 }: ApplyButtonProps) {
   const { openApplyPopup } = useApply()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const supabase = createClientComponentClient()
-
-  useEffect(() => {
-    async function checkAuth() {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession()
-      setIsAuthenticated(!!session)
-    }
-
-    checkAuth()
-  }, [supabase])
 
   const handleClick = () => {
-    if (!isAuthenticated) {
-      openApplyPopup({
-        userType,
-        redirectUrl,
-        actionName: "apply",
-      })
-    } else if (redirectUrl) {
-      window.location.href = redirectUrl
-    }
+    openApplyPopup({
+      requiredPoints,
+      actionName,
+      redirectUrl,
+      userType,
+    })
   }
 
   return (
-    <Button className={className} variant={variant} size={size} onClick={handleClick}>
-      {children}
+    <Button variant={variant} size={size} className={cn("font-medium", className)} onClick={handleClick} {...props}>
+      {props.children || "Apply Now"}
     </Button>
   )
 }

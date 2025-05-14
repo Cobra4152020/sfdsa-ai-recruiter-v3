@@ -2,18 +2,16 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
-import { X, Facebook, Twitter, Linkedin, Apple } from "lucide-react"
+import { useState } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Card } from "@/components/ui/card"
-import { useToast } from "@/hooks/use-toast"
-import confetti from "canvas-confetti"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useRouter } from "next/navigation"
+import { useToast } from "@/hooks/use-toast"
+import { Star, Shield, User } from "lucide-react"
 
 interface UnifiedApplyPopupProps {
   isOpen: boolean
@@ -32,90 +30,42 @@ export default function UnifiedApplyPopup({
   redirectUrl,
   userType = "recruit",
 }: UnifiedApplyPopupProps) {
-  const [activeTab, setActiveTab] = useState("signin")
+  const [activeTab, setActiveTab] = useState<string>("login")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
   const [fullName, setFullName] = useState("")
-  const [agreeTerms, setAgreeTerms] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState("")
-  const { toast } = useToast()
-  const router = useRouter()
+  const [error, setError] = useState<string | null>(null)
   const supabase = createClientComponentClient()
+  const router = useRouter()
+  const { toast } = useToast()
 
-  // Reset form when tab changes
-  useEffect(() => {
-    setError("")
-    setIsLoading(false)
-  }, [activeTab])
-
-  // Close on escape key
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
-    }
-
-    window.addEventListener("keydown", handleEscape)
-    return () => window.removeEventListener("keydown", handleEscape)
-  }, [onClose])
-
-  if (!isOpen) return null
-
-  const triggerConfetti = () => {
-    const duration = 2000
-    const end = Date.now() + duration
-
-    const colors = ["#FFC700", "#FF0000", "#2E86C1", "#58D68D", "#C39BD3"]
-    ;(function frame() {
-      confetti({
-        particleCount: 3,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors,
-      })
-      confetti({
-        particleCount: 3,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors,
-      })
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame)
-      }
-    })()
-  }
-
-  const handleSignIn = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
+    setError(null)
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
       if (error) throw error
 
-      triggerConfetti()
       toast({
-        title: "Welcome back!",
-        description: "You've successfully signed in.",
+        title: "Login successful",
+        description: "Welcome back!",
       })
 
+      onClose()
       if (redirectUrl) {
         router.push(redirectUrl)
       } else {
         router.refresh()
       }
-      onClose()
-    } catch (err: any) {
-      setError(err.message || "Failed to sign in")
+    } catch (error: any) {
+      setError(error.message || "Failed to login")
     } finally {
       setIsLoading(false)
     }
@@ -124,305 +74,177 @@ export default function UnifiedApplyPopup({
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError("")
-
-    if (!agreeTerms) {
-      setError("You must agree to the Terms of Service")
-      setIsLoading(false)
-      return
-    }
-
-    if (password !== confirmPassword) {
-      setError("Passwords do not match")
-      setIsLoading(false)
-      return
-    }
+    setError(null)
 
     try {
-      // Register with Supabase Auth
+      // Create auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: {
-            full_name: fullName,
-            user_type: userType,
-          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       })
 
       if (authError) throw authError
 
-      // Create user profile in the appropriate table based on user type
-      const { error: profileError } = await supabase
-        .from(userType === "volunteer" ? "volunteer_users" : userType === "admin" ? "admin_users" : "recruit_users")
-        .insert({
-          user_id: authData.user?.id,
-          email,
+      if (authData.user) {
+        // Create user profile
+        const { error: profileError } = await supabase.from("recruit_users").insert({
+          user_id: authData.user.id,
           full_name: fullName,
+          email,
           created_at: new Date().toISOString(),
         })
 
-      if (profileError) throw profileError
+        if (profileError) throw profileError
 
-      // Award 50 points to new user
-      if (userType === "recruit") {
+        // Award initial points
         const { error: pointsError } = await supabase.from("user_points").insert({
-          user_id: authData.user?.id,
-          points: 50,
-          reason: "Welcome bonus",
+          user_id: authData.user.id,
+          points: 10,
+          reason: "Joining the platform",
           created_at: new Date().toISOString(),
         })
 
-        if (pointsError) console.error("Failed to award points:", pointsError)
-      }
+        if (pointsError) console.error("Error awarding initial points:", pointsError)
 
-      triggerConfetti()
-      toast({
-        title: "Welcome to SF Deputy Sheriff's Association!",
-        description: "Your account has been created successfully.",
-      })
+        toast({
+          title: "Account created",
+          description: "Please check your email to verify your account.",
+        })
 
-      if (redirectUrl) {
-        router.push(redirectUrl)
-      } else {
-        router.refresh()
+        onClose()
+        if (redirectUrl) {
+          router.push(redirectUrl)
+        } else {
+          router.refresh()
+        }
       }
-      onClose()
-    } catch (err: any) {
-      setError(err.message || "Failed to create account")
+    } catch (error: any) {
+      setError(error.message || "Failed to create account")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleSocialSignIn = async (provider: "facebook" | "twitter" | "apple" | "linkedin") => {
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider,
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback?user_type=${userType}`,
-          queryParams: {
-            user_type: userType,
-          },
-        },
-      })
-
-      if (error) throw error
-    } catch (err: any) {
-      toast({
-        title: "Authentication Error",
-        description: err.message || "Failed to authenticate with social provider",
-        variant: "destructive",
-      })
-    }
-  }
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <Card className="relative w-full max-w-md p-6 overflow-hidden bg-white shadow-xl rounded-xl">
-        <button
-          onClick={onClose}
-          className="absolute p-1 rounded-full top-4 right-4 hover:bg-gray-100"
-          aria-label="Close"
-        >
-          <X className="w-5 h-5" />
-        </button>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Join the SF Deputy Sheriff's Association</DialogTitle>
+          <DialogDescription>
+            {requiredPoints > 0
+              ? `You need ${requiredPoints} points to ${actionName}. Please sign in or create an account.`
+              : `Please sign in or create an account to ${actionName}.`}
+          </DialogDescription>
+        </DialogHeader>
 
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-bold text-gray-900">{activeTab === "signin" ? "Sign In" : "Create Account"}</h2>
-          {requiredPoints > 0 && (
-            <p className="mt-2 text-sm text-gray-600">
-              You need {requiredPoints} points to {actionName}. Sign in or create an account to continue.
-            </p>
-          )}
-        </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="signin">Sign In</TabsTrigger>
+        <Tabs defaultValue="login" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="signin">
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div>
-                <Label htmlFor="signin-email">Email</Label>
+          <TabsContent value="login" className="mt-4">
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
                 <Input
-                  id="signin-email"
+                  id="email"
                   type="email"
+                  placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@example.com"
                   required
                 />
               </div>
-
-              <div>
-                <Label htmlFor="signin-password">Password</Label>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
                 <Input
-                  id="signin-password"
+                  id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   required
                 />
               </div>
 
-              <div className="text-sm text-right">
-                <a href="/forgot-password" className="text-blue-600 hover:underline">
-                  Forgot password?
-                </a>
-              </div>
-
-              {error && <div className="p-3 text-sm text-white bg-red-500 rounded">{error}</div>}
+              {error && <p className="text-sm text-red-500">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign In"}
+                {isLoading ? "Logging in..." : "Login"}
               </Button>
             </form>
           </TabsContent>
 
-          <TabsContent value="signup">
+          <TabsContent value="signup" className="mt-4">
             <form onSubmit={handleSignUp} className="space-y-4">
-              <div>
-                <Label htmlFor="signup-name">Full Name</Label>
+              <div className="space-y-2">
+                <Label htmlFor="fullName">Full Name</Label>
                 <Input
-                  id="signup-name"
+                  id="fullName"
                   type="text"
+                  placeholder="John Doe"
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
-                  placeholder="John Doe"
                   required
                 />
               </div>
-
-              <div>
-                <Label htmlFor="signup-email">Email</Label>
+              <div className="space-y-2">
+                <Label htmlFor="signupEmail">Email</Label>
                 <Input
-                  id="signup-email"
+                  id="signupEmail"
                   type="email"
+                  placeholder="your@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="your.email@example.com"
                   required
                 />
               </div>
-
-              <div>
-                <Label htmlFor="signup-password">Password</Label>
+              <div className="space-y-2">
+                <Label htmlFor="signupPassword">Password</Label>
                 <Input
-                  id="signup-password"
+                  id="signupPassword"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
                   required
                 />
               </div>
 
-              <div>
-                <Label htmlFor="signup-confirm-password">Confirm Password</Label>
-                <Input
-                  id="signup-confirm-password"
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="••••••••"
-                  required
-                />
-              </div>
-
-              <div className="flex items-center space-x-2">
-                <Checkbox
-                  id="terms"
-                  checked={agreeTerms}
-                  onCheckedChange={(checked) => setAgreeTerms(checked === true)}
-                />
-                <label
-                  htmlFor="terms"
-                  className="text-sm font-medium leading-none text-gray-700 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  I agree to the{" "}
-                  <a href="/terms-of-service" className="text-blue-600 hover:underline">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a href="/privacy-policy" className="text-blue-600 hover:underline">
-                    Privacy Policy
-                  </a>
-                </label>
-              </div>
-
-              {error && <div className="p-3 text-sm text-white bg-red-500 rounded">{error}</div>}
+              {error && <p className="text-sm text-red-500">{error}</p>}
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating Account..." : "Create Account"}
+                {isLoading ? "Creating account..." : "Create Account"}
               </Button>
             </form>
           </TabsContent>
         </Tabs>
 
-        <div className="relative mt-6">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
-          </div>
-          <div className="relative flex justify-center text-sm">
-            <span className="px-2 text-gray-500 bg-white">Or continue with</span>
+        <div className="mt-6 pt-6 border-t">
+          <div className="flex items-center justify-center space-x-4">
+            <div className="flex flex-col items-center">
+              <div className="p-2 bg-blue-100 rounded-full">
+                <Shield className="w-5 h-5 text-blue-600" />
+              </div>
+              <span className="mt-1 text-xs text-center">Secure</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="p-2 bg-green-100 rounded-full">
+                <Star className="w-5 h-5 text-green-600" />
+              </div>
+              <span className="mt-1 text-xs text-center">Earn Points</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="p-2 bg-purple-100 rounded-full">
+                <User className="w-5 h-5 text-purple-600" />
+              </div>
+              <span className="mt-1 text-xs text-center">Community</span>
+            </div>
           </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-3 mt-6">
-          <Button
-            variant="outline"
-            onClick={() => handleSocialSignIn("facebook")}
-            className="flex items-center justify-center gap-2 text-blue-600 border-blue-600 hover:bg-blue-50"
-          >
-            <Facebook className="w-5 h-5" />
-            <span>Facebook</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => handleSocialSignIn("twitter")}
-            className="flex items-center justify-center gap-2 text-blue-400 border-blue-400 hover:bg-blue-50"
-          >
-            <Twitter className="w-5 h-5" />
-            <span>Twitter</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => handleSocialSignIn("linkedin")}
-            className="flex items-center justify-center gap-2 text-blue-700 border-blue-700 hover:bg-blue-50"
-          >
-            <Linkedin className="w-5 h-5" />
-            <span>LinkedIn</span>
-          </Button>
-
-          <Button
-            variant="outline"
-            onClick={() => handleSocialSignIn("apple")}
-            className="flex items-center justify-center gap-2 text-gray-800 border-gray-800 hover:bg-gray-50"
-          >
-            <Apple className="w-5 h-5" />
-            <span>Apple</span>
-          </Button>
-        </div>
-
-        {userType === "recruit" && (
-          <p className="mt-6 text-xs text-center text-gray-500">
-            By signing up, you'll receive 50 points as a welcome bonus!
-          </p>
-        )}
-
-        {userType === "volunteer" && (
-          <p className="mt-6 text-xs text-center text-gray-500">
-            Signing up as a Volunteer Recruiter? Your account will need approval before you can access all features.
-          </p>
-        )}
-      </Card>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import PointsSummary from "@/components/user-dashboard/points-summary"
 import Leaderboard from "@/components/user-dashboard/leaderboard"
 import ActiveChallenges from "@/components/user-dashboard/active-challenges"
+import BadgeShowcase from "@/components/user-dashboard/badge-showcase"
 import ImprovedHeader from "@/components/improved-header"
 
 export const metadata: Metadata = {
@@ -29,8 +30,7 @@ export default function UserDashboardPage() {
         </div>
 
         <div className="mt-8">
-          <h2 className="mb-4 text-2xl font-bold">Your Progress</h2>
-          {/* Additional dashboard components can be added here */}
+          <BadgeShowcase />
         </div>
       </main>
     </>

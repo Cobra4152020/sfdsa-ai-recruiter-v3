@@ -4,10 +4,8 @@ import { useEffect, useState } from "react"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { useApply } from "@/context/apply-context"
 import { useRouter } from "next/navigation"
-
-// Import your existing chat components
-import EnhancedChatBubble from "@/components/enhanced-chat-bubble"
-import TypingIndicator from "@/components/typing-indicator"
+import ChatInterface from "@/components/chat-with-sgt-ken/chat-interface"
+import ImprovedHeader from "@/components/improved-header"
 
 export default function ChatWithSgtKenPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -54,33 +52,18 @@ export default function ChatWithSgtKenPage() {
     return null // Will redirect via useEffect
   }
 
-  // Your existing chat component JSX goes here
   return (
-    <div className="container px-4 py-8 mx-auto">
-      <h1 className="mb-6 text-3xl font-bold">Chat with Sgt. Ken</h1>
+    <>
+      <ImprovedHeader />
+      <div className="container px-4 py-8 mx-auto">
+        <h1 className="mb-6 text-3xl font-bold">Chat with Sgt. Ken</h1>
+        <p className="mb-6 text-gray-600">
+          Have questions about becoming a Deputy Sheriff? Sgt. Ken is here to help! Ask about the application process,
+          requirements, training, or anything else you'd like to know.
+        </p>
 
-      {/* Your existing chat UI components */}
-      <div className="p-4 bg-white rounded-lg shadow">
-        {/* Chat messages would go here */}
-        <div className="space-y-4 mb-4">
-          <EnhancedChatBubble
-            message="Hi there! I'm Sgt. Ken. How can I help you with your journey to becoming a Deputy Sheriff?"
-            isUser={false}
-            timestamp={new Date().toLocaleTimeString()}
-          />
-          <TypingIndicator />
-        </div>
-
-        {/* Chat input would go here */}
-        <div className="flex mt-4">
-          <input
-            type="text"
-            placeholder="Type your message..."
-            className="flex-1 px-4 py-2 border rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button className="px-4 py-2 text-white bg-blue-600 rounded-r-md hover:bg-blue-700">Send</button>
-        </div>
+        <ChatInterface />
       </div>
-    </div>
+    </>
   )
 }

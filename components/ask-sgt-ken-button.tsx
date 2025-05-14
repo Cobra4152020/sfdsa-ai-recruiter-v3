@@ -1,23 +1,30 @@
 "use client"
 
+import type React from "react"
+
 import { Button } from "@/components/ui/button"
 import { MessageSquare } from "lucide-react"
-import { useApply } from "@/context/apply-context"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { cn } from "@/lib/utils"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import { useState, useEffect } from "react"
+import { useApply } from "@/context/apply-context"
 
-interface AskSgtKenButtonProps {
-  className?: string
+interface AskSgtKenButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link"
-  size?: "default" | "sm" | "lg"
+  size?: "default" | "sm" | "lg" | "icon"
 }
 
-export default function AskSgtKenButton({ className, variant = "default", size = "default" }: AskSgtKenButtonProps) {
-  const { openApplyPopup } = useApply()
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const supabase = createClientComponentClient()
+export default function AskSgtKenButton({
+  className,
+  variant = "default",
+  size = "default",
+  ...props
+}: AskSgtKenButtonProps) {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
   const router = useRouter()
+  const supabase = createClientComponentClient()
+  const { openApplyPopup } = useApply()
 
   useEffect(() => {
     async function checkAuth() {
@@ -30,21 +37,26 @@ export default function AskSgtKenButton({ className, variant = "default", size =
     checkAuth()
   }, [supabase])
 
-  const handleClick = () => {
-    if (!isAuthenticated) {
+  const handleClick = async () => {
+    if (isAuthenticated === null) {
+      // Still loading auth state
+      return
+    }
+
+    if (isAuthenticated) {
+      router.push("/chat-with-sgt-ken")
+    } else {
       openApplyPopup({
         actionName: "chat with Sgt. Ken",
         redirectUrl: "/chat-with-sgt-ken",
       })
-    } else {
-      router.push("/chat-with-sgt-ken")
     }
   }
 
   return (
-    <Button className={className} variant={variant} size={size} onClick={handleClick}>
+    <Button variant={variant} size={size} className={cn("font-medium", className)} onClick={handleClick} {...props}>
       <MessageSquare className="w-4 h-4 mr-2" />
-      Ask Sgt. Ken
+      {props.children || "Ask Sgt. Ken"}
     </Button>
   )
 }
