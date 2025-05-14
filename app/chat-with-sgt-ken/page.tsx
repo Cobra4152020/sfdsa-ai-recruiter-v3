@@ -62,12 +62,14 @@ export default function ChatWithSgtKenPage() {
       {/* Your existing chat UI components */}
       <div className="p-4 bg-white rounded-lg shadow">
         {/* Chat messages would go here */}
-        <EnhancedChatBubble
-          message="Hi there! I'm Sgt. Ken. How can I help you with your journey to becoming a Deputy Sheriff?"
-          isUser={false}
-        />
-
-        <TypingIndicator />
+        <div className="space-y-4 mb-4">
+          <EnhancedChatBubble
+            message="Hi there! I'm Sgt. Ken. How can I help you with your journey to becoming a Deputy Sheriff?"
+            isUser={false}
+            timestamp={new Date().toLocaleTimeString()}
+          />
+          <TypingIndicator />
+        </div>
 
         {/* Chat input would go here */}
         <div className="flex mt-4">
