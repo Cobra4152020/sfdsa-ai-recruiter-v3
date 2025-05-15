@@ -1,244 +1,220 @@
 "use client"
 
-import Link from "next/link"
 import { useState } from "react"
-import { usePathname } from "next/navigation"
-import { Menu, X, ChevronDown } from "lucide-react"
+import Link from "next/link"
+import { Menu, X, Shield, Sun, Moon } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { AuthTriggerButton } from "@/components/auth-trigger-button"
-import { UserAuthStatus } from "@/components/user-auth-status"
-import { useMobile } from "@/hooks/use-mobile"
-import { useClickOutside } from "@/hooks/use-click-outside"
+import { useUser } from "@/context/user-context"
+import { UserProfile } from "@/components/user-profile"
+import { useTheme } from "@/components/theme-provider"
 import { useAuthModal } from "@/context/auth-modal-context"
 
-interface NavItem {
-  label: string
-  href: string
-  children?: NavItem[]
-}
-
 interface ImprovedHeaderProps {
-  showOptInForm: () => void
+  showOptInForm?: (isApplying?: boolean) => void
 }
-
-const mainNavItems: NavItem[] = [
-  { label: "Home", href: "/" },
-  {
-    label: "Resources",
-    href: "#",
-    children: [
-      { label: "GI Bill Benefits", href: "/gi-bill" },
-      { label: "Discounted Housing", href: "/discounted-housing" },
-      { label: "Gamification", href: "/gamification" },
-      { label: "Mission Briefing", href: "/mission-briefing" },
-      { label: "Deputy Launchpad", href: "/deputy-launchpad" },
-    ],
-  },
-  {
-    label: "Trivia Games",
-    href: "#",
-    children: [
-      { label: "All Trivia Games", href: "/trivia" },
-      { label: "SF Football", href: "/trivia/sf-football" },
-      { label: "SF Baseball", href: "/trivia/sf-baseball" },
-      { label: "SF Basketball", href: "/trivia/sf-basketball" },
-      { label: "SF Districts", href: "/trivia/sf-districts" },
-      { label: "SF Tourist Spots", href: "/trivia/sf-tourist-spots" },
-      { label: "SF Day Trips", href: "/sf-day-trips" },
-    ],
-  },
-  {
-    label: "Community",
-    href: "#",
-    children: [
-      { label: "Awards", href: "/awards" },
-      { label: "Badges", href: "/badges" },
-      { label: "Chat with Sgt. Ken", href: "/chat-with-sgt-ken" },
-      { label: "Daily Briefing", href: "/daily-briefing" },
-      { label: "TikTok Challenges", href: "/tiktok-challenges" },
-    ],
-  },
-  { label: "Donate", href: "/donate" },
-  { label: "Contact", href: "/contact" },
-]
 
 export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [activeSubmenu, setActiveSubmenu] = useState<string | null>(null)
-  const pathname = usePathname()
-  const isMobile = useMobile()
-  const mobileMenuRef = useClickOutside<HTMLDivElement>(() => setMobileMenuOpen(false))
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { theme, setTheme } = useTheme()
+  const { isLoggedIn } = useUser()
+  const { openModal } = useAuthModal()
 
-  // Safely access the auth modal context
-  const { openModal: contextOpenModal } = useAuthModal()
-  const openModal =
-    contextOpenModal ||
-    (() => {
-      console.warn("Auth modal context not available")
-      showOptInForm()
-    })
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
 
-  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen)
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark")
+  }
 
-  const toggleSubmenu = (label: string) => {
-    if (activeSubmenu === label) {
-      setActiveSubmenu(null)
-    } else {
-      setActiveSubmenu(label)
+  // Handle sign up button click
+  const handleSignUp = () => {
+    if (typeof openModal === "function") {
+      openModal("signup", "recruit")
+    } else if (showOptInForm) {
+      showOptInForm(false)
     }
   }
 
-  const handleRegisterClick = () => {
+  // Handle apply now button click
+  const handleApplyNow = () => {
     if (typeof openModal === "function") {
-      openModal("signup", "recruit")
-    } else {
-      showOptInForm()
+      openModal("optin", "recruit")
+    } else if (showOptInForm) {
+      showOptInForm(true)
     }
   }
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-[#0A3C1F] mr-8">
-              SFDSA AI Recruiter
-            </Link>
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-[#0A3C1F] dark:bg-black py-1 shadow-lg`}
+      role="banner"
+    >
+      <div className="container mx-auto px-4">
+        {/* Top row with logo and theme toggle */}
+        <div className="flex items-center justify-between py-1 border-b border-white/10">
+          {/* Logo */}
+          <Link href="/" className="flex items-center" aria-label="SF Deputy Sheriff AI Recruitment - Home">
+            <Shield className="h-8 w-8 text-[#FFD700] mr-2" aria-hidden="true" />
+            <div>
+              <span className="font-bold text-white text-lg">SF Deputy Sheriff</span>
+              <span className="text-[#FFD700] text-xs block -mt-1">AI Recruitment</span>
+            </div>
+          </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-6">
-              {mainNavItems.map((item) => (
-                <div key={item.label} className="relative group">
-                  {item.children ? (
-                    <button
-                      className={`flex items-center text-gray-600 hover:text-[#0A3C1F] px-1 py-2 ${
-                        item.children.some((child) => child.href === pathname) ? "text-[#0A3C1F] font-medium" : ""
-                      }`}
-                      onClick={() => toggleSubmenu(item.label)}
-                    >
-                      {item.label}
-                      <ChevronDown className="ml-1 h-4 w-4" />
-                    </button>
-                  ) : (
-                    <Link
-                      href={item.href}
-                      className={`text-gray-600 hover:text-[#0A3C1F] px-1 py-2 ${
-                        pathname === item.href ? "text-[#0A3C1F] font-medium" : ""
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  )}
+          {/* Theme toggle and mobile menu button */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+              aria-label={`Switch to ${theme === "dark" ? "light" : "dark"} mode`}
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" aria-hidden="true" />
+              ) : (
+                <Moon className="h-5 w-5" aria-hidden="true" />
+              )}
+            </button>
 
-                  {/* Desktop Dropdown */}
-                  {item.children && (
-                    <div className="absolute left-0 mt-2 w-48 bg-white rounded-md shadow-lg overflow-hidden z-10 hidden group-hover:block">
-                      <div className="py-1">
-                        {item.children.map((child) => (
-                          <Link
-                            key={child.label}
-                            href={child.href}
-                            className={`block px-4 py-2 text-sm hover:bg-gray-100 ${
-                              pathname === child.href ? "bg-gray-50 text-[#0A3C1F] font-medium" : "text-gray-700"
-                            }`}
-                          >
-                            {child.label}
-                          </Link>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </nav>
+            {/* Mobile menu button */}
+            <div className="md:hidden">
+              <button
+                onClick={toggleMenu}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isMenuOpen}
+                aria-controls="mobile-menu"
+              >
+                {isMenuOpen ? (
+                  <X className="h-6 w-6" aria-hidden="true" />
+                ) : (
+                  <Menu className="h-6 w-6" aria-hidden="true" />
+                )}
+              </button>
+            </div>
           </div>
+        </div>
 
-          <div className="hidden md:flex items-center space-x-4">
-            <UserAuthStatus />
-            <AuthTriggerButton mode="signin" userType="recruit" label="Sign In" />
-            <Button onClick={handleRegisterClick} className="bg-[#0A3C1F] hover:bg-[#0D4D28] text-white">
-              Join Now
+        {/* Bottom row with navigation and buttons */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between py-1">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-6" aria-label="Main Navigation">
+            <Link href="/" className="text-white hover:text-[#FFD700] transition-colors">
+              Home
+            </Link>
+            <Link href="/awards" className="text-white hover:text-[#FFD700] transition-colors">
+              Top Recruit Awards
+            </Link>
+            <Link href="/practice-tests" className="text-white hover:text-[#FFD700] transition-colors">
+              Practice Tests
+            </Link>
+            <Link href="/gi-bill" className="text-white hover:text-[#FFD700] transition-colors">
+              G.I. Bill
+            </Link>
+            <Link href="/discounted-housing" className="text-white hover:text-[#FFD700] transition-colors">
+              Discounted Housing
+            </Link>
+          </nav>
+
+          {/* Right side buttons */}
+          <div className="hidden md:flex items-center space-x-4 mt-1 md:mt-0">
+            {isLoggedIn ? (
+              <UserProfile />
+            ) : (
+              <Button
+                onClick={handleSignUp}
+                className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-black font-medium"
+              >
+                Sign Up
+              </Button>
+            )}
+
+            <Button
+              onClick={handleApplyNow}
+              className="bg-white hover:bg-white/90 text-[#0A3C1F] font-medium"
+              aria-label="Apply now for Deputy Sheriff position"
+            >
+              Apply Now
             </Button>
           </div>
-
-          {/* Mobile menu button */}
-          <button
-            type="button"
-            className="md:hidden text-gray-700"
-            onClick={toggleMobileMenu}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-          >
-            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
         </div>
       </div>
 
       {/* Mobile menu */}
-      {mobileMenuOpen && (
-        <div className="md:hidden bg-white py-2 px-4 shadow-lg absolute top-16 left-0 right-0 z-50" ref={mobileMenuRef}>
-          <nav className="flex flex-col space-y-3">
-            {mainNavItems.map((item) => (
-              <div key={item.label} className="py-1">
-                {item.children ? (
-                  <>
-                    <button
-                      className={`flex items-center justify-between w-full text-left text-gray-600 px-1 py-2 ${
-                        item.children.some((child) => child.href === pathname) ? "text-[#0A3C1F] font-medium" : ""
-                      }`}
-                      onClick={() => toggleSubmenu(item.label)}
-                    >
-                      {item.label}
-                      <ChevronDown
-                        className={`h-4 w-4 transition-transform ${activeSubmenu === item.label ? "rotate-180" : ""}`}
-                      />
-                    </button>
-
-                    {/* Mobile Dropdown */}
-                    {activeSubmenu === item.label && (
-                      <div className="pl-4 mt-1 space-y-1 border-l-2 border-gray-200">
-                        {item.children.map((child) => (
-                          <Link
-                            key={child.label}
-                            href={child.href}
-                            className={`block py-2 text-sm ${
-                              pathname === child.href ? "text-[#0A3C1F] font-medium" : "text-gray-600"
-                            }`}
-                            onClick={() => setMobileMenuOpen(false)}
-                          >
-                            {child.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <Link
-                    href={item.href}
-                    className={`block px-1 py-2 ${
-                      pathname === item.href ? "text-[#0A3C1F] font-medium" : "text-gray-600"
-                    }`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </div>
-            ))}
-
-            <div className="pt-4 mt-2 border-t border-gray-200 space-y-3">
-              <UserAuthStatus />
-              <AuthTriggerButton mode="signin" userType="recruit" label="Sign In" className="w-full" />
-              <Button
-                onClick={() => {
-                  handleRegisterClick()
-                  setMobileMenuOpen(false)
-                }}
-                className="w-full bg-[#0A3C1F] hover:bg-[#0D4D28] text-white"
+      {isMenuOpen && (
+        <div
+          id="mobile-menu"
+          className="md:hidden bg-[#0A3C1F] dark:bg-black border-t border-white/10"
+          aria-label="Mobile Navigation"
+        >
+          <div className="container mx-auto px-4 py-4">
+            <nav className="flex flex-col space-y-4">
+              <Link
+                href="/"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-white hover:text-[#FFD700] py-2 transition-colors"
               >
-                Join Now
-              </Button>
-            </div>
-          </nav>
+                Home
+              </Link>
+              <Link
+                href="/awards"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-white hover:text-[#FFD700] py-2 transition-colors"
+              >
+                Top Recruit Awards
+              </Link>
+              <Link
+                href="/practice-tests"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-white hover:text-[#FFD700] py-2 transition-colors"
+              >
+                Practice Tests
+              </Link>
+              <Link
+                href="/gi-bill"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-white hover:text-[#FFD700] py-2 transition-colors"
+              >
+                G.I. Bill
+              </Link>
+              <Link
+                href="/discounted-housing"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-white hover:text-[#FFD700] py-2 transition-colors"
+              >
+                Discounted Housing
+              </Link>
+
+              <div className="pt-4 border-t border-white/10 flex flex-col space-y-3">
+                {isLoggedIn ? (
+                  <div className="py-2">
+                    <UserProfile />
+                  </div>
+                ) : (
+                  <Button
+                    onClick={() => {
+                      handleSignUp()
+                      setIsMenuOpen(false)
+                    }}
+                    className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-black font-medium w-full"
+                  >
+                    Sign Up
+                  </Button>
+                )}
+
+                <Button
+                  onClick={() => {
+                    handleApplyNow()
+                    setIsMenuOpen(false)
+                  }}
+                  className="bg-white hover:bg-white/90 text-[#0A3C1F] font-medium w-full"
+                  aria-label="Apply now for Deputy Sheriff position"
+                >
+                  Apply Now
+                </Button>
+              </div>
+            </nav>
+          </div>
         </div>
       )}
     </header>

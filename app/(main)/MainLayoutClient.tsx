@@ -7,6 +7,7 @@ import { OptInForm } from "@/components/opt-in-form"
 import { useState } from "react"
 import { UserProvider } from "@/context/user-context"
 import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
+import { UnifiedAuthModal } from "@/components/unified-auth-modal"
 
 export default function MainLayoutClient({ children }: { children: React.ReactNode }) {
   const [isOptInFormOpen, setIsOptInFormOpen] = useState(false)
@@ -36,6 +37,7 @@ export default function MainLayoutClient({ children }: { children: React.ReactNo
         <div className="fixed bottom-6 right-6 z-50">
           <AskSgtKenButton position="fixed" variant="secondary" />
         </div>
+        <UnifiedAuthModal />
       </div>
     </UserProvider>
   )

@@ -1,17 +1,16 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { X } from "lucide-react"
 import { useAuthModal } from "@/context/auth-modal-context"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-
-type TabType = "signin" | "signup" | "optin"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
 
 export function UnifiedAuthModal() {
-  const { isOpen, modalType, userType, referralCode, closeModal } = useAuthModal()
-  const [activeTab, setActiveTab] = useState<TabType>(modalType)
+  const { isOpen, modalType, userType, closeModal } = useAuthModal()
+  const [activeTab, setActiveTab] = useState<"signin" | "signup" | "optin">("signin")
 
-  // Update active tab when modalType changes
   useEffect(() => {
     if (isOpen) {
       setActiveTab(modalType)
@@ -20,63 +19,52 @@ export function UnifiedAuthModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
-      <DialogContent className="sm:max-w-md">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">
-            {activeTab === "signin" ? "Sign In" : activeTab === "signup" ? "Create Account" : "Complete Registration"}
-          </h2>
-          <button onClick={closeModal} className="rounded-full p-1 hover:bg-gray-100" aria-label="Close">
-            <X className="h-5 w-5" />
-          </button>
-        </div>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader className="flex justify-between items-center">
+          <DialogTitle>
+            {activeTab === "signin" ? "Sign In" : activeTab === "signup" ? "Create Account" : "Apply Now"}
+          </DialogTitle>
+          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={closeModal}>
+            <X className="h-4 w-4" />
+            <span className="sr-only">Close</span>
+          </Button>
+        </DialogHeader>
 
-        <div className="mb-6">
-          <div className="flex border-b">
-            <button
-              className={`py-2 px-4 text-sm font-medium ${
-                activeTab === "signin"
-                  ? "border-b-2 border-[#0A3C1F] text-[#0A3C1F]"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-              onClick={() => setActiveTab("signin")}
-            >
-              Sign In
-            </button>
-            <button
-              className={`py-2 px-4 text-sm font-medium ${
-                activeTab === "signup"
-                  ? "border-b-2 border-[#0A3C1F] text-[#0A3C1F]"
-                  : "text-gray-500 hover:text-gray-700"
-              }`}
-              onClick={() => setActiveTab("signup")}
-            >
-              Create Account
-            </button>
-            {activeTab === "optin" && (
-              <button className={`py-2 px-4 text-sm font-medium border-b-2 border-[#0A3C1F] text-[#0A3C1F]`}>
-                Complete Registration
-              </button>
-            )}
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          {/* This is a placeholder for actual authentication components */}
-          <div className="p-4 bg-gray-50 rounded-md text-center">
-            <p>Authentication forms will be populated here based on:</p>
-            <p>
-              <strong>Active Tab:</strong> {activeTab}
-            </p>
-            <p>
-              <strong>User Type:</strong> {userType}
-            </p>
-            {referralCode && (
-              <p>
-                <strong>Referral Code:</strong> {referralCode}
-              </p>
-            )}
-          </div>
-        </div>
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="signin">Sign In</TabsTrigger>
+            <TabsTrigger value="signup">Sign Up</TabsTrigger>
+          </TabsList>
+          <TabsContent value="signin">
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Sign in to your account using your email and password.</p>
+              </div>
+              {/* Sign in form would go here */}
+              <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">Sign In</Button>
+            </div>
+          </TabsContent>
+          <TabsContent value="signup">
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">Create a new account to join our community.</p>
+              </div>
+              {/* Sign up form would go here */}
+              <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">Create Account</Button>
+            </div>
+          </TabsContent>
+          <TabsContent value="optin">
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <p className="text-sm text-muted-foreground">
+                  Apply to become a Deputy Sheriff with the San Francisco Sheriff's Department.
+                </p>
+              </div>
+              {/* Opt-in form would go here */}
+              <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">Submit Application</Button>
+            </div>
+          </TabsContent>
+        </Tabs>
       </DialogContent>
     </Dialog>
   )

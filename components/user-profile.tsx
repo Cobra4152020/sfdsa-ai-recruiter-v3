@@ -1,162 +1,84 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Trophy, Medal, Share2, ChevronRight, Bell } from "lucide-react"
+import { useState } from "react"
 import Link from "next/link"
-import { BadgeSharingDialog } from "./badge-sharing-dialog"
+import { LogOut, User, Settings, Award, ChevronDown } from "lucide-react"
+import { useUser } from "@/context/user-context"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "@/components/ui/button"
 
-interface UserProfileProps {
-  userId: string
-  showDetails?: boolean
-}
+export function UserProfile() {
+  const { currentUser, logout } = useUser()
+  const [isOpen, setIsOpen] = useState(false)
 
-interface UserData {
-  id: string
-  name: string
-  email: string
-  avatar_url?: string
-  points: number
-  rank: number
-  badges: number
-  level: string
-  joined_at: string
-}
-
-export function UserProfile({ userId, showDetails = true }: UserProfileProps) {
-  const [userData, setUserData] = useState<UserData | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        setIsLoading(true)
-        const response = await fetch(`/api/users/${userId}/profile`)
-        const data = await response.json()
-
-        if (data.success && data.profile) {
-          setUserData(data.profile)
-        } else {
-          setError(data.message || "Failed to load user profile")
-        }
-      } catch (err) {
-        setError("An error occurred while fetching user data")
-        console.error(err)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    if (userId) {
-      fetchUserData()
-    }
-  }, [userId])
-
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center space-x-4">
-            <Skeleton className="h-12 w-12 rounded-full" />
-            <div className="space-y-2">
-              <Skeleton className="h-4 w-[250px]" />
-              <Skeleton className="h-4 w-[200px]" />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    )
+  if (!currentUser) {
+    return null
   }
 
-  if (error || !userData) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center py-4">
-            <p className="text-red-500">{error || "User not found"}</p>
-          </div>
-        </CardContent>
-      </Card>
-    )
+  const handleLogout = async () => {
+    await logout()
+    setIsOpen(false)
   }
 
-  const getInitials = (name: string) => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .toUpperCase()
-  }
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString)
-    return new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" }).format(date)
-  }
+  const userInitials = currentUser.name
+    ? currentUser.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+    : "U"
 
   return (
-    <>
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
-            <Avatar className="h-16 w-16 border-2 border-primary">
-              <AvatarImage src={userData.avatar_url || "/placeholder.svg"} alt={userData.name} />
-              <AvatarFallback>{getInitials(userData.name)}</AvatarFallback>
-            </Avatar>
-
-            <div className="flex-1 text-center sm:text-left">
-              <h2 className="text-xl font-bold">{userData.name}</h2>
-              <p className="text-muted-foreground text-sm mb-2">Joined {formatDate(userData.joined_at)}</p>
-
-              <div className="flex flex-wrap gap-2 justify-center sm:justify-start mb-4">
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Trophy className="h-3 w-3" />
-                  Rank #{userData.rank}
-                </Badge>
-                <Badge variant="outline" className="flex items-center gap-1">
-                  <Medal className="h-3 w-3" />
-                  {userData.badges} Badges
-                </Badge>
-                <Badge className="bg-[#0A3C1F] text-white">{userData.level}</Badge>
-              </div>
-
-              <div className="flex flex-wrap gap-2 justify-center sm:justify-start">
-                <Button variant="outline" size="sm" className="text-xs h-8" onClick={() => setIsShareDialogOpen(true)}>
-                  <Share2 className="h-3 w-3 mr-1" />
-                  Share Profile
-                </Button>
-
-                {showDetails && (
-                  <Link href={`/profile/${userId}`}>
-                    <Button variant="default" size="sm" className="text-xs h-8">
-                      View Full Profile
-                      <ChevronRight className="h-3 w-3 ml-1" />
-                    </Button>
-                  </Link>
-                )}
-              </div>
-              <div className="mt-4">
-                <Link href="/profile/notifications" className="flex items-center text-primary hover:underline">
-                  <Bell className="mr-2 h-4 w-4" />
-                  Manage Notification Preferences
-                </Link>
-              </div>
-            </div>
+    <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+          <Avatar className="h-10 w-10 border-2 border-[#FFD700]">
+            <AvatarImage src={currentUser.avatarUrl || ""} alt={currentUser.name || "User"} />
+            <AvatarFallback className="bg-[#0A3C1F] text-white">{userInitials}</AvatarFallback>
+          </Avatar>
+          <ChevronDown className="h-4 w-4 text-white absolute -bottom-1 -right-1" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="w-56" align="end" forceMount>
+        <DropdownMenuLabel>
+          <div className="flex flex-col space-y-1">
+            <p className="text-sm font-medium leading-none">{currentUser.name}</p>
+            <p className="text-xs leading-none text-muted-foreground">{currentUser.email}</p>
           </div>
-        </CardContent>
-      </Card>
-
-      <BadgeSharingDialog
-        isOpen={isShareDialogOpen}
-        onClose={() => setIsShareDialogOpen(false)}
-        badges={[]}
-        userName={userData.name}
-      />
-    </>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/profile" className="flex items-center cursor-pointer">
+            <User className="mr-2 h-4 w-4" />
+            <span>Profile</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/profile/settings" className="flex items-center cursor-pointer">
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/awards" className="flex items-center cursor-pointer">
+            <Award className="mr-2 h-4 w-4" />
+            <span>My Awards</span>
+          </Link>
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>Log out</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
