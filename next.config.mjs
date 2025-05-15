@@ -67,6 +67,9 @@ const nextConfig = {
       fallback: [],
     };
   },
+  output: 'export',  // Enable static HTML export
+  basePath: process.env.NODE_ENV === 'production' ? '/sfdsa-ai-recruiter-v3' : '', // Add repo name for GitHub Pages
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/sfdsa-ai-recruiter-v3/' : '',
 };
 
 if (userConfig) {

@@ -230,13 +230,13 @@ importers:
         version: 3.24.1
     devDependencies:
       '@types/node':
-        specifier: ^22
+        specifier: ^22.0.0
         version: 22.0.0
       '@types/react':
-        specifier: ^19
+        specifier: ^19.0.0
         version: 19.0.0
       '@types/react-dom':
-        specifier: ^19
+        specifier: ^19.0.0
         version: 19.0.0
       postcss:
         specifier: ^8
