@@ -9,10 +9,11 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Shield, CheckCircle } from "lucide-react"
+import { Shield, CheckCircle, AlertCircle } from "lucide-react"
 import { v4 as uuidv4 } from "uuid"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/lib/supabase-service"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 
 interface OptInFormProps {
   onClose: () => void
@@ -33,11 +34,42 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
   const [isSubmitted, setIsSubmitted] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [trackingNumber, setTrackingNumber] = useState("")
+  const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
   const handleClose = () => {
     setIsDialogOpen(false)
     onClose()
+  }
+
+  // Form validation
+  const [errors, setErrors] = useState<Record<string, string>>({})
+  const validateForm = () => {
+    const newErrors: Record<string, string> = {}
+
+    if (!firstName.trim()) newErrors.firstName = "First name is required"
+    if (!lastName.trim()) newErrors.lastName = "Last name is required"
+
+    if (!email.trim()) {
+      newErrors.email = "Email is required"
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email address"
+    }
+
+    if (phone.trim() && !/^[\d\s$$$$\-+]{10,15}$/.test(phone)) {
+      newErrors.phone = "Please enter a valid phone number"
+    }
+
+    if (zipCode.trim() && !/^\d{5}(-\d{4})?$/.test(zipCode)) {
+      newErrors.zipCode = "Please enter a valid ZIP code"
+    }
+
+    if (!agreeToTerms) {
+      newErrors.agreeToTerms = "You must agree to receive communications"
+    }
+
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
   }
 
   // Generate a unique tracking number
@@ -50,16 +82,23 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError(null)
+
+    // Validate form before submission
+    if (!validateForm()) {
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
       // Save to database
-      const { error } = await supabase.from("applicants").insert({
+      const { error: dbError } = await supabase.from("applicants").insert({
         first_name: firstName,
         last_name: lastName,
         email,
-        phone,
-        zip_code: zipCode,
+        phone: phone || null,
+        zip_code: zipCode || null,
         referral_source: referralSource,
         referral_code: referralCode || null,
         tracking_number: trackingNumber,
@@ -68,19 +107,39 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
         updated_at: new Date().toISOString(),
       })
 
-      if (error) {
-        console.error("Error submitting form:", error)
-        toast({
-          title: "Submission Error",
-          description: "There was a problem submitting your information. Please try again.",
-          variant: "destructive",
-        })
+      if (dbError) {
+        console.error("Error submitting form:", dbError)
+
+        // Special handling for duplicate emails
+        if (dbError.code === "23505" && dbError.message.includes("email")) {
+          setError("This email address is already registered. Please use a different email or contact support.")
+        } else {
+          setError("There was a problem submitting your information. Please try again later.")
+        }
+
         setIsSubmitting(false)
         return
       }
 
       // Show success message
       setIsSubmitted(true)
+
+      // Log success in analytics
+      try {
+        await fetch("/api/analytics/page-view", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            page: isApplying ? "application_started" : "opt_in_completed",
+            properties: {
+              referral_source: referralSource,
+              has_referral_code: !!referralCode,
+            },
+          }),
+        })
+      } catch (analyticsError) {
+        console.error("Analytics error:", analyticsError)
+      }
 
       // Redirect after showing success message
       setTimeout(() => {
@@ -92,11 +151,7 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
       }, 3000)
     } catch (error) {
       console.error("Error submitting form:", error)
-      toast({
-        title: "Submission Error",
-        description: "There was a problem submitting your information. Please try again.",
-        variant: "destructive",
-      })
+      setError("There was a problem connecting to our service. Please try again later.")
     } finally {
       setIsSubmitting(false)
     }
@@ -126,33 +181,57 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
                   : "Get the latest information about the SF Deputy Sheriff recruitment process, events, and opportunities."}
               </DialogDescription>
             </DialogHeader>
+
+            {error && (
+              <Alert variant="destructive" className="mt-2">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">First Name</Label>
+                  <Label htmlFor="firstName">
+                    First Name <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="firstName"
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Enter your first name"
                     required
-                    className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                    className={cn(
+                      "border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]",
+                      errors.firstName ? "border-red-500" : "",
+                    )}
+                    aria-invalid={errors.firstName ? "true" : "false"}
                   />
+                  {errors.firstName && <p className="text-red-500 text-xs mt-1">{errors.firstName}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Last Name</Label>
+                  <Label htmlFor="lastName">
+                    Last Name <span className="text-red-500">*</span>
+                  </Label>
                   <Input
                     id="lastName"
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Enter your last name"
                     required
-                    className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                    className={cn(
+                      "border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]",
+                      errors.lastName ? "border-red-500" : "",
+                    )}
+                    aria-invalid={errors.lastName ? "true" : "false"}
                   />
+                  {errors.lastName && <p className="text-red-500 text-xs mt-1">{errors.lastName}</p>}
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">
+                  Email <span className="text-red-500">*</span>
+                </Label>
                 <Input
                   id="email"
                   type="email"
@@ -160,8 +239,13 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email address"
                   required
-                  className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                  className={cn(
+                    "border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]",
+                    errors.email ? "border-red-500" : "",
+                  )}
+                  aria-invalid={errors.email ? "true" : "false"}
                 />
+                {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="phone">Phone Number</Label>
@@ -171,8 +255,13 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="(415) 555-1234"
-                  className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                  className={cn(
+                    "border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]",
+                    errors.phone ? "border-red-500" : "",
+                  )}
+                  aria-invalid={errors.phone ? "true" : "false"}
                 />
+                {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="zipCode">ZIP Code</Label>
@@ -181,8 +270,13 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
                   value={zipCode}
                   onChange={(e) => setZipCode(e.target.value)}
                   placeholder="94102"
-                  className="border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]"
+                  className={cn(
+                    "border-[#0A3C1F]/30 focus:border-[#0A3C1F] focus:ring-[#0A3C1F]",
+                    errors.zipCode ? "border-red-500" : "",
+                  )}
+                  aria-invalid={errors.zipCode ? "true" : "false"}
                 />
+                {errors.zipCode && <p className="text-red-500 text-xs mt-1">{errors.zipCode}</p>}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="referralSource">How did you hear about us?</Label>
@@ -203,26 +297,26 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex items-center space-x-2">
+              <div className="flex items-start space-x-2">
                 <Checkbox
                   id="terms"
                   checked={agreeToTerms}
                   onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
                   required
+                  className={errors.agreeToTerms ? "border-red-500" : ""}
                 />
-                <Label htmlFor="terms" className="text-sm">
-                  I agree to receive communications about the San Francisco Sheriff's Office recruitment process.
-                </Label>
+                <div>
+                  <Label htmlFor="terms" className="text-sm">
+                    I agree to receive communications about the San Francisco Sheriff's Office recruitment process.
+                  </Label>
+                  {errors.agreeToTerms && <p className="text-red-500 text-xs mt-1">{errors.agreeToTerms}</p>}
+                </div>
               </div>
               <div className="flex justify-end gap-2 pt-2">
                 <Button type="button" variant="outline" onClick={handleClose}>
                   Cancel
                 </Button>
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || !agreeToTerms}
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
-                >
+                <Button type="submit" disabled={isSubmitting} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
                   {isSubmitting ? "Submitting..." : isApplying ? "Start Application" : "Sign Up"}
                 </Button>
               </div>
@@ -255,4 +349,9 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
       </DialogContent>
     </Dialog>
   )
+}
+
+// Utility function for conditional class names
+function cn(...classes: (string | boolean | undefined)[]) {
+  return classes.filter(Boolean).join(" ")
 }

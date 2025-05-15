@@ -1,12 +1,10 @@
 "use client"
 
 import type React from "react"
-
-import { useRef, useEffect } from "react"
+import { useRef, useEffect, useState } from "react"
 import Link from "next/link"
 import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { useAnimationState } from "@/hooks/use-animation-state"
 
 interface DropdownNavItem {
   label: React.ReactNode
@@ -16,27 +14,28 @@ interface DropdownNavItem {
 interface DropdownNavProps {
   label: React.ReactNode
   items: DropdownNavItem[]
+  icon?: React.ReactNode
   isOpen?: boolean
   onToggle?: () => void
 }
 
-export function DropdownNav({ label, items, isOpen: controlledIsOpen, onToggle }: DropdownNavProps) {
-  const { isOpen, toggle, close, isVisible, animationState } = useAnimationState(controlledIsOpen || false)
+export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onToggle }: DropdownNavProps) {
+  const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
 
   // Handle controlled vs uncontrolled state
   useEffect(() => {
-    if (controlledIsOpen !== undefined && controlledIsOpen !== isOpen) {
-      if (controlledIsOpen) toggle()
-      else close()
+    if (controlledIsOpen !== undefined) {
+      setIsOpen(controlledIsOpen)
     }
-  }, [controlledIsOpen, isOpen, toggle, close])
+  }, [controlledIsOpen])
 
-  const handleToggle = () => {
+  const handleToggle = (e: React.MouseEvent) => {
+    e.preventDefault()
     if (onToggle) {
       onToggle()
     } else {
-      toggle()
+      setIsOpen(!isOpen)
     }
   }
 
@@ -44,7 +43,7 @@ export function DropdownNav({ label, items, isOpen: controlledIsOpen, onToggle }
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        close()
+        setIsOpen(false)
       }
     }
 
@@ -52,29 +51,38 @@ export function DropdownNav({ label, items, isOpen: controlledIsOpen, onToggle }
     return () => {
       document.removeEventListener("mousedown", handleClickOutside)
     }
-  }, [close])
+  }, [])
+
+  // Close dropdown when pressing escape
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsOpen(false)
+      }
+    }
+
+    document.addEventListener("keydown", handleEscape)
+    return () => {
+      document.removeEventListener("keydown", handleEscape)
+    }
+  }, [])
 
   return (
-    <div className="relative group" ref={dropdownRef}>
+    <div className="relative" ref={dropdownRef}>
       <button
         onClick={handleToggle}
         className="flex items-center text-white hover:text-[#FFD700] transition-colors focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:ring-opacity-50 rounded px-2 py-1"
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        {label}
-        <ChevronDown className="ml-1 h-4 w-4 transition-transform duration-200 group-hover:rotate-180" />
+        {icon && <span className="mr-1">{icon}</span>}
+        <span>{label}</span>
+        <ChevronDown className={cn("ml-1 h-4 w-4 transition-transform duration-200", isOpen ? "rotate-180" : "")} />
       </button>
 
-      {isVisible && (
+      {isOpen && (
         <div
-          className={cn(
-            "absolute left-0 mt-2 w-48 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50",
-            {
-              "opacity-0 translate-y-[-8px]": animationState === "closing" || animationState === "closed",
-              "opacity-100 translate-y-0": animationState === "opening" || animationState === "open",
-            },
-          )}
+          className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50 animate-in fade-in slide-in-from-top-5 duration-200"
           role="menu"
           aria-orientation="vertical"
         >
@@ -85,8 +93,8 @@ export function DropdownNav({ label, items, isOpen: controlledIsOpen, onToggle }
                 href={item.href}
                 className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
                 role="menuitem"
-                onClick={close}
-                style={{ transitionDelay: `${50 + index * 50}ms` }}
+                onClick={() => setIsOpen(false)}
+                style={{ transitionDelay: `${50 + index * 25}ms` }}
               >
                 {item.label}
               </Link>
