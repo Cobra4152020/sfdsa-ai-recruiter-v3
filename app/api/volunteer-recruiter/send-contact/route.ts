@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-service"
 import { sendEmail } from "@/lib/email/send-email"
@@ -53,8 +55,6 @@ export async function POST(request: Request) {
         <style>
           body {
             font-family: Arial, sans-serif;
-
-export const dynamic = 'force-dynamic';
 
             line-height: 1.6;
             color: #333;

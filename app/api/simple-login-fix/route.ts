@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-service"
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   try {
     const supabase = getServiceSupabase()
@@ -11,9 +13,6 @@ export async function GET(request: Request) {
         -- Fix the role column constraint directly
         BEGIN;
 
-export const dynamic = 'force-dynamic';
-
-        
         -- Drop the constraint if it exists (ignoring errors)
         ALTER TABLE user_roles DROP CONSTRAINT IF EXISTS user_roles_role_check;
         ALTER TABLE user_roles DROP CONSTRAINT IF EXISTS user_roles_user_type_check;
