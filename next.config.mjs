@@ -42,10 +42,21 @@ const nextConfig = {
       },
     ],
   },
+  // Disable server-only features for static export
   experimental: {
-    serverActions: {},
+    serverActions: false,
     typedRoutes: true,
-    allowedRevalidateHeaderKeys: ['x-prerender-revalidate'],
+  },
+  // Configure which routes to generate for static export
+  trailingSlash: true, // Add trailing slashes for cleaner URLs
+  // Exclude API routes and dynamic routes that require server
+  exportPathMap: async function() {
+    return {
+      '/': { page: '/' },
+      '/admin': { page: '/admin' },
+      '/admin/setup-daily-briefings': { page: '/admin/setup-daily-briefings' },
+      // Add other static routes here
+    }
   },
   // Add canonical URL to improve SEO
   async headers() {

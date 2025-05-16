@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react"
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { setupDailyBriefingsTable, addSampleBriefing } from "@/lib/daily-briefing-setup"
 
 export default function SetupDailyBriefingsPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -17,12 +19,8 @@ export default function SetupDailyBriefingsPage() {
     setResult(null)
 
     try {
-      const response = await fetch("/api/admin/setup-daily-briefings", {
-        method: "POST",
-      })
-
-      const data = await response.json()
-      setResult(data)
+      const result = await setupDailyBriefingsTable()
+      setResult(result)
     } catch (error) {
       console.error("Error setting up daily briefings table:", error)
       setResult({ success: false, message: "An unexpected error occurred" })
@@ -31,17 +29,13 @@ export default function SetupDailyBriefingsPage() {
     }
   }
 
-  const addBriefing = async () => {
+  const handleAddBriefing = async () => {
     setAddingBriefing(true)
     setBriefingResult(null)
 
     try {
-      const response = await fetch("/api/admin/add-sample-briefing", {
-        method: "POST",
-      })
-
-      const data = await response.json()
-      setBriefingResult(data)
+      const result = await addSampleBriefing()
+      setBriefingResult(result)
     } catch (error) {
       console.error("Error adding sample briefing:", error)
       setBriefingResult({ success: false, message: "An unexpected error occurred" })
@@ -101,7 +95,7 @@ export default function SetupDailyBriefingsPage() {
             )}
           </CardContent>
           <CardFooter>
-            <Button onClick={addBriefing} disabled={addingBriefing}>
+            <Button onClick={handleAddBriefing} disabled={addingBriefing}>
               {addingBriefing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {addingBriefing ? "Adding..." : "Add Sample Briefing"}
             </Button>
