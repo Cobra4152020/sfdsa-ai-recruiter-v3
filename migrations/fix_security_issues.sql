@@ -131,20 +131,65 @@ ALTER FUNCTION IF EXISTS public.is_public_leaderboard SET search_path = public, 
 REVOKE SELECT ON public.leaderboard_cache FROM anon, authenticated;
 REVOKE SELECT ON public.leaderboard_weekly_cache FROM anon, authenticated;
 
--- Create helper function to check if leaderboard is public
+-- Create notifications table if it doesn't exist
+CREATE TABLE IF NOT EXISTS public.notifications (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    read BOOLEAN DEFAULT false,
+    metadata JSONB DEFAULT '{}',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
+);
+
+-- Enable RLS on notifications
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+
+-- Drop existing policy if it exists
+DROP POLICY IF EXISTS notifications_policy ON public.notifications;
+
+-- Create notifications policy
+CREATE POLICY notifications_policy ON public.notifications
+    USING (user_id::text = auth.uid()::text);
+
+-- Create leaderboard cache tables
+CREATE TABLE IF NOT EXISTS public.leaderboard_cache (
+    rank INTEGER NOT NULL,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    points INTEGER NOT NULL DEFAULT 0,
+    username TEXT NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    PRIMARY KEY (rank, user_id)
+);
+
+CREATE TABLE IF NOT EXISTS public.leaderboard_weekly_cache (
+    rank INTEGER NOT NULL,
+    user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+    points INTEGER NOT NULL DEFAULT 0,
+    username TEXT NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
+    PRIMARY KEY (rank, user_id)
+);
+
+-- Enable RLS on leaderboard cache tables
+ALTER TABLE public.leaderboard_cache ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.leaderboard_weekly_cache ENABLE ROW LEVEL SECURITY;
+
+-- Create function to check if leaderboard is public
 CREATE OR REPLACE FUNCTION public.is_public_leaderboard()
 RETURNS boolean
-SECURITY INVOKER
+SECURITY DEFINER
 SET search_path = public, pg_temp
 LANGUAGE sql
-AS $$
-    SELECT COALESCE(
-        (SELECT value::boolean
-         FROM public.system_settings
-         WHERE key = 'public_leaderboard'),
-        false
-    )
-$$;
+AS $is_public$
+    SELECT EXISTS (
+        SELECT 1 FROM public.system_settings 
+        WHERE setting_key = 'public_leaderboard' 
+        AND setting_value::boolean = true
+    );
+$is_public$ LANGUAGE sql;
 
 -- Create leaderboard cache access function
 CREATE OR REPLACE FUNCTION public.get_leaderboard_cache(
@@ -159,14 +204,14 @@ RETURNS TABLE (
 SECURITY DEFINER
 SET search_path = public, pg_temp
 LANGUAGE sql
-AS $$
+AS $get_leaderboard$
     SELECT rank, user_id, points, username
     FROM public.leaderboard_cache
     WHERE
         auth.uid()::text IN (SELECT id::text FROM public.admins)
         OR user_id::text = auth.uid()::text
         OR true = public.is_public_leaderboard()
-$$;
+$get_leaderboard$ LANGUAGE sql;
 
 -- Create weekly leaderboard cache access function
 CREATE OR REPLACE FUNCTION public.get_weekly_leaderboard_cache(
@@ -181,16 +226,15 @@ RETURNS TABLE (
 SECURITY DEFINER
 SET search_path = public, pg_temp
 LANGUAGE sql
-AS $$
+AS $get_weekly_leaderboard$
     SELECT rank, user_id, points, username
     FROM public.leaderboard_weekly_cache
     WHERE
         auth.uid()::text IN (SELECT id::text FROM public.admins)
         OR user_id::text = auth.uid()::text
         OR true = public.is_public_leaderboard()
-$$;
+$get_weekly_leaderboard$ LANGUAGE sql;
 
 -- Add comments to functions
 COMMENT ON FUNCTION public.get_leaderboard_cache IS 'Secure access to leaderboard cache with RLS';
-COMMENT ON FUNCTION public.get_weekly_leaderboard_cache IS 'Secure access to weekly leaderboard cache with RLS';
-COMMENT ON FUNCTION public.is_public_leaderboard IS 'Check if leaderboard is publicly viewable'; 
+COMMENT ON FUNCTION public.get_weekly_leaderboard_cache IS 'Secure access to weekly leaderboard cache with RLS'; 

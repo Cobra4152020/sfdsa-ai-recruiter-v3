@@ -26,9 +26,7 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  experimental: {
-    serverActions: true
-  }
+  output: 'standalone'
 }
 
 export default nextConfig;

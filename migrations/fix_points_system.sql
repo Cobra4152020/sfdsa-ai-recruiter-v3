@@ -16,7 +16,7 @@ DROP TABLE IF EXISTS points_history CASCADE;
 
 -- Recreate points tables with proper dependencies
 CREATE TABLE points_history (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL,
     points INTEGER NOT NULL,
     reason TEXT NOT NULL,
@@ -28,7 +28,7 @@ CREATE TABLE points_history (
 );
 
 CREATE TABLE points_rewards (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     description TEXT,
     points_required INTEGER NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE points_rewards (
 );
 
 CREATE TABLE user_rewards (
-    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID NOT NULL,
     reward_id UUID NOT NULL,
     redeemed_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
@@ -54,9 +54,8 @@ CREATE TABLE user_rewards (
 DROP TRIGGER IF EXISTS points_history_update ON points_history;
 DROP FUNCTION IF EXISTS update_user_points();
 
--- Recreate points update function with better error handling
-CREATE OR REPLACE FUNCTION update_user_points()
-RETURNS TRIGGER AS $$
+-- Create points update function
+CREATE OR REPLACE FUNCTION update_user_points() RETURNS TRIGGER AS $points_trigger$
 BEGIN
     -- Ensure recruit.users record exists
     INSERT INTO recruit.users (id, points)
@@ -76,13 +75,12 @@ BEGIN
     
     RETURN NEW;
 EXCEPTION WHEN OTHERS THEN
-    -- Log error and continue
     RAISE WARNING 'Error in update_user_points: %', SQLERRM;
     RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$points_trigger$ LANGUAGE plpgsql;
 
--- Create new trigger
+-- Create trigger
 CREATE TRIGGER points_history_update
 AFTER INSERT OR UPDATE OR DELETE ON points_history
 FOR EACH ROW
@@ -94,19 +92,23 @@ ALTER TABLE points_rewards ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_rewards ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies
+DROP POLICY IF EXISTS "Users can view their own points history" ON points_history;
 CREATE POLICY "Users can view their own points history"
 ON points_history FOR SELECT
 USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can view available rewards" ON points_rewards;
 CREATE POLICY "Users can view available rewards"
 ON points_rewards FOR SELECT
 USING (is_active = true);
 
+DROP POLICY IF EXISTS "Users can view their own rewards" ON user_rewards;
 CREATE POLICY "Users can view their own rewards"
 ON user_rewards FOR SELECT
 USING (auth.uid() = user_id);
 
 -- Allow admins full access
+DROP POLICY IF EXISTS "Admins can manage points history" ON points_history;
 CREATE POLICY "Admins can manage points history"
 ON points_history FOR ALL
 USING (
@@ -117,6 +119,7 @@ USING (
     )
 );
 
+DROP POLICY IF EXISTS "Admins can manage rewards" ON points_rewards;
 CREATE POLICY "Admins can manage rewards"
 ON points_rewards FOR ALL
 USING (
@@ -127,6 +130,7 @@ USING (
     )
 );
 
+DROP POLICY IF EXISTS "Admins can manage user rewards" ON user_rewards;
 CREATE POLICY "Admins can manage user rewards"
 ON user_rewards FOR ALL
 USING (

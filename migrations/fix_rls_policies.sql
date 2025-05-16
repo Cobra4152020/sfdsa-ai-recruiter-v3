@@ -3,7 +3,7 @@ CREATE OR REPLACE FUNCTION safely_recreate_policy(
     p_table_name text,
     p_policy_name text,
     p_command text
-) RETURNS void AS $$
+) RETURNS void AS $recreate_policy$
 BEGIN
     -- Drop existing policy if it exists
     EXECUTE format('DROP POLICY IF EXISTS %I ON %I', p_policy_name, p_table_name);
@@ -12,22 +12,21 @@ BEGIN
 EXCEPTION WHEN OTHERS THEN
     RAISE WARNING 'Error recreating policy % on table %: %', p_policy_name, p_table_name, SQLERRM;
 END;
-$$ LANGUAGE plpgsql;
+$recreate_policy$ LANGUAGE plpgsql;
 
 -- Function to safely enable RLS
 CREATE OR REPLACE FUNCTION safely_enable_rls(
     p_table_name text
-) RETURNS void AS $$
+) RETURNS void AS $enable_rls$
 BEGIN
     EXECUTE format('ALTER TABLE %I ENABLE ROW LEVEL SECURITY', p_table_name);
 EXCEPTION WHEN OTHERS THEN
     RAISE WARNING 'Error enabling RLS on table %: %', p_table_name, SQLERRM;
 END;
-$$ LANGUAGE plpgsql;
+$enable_rls$ LANGUAGE plpgsql;
 
--- Drop helper functions at the end
-DROP FUNCTION IF EXISTS cleanup_policies();
-CREATE OR REPLACE FUNCTION cleanup_policies() RETURNS void AS $$
+-- Function to clean up policies
+CREATE OR REPLACE FUNCTION cleanup_policies() RETURNS void AS $cleanup_policies$
 DECLARE
     r RECORD;
 BEGIN
@@ -78,12 +77,12 @@ BEGIN
         );
     END LOOP;
 END;
-$$ LANGUAGE plpgsql;
+$cleanup_policies$ LANGUAGE plpgsql;
 
 -- Execute cleanup
 SELECT cleanup_policies();
 
 -- Drop helper functions
 DROP FUNCTION IF EXISTS cleanup_policies();
-DROP FUNCTION IF EXISTS safely_recreate_policy();
-DROP FUNCTION IF EXISTS safely_enable_rls(); 
+DROP FUNCTION IF EXISTS safely_recreate_policy(text, text, text);
+DROP FUNCTION IF EXISTS safely_enable_rls(text); 
