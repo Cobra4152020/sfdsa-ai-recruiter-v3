@@ -4,8 +4,42 @@ import { Suspense } from "react"
 import { PageWrapper } from "@/components/page-wrapper"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { DashboardStatsWrapper } from "@/components/admin/dashboard-stats-wrapper"
-import { TiktokChallengesWrapper } from "@/components/admin/tiktok-challenges-wrapper"
+import { TikTokChallengesAdmin } from "@/components/admin/tiktok-challenges-admin"
 import { RecentApplicantsWrapper } from "@/components/admin/recent-applicants-wrapper"
+
+const mockStats = {
+  totalApplicants: 1250,
+  qualifiedCandidates: 850,
+  processingTime: "14 days",
+  conversionRate: "68%"
+}
+
+const mockApplicants = [
+  {
+    id: "1",
+    name: "John Smith",
+    email: "john.smith@example.com",
+    status: "pending" as const,
+    appliedDate: "2024-03-20",
+    position: "Deputy Sheriff Trainee"
+  },
+  {
+    id: "2",
+    name: "Sarah Johnson",
+    email: "sarah.j@example.com",
+    status: "approved" as const,
+    appliedDate: "2024-03-19",
+    position: "Deputy Sheriff Trainee"
+  },
+  {
+    id: "3",
+    name: "Michael Chen",
+    email: "m.chen@example.com",
+    status: "pending" as const,
+    appliedDate: "2024-03-18",
+    position: "Deputy Sheriff Trainee"
+  }
+]
 
 export default function SecureDashboardPage() {
   return (
@@ -15,7 +49,7 @@ export default function SecureDashboardPage() {
 
         <div className="mb-8">
           <Suspense fallback={<div>Loading stats...</div>}>
-            <DashboardStatsWrapper />
+            <DashboardStatsWrapper stats={mockStats} />
           </Suspense>
         </div>
 
@@ -27,7 +61,7 @@ export default function SecureDashboardPage() {
             </CardHeader>
             <CardContent>
               <Suspense fallback={<div>Loading challenges...</div>}>
-                <TiktokChallengesWrapper />
+                <TikTokChallengesAdmin />
               </Suspense>
             </CardContent>
           </Card>
@@ -39,7 +73,7 @@ export default function SecureDashboardPage() {
             </CardHeader>
             <CardContent>
               <Suspense fallback={<div>Loading applicants...</div>}>
-                <RecentApplicantsWrapper />
+                <RecentApplicantsWrapper applicants={mockApplicants} />
               </Suspense>
             </CardContent>
           </Card>

@@ -7,6 +7,7 @@ import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
 import { OptInForm } from "@/components/opt-in-form"
 import { UserProvider } from "@/context/user-context"
+import { AuthModalProvider } from "@/context/auth-modal-context"
 import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
 
 interface PageWrapperProps {
@@ -28,20 +29,22 @@ export function PageWrapper({ children }: PageWrapperProps) {
 
   return (
     <UserProvider>
-      <div className="min-h-screen flex flex-col">
-        <ImprovedHeader showOptInForm={showOptInForm} />
-        <main id="main-content" className="flex-1 pt-40 pb-12 bg-background dark:bg-[#121212]">
-          {children}
-        </main>
-        <ImprovedFooter />
+      <AuthModalProvider>
+        <div className="min-h-screen flex flex-col">
+          <ImprovedHeader showOptInForm={showOptInForm} />
+          <main id="main-content" className="flex-1 pt-16 pb-12 bg-background dark:bg-[#121212]">
+            {children}
+          </main>
+          <ImprovedFooter />
 
-        {isOptInFormOpen && (
-          <OptInForm onClose={handleCloseOptInForm} isApplying={isApplying} isOpen={isOptInFormOpen} />
-        )}
-        <div className="fixed bottom-6 right-6 z-50">
-          <AskSgtKenButton position="fixed" variant="secondary" />
+          {isOptInFormOpen && (
+            <OptInForm onClose={handleCloseOptInForm} isApplying={isApplying} isOpen={isOptInFormOpen} />
+          )}
+          <div className="fixed bottom-6 right-6 z-50">
+            <AskSgtKenButton position="fixed" variant="secondary" />
+          </div>
         </div>
-      </div>
+      </AuthModalProvider>
     </UserProvider>
   )
 }

@@ -6,8 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { AlertCircle, CheckCircle, RefreshCw, Database, FileText, Clock, Info } from "lucide-react"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
+import { PageWrapper } from "@/components/page-wrapper"
 
 interface SystemHealthData {
   status: string
@@ -132,8 +131,7 @@ export default function TriviaSystemHealthPage() {
   }
 
   return (
-    <>
-      <ImprovedHeader showOptInForm={() => {}} />
+    <PageWrapper>
       <main className="container mx-auto px-4 py-8">
         <h1 className="text-3xl font-bold mb-6">Trivia System Health Dashboard</h1>
 
@@ -502,7 +500,6 @@ export default function TriviaSystemHealthPage() {
           </TabsContent>
         </Tabs>
       </main>
-      <ImprovedFooter />
-    </>
+    </PageWrapper>
   )
 }

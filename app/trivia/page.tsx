@@ -1,7 +1,6 @@
 "use client"
 
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
+import { PageWrapper } from "@/components/page-wrapper"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
@@ -163,8 +162,7 @@ export default function TriviaHubPage() {
   }
 
   return (
-    <>
-      <ImprovedHeader showOptInForm={() => {}} />
+    <PageWrapper>
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
@@ -347,7 +345,6 @@ export default function TriviaHubPage() {
           })}
         </div>
       </main>
-      <ImprovedFooter />
-    </>
+    </PageWrapper>
   )
 }

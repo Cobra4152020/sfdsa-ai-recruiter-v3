@@ -1,30 +1,28 @@
 "use client"
 
 import { useState } from "react"
-import { EnhancedTriviaGame } from "@/components/trivia/enhanced-trivia-game"
-import { TriviaBadges } from "@/components/trivia/trivia-badges"
-import { TriviaLeaderboard } from "@/components/trivia/trivia-leaderboard"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ErrorBoundaryWrapper } from "@/components/error-boundary-wrapper"
+import { PageWrapper } from "@/components/page-wrapper"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Trophy, Award } from "lucide-react"
+import { EnhancedTriviaGame } from "@/components/trivia/enhanced-trivia-game"
+import { TriviaLeaderboard } from "@/components/trivia/trivia-leaderboard"
+import { TriviaBadges } from "@/components/trivia/trivia-badges"
+import { ErrorBoundaryWrapper } from "@/components/error-boundary-wrapper"
+
+const gameId = "sf-tourist-spots"
+const gameName = "San Francisco Tourist Spots Trivia"
+const gameDescription = "Test your knowledge of San Francisco's most popular tourist destinations."
+const badgeTypes = {
+  participant: "sf-tourist-spots-participant",
+  enthusiast: "sf-tourist-spots-enthusiast",
+  master: "sf-tourist-spots-master",
+}
 
 export default function SFTouristSpotsTriviaPage() {
   const [activeTab, setActiveTab] = useState("play")
-  const gameId = "sf-tourist-spots"
-  const gameName = "SF Most Popular Tourist Spots"
-  const gameDescription = "How well do you know San Francisco's famous landmarks and tourist attractions?"
-
-  const badgeTypes = {
-    participant: "sf-tourist-spots-participant",
-    enthusiast: "sf-tourist-spots-enthusiast",
-    master: "sf-tourist-spots-master",
-  }
 
   return (
-    <>
-      <ImprovedHeader showOptInForm={() => {}} />
+    <PageWrapper>
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">{gameName}</h1>
@@ -46,10 +44,8 @@ export default function SFTouristSpotsTriviaPage() {
               Badges
             </TabsTrigger>
           </TabsList>
-        </Tabs>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className={`lg:col-span-2 ${activeTab !== "play" ? "hidden lg:block" : ""}`}>
+          <TabsContent value="play">
             <ErrorBoundaryWrapper>
               <EnhancedTriviaGame
                 gameId={gameId}
@@ -61,22 +57,21 @@ export default function SFTouristSpotsTriviaPage() {
                 badgeTypes={badgeTypes}
               />
             </ErrorBoundaryWrapper>
-          </div>
+          </TabsContent>
 
-          <div className={`${activeTab !== "leaderboard" ? "hidden lg:block" : ""}`}>
+          <TabsContent value="leaderboard">
             <ErrorBoundaryWrapper>
               <TriviaLeaderboard gameId={gameId} gameName={gameName} />
             </ErrorBoundaryWrapper>
-          </div>
+          </TabsContent>
 
-          <div className={`${activeTab !== "badges" ? "hidden lg:block" : ""}`}>
+          <TabsContent value="badges">
             <ErrorBoundaryWrapper>
               <TriviaBadges gameId={gameId} gameName={gameName} badgeTypes={badgeTypes} />
             </ErrorBoundaryWrapper>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
-      <ImprovedFooter />
-    </>
+    </PageWrapper>
   )
 }

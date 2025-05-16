@@ -1,6 +1,7 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { PageWrapper } from "@/components/page-wrapper"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -11,16 +12,14 @@ import { ImprovedFooter } from "@/components/improved-footer"
 export default function TriviaDiagnosticsPage() {
   const [diagnosticResults, setDiagnosticResults] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<string | null>(null)
 
-  const runDiagnostics = async (gameId = null) => {
+  const runDiagnostics = async () => {
     setIsLoading(true)
     setError(null)
 
     try {
-      const url = gameId ? `/api/trivia/diagnostics?gameId=${gameId}` : "/api/trivia/diagnostics"
-
-      const response = await fetch(url)
+      const response = await fetch("/api/trivia/diagnostics")
 
       if (!response.ok) {
         throw new Error(`API returned status: ${response.status}`)
@@ -30,19 +29,14 @@ export default function TriviaDiagnosticsPage() {
       setDiagnosticResults(data)
     } catch (err) {
       console.error("Error running trivia diagnostics:", err)
-      setError(err.message)
+      setError(err instanceof Error ? err.message : "Unknown error occurred")
     } finally {
       setIsLoading(false)
     }
   }
 
-  useEffect(() => {
-    runDiagnostics()
-  }, [])
-
   return (
-    <>
-      <ImprovedHeader showOptInForm={() => {}} />
+    <PageWrapper>
       <main className="container mx-auto px-4 py-8">
         <Card className="mb-8">
           <CardHeader>
@@ -154,7 +148,7 @@ export default function TriviaDiagnosticsPage() {
         </Card>
       </main>
       <ImprovedFooter />
-    </>
+    </PageWrapper>
   )
 }
 

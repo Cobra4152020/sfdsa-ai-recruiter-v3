@@ -1,33 +1,28 @@
 "use client"
 
 import { useState } from "react"
-import { EnhancedTriviaGame } from "@/components/trivia/enhanced-trivia-game"
-import { TriviaBadges } from "@/components/trivia/trivia-badges"
-import { TriviaLeaderboard } from "@/components/trivia/trivia-leaderboard"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { ErrorBoundaryWrapper } from "@/components/error-boundary-wrapper"
+import { PageWrapper } from "@/components/page-wrapper"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Trophy, Award } from "lucide-react"
+import { EnhancedTriviaGame } from "@/components/trivia/enhanced-trivia-game"
+import { TriviaLeaderboard } from "@/components/trivia/trivia-leaderboard"
+import { TriviaBadges } from "@/components/trivia/trivia-badges"
+import { ErrorBoundaryWrapper } from "@/components/error-boundary-wrapper"
+
+const gameId = "sf-districts"
+const gameName = "San Francisco Districts Trivia"
+const gameDescription = "Test your knowledge of San Francisco's diverse neighborhoods and districts."
+const badgeTypes = {
+  participant: "sf-districts-participant",
+  enthusiast: "sf-districts-enthusiast",
+  master: "sf-districts-master",
+}
 
 export default function SFDistrictsTriviaPage() {
   const [activeTab, setActiveTab] = useState("play")
-  const gameId = "sf-districts"
-  const gameName = "SF District Trivia"
-  const gameDescription = "Test your knowledge of San Francisco's unique and diverse neighborhoods and districts."
-
-  const badgeTypes = {
-    participant: "sf-districts-participant",
-    enthusiast: "sf-districts-enthusiast",
-    master: "sf-districts-master",
-  }
-
-  // Create a dummy function for showOptInForm since we're using the auth modal context instead
-  const showOptInForm = () => {}
 
   return (
-    <>
-      <ImprovedHeader showOptInForm={showOptInForm} />
+    <PageWrapper>
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">{gameName}</h1>
@@ -49,10 +44,8 @@ export default function SFDistrictsTriviaPage() {
               Badges
             </TabsTrigger>
           </TabsList>
-        </Tabs>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className={`lg:col-span-2 ${activeTab !== "play" ? "hidden lg:block" : ""}`}>
+          <TabsContent value="play">
             <ErrorBoundaryWrapper>
               <EnhancedTriviaGame
                 gameId={gameId}
@@ -64,22 +57,21 @@ export default function SFDistrictsTriviaPage() {
                 badgeTypes={badgeTypes}
               />
             </ErrorBoundaryWrapper>
-          </div>
+          </TabsContent>
 
-          <div className={`${activeTab !== "leaderboard" ? "hidden lg:block" : ""}`}>
+          <TabsContent value="leaderboard">
             <ErrorBoundaryWrapper>
               <TriviaLeaderboard gameId={gameId} gameName={gameName} />
             </ErrorBoundaryWrapper>
-          </div>
+          </TabsContent>
 
-          <div className={`${activeTab !== "badges" ? "hidden lg:block" : ""}`}>
+          <TabsContent value="badges">
             <ErrorBoundaryWrapper>
               <TriviaBadges gameId={gameId} gameName={gameName} badgeTypes={badgeTypes} />
             </ErrorBoundaryWrapper>
-          </div>
-        </div>
+          </TabsContent>
+        </Tabs>
       </main>
-      <ImprovedFooter />
-    </>
+    </PageWrapper>
   )
 }
