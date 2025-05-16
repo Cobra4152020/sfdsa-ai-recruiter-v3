@@ -1,6 +1,7 @@
 "use client"
 
 import type React from "react"
+import type { PageProps } from "next"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
@@ -29,6 +30,12 @@ import {
   type UserRole,
 } from "@/lib/user-management-service"
 import { ArrowLeft, Save, Trash, RefreshCw, Shield, UserCog, User } from "lucide-react"
+
+interface UserDetailPageProps {
+  params: {
+    id: string;
+  };
+}
 
 export default function UserDetailPage({ params }: { params: { id: string } }) {
   const router = useRouter()
