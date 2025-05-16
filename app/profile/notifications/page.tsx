@@ -1,8 +1,9 @@
-export const dynamic = "force-dynamic"
+"use client"
 
+import { useEffect, useState } from "react"
 import type { Metadata } from "next"
-import { redirect } from "next/navigation"
-import { createServerClient } from "@/lib/supabase-server"
+import { useRouter } from "next/navigation"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { PushNotificationPermission } from "@/components/push-notification-permission"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
@@ -13,20 +14,29 @@ export const metadata: Metadata = {
   description: "Manage your notification preferences",
 }
 
-export default async function NotificationPreferencesPage() {
-  const supabase = createServerClient()
+export default function NotificationPreferencesPage() {
+  const router = useRouter()
+  const [userId, setUserId] = useState<string | null>(null)
+  const supabase = createClientComponentClient()
 
-  // Get the user session
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      
+      if (!session) {
+        router.push("/login?redirect=/profile/notifications")
+        return
+      }
 
-  // Redirect to login if not authenticated
-  if (!session) {
-    redirect("/login?redirect=/profile/notifications")
+      setUserId(session.user.id)
+    }
+
+    checkSession()
+  }, [router, supabase])
+
+  if (!userId) {
+    return null // Or a loading spinner
   }
-
-  const userId = session.user.id
 
   return (
     <div className="container max-w-4xl py-8">

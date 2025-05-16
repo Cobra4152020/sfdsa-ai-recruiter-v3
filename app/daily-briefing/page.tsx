@@ -1,11 +1,13 @@
-import { Suspense } from "react"
+"use client"
+
+import { Suspense, useEffect, useState } from "react"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { BriefingCard } from "@/components/daily-briefing/briefing-card"
 import { BriefingStats } from "@/components/daily-briefing/briefing-stats"
 import { BriefingLeaderboard } from "@/components/daily-briefing/briefing-leaderboard"
-import { getServerSupabase } from "@/lib/supabase-server"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 3600 // Revalidate every hour
@@ -54,7 +56,7 @@ const fallbackBriefing = {
 // Function to check if a table exists in the database
 async function checkTableExists(tableName: string) {
   try {
-    const supabase = getServerSupabase()
+    const supabase = createClientComponentClient()
 
     // Try to query the information_schema to check if the table exists
     const { data, error } = await supabase
@@ -90,7 +92,7 @@ async function getTodaysBriefing() {
       }
     }
 
-    const supabase = getServerSupabase()
+    const supabase = createClientComponentClient()
 
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split("T")[0]
@@ -125,25 +127,33 @@ async function getTodaysBriefing() {
 }
 
 // Main page component
-export default async function DailyBriefingPage() {
-  // Fetch the briefing data from the database
-  const { briefing, error } = await getTodaysBriefing()
-
-  // Default stats when database fetch fails
-  const stats = {
+export default function DailyBriefingPage() {
+  const [briefing, setBriefing] = useState(fallbackBriefing)
+  const [error, setError] = useState<string | null>(null)
+  const [stats, setStats] = useState({
     total_attendees: 0,
     total_shares: 0,
     user_attended: false,
     user_shared: false,
     user_platforms_shared: [],
-  }
+  })
+
+  useEffect(() => {
+    const fetchBriefing = async () => {
+      const { briefing: fetchedBriefing, error: fetchError } = await getTodaysBriefing()
+      setBriefing(fetchedBriefing)
+      setError(fetchError)
+    }
+
+    fetchBriefing()
+  }, [])
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Daily Briefing</h1>
 
       {error && (
-        <Alert variant="warning" className="mb-6">
+        <Alert variant="destructive" className="mb-6">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Note</AlertTitle>
           <AlertDescription>{error}</AlertDescription>
