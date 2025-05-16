@@ -1,11 +1,17 @@
 "use server"
 
-import { fetchDatabaseSchema } from "@/lib/schema-visualization"
 import type { DatabaseSchema } from "@/lib/schema-visualization"
 
 export async function fetchSchema(): Promise<DatabaseSchema> {
   try {
-    return await fetchDatabaseSchema()
+    const response = await fetch('/api/admin/database-schema')
+    const data = await response.json()
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to fetch database schema')
+    }
+    
+    return data
   } catch (error) {
     console.error("Error fetching database schema:", error)
     return {

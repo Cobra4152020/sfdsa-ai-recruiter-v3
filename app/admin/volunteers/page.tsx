@@ -1,10 +1,24 @@
-export const dynamic = "force-dynamic"
+"use client"
 
+import { useEffect, useState } from "react"
 import { getPendingVolunteerRecruiters } from "@/app/actions/admin-actions"
 import { VolunteerApprovalList } from "@/components/admin/volunteer-approval-list"
 
-export default async function AdminVolunteersPage() {
-  const { data: pendingVolunteers, success, error } = await getPendingVolunteerRecruiters()
+export default function AdminVolunteersPage() {
+  const [pendingVolunteers, setPendingVolunteers] = useState([])
+  const [success, setSuccess] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchVolunteers = async () => {
+      const { data, success, error } = await getPendingVolunteerRecruiters()
+      setPendingVolunteers(data || [])
+      setSuccess(success)
+      setError(error)
+    }
+
+    fetchVolunteers()
+  }, [])
 
   return (
     <div className="container mx-auto py-8">

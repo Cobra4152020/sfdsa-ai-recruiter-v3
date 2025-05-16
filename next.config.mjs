@@ -42,44 +42,12 @@ const nextConfig = {
       },
     ],
   },
-  // Disable server-only features for static export
+  // Configure experimental features
   experimental: {
-    serverActions: false,
     typedRoutes: true,
   },
-  // Configure which routes to generate for static export
-  trailingSlash: true, // Add trailing slashes for cleaner URLs
-  // Exclude API routes and dynamic routes that require server
-  exportPathMap: async function() {
-    return {
-      '/': { page: '/' },
-      '/admin': { page: '/admin' },
-      '/admin/setup-daily-briefings': { page: '/admin/setup-daily-briefings' },
-      // Add other static routes here
-    }
-  },
-  // Add canonical URL to improve SEO
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-DNS-Prefetch-Control',
-            value: 'on',
-          },
-        ],
-      },
-    ];
-  },
-  // This might help with dynamic route conflicts by disabling strict mode for routes
-  async rewrites() {
-    return {
-      beforeFiles: [],
-      afterFiles: [],
-      fallback: [],
-    };
-  },
+  // Add trailing slashes for cleaner URLs
+  trailingSlash: true,
 };
 
 if (userConfig) {

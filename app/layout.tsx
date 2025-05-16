@@ -5,38 +5,34 @@ import { ThemeProvider } from "@/components/theme-provider"
 import PerformanceMonitor from "@/components/performance-monitor"
 import { ErrorMonitor } from "@/components/error-monitor"
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
-import { createPerformanceMetricsTable } from "@/lib/database-setup"
 import { RegistrationProvider } from "@/context/registration-context"
 import { AuthModalProvider } from "@/context/auth-modal-context"
+import Head from 'next/head'
 
 const inter = Inter({ subsets: ["latin"] })
-
-export const metadata = {
-  title: "SFDSA AI Recruiter",
-  description: "San Francisco Deputy Sheriffs' Association AI Recruiter",
-    generator: 'v0.dev'
-}
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  // Try to create the performance metrics table, but don't wait for it
-  if (process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === "true") {
-    createPerformanceMetricsTable().catch(console.error)
-  }
-
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <Head>
+        <title>SFDSA AI Recruiter</title>
+        <meta name="description" content="San Francisco Deputy Sheriffs' Association AI Recruiter" />
+        <meta name="generator" content="v0.dev" />
+      </Head>
       <body className={inter.className}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <AuthModalProvider>
-            <RegistrationProvider>{children}</RegistrationProvider>
-          </AuthModalProvider>
-          <PerformanceMonitor />
-          <ErrorMonitor />
-          <WebSocketErrorHandler />
+        <ThemeProvider defaultTheme="light" storageKey="app-theme">
+          <RegistrationProvider>
+            <AuthModalProvider>
+              <WebSocketErrorHandler />
+              <ErrorMonitor />
+              <PerformanceMonitor />
+              {children}
+            </AuthModalProvider>
+          </RegistrationProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -9,9 +9,6 @@ import { BriefingStats } from "@/components/daily-briefing/briefing-stats"
 import { BriefingLeaderboard } from "@/components/daily-briefing/briefing-leaderboard"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 
-export const dynamic = "force-dynamic"
-export const revalidate = 3600 // Revalidate every hour
-
 // Fallback briefing data - used when database fetch fails
 const fallbackBriefing = {
   id: "fallback-briefing",

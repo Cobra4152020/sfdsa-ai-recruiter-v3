@@ -1,36 +1,63 @@
-import type { Metadata } from "next"
+"use client"
+
+import { useState, useEffect } from "react"
 import { DonationStatsCards } from "@/components/analytics/donation-stats-cards"
 import { DonationTrendsChart } from "@/components/analytics/donation-trends-chart"
 import { ConversionRatesChart } from "@/components/analytics/conversion-rates-chart"
 import { PointDistributionChart } from "@/components/analytics/point-distribution-chart"
 import { CampaignPerformanceTable } from "@/components/analytics/campaign-performance-table"
 
-export const metadata: Metadata = {
-  title: "Donation Analytics Dashboard",
-  description: "Monitor donation trends, conversion rates, and point distribution",
-}
+export default function DonationAnalyticsPage() {
+  const [isLoading, setIsLoading] = useState(true)
+  const [data, setData] = useState({
+    stats: null,
+    trends: null,
+    conversions: null,
+    points: null,
+    campaigns: null
+  })
 
-export default function DonationAnalyticsDashboard() {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [statsRes, trendsRes, conversionsRes, pointsRes, campaignsRes] = await Promise.all([
+          fetch('/api/analytics/donations/stats'),
+          fetch('/api/analytics/donations/trends'),
+          fetch('/api/analytics/donations/conversion'),
+          fetch('/api/analytics/donations/points'),
+          fetch('/api/analytics/donations/campaigns')
+        ])
+
+        const [stats, trends, conversions, points, campaigns] = await Promise.all([
+          statsRes.json(),
+          trendsRes.json(),
+          conversionsRes.json(),
+          pointsRes.json(),
+          campaignsRes.json()
+        ])
+
+        setData({ stats, trends, conversions, points, campaigns })
+      } catch (error) {
+        console.error('Error fetching donation analytics data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
   return (
-    <div className="container space-y-6 py-8">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">Donation Analytics Dashboard</h1>
-        <p className="text-muted-foreground">
-          Monitor donation trends, conversion rates, and point distribution over time
-        </p>
-      </div>
-
-      <DonationStatsCards />
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <DonationTrendsChart />
-        <ConversionRatesChart />
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <PointDistributionChart />
-        <CampaignPerformanceTable />
-      </div>
+    <div className="space-y-8">
+      <DonationStatsCards data={data.stats} />
+      <DonationTrendsChart data={data.trends} />
+      <ConversionRatesChart data={data.conversions} />
+      <PointDistributionChart data={data.points} />
+      <CampaignPerformanceTable data={data.campaigns} />
     </div>
   )
 }

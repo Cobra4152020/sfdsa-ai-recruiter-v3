@@ -1,18 +1,12 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import type { Metadata } from "next"
 import { useRouter } from "next/navigation"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
 import { PushNotificationPermission } from "@/components/push-notification-permission"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
-
-export const metadata: Metadata = {
-  title: "Notification Preferences",
-  description: "Manage your notification preferences",
-}
 
 export default function NotificationPreferencesPage() {
   const router = useRouter()
