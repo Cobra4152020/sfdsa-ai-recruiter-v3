@@ -15,6 +15,8 @@ import { CalendarDays, Search, Filter, Award } from "lucide-react"
 import { ChallengeLeaderboard } from "@/components/tiktok-challenge-leaderboard"
 import { toast } from "@/components/ui/use-toast"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Users, Trophy, Video, Share2 } from "lucide-react"
 
 interface Challenge {
   id: number
@@ -178,6 +180,39 @@ export default function TikTokChallengesPage() {
     )
   }
 
+  const activeChallenges = [
+    {
+      id: "1",
+      title: "SFDA Dance Challenge",
+      description: "Show your moves in uniform! Share your best dance moves while representing SFDA.",
+      hashtag: "#SFDADance",
+      participants: 120,
+      views: 15000,
+      endDate: "2024-04-30",
+      points: 100
+    },
+    {
+      id: "2",
+      title: "Community Connection",
+      description: "Share a moment of positive community interaction while on duty.",
+      hashtag: "#SFDACommunity",
+      participants: 85,
+      views: 12000,
+      endDate: "2024-05-15",
+      points: 150
+    },
+    {
+      id: "3",
+      title: "Training Day",
+      description: "Share a glimpse of your training routine or preparation for the academy.",
+      hashtag: "#SFDATraining",
+      participants: 95,
+      views: 13500,
+      endDate: "2024-05-01",
+      points: 120
+    }
+  ]
+
   return (
     <PageWrapper>
       <div className="container py-8">
@@ -248,6 +283,30 @@ export default function TikTokChallengesPage() {
             <ChallengeLeaderboard />
           </TabsContent>
         </Tabs>
+
+        <div className="mt-12 bg-gray-50 border rounded-lg p-6">
+          <h2 className="text-xl font-semibold mb-4">How TikTok Challenges Work</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            <div>
+              <h3 className="font-medium mb-2">1. Choose a Challenge</h3>
+              <p className="text-gray-600">
+                Pick an active challenge that matches your skills and interests. Each challenge has specific requirements and rewards.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium mb-2">2. Create & Share</h3>
+              <p className="text-gray-600">
+                Create your TikTok video following the challenge guidelines. Use the specified hashtag when posting.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-medium mb-2">3. Earn Rewards</h3>
+              <p className="text-gray-600">
+                Submit your video link to earn points. Top performers receive special badges and recognition.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {viewingSubmissionId && (

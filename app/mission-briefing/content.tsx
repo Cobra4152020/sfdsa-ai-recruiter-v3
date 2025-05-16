@@ -6,6 +6,7 @@ import { FileText, Briefcase, GraduationCap, DollarSign, Clock, Shield, Users, C
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
+import type { Route } from "next"
 
 export default function MissionBriefingContent() {
   return (
@@ -76,7 +77,7 @@ export default function MissionBriefingContent() {
                   Start your application process today and begin your career in law enforcement with the San Francisco
                   Sheriff's Department.
                 </p>
-                <Link href="/apply">
+                <Link href={"/apply" as Route}>
                   <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">Apply Now</Button>
                 </Link>
               </div>
@@ -85,7 +86,7 @@ export default function MissionBriefingContent() {
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Learn about our points system, badges, and rewards as you progress through the recruitment process.
                 </p>
-                <Link href="/deputy-launchpad">
+                <Link href={"/deputy-launchpad" as Route}>
                   <Button variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
                     <Rocket className="h-4 w-4 mr-2" />
                     Visit Deputy Launchpad
@@ -201,91 +202,106 @@ function RoleExplainer() {
   )
 }
 
-function RequirementsExplainer() {
+export function RequirementsExplainer() {
   const basicRequirements = [
-    "Be at least 21 years of age",
-    "U.S. citizenship or permanent resident alien who is eligible for and has applied for citizenship",
-    "High school diploma or GED equivalent",
+    "Must be at least 18 years old",
+    "U.S. citizenship or permanent resident alien status",
+    "High school diploma or equivalent (GED)",
     "Valid California driver's license",
     "No felony convictions",
-    "Good physical condition",
-    "Good moral character",
+    "Pass background investigation",
+    "Pass medical and psychological examinations",
+    "Physical fitness meeting department standards",
   ]
 
   return (
-    <Card>
-      <CardHeader className="bg-[#0A3C1F] text-white">
-        <CardTitle className="flex items-center">
-          <Clipboard className="h-5 w-5 text-[#FFD700] mr-2" />
-          Requirements
-        </CardTitle>
-        <CardDescription className="text-gray-200">
-          Understand the qualifications needed to become a San Francisco Deputy Sheriff
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Basic Requirements</h3>
-            <ul className="space-y-2">
-              {basicRequirements.map((req, index) => (
-                <li key={index} className="flex items-start">
-                  <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                    <Shield className="h-4 w-4 text-[#0A3C1F]" />
-                  </div>
-                  <span>{req}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+    <div className="space-y-6">
+      <Card>
+        <CardContent className="pt-6">
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Basic Requirements</h3>
+              <ul className="space-y-2">
+                {basicRequirements.map((req, index) => (
+                  <li key={index} className="flex items-start">
+                    <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+                      <Shield className="h-4 w-4 text-[#0A3C1F]" />
+                    </div>
+                    <span>{req}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Testing Requirements</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Written Exam</h4>
-                <p className="text-sm text-gray-600">
-                  Tests basic reading comprehension, writing skills, and problem-solving abilities. Preparation
-                  materials are available through our platform.
-                </p>
-              </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Physical Ability Test</h4>
-                <p className="text-sm text-gray-600">
-                  Includes push-ups, sit-ups, and a 1.5-mile run to assess physical fitness and endurance.
-                </p>
-              </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Oral Interview</h4>
-                <p className="text-sm text-gray-600">
-                  Evaluates communication skills, judgment, and suitability for law enforcement work.
-                </p>
-              </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Background Investigation</h4>
-                <p className="text-sm text-gray-600">
-                  Thorough review of personal history, including employment, education, and criminal records.
-                </p>
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Testing Requirements</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-semibold mb-2">Written Exam</h4>
+                  <p className="text-sm text-gray-600">
+                    Tests basic reading comprehension, writing skills, and problem-solving abilities. Preparation materials
+                    are available through our platform.
+                  </p>
+                </div>
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-semibold mb-2">Physical Ability Test</h4>
+                  <p className="text-sm text-gray-600">
+                    Includes push-ups, sit-ups, and a 1.5-mile run to assess physical fitness and endurance.
+                  </p>
+                </div>
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-semibold mb-2">Oral Interview</h4>
+                  <p className="text-sm text-gray-600">
+                    Evaluates communication skills, judgment, and suitability for law enforcement work.
+                  </p>
+                </div>
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-semibold mb-2">Background Check</h4>
+                  <p className="text-sm text-gray-600">
+                    Thorough investigation of personal history, employment, education, and criminal record.
+                  </p>
+                </div>
               </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-            <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">Additional Screenings</h3>
-            <p className="mb-2">Candidates who pass the initial requirements will also undergo:</p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700">
-              <li>Medical examination</li>
-              <li>Psychological evaluation</li>
-              <li>Drug screening</li>
-              <li>Polygraph examination</li>
-            </ul>
-            <p className="mt-2">
-              These screenings ensure that candidates are physically and mentally prepared for the demands of the job.
-            </p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Preferred Qualifications</CardTitle>
+          <CardDescription>These qualities will strengthen your application</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2">
+            <li className="flex items-start">
+              <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+                <GraduationCap className="h-4 w-4 text-[#0A3C1F]" />
+              </div>
+              <span>College degree in Criminal Justice or related field</span>
+            </li>
+            <li className="flex items-start">
+              <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+                <Briefcase className="h-4 w-4 text-[#0A3C1F]" />
+              </div>
+              <span>Prior law enforcement or military experience</span>
+            </li>
+            <li className="flex items-start">
+              <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+                <Users className="h-4 w-4 text-[#0A3C1F]" />
+              </div>
+              <span>Community service or volunteer experience</span>
+            </li>
+            <li className="flex items-start">
+              <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+                <FileText className="h-4 w-4 text-[#0A3C1F]" />
+              </div>
+              <span>Bilingual abilities</span>
+            </li>
+          </ul>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
@@ -399,7 +415,7 @@ function BenefitsExplainer() {
   )
 }
 
-function ProcessExplainer() {
+export function ProcessExplainer() {
   const applicationSteps = [
     {
       step: 1,
@@ -439,104 +455,63 @@ function ProcessExplainer() {
   ]
 
   return (
-    <Card>
-      <CardHeader className="bg-[#0A3C1F] text-white">
-        <CardTitle className="flex items-center">
-          <Clock className="h-5 w-5 text-[#FFD700] mr-2" />
-          Application Process
-        </CardTitle>
-        <CardDescription className="text-gray-200">
-          Understand the steps to becoming a San Francisco Deputy Sheriff
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="pt-6">
-        <div className="space-y-6">
-          <div>
-            <h3 className="text-xl font-semibold mb-4">Application Timeline</h3>
-            <p className="mb-4">
-              The application process typically takes 4-6 months from initial application to final offer. Each step must
-              be completed successfully before moving to the next phase.
-            </p>
-            <div className="relative">
-              <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-[#0A3C1F]/20"></div>
-              <div className="space-y-8 relative">
-                {applicationSteps.map((step) => (
-                  <div key={step.step} className="flex">
-                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-[#0A3C1F] text-white flex items-center justify-center z-10">
-                      {step.step}
-                    </div>
-                    <div className="ml-6">
-                      <h4 className="font-semibold">{step.title}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{step.description}</p>
-                    </div>
-                  </div>
-                ))}
+    <div className="space-y-6">
+      <div className="grid gap-4">
+        {applicationSteps.map((step) => (
+          <Card key={step.step} className="overflow-hidden">
+            <CardHeader className="bg-[#0A3C1F]/5 pb-4">
+              <div className="flex items-center">
+                <div className="bg-[#0A3C1F] text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                  {step.step}
+                </div>
+                <CardTitle>{step.title}</CardTitle>
               </div>
-            </div>
-          </div>
+            </CardHeader>
+            <CardContent className="pt-4">
+              <p className="text-gray-600">{step.description}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
 
-          <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20 mt-8">
-            <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">Tips for Success</h3>
-            <ul className="space-y-2">
-              <li className="flex items-start">
-                <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                  <Shield className="h-4 w-4 text-[#0A3C1F]" />
-                </div>
-                <span>
-                  <strong>Prepare thoroughly</strong> for each step of the process, especially the written and physical
-                  tests.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                  <Shield className="h-4 w-4 text-[#0A3C1F]" />
-                </div>
-                <span>
-                  <strong>Be honest</strong> throughout the entire process, particularly during the background
-                  investigation.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                  <Shield className="h-4 w-4 text-[#0A3C1F]" />
-                </div>
-                <span>
-                  <strong>Stay in touch</strong> with your background investigator and respond promptly to requests for
-                  information.
-                </span>
-              </li>
-              <li className="flex items-start">
-                <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                  <Shield className="h-4 w-4 text-[#0A3C1F]" />
-                </div>
-                <span>
-                  <strong>Maintain physical fitness</strong> throughout the process to ensure you're ready for the
-                  academy.
-                </span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="text-center p-6 border rounded-lg bg-gradient-to-b from-[#0A3C1F]/10 to-transparent">
-            <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">Ready to Begin?</h3>
-            <p className="mb-4">
-              Start your journey to becoming a San Francisco Deputy Sheriff today. Our platform provides resources to
-              help you succeed at every step of the process.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/apply">
-                <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">Apply Now</Button>
-              </Link>
-              <Link href="/deputy-launchpad">
-                <Button variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
-                  Explore Deputy Launchpad
-                </Button>
-              </Link>
+      <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
+        <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">Tips for Success</h3>
+        <ul className="space-y-2">
+          <li className="flex items-start">
+            <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-[#0A3C1F]" />
             </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+            <span>
+              <strong>Prepare thoroughly</strong> for each step of the process, especially the written and physical tests.
+            </span>
+          </li>
+          <li className="flex items-start">
+            <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-[#0A3C1F]" />
+            </div>
+            <span>
+              <strong>Be honest</strong> throughout the entire process, particularly during the background investigation.
+            </span>
+          </li>
+          <li className="flex items-start">
+            <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-[#0A3C1F]" />
+            </div>
+            <span>
+              <strong>Stay in touch</strong> with your background investigator and respond promptly to requests for information.
+            </span>
+          </li>
+          <li className="flex items-start">
+            <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-[#0A3C1F]" />
+            </div>
+            <span>
+              <strong>Maintain physical fitness</strong> throughout the process to ensure you're ready for the academy.
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
   )
 }
 
