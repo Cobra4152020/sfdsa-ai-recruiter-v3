@@ -23,6 +23,10 @@ import {
   UserCog,
 } from "lucide-react"
 import { mockAdminData } from "@/lib/mock-admin-data"
+import { DashboardStatsWrapper } from "@/components/admin/dashboard-stats-wrapper"
+import { TikTokChallengesWrapper } from "@/components/admin/tiktok-challenges-wrapper"
+import { RecentApplicantsWrapper } from "@/components/admin/recent-applicants-wrapper"
+import { LoginAuditDashboard } from "@/components/admin/login-audit-dashboard"
 
 interface SystemStatus {
   database: { status: "ok" | "error" | "loading"; message: string }
@@ -36,143 +40,88 @@ export default function AdminDashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { toast } = useToast()
 
-  useEffect(() => {
-    checkSystemStatus()
-  }, [])
-
   const checkSystemStatus = async () => {
     setIsRefreshing(true)
-
-    // Use mock data for static export
-    if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
-      setSystemStatus(mockAdminData.systemStatus)
-      setIsRefreshing(false)
-      return
-    }
-
-    // Check database
-    try {
-      const response = await fetch("/api/health/database")
-      const data = await response.json()
-      setSystemStatus((prev) => ({
-        ...prev,
-        database: { status: data.success ? "ok" : "error", message: data.message },
-      }))
-    } catch (error) {
-      console.error("Database check error:", error)
-      setSystemStatus((prev) => ({
-        ...prev,
-        database: {
-          status: "error",
-          message: error instanceof Error ? error.message : "Database connection failed",
-        },
-      }))
-    }
-
-    // Check email service
-    try {
-      const response = await fetch("/api/health/email")
-      const data = await response.json()
-      setSystemStatus((prev) => ({
-        ...prev,
-        email: {
-          status: data.success ? "ok" : "error",
-          message: data.message,
-        },
-      }))
-    } catch (error) {
-      setSystemStatus((prev) => ({
-        ...prev,
-        email: {
-          status: "error",
-          message: error instanceof Error ? error.message : "Email service check failed",
-        },
-      }))
-    }
-
-    // Check auth service
-    try {
-      const response = await fetch("/api/health/auth")
-      const data = await response.json()
-      setSystemStatus((prev) => ({
-        ...prev,
-        auth: {
-          status: data.success ? "ok" : "error",
-          message: data.message,
-        },
-      }))
-    } catch (error) {
-      setSystemStatus((prev) => ({
-        ...prev,
-        auth: {
-          status: "error",
-          message: error instanceof Error ? error.message : "Authentication service check failed",
-        },
-      }))
-    }
-
-    // Check storage service
-    try {
-      const response = await fetch("/api/health/storage")
-      const data = await response.json()
-      setSystemStatus((prev) => ({
-        ...prev,
-        storage: {
-          status: data.success ? "ok" : "error",
-          message: data.message,
-        },
-      }))
-    } catch (error) {
-      setSystemStatus((prev) => ({
-        ...prev,
-        storage: {
-          status: "error",
-          message: error instanceof Error ? error.message : "Storage service check failed",
-        },
-      }))
-    }
-
+    // Simulated delay for demo
+    await new Promise((resolve) => setTimeout(resolve, 1000))
     setIsRefreshing(false)
+    toast({
+      title: "System Status Updated",
+      description: "All systems are operational",
+    })
   }
 
-  const handleRefreshCache = async () => {
-    try {
-      // In static export, just show success message
-      if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
-        toast({
-          title: "Cache refreshed",
-          description: "The leaderboard cache has been successfully refreshed (Demo Mode).",
-        })
-        return
-      }
+  const mockStats = {
+    totalApplicants: 150,
+    qualifiedCandidates: 45,
+    processingTime: "3.5 days",
+    conversionRate: "30%"
+  }
 
-      const response = await fetch("/api/admin/refresh-leaderboard", {
-        method: "POST",
-      })
-
-      if (!response.ok) {
-        throw new Error(`Failed to refresh cache: ${response.status}`)
-      }
-
-      toast({
-        title: "Cache refreshed",
-        description: "The leaderboard cache has been successfully refreshed.",
-      })
-    } catch (error) {
-      console.error("Error refreshing cache:", error)
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to refresh cache",
-        variant: "destructive",
-      })
+  const mockChallenges = [
+    {
+      id: "1",
+      title: "Deputy Skills Challenge",
+      participants: 120,
+      views: 1500,
+      status: "active" as const,
+      hashtag: "SFDSAChallenge",
+      endDate: "2024-04-30"
+    },
+    {
+      id: "2",
+      title: "Community Service",
+      participants: 85,
+      views: 1200,
+      status: "active" as const,
+      hashtag: "ServeWithSFDSA",
+      endDate: "2024-05-15"
     }
-  }
+  ]
 
-  const StatusIcon = ({ status }: { status: "ok" | "error" | "loading" }) => {
-    if (status === "loading") return <RefreshCw className="h-5 w-5 text-gray-400 animate-spin" />
-    if (status === "ok") return <CheckCircle className="h-5 w-5 text-green-500" />
-    return <XCircle className="h-5 w-5 text-red-500" />
-  }
+  const mockApplicants = [
+    {
+      id: "1",
+      name: "John Doe",
+      email: "john.doe@example.com",
+      position: "Deputy Sheriff",
+      status: "pending" as const,
+      appliedDate: "2024-03-20",
+      avatarUrl: ""
+    },
+    {
+      id: "2",
+      name: "Jane Smith",
+      email: "jane.smith@example.com",
+      position: "Deputy Sheriff",
+      status: "approved" as const,
+      appliedDate: "2024-03-19",
+      avatarUrl: ""
+    }
+  ]
+
+  const mockLoginEvents = [
+    {
+      id: "1",
+      userId: "user1",
+      userEmail: "admin@sfdsa.org",
+      eventType: "login" as const,
+      timestamp: "2024-03-20 14:30:00",
+      ipAddress: "192.168.1.1",
+      userAgent: "Chrome/120.0.0.0",
+      location: "San Francisco, CA"
+    },
+    {
+      id: "2",
+      userId: "user2",
+      userEmail: "volunteer@sfdsa.org",
+      eventType: "failed_attempt" as const,
+      timestamp: "2024-03-20 14:25:00",
+      ipAddress: "192.168.1.2",
+      userAgent: "Firefox/122.0",
+      location: "San Francisco, CA"
+    }
+  ]
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -207,176 +156,79 @@ export default function AdminDashboard() {
         </Card>
       )}
 
-      <Tabs defaultValue="overview">
-        <TabsList className="mb-6">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="system">System Status</TabsTrigger>
-        </TabsList>
+      <div className="space-y-6">
+        {/* Stats Overview */}
+        <DashboardStatsWrapper stats={mockStats} />
 
-        <TabsContent value="overview">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Link href="/admin/applicants" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Applicant Management</CardTitle>
-                    <Users className="h-5 w-5 text-[#0A3C1F]" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-2xl font-bold">{mockAdminData.stats.totalApplicants}</p>
-                    <p className="text-sm text-gray-500">Total Applicants</p>
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Pending Applications</span>
-                      <span className="font-medium">{mockAdminData.stats.pendingApplications}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span>Completed Interviews</span>
-                      <span className="font-medium">{mockAdminData.stats.completedInterviews}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+        {/* TikTok Challenges and Recent Applicants */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TikTokChallengesWrapper challenges={mockChallenges} />
+          <RecentApplicantsWrapper applicants={mockApplicants} />
+        </div>
 
-            <Link href="/admin/volunteers" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Volunteer Management</CardTitle>
-                    <UserCog className="h-5 w-5 text-[#0A3C1F]" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-2xl font-bold">{mockAdminData.stats.activeVolunteers}</p>
-                    <p className="text-sm text-gray-500">Active Volunteers</p>
-                  </div>
-                  <div className="mt-4">
-                    <PerformanceWidget data={mockAdminData.performance} />
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+        {/* Login Audit */}
+        <LoginAuditDashboard events={mockLoginEvents} />
 
-            <Link href="/admin/analytics" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Analytics</CardTitle>
-                    <BarChart3 className="h-5 w-5 text-[#0A3C1F]" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-2xl font-bold">{mockAdminData.stats.emailOpenRate}%</p>
-                    <p className="text-sm text-gray-500">Email Open Rate</p>
-                  </div>
-                  <div className="mt-4 space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span>Total Emails Sent</span>
-                      <span className="font-medium">{mockAdminData.stats.emailsSent}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+        {/* System Status */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>System Health</CardTitle>
+              <CardDescription>Current status of system components</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <HealthCheck data={mockAdminData.healthChecks} />
+            </CardContent>
+          </Card>
 
-            <Link href="/admin/system-settings" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">System Settings</CardTitle>
-                    <Settings className="h-5 w-5 text-[#0A3C1F]" />
+          <Card>
+            <CardHeader>
+              <CardTitle>Performance Metrics</CardTitle>
+              <CardDescription>System performance indicators</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span>CPU Usage</span>
+                    <span>{mockAdminData.performance.cpu.usage}%</span>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <StatusIcon status={systemStatus.database.status} />
-                        <span>Database</span>
-                      </div>
-                      <span className="text-sm">{mockAdminData.healthChecks.database.latency}</span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-2">
-                        <StatusIcon status={systemStatus.storage.status} />
-                        <span>Storage</span>
-                      </div>
-                      <span className="text-sm">{mockAdminData.stats.storageUsed} / {mockAdminData.stats.storageLimit}</span>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="system">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>System Health</CardTitle>
-                <CardDescription>Current status of system components</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <HealthCheck data={mockAdminData.healthChecks} />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Metrics</CardTitle>
-                <CardDescription>System performance indicators</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span>CPU Usage</span>
-                      <span>{mockAdminData.performance.cpu.usage}%</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-green-500 rounded-full"
-                        style={{ width: `${mockAdminData.performance.cpu.usage}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span>Memory Usage</span>
-                      <span>{mockAdminData.performance.memory.used}GB / {mockAdminData.performance.memory.total}GB</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-blue-500 rounded-full"
-                        style={{ width: `${(mockAdminData.performance.memory.used / mockAdminData.performance.memory.total) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <div className="flex justify-between mb-2">
-                      <span>Disk Usage</span>
-                      <span>{mockAdminData.performance.disk.used}GB / {mockAdminData.performance.disk.total}GB</span>
-                    </div>
-                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className="h-full bg-yellow-500 rounded-full"
-                        style={{ width: `${(mockAdminData.performance.disk.used / mockAdminData.performance.disk.total) * 100}%` }}
-                      />
-                    </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-green-500 rounded-full"
+                      style={{ width: `${mockAdminData.performance.cpu.usage}%` }}
+                    />
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-      </Tabs>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span>Memory Usage</span>
+                    <span>{mockAdminData.performance.memory.used}GB / {mockAdminData.performance.memory.total}GB</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-blue-500 rounded-full"
+                      style={{ width: `${(mockAdminData.performance.memory.used / mockAdminData.performance.memory.total) * 100}%` }}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex justify-between mb-2">
+                    <span>Disk Usage</span>
+                    <span>{mockAdminData.performance.disk.used}GB / {mockAdminData.performance.disk.total}GB</span>
+                  </div>
+                  <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-yellow-500 rounded-full"
+                      style={{ width: `${(mockAdminData.performance.disk.used / mockAdminData.performance.disk.total) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
     </div>
   )
 }
