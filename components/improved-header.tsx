@@ -61,28 +61,30 @@ function DropdownNav({ label, icon, items }: DropdownNavProps): JSX.Element {
           <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </span>
       </button>
-      <div
-        className={`absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50 transform transition-all duration-200 origin-top-right border border-gray-100 dark:border-gray-700
-          ${isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}
-        `}
-      >
-        {items.map((item) => (
-          <Link 
-            key={item.href} 
-            href={item.href} 
-            className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-150 group"
-          >
-            {item.icon && (
-              <span className="mr-2 transform group-hover:scale-110 transition-transform duration-200 text-gray-500 dark:text-gray-400 group-hover:text-[#FFD700]">
-                {item.icon}
+      {isOpen && (
+        <div
+          className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50 border border-gray-100 dark:border-gray-700"
+          onMouseEnter={() => setIsOpen(true)}
+          onMouseLeave={() => setIsOpen(false)}
+        >
+          {items.map((item) => (
+            <Link 
+              key={item.href} 
+              href={item.href} 
+              className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-150 group"
+            >
+              {item.icon && (
+                <span className="mr-2 transform group-hover:scale-110 transition-transform duration-200 text-gray-500 dark:text-gray-400 group-hover:text-[#FFD700]">
+                  {item.icon}
+                </span>
+              )}
+              <span className="transform group-hover:translate-x-1 transition-transform duration-200">
+                {item.label}
               </span>
-            )}
-            <span className="transform group-hover:translate-x-1 transition-transform duration-200">
-              {item.label}
-            </span>
-          </Link>
-        ))}
-      </div>
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

@@ -32,11 +32,13 @@ jobs:
       
       - name: Build project
         run: npm run build
+        env:
+          NEXT_PUBLIC_BASE_PATH: /sfdsa-ai-recruiter-v3
       
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./out
+          path: .next/server
 
   deploy:
     environment:

@@ -40,6 +40,16 @@ const mockBadges = [
   }
 ]
 
+// Generate static paths for all user IDs
+export function generateStaticParams() {
+  return [
+    { id: 'test-user' },
+    { id: 'user1' },
+    { id: 'user2' },
+    { id: 'user3' }
+  ]
+}
+
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
     const userId = params.id

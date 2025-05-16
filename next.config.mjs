@@ -12,7 +12,6 @@ try {
 }
 
 const nextConfig = {
-  // Remove static export to support API routes and dynamic pages
   basePath: process.env.GITHUB_ACTIONS ? '/sfdsa-ai-recruiter-v3' : '', // Set base path for GitHub Pages
   reactStrictMode: true,
   typescript: {
@@ -47,6 +46,10 @@ const nextConfig = {
   },
   // Add trailing slashes for cleaner URLs
   trailingSlash: true,
+  // Configure environment variables
+  env: {
+    NEXT_PUBLIC_BASE_PATH: process.env.GITHUB_ACTIONS ? '/sfdsa-ai-recruiter-v3' : '',
+  },
 };
 
 if (userConfig) {
