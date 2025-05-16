@@ -1,5 +1,6 @@
 import { generateUserStaticParams } from "@/lib/static-params"
 import { AdminUserPageClient } from "@/components/admin-user-page-client"
+import { PageWrapper } from "@/components/page-wrapper"
 
 export async function generateStaticParams() {
   // Add dummy params for testing
@@ -7,5 +8,9 @@ export async function generateStaticParams() {
 }
 
 export default function AdminUserPage({ params }: { params: { id: string } }) {
-  return <AdminUserPageClient params={params} />
+  return (
+    <PageWrapper>
+      <AdminUserPageClient params={params} />
+    </PageWrapper>
+  )
 }

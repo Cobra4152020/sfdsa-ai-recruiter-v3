@@ -1,4 +1,5 @@
 import Link from "next/link"
+import { PageWrapper } from "@/components/page-wrapper"
 
 export default function AdminShortcuts() {
   // List of common admin routes
@@ -21,45 +22,21 @@ export default function AdminShortcuts() {
   ]
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4 md:p-8">
-      <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6">
-        <h1 className="text-2xl font-bold mb-6 text-center">Admin Shortcuts</h1>
-
-        <div className="text-center mb-6">
-          <p className="text-red-600 font-bold">⚠️ Development Mode: Authentication Bypassed ⚠️</p>
-          <p className="text-gray-600">For testing purposes only. Do not use in production.</p>
-        </div>
-
+    <PageWrapper>
+      <div className="container mx-auto py-8 px-4">
+        <h1 className="text-3xl font-bold mb-6">Admin Quick Links</h1>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {adminRoutes.map((route) => (
             <Link
               key={route.path}
               href={route.path}
-              className="block bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-md p-4 text-center transition-colors"
+              className="p-4 bg-white rounded-lg shadow hover:shadow-md transition-shadow"
             >
               {route.name}
             </Link>
           ))}
         </div>
-
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h2 className="text-xl font-semibold mb-4">Quick Navigation</h2>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/" className="text-blue-600 hover:text-blue-800">
-              Home
-            </Link>
-            <Link href="/admin-login" className="text-blue-600 hover:text-blue-800">
-              Admin Login
-            </Link>
-            <Link href="/login" className="text-blue-600 hover:text-blue-800">
-              User Login
-            </Link>
-            <Link href="/volunteer-login" className="text-blue-600 hover:text-blue-800">
-              Volunteer Login
-            </Link>
-          </div>
-        </div>
       </div>
-    </div>
+    </PageWrapper>
   )
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
-import LoginAuditDashboard from "@/components/login-audit-dashboard"
+import { LoginAuditDashboard } from "@/components/admin/login-audit-dashboard"
+import { PageWrapper } from "@/components/page-wrapper"
 
 export const metadata: Metadata = {
   title: "Login Audit | Admin Dashboard",
@@ -8,8 +9,10 @@ export const metadata: Metadata = {
 
 export default function LoginAuditPage() {
   return (
-    <div className="container mx-auto py-8">
-      <LoginAuditDashboard />
-    </div>
+    <PageWrapper>
+      <div className="container mx-auto py-8">
+        <LoginAuditDashboard />
+      </div>
+    </PageWrapper>
   )
 }

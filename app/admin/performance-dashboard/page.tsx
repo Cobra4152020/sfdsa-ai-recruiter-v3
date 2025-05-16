@@ -1,4 +1,5 @@
 import { PerformanceDashboard } from "@/components/performance-dashboard"
+import { PageWrapper } from "@/components/page-wrapper"
 
 export const metadata = {
   title: "Performance Dashboard | SFDSA AI Recruiter",
@@ -7,9 +8,11 @@ export const metadata = {
 
 export default function PerformanceDashboardPage() {
   return (
-    <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6">Performance Dashboard</h1>
-      <PerformanceDashboard />
-    </div>
+    <PageWrapper>
+      <div className="container mx-auto py-8">
+        <h1 className="text-3xl font-bold mb-6">Performance Dashboard</h1>
+        <PerformanceDashboard />
+      </div>
+    </PageWrapper>
   )
 }
