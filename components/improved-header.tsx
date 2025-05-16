@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import type { ReactNode, JSX } from "react"
 import Link from "next/link"
+import type { Route } from "next"
 import { 
   ChevronDown, 
   Facebook, 
@@ -32,7 +33,7 @@ interface ImprovedHeaderProps {
 
 interface NavItem {
   label: string
-  href: string
+  href: Route
   icon?: ReactNode
 }
 
@@ -46,32 +47,39 @@ function DropdownNav({ label, icon, items }: DropdownNavProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <div className="relative group">
+    <div 
+      className="relative group"
+      onMouseEnter={() => setIsOpen(true)}
+      onMouseLeave={() => setIsOpen(false)}
+    >
       <button 
-        className="flex items-center text-white hover:text-[#FFD700] py-2 transition-colors duration-200" 
-        onClick={() => setIsOpen(!isOpen)}
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
+        className="flex items-center text-white hover:text-[#FFD700] py-2 transition-all duration-200 group"
       >
-        {icon}
-        <span className="mx-1">{label}</span>
-        <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <span className="flex items-center transform group-hover:scale-105 transition-transform duration-200">
+          {icon}
+          <span className="mx-1">{label}</span>
+          <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        </span>
       </button>
       <div
-        className={`absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-md shadow-lg overflow-hidden z-50 transform transition-all duration-200 origin-top-right
+        className={`absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50 transform transition-all duration-200 origin-top-right border border-gray-100 dark:border-gray-700
           ${isOpen ? "scale-100 opacity-100" : "scale-95 opacity-0 pointer-events-none"}
         `}
-        onMouseEnter={() => setIsOpen(true)}
-        onMouseLeave={() => setIsOpen(false)}
       >
         {items.map((item) => (
           <Link 
             key={item.href} 
             href={item.href} 
-            className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors duration-150"
+            className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-150 group"
           >
-            {item.icon && <span className="mr-2">{item.icon}</span>}
-            {item.label}
+            {item.icon && (
+              <span className="mr-2 transform group-hover:scale-110 transition-transform duration-200 text-gray-500 dark:text-gray-400 group-hover:text-[#FFD700]">
+                {item.icon}
+              </span>
+            )}
+            <span className="transform group-hover:translate-x-1 transition-transform duration-200">
+              {item.label}
+            </span>
           </Link>
         ))}
       </div>
@@ -123,37 +131,37 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       label: "Mission Briefing",
       icon: <BookOpen className="w-4 h-4" />,
       items: [
-        { label: "Overview", href: "/mission-briefing", icon: <Shield className="w-4 h-4" /> },
-        { label: "Daily Briefing", href: "/daily-briefing", icon: <BookOpen className="w-4 h-4" /> },
-        { label: "Requirements", href: "/mission-briefing/requirements", icon: <Shield className="w-4 h-4" /> },
-        { label: "Application Process", href: "/mission-briefing/process", icon: <Shield className="w-4 h-4" /> }
+        { label: "Overview", href: "/mission-briefing" as Route, icon: <Shield className="w-4 h-4" /> },
+        { label: "Daily Briefing", href: "/daily-briefing" as Route, icon: <BookOpen className="w-4 h-4" /> },
+        { label: "Requirements", href: "/mission-briefing/requirements" as Route, icon: <Shield className="w-4 h-4" /> },
+        { label: "Application Process", href: "/mission-briefing/process" as Route, icon: <Shield className="w-4 h-4" /> }
       ]
     },
     gamification: {
       label: "Achievements",
       icon: <Trophy className="w-4 h-4" />,
       items: [
-        { label: "Badges Gallery", href: "/badges", icon: <Shield className="w-4 h-4" /> },
-        { label: "NFT Awards", href: "/nft-awards", icon: <Trophy className="w-4 h-4" /> },
-        { label: "Leaderboard", href: "/gamification", icon: <Trophy className="w-4 h-4" /> }
+        { label: "Badges Gallery", href: "/badges" as Route, icon: <Shield className="w-4 h-4" /> },
+        { label: "NFT Awards", href: "/nft-awards" as Route, icon: <Trophy className="w-4 h-4" /> },
+        { label: "Leaderboard", href: "/gamification" as Route, icon: <Trophy className="w-4 h-4" /> }
       ]
     },
     games: {
       label: "Challenges",
       icon: <Gamepad2 className="w-4 h-4" />,
       items: [
-        { label: "Daily Trivia", href: "/trivia", icon: <Gamepad2 className="w-4 h-4" /> },
-        { label: "TikTok Challenges", href: "/tiktok-challenges", icon: <Gamepad2 className="w-4 h-4" /> },
-        { label: "Special Missions", href: "/games", icon: <Gamepad2 className="w-4 h-4" /> }
+        { label: "Daily Trivia", href: "/trivia" as Route, icon: <Gamepad2 className="w-4 h-4" /> },
+        { label: "TikTok Challenges", href: "/tiktok-challenges" as Route, icon: <Gamepad2 className="w-4 h-4" /> },
+        { label: "Special Missions", href: "/games" as Route, icon: <Gamepad2 className="w-4 h-4" /> }
       ]
     },
     support: {
       label: "Support",
       icon: <HelpCircle className="w-4 h-4" />,
       items: [
-        { label: "Chat with Sgt. Ken", href: "/chat-with-sgt-ken", icon: <MessageSquare className="w-4 h-4" /> },
-        { label: "Contact Support", href: "/contact", icon: <HelpCircle className="w-4 h-4" /> },
-        { label: "Accessibility", href: "/accessibility", icon: <HelpCircle className="w-4 h-4" /> }
+        { label: "Chat with Sgt. Ken", href: "/chat-with-sgt-ken" as Route, icon: <MessageSquare className="w-4 h-4" /> },
+        { label: "Contact Support", href: "/contact" as Route, icon: <HelpCircle className="w-4 h-4" /> },
+        { label: "Accessibility", href: "/accessibility" as Route, icon: <HelpCircle className="w-4 h-4" /> }
       ]
     }
   }
@@ -162,9 +170,9 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
     label: "Account",
     icon: <User className="w-4 h-4" />,
     items: [
-      { label: "Dashboard", href: "/dashboard", icon: <User className="w-4 h-4" /> },
-      { label: "Profile", href: "/profile", icon: <User className="w-4 h-4" /> },
-      { label: "Settings", href: "/profile/settings", icon: <Settings className="w-4 h-4" /> }
+      { label: "Dashboard", href: "/dashboard" as Route, icon: <User className="w-4 h-4" /> },
+      { label: "Profile", href: "/profile" as Route, icon: <User className="w-4 h-4" /> },
+      { label: "Settings", href: "/profile/settings" as Route, icon: <Settings className="w-4 h-4" /> }
     ]
   } : null
 
@@ -213,7 +221,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       </div>
 
       {/* Navigation bar */}
-      <div className={`bg-[#0A3C1F] text-white border-t border-[#1a4c2f] transition-all duration-200 ${scrolled ? 'bg-opacity-95' : ''}`}>
+      <div className={`bg-[#0A3C1F] text-white border-t border-[#1a4c2f] transition-all duration-200 ${scrolled ? 'bg-opacity-95 backdrop-blur-sm' : ''}`}>
         <div className="container mx-auto px-4 py-2">
           <div className="flex justify-between items-center">
             {/* Desktop Navigation */}
@@ -231,7 +239,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               onClick={toggleMobileMenu}
               aria-label="Toggle mobile menu"
             >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className={`w-6 h-6 transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -242,61 +250,114 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                 <>
                   <button
                     onClick={handleLogin}
-                    className="px-4 py-2 text-sm font-medium text-white hover:text-[#FFD700] transition-colors duration-200"
+                    className="px-4 py-2 text-sm font-medium text-white hover:text-[#FFD700] transition-all duration-200 border border-transparent hover:border-[#FFD700] rounded-lg hover:shadow-[0_0_15px_rgba(255,215,0,0.3)]"
                   >
                     Sign In
                   </button>
+                  <a
+                    href="https://www.sfdsa.org/donate"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#F4C430] transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
+                  >
+                    Support SFDSA
+                  </a>
                   <button
                     onClick={handleApplyNow}
-                    className="px-4 py-2 text-sm font-medium bg-[#FFD700] text-[#0A3C1F] rounded-md hover:bg-[#FFE55C] transition-colors duration-200"
+                    className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#F4C430] transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
                   >
                     Apply Now
                   </button>
                 </>
               )}
+              {currentUser && (
+                <button
+                  onClick={handleApplyNow}
+                  className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#F4C430] transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
+                >
+                  Apply Now
+                </button>
+              )}
             </div>
           </div>
 
           {/* Mobile Navigation Menu */}
-          {isMobileMenuOpen && (
-            <div className="md:hidden mt-4 pb-4">
-              {Object.values(mainNavItems).map((item) => (
-                <div key={item.label} className="py-2">
-                  <div className="flex items-center px-4 py-2 text-white font-medium">
-                    {item.icon}
+          <div 
+            className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
+              isMobileMenuOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
+            }`}
+          >
+            <div className="mt-4 pb-4 space-y-2">
+              {Object.values(mainNavItems).map((item, index) => (
+                <div 
+                  key={item.label} 
+                  className={`py-2 transform transition-all duration-300 ${
+                    isMobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
+                  }`}
+                  style={{ transitionDelay: `${index * 50}ms` }}
+                >
+                  <div className="flex items-center px-4 py-2 text-white font-medium rounded-lg hover:bg-[#0A3C1F]/30 transition-all duration-200">
+                    <span className="transform transition-transform duration-200 text-[#FFD700]">
+                      {item.icon}
+                    </span>
                     <span className="ml-2">{item.label}</span>
                   </div>
-                  <div className="pl-8">
-                    {item.items.map((subItem) => (
+                  <div className="pl-8 space-y-1 mt-1">
+                    {item.items.map((subItem, subIndex) => (
                       <Link
                         key={subItem.href}
                         href={subItem.href}
-                        className="block px-4 py-2 text-sm text-white hover:text-[#FFD700] transition-colors duration-200"
+                        className={`block px-4 py-2 text-sm text-white hover:text-[#FFD700] transition-all duration-200 hover:bg-[#0A3C1F]/50 rounded-lg transform ${
+                          isMobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
+                        }`}
+                        style={{ transitionDelay: `${(index * 50) + (subIndex * 30)}ms` }}
                       >
-                        {subItem.label}
+                        <span className="flex items-center">
+                          <span className="transform transition-transform duration-200 text-gray-400 group-hover:text-[#FFD700]">
+                            {subItem.icon}
+                          </span>
+                          <span className="ml-2">{subItem.label}</span>
+                        </span>
                       </Link>
                     ))}
                   </div>
                 </div>
               ))}
               {!currentUser && (
-                <div className="mt-4 px-4 space-y-2">
+                <div className="mt-6 px-4 space-y-3">
                   <button
                     onClick={handleLogin}
-                    className="w-full px-4 py-2 text-sm font-medium text-white hover:text-[#FFD700] transition-colors duration-200"
+                    className={`w-full px-4 py-2.5 text-sm font-medium text-white hover:text-[#FFD700] transition-all duration-200 border border-transparent hover:border-[#FFD700] rounded-lg transform ${
+                      isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                    }`}
+                    style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 100}ms` }}
                   >
                     Sign In
                   </button>
+                  <a
+                    href="https://www.sfdsa.org/donate"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`block w-full px-4 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#F4C430] transition-all duration-200 rounded-lg text-center transform ${
+                      isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                    }`}
+                    style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 150}ms` }}
+                  >
+                    Support SFDSA
+                  </a>
                   <button
                     onClick={handleApplyNow}
-                    className="w-full px-4 py-2 text-sm font-medium bg-[#FFD700] text-[#0A3C1F] rounded-md hover:bg-[#FFE55C] transition-colors duration-200"
+                    className={`w-full px-4 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#F4C430] transition-all duration-200 rounded-lg transform ${
+                      isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                    }`}
+                    style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 200}ms` }}
                   >
                     Apply Now
                   </button>
                 </div>
               )}
             </div>
-          )}
+          </div>
         </div>
       </div>
     </header>

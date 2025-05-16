@@ -13,12 +13,6 @@ try {
 
 const nextConfig = {
   reactStrictMode: true,
-  eslint: {
-    ignoreDuringBuilds: true,
-  },
-  typescript: {
-    ignoreBuildErrors: true,
-  },
   images: {
     unoptimized: true,
     domains: [
@@ -40,9 +34,7 @@ const nextConfig = {
   },
   experimental: {
     serverActions: {},
-    // Add typedRoutes to help with dynamic route conflicts
     typedRoutes: true,
-    // This might help with dynamic route parameter conflicts
     allowedRevalidateHeaderKeys: ['x-prerender-revalidate'],
   },
   // Add canonical URL to improve SEO
