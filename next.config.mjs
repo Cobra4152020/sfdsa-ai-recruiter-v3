@@ -52,6 +52,18 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_BASE_PATH: process.env.GITHUB_ACTIONS ? '/sfdsa-ai-recruiter-v3' : '',
   },
+  // Handle static file copying
+  async rewrites() {
+    return {
+      beforeFiles: [
+        // Rewrite API requests to static JSON files
+        {
+          source: '/api/:path*',
+          destination: '/_static/api/:path*/index.json',
+        },
+      ],
+    }
+  },
 };
 
 if (userConfig) {

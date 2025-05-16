@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { createClient } from "@supabase/supabase-js"
+import { mockData } from './app/lib/mock-data'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
@@ -112,6 +113,42 @@ export async function middleware(req: NextRequest) {
       if (isAdminRoute) {
         return res
       }
+    }
+  }
+
+  // Handle API routes in static export
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    const apiPath = req.nextUrl.pathname.replace('/api/', '')
+    
+    // Map API paths to mock data
+    switch (apiPath) {
+      case 'leaderboard':
+      case 'leaderboard/':
+        return NextResponse.json(mockData.leaderboard)
+      
+      case 'users':
+      case 'users/':
+        return NextResponse.json({ users: [] })
+      
+      case 'trivia/questions':
+      case 'trivia/questions/':
+        return NextResponse.json({ questions: mockData.triviaQuestions })
+      
+      case 'badges':
+      case 'badges/':
+        return NextResponse.json({ badges: mockData.badges })
+      
+      case 'stats':
+      case 'stats/':
+        return NextResponse.json(mockData.stats)
+      
+      case 'notifications':
+      case 'notifications/':
+        return NextResponse.json({ notifications: mockData.notifications })
+      
+      default:
+        // Return empty success response for other API routes
+        return NextResponse.json({ success: true })
     }
   }
 
