@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-clients"
 import { constructUrl } from "@/lib/url-utils"
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     const supabase = getServiceSupabase()

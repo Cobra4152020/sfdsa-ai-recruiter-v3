@@ -53,6 +53,9 @@ export async function POST(request: Request) {
         <style>
           body {
             font-family: Arial, sans-serif;
+
+export const dynamic = 'force-dynamic';
+
             line-height: 1.6;
             color: #333;
             margin: 0;

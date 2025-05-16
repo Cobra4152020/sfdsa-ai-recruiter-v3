@@ -1,3 +1,6 @@
+
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from "next/server"
 import { redeemReward } from "@/lib/recruiter-rewards-service"
 

@@ -1,3 +1,6 @@
+
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from "next/server"
 import { API_CACHE_HEADERS } from "@/lib/cache-utils"
 

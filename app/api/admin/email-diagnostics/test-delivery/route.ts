@@ -17,7 +17,10 @@ export async function POST(request: Request) {
       to: email,
       subject: "Email Delivery Test",
       html: `
-        <div style="font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto;">
+        <div style="font-family: Arial, sans-serif;
+export const dynamic = 'force-dynamic';
+
+ padding: 20px; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #0A3C1F;">Email Delivery Test</h1>
           <p>This is a test email to verify that the email delivery system is working correctly.</p>
           <p>If you're receiving this email, it means the email delivery system is configured properly.</p>

@@ -10,6 +10,9 @@ export async function GET(request: Request) {
       query: `
         -- Drop the existing constraint if it's incorrect
         ALTER TABLE user_roles DROP CONSTRAINT IF EXISTS user_roles_role_check;
+
+export const dynamic = 'force-dynamic';
+
         
         -- Add the correct constraint
         ALTER TABLE user_roles ADD CONSTRAINT user_roles_role_check 

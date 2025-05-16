@@ -1,3 +1,6 @@
+
+export const dynamic = 'force-dynamic';
+
 import { NextResponse } from "next/server"
 import { getBriefingStats } from "@/lib/daily-briefing-service"
 import { createClient } from "@/lib/supabase-clients"

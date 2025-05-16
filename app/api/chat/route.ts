@@ -1,3 +1,6 @@
+
+export const dynamic = 'force-dynamic';
+
 import { type NextRequest, NextResponse } from "next/server"
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
 import { generateResponse } from "@/lib/sgt-ken-knowledge-base"

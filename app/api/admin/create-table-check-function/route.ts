@@ -15,6 +15,9 @@ export async function POST() {
         AS $$
         DECLARE
           table_exists boolean;
+
+export const dynamic = 'force-dynamic';
+
         BEGIN
           SELECT EXISTS (
             SELECT FROM information_schema.tables 

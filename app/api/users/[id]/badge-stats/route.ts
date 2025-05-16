@@ -79,7 +79,10 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     // Prepare update data
-    const updateData: { participation_count?: number; has_applied?: boolean } = {}
+    const updateData: { participation_count?: number;
+export const dynamic = 'force-dynamic';
+
+ has_applied?: boolean } = {}
 
     if (participationPoints !== undefined) {
       updateData.participation_count = (user?.participation_count || 0) + participationPoints
