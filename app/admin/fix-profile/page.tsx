@@ -2,31 +2,45 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { fixAdminProfile } from "@/app/actions/fix-admin-profile"
-import { useUser } from "@/context/user-context"
-import { AlertCircle, CheckCircle2 } from "lucide-react"
+import { AlertCircle, CheckCircle } from "lucide-react"
+import { fixAdminProfile } from "@/lib/actions/fix-admin-profile"
+import Link from "next/link"
 
 export default function FixAdminProfilePage() {
-  const { currentUser } = useUser()
-  const [userId, setUserId] = useState(currentUser?.id || "")
+  const [email, setEmail] = useState("")
+  const [recoveryCode, setRecoveryCode] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const handleFix = async () => {
-    if (!userId) return
+    if (!email || !recoveryCode) {
+      setError("Email and recovery code are required")
+      return
+    }
 
     setIsLoading(true)
+    setError(null)
+    setSuccess(null)
+
     try {
-      const result = await fixAdminProfile(userId)
-      setResult(result)
-    } catch (error) {
-      setResult({
-        success: false,
-        message: error instanceof Error ? error.message : "An unexpected error occurred",
-      })
+      const result = await fixAdminProfile({ email, recoveryCode })
+
+      if (result.success) {
+        setSuccess(result.message)
+        if (result.userId) {
+          setUserId(result.userId)
+        }
+      } else {
+        setError(result.message)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred")
     } finally {
       setIsLoading(false)
     }
@@ -42,32 +56,50 @@ export default function FixAdminProfilePage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {result && (
-            <Alert variant={result.success ? "default" : "destructive"}>
-              {result.success ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-              <AlertTitle>{result.success ? "Success" : "Error"}</AlertTitle>
-              <AlertDescription>{result.message}</AlertDescription>
+          {success && (
+            <Alert variant="default">
+              <CheckCircle className="h-4 w-4" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
           <div className="space-y-2">
-            <label htmlFor="userId" className="text-sm font-medium">
-              Your User ID
+            <label htmlFor="email" className="text-sm font-medium">
+              Email
             </label>
             <Input
-              id="userId"
-              value={userId}
-              onChange={(e) => setUserId(e.target.value)}
-              placeholder="Enter your user ID"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Enter your email"
               disabled={isLoading}
             />
-            <p className="text-xs text-muted-foreground">
-              {currentUser ? "Your current user ID has been pre-filled." : "Please enter your user ID."}
-            </p>
+          </div>
+
+          <div className="space-y-2">
+            <label htmlFor="recoveryCode" className="text-sm font-medium">
+              Recovery Code
+            </label>
+            <Input
+              id="recoveryCode"
+              value={recoveryCode}
+              onChange={(e) => setRecoveryCode(e.target.value)}
+              placeholder="Enter your recovery code"
+              disabled={isLoading}
+            />
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleFix} disabled={!userId || isLoading} className="w-full">
+          <Button onClick={handleFix} disabled={!email || !recoveryCode || isLoading} className="w-full">
             {isLoading ? "Fixing..." : "Fix My Profile"}
           </Button>
         </CardFooter>

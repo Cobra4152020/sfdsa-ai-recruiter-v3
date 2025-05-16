@@ -6,6 +6,8 @@ import { DonationTrendsChart } from "@/components/analytics/donation-trends-char
 import { ConversionRatesChart } from "@/components/analytics/conversion-rates-chart"
 import { PointDistributionChart } from "@/components/analytics/point-distribution-chart"
 import { CampaignPerformanceTable } from "@/components/analytics/campaign-performance-table"
+import { mockDonationData } from "@/lib/mock-donation-data"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
 export default function DonationAnalyticsPage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -20,6 +22,13 @@ export default function DonationAnalyticsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // Use mock data for static export
+        if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+          setData(mockDonationData)
+          setIsLoading(false)
+          return
+        }
+
         const [statsRes, trendsRes, conversionsRes, pointsRes, campaignsRes] = await Promise.all([
           fetch('/api/analytics/donations/stats'),
           fetch('/api/analytics/donations/trends'),
@@ -39,6 +48,8 @@ export default function DonationAnalyticsPage() {
         setData({ stats, trends, conversions, points, campaigns })
       } catch (error) {
         console.error('Error fetching donation analytics data:', error)
+        // Fallback to mock data on error
+        setData(mockDonationData)
       } finally {
         setIsLoading(false)
       }
@@ -48,11 +59,29 @@ export default function DonationAnalyticsPage() {
   }, [])
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading donation analytics...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
+      {process.env.NEXT_PUBLIC_GITHUB_PAGES === "true" && (
+        <Card className="bg-yellow-50">
+          <CardHeader>
+            <CardTitle>Demo Mode</CardTitle>
+            <CardDescription>
+              This is a demo version with mock donation data. In production, this would show real-time donation analytics.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
       <DonationStatsCards data={data.stats} />
       <DonationTrendsChart data={data.trends} />
       <ConversionRatesChart data={data.conversions} />

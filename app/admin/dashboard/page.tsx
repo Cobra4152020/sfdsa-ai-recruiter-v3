@@ -22,7 +22,7 @@ import {
   RefreshCw,
   UserCog,
 } from "lucide-react"
-import { getSupabaseClient } from "@/lib/supabase-core"
+import { mockAdminData } from "@/lib/mock-admin-data"
 
 interface SystemStatus {
   database: { status: "ok" | "error" | "loading"; message: string }
@@ -32,15 +32,9 @@ interface SystemStatus {
 }
 
 export default function AdminDashboard() {
-  const [systemStatus, setSystemStatus] = useState<SystemStatus>({
-    database: { status: "loading", message: "Checking database connection..." },
-    email: { status: "loading", message: "Checking email service..." },
-    auth: { status: "loading", message: "Checking authentication service..." },
-    storage: { status: "loading", message: "Checking storage service..." },
-  })
+  const [systemStatus, setSystemStatus] = useState<SystemStatus>(mockAdminData.systemStatus)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const { toast } = useToast()
-  const supabase = getSupabaseClient()
 
   useEffect(() => {
     checkSystemStatus()
@@ -49,13 +43,20 @@ export default function AdminDashboard() {
   const checkSystemStatus = async () => {
     setIsRefreshing(true)
 
+    // Use mock data for static export
+    if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+      setSystemStatus(mockAdminData.systemStatus)
+      setIsRefreshing(false)
+      return
+    }
+
     // Check database
     try {
-      const { data, error } = await supabase.from("health_check").select("*").limit(1)
-      if (error) throw error
+      const response = await fetch("/api/health/database")
+      const data = await response.json()
       setSystemStatus((prev) => ({
         ...prev,
-        database: { status: "ok", message: "Database connection successful" },
+        database: { status: data.success ? "ok" : "error", message: data.message },
       }))
     } catch (error) {
       console.error("Database check error:", error)
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
 
     // Check email service
     try {
-      const response = await fetch("/api/health/email", { method: "GET" })
+      const response = await fetch("/api/health/email")
       const data = await response.json()
       setSystemStatus((prev) => ({
         ...prev,
@@ -91,12 +92,13 @@ export default function AdminDashboard() {
 
     // Check auth service
     try {
-      const { data, error } = await supabase.auth.getSession()
+      const response = await fetch("/api/health/auth")
+      const data = await response.json()
       setSystemStatus((prev) => ({
         ...prev,
         auth: {
-          status: "ok",
-          message: "Authentication service is operational",
+          status: data.success ? "ok" : "error",
+          message: data.message,
         },
       }))
     } catch (error) {
@@ -111,12 +113,13 @@ export default function AdminDashboard() {
 
     // Check storage service
     try {
-      const { data, error } = await supabase.storage.getBucket("public")
+      const response = await fetch("/api/health/storage")
+      const data = await response.json()
       setSystemStatus((prev) => ({
         ...prev,
         storage: {
-          status: error ? "error" : "ok",
-          message: error ? error.message : "Storage service is operational",
+          status: data.success ? "ok" : "error",
+          message: data.message,
         },
       }))
     } catch (error) {
@@ -134,6 +137,15 @@ export default function AdminDashboard() {
 
   const handleRefreshCache = async () => {
     try {
+      // In static export, just show success message
+      if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+        toast({
+          title: "Cache refreshed",
+          description: "The leaderboard cache has been successfully refreshed (Demo Mode).",
+        })
+        return
+      }
+
       const response = await fetch("/api/admin/refresh-leaderboard", {
         method: "POST",
       })
@@ -184,6 +196,17 @@ export default function AdminDashboard() {
         </Button>
       </div>
 
+      {process.env.NEXT_PUBLIC_GITHUB_PAGES === "true" && (
+        <Card className="mb-6 bg-yellow-50">
+          <CardHeader>
+            <CardTitle>Demo Mode</CardTitle>
+            <CardDescription>
+              This is a demo version with mock data. Changes will not persist after page refresh.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
       <Tabs defaultValue="overview">
         <TabsList className="mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>
@@ -201,190 +224,153 @@ export default function AdminDashboard() {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>View and manage applicant data and track recruitment progress</CardDescription>
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold">{mockAdminData.stats.totalApplicants}</p>
+                    <p className="text-sm text-gray-500">Total Applicants</p>
+                  </div>
+                  <div className="mt-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Pending Applications</span>
+                      <span className="font-medium">{mockAdminData.stats.pendingApplications}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Completed Interviews</span>
+                      <span className="font-medium">{mockAdminData.stats.completedInterviews}</span>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </Link>
 
-            <Link href="/admin/users" className="block">
+            <Link href="/admin/volunteers" className="block">
               <Card className="h-full hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">User Management</CardTitle>
+                    <CardTitle className="text-lg">Volunteer Management</CardTitle>
                     <UserCog className="h-5 w-5 text-[#0A3C1F]" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>Manage users, roles, and permissions across the platform</CardDescription>
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold">{mockAdminData.stats.activeVolunteers}</p>
+                    <p className="text-sm text-gray-500">Active Volunteers</p>
+                  </div>
+                  <div className="mt-4">
+                    <PerformanceWidget data={mockAdminData.performance} />
+                  </div>
                 </CardContent>
               </Card>
             </Link>
 
-            <Link href="/admin/performance-dashboard" className="block">
+            <Link href="/admin/analytics" className="block">
               <Card className="h-full hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Performance Metrics</CardTitle>
+                    <CardTitle className="text-lg">Analytics</CardTitle>
                     <BarChart3 className="h-5 w-5 text-[#0A3C1F]" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>Analyze platform performance and user engagement metrics</CardDescription>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/admin/journey-performance" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">User Journeys</CardTitle>
-                    <Award className="h-5 w-5 text-[#0A3C1F]" />
+                  <div className="space-y-2">
+                    <p className="text-2xl font-bold">{mockAdminData.stats.emailOpenRate}%</p>
+                    <p className="text-sm text-gray-500">Email Open Rate</p>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>Track user journey performance and conversion metrics</CardDescription>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/admin/database-health" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Database Health</CardTitle>
-                    <Database className="h-5 w-5 text-[#0A3C1F]" />
+                  <div className="mt-4 space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span>Total Emails Sent</span>
+                      <span className="font-medium">{mockAdminData.stats.emailsSent}</span>
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>Monitor database health and performance metrics</CardDescription>
                 </CardContent>
               </Card>
             </Link>
 
-            <Link href="/admin/email-test" className="block">
+            <Link href="/admin/system-settings" className="block">
               <Card className="h-full hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Email Testing</CardTitle>
-                    <Mail className="h-5 w-5 text-[#0A3C1F]" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>Test email templates and delivery functionality</CardDescription>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/admin/donations" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">Donation Management</CardTitle>
-                    <DollarSign className="h-5 w-5 text-[#0A3C1F]" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>Track and manage donation transactions and analytics</CardDescription>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/admin/diagnostics" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">System Diagnostics</CardTitle>
+                    <CardTitle className="text-lg">System Settings</CardTitle>
                     <Settings className="h-5 w-5 text-[#0A3C1F]" />
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <CardDescription>Run diagnostics and check system health</CardDescription>
-                </CardContent>
-              </Card>
-            </Link>
-
-            <Link href="/admin/health" className="block">
-              <Card className="h-full hover:shadow-md transition-shadow">
-                <CardHeader className="pb-2">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">System Health</CardTitle>
-                    <Settings className="h-5 w-5 text-[#0A3C1F]" />
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <StatusIcon status={systemStatus.database.status} />
+                        <span>Database</span>
+                      </div>
+                      <span className="text-sm">{mockAdminData.healthChecks.database.latency}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <StatusIcon status={systemStatus.storage.status} />
+                        <span>Storage</span>
+                      </div>
+                      <span className="text-sm">{mockAdminData.stats.storageUsed} / {mockAdminData.stats.storageLimit}</span>
+                    </div>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <CardDescription>Monitor system health and check for issues</CardDescription>
                 </CardContent>
               </Card>
             </Link>
-
-            <Card className="h-full">
-              <CardHeader className="pb-2">
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg">Quick Actions</CardTitle>
-                  <Settings className="h-5 w-5 text-[#0A3C1F]" />
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Button onClick={handleRefreshCache} variant="outline" className="w-full justify-start">
-                  <RefreshCw className="h-4 w-4 mr-2" />
-                  Refresh Leaderboard Cache
-                </Button>
-                <Link href="/admin/test" className="block w-full">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Test Components
-                  </Button>
-                </Link>
-                <Link href="/admin/image-diagnostics" className="block w-full">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Settings className="h-4 w-4 mr-2" />
-                    Image Diagnostics
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
           </div>
         </TabsContent>
 
         <TabsContent value="system">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <HealthCheck />
-            <PerformanceWidget />
-          </div>
-
-          <div className="mt-6">
             <Card>
               <CardHeader>
-                <CardTitle>System Messages</CardTitle>
-                <CardDescription>Recent system alerts and notifications</CardDescription>
+                <CardTitle>System Health</CardTitle>
+                <CardDescription>Current status of system components</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <HealthCheck data={mockAdminData.healthChecks} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Metrics</CardTitle>
+                <CardDescription>System performance indicators</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {Object.entries(systemStatus).map(
-                    ([key, value]) =>
-                      value.status === "error" && (
-                        <div key={key} className="flex p-3 bg-red-50 border border-red-200 rounded-lg">
-                          <AlertTriangle className="h-5 w-5 text-red-500 mr-3 flex-shrink-0 mt-0.5" />
-                          <div>
-                            <p className="font-medium text-red-700">
-                              {key.charAt(0).toUpperCase() + key.slice(1)} Error
-                            </p>
-                            <p className="text-sm text-red-600">{value.message}</p>
-                          </div>
-                        </div>
-                      ),
-                  )}
-
-                  {Object.values(systemStatus).every((status) => status.status !== "error") && (
-                    <div className="flex p-3 bg-green-50 border border-green-200 rounded-lg">
-                      <CheckCircle className="h-5 w-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                      <div>
-                        <p className="font-medium text-green-700">All Systems Operational</p>
-                        <p className="text-sm text-green-600">All services are running normally.</p>
-                      </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span>CPU Usage</span>
+                      <span>{mockAdminData.performance.cpu.usage}%</span>
                     </div>
-                  )}
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-green-500 rounded-full"
+                        style={{ width: `${mockAdminData.performance.cpu.usage}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span>Memory Usage</span>
+                      <span>{mockAdminData.performance.memory.used}GB / {mockAdminData.performance.memory.total}GB</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-blue-500 rounded-full"
+                        style={{ width: `${(mockAdminData.performance.memory.used / mockAdminData.performance.memory.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between mb-2">
+                      <span>Disk Usage</span>
+                      <span>{mockAdminData.performance.disk.used}GB / {mockAdminData.performance.disk.total}GB</span>
+                    </div>
+                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+                      <div
+                        className="h-full bg-yellow-500 rounded-full"
+                        style={{ width: `${(mockAdminData.performance.disk.used / mockAdminData.performance.disk.total) * 100}%` }}
+                      />
+                    </div>
+                  </div>
                 </div>
               </CardContent>
             </Card>

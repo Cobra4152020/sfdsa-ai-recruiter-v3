@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { approveVolunteerRecruiter, rejectVolunteerRecruiter } from "@/app/actions/admin-actions"
+import { adminActions } from "@/lib/actions/admin-actions"
 import { useToast } from "@/components/ui/use-toast"
 import { CheckCircle, XCircle } from "lucide-react"
 
@@ -25,7 +25,7 @@ export function VolunteerApprovalList({ volunteers }: { volunteers: Volunteer[] 
     setProcessing((prev) => ({ ...prev, [userId]: true }))
 
     try {
-      const result = await approveVolunteerRecruiter(userId)
+      const result = await adminActions({ action: 'approveVolunteerRecruiter', userId })
 
       if (result.success) {
         toast({
@@ -61,7 +61,7 @@ export function VolunteerApprovalList({ volunteers }: { volunteers: Volunteer[] 
     setProcessing((prev) => ({ ...prev, [userId]: true }))
 
     try {
-      const result = await rejectVolunteerRecruiter(userId)
+      const result = await adminActions({ action: 'rejectVolunteerRecruiter', userId })
 
       if (result.success) {
         toast({

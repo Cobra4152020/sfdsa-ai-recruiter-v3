@@ -12,7 +12,7 @@ try {
 }
 
 const nextConfig = {
-  output: 'export',  // Enable static exports
+  // Remove static export to support API routes and dynamic pages
   basePath: process.env.GITHUB_ACTIONS ? '/sfdsa-ai-recruiter-v3' : '', // Set base path for GitHub Pages
   reactStrictMode: true,
   typescript: {
@@ -24,7 +24,6 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    unoptimized: true,
     domains: [
       'fonts.googleapis.com', 
       'fonts.gstatic.com',

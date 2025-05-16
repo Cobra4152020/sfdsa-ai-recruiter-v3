@@ -5,99 +5,102 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { LineChart } from "@/components/ui/charts"
 
-export function PerformanceWidget() {
-  const [data, setData] = useState<any[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+interface PerformanceData {
+  cpu: {
+    usage: number
+    temperature: number
+    processes: number
+  }
+  memory: {
+    used: number
+    total: number
+    swap: number
+  }
+  disk: {
+    used: number
+    total: number
+    readSpeed: string
+    writeSpeed: string
+  }
+  network: {
+    incoming: string
+    outgoing: string
+    latency: string
+    errors: number
+  }
+}
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch("/api/performance/dashboard?days=3&metric=LCP")
+interface PerformanceWidgetProps {
+  data: PerformanceData
+}
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch performance data")
-        }
+export function PerformanceWidget({ data }: PerformanceWidgetProps) {
+  // Calculate performance ratings
+  const cpuRating = data.cpu.usage <= 50 ? "good" : data.cpu.usage <= 80 ? "needs-improvement" : "poor"
+  const memoryRating = (data.memory.used / data.memory.total) <= 0.6 ? "good" : (data.memory.used / data.memory.total) <= 0.8 ? "needs-improvement" : "poor"
+  const diskRating = (data.disk.used / data.disk.total) <= 0.6 ? "good" : (data.disk.used / data.disk.total) <= 0.8 ? "needs-improvement" : "poor"
 
-        const result = await response.json()
-        setData(result.data || [])
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error")
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchData()
-
-    // Refresh data every 5 minutes
-    const interval = setInterval(fetchData, 5 * 60 * 1000)
-
-    return () => clearInterval(interval)
-  }, [])
-
-  // Format data for chart
-  const chartData = data
-    .sort((a, b) => new Date(a.day).getTime() - new Date(b.day).getTime())
-    .map((item) => ({
-      date: new Date(item.day).toLocaleDateString(),
-      LCP: item.avg_value,
-    }))
-
-  // Calculate average LCP
-  const avgLCP = data.length > 0 ? data.reduce((sum, item) => sum + item.avg_value, 0) / data.length : 0
-
-  // Determine performance rating
-  let rating: "good" | "needs-improvement" | "poor" = "good"
-  if (avgLCP > 4000) rating = "poor"
-  else if (avgLCP > 2500) rating = "needs-improvement"
+  // Overall rating is the worst of all ratings
+  const overallRating = [cpuRating, memoryRating, diskRating].includes("poor") ? "poor" : 
+                       [cpuRating, memoryRating, diskRating].includes("needs-improvement") ? "needs-improvement" : "good"
 
   return (
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="flex items-center justify-between">
           <span>Performance</span>
-          {!loading && !error && (
-            <Badge variant={rating === "good" ? "success" : rating === "needs-improvement" ? "warning" : "destructive"}>
-              {rating === "good" ? "Good" : rating === "needs-improvement" ? "Needs Improvement" : "Poor"}
-            </Badge>
-          )}
+          <Badge variant={overallRating === "good" ? "success" : overallRating === "needs-improvement" ? "warning" : "destructive"}>
+            {overallRating === "good" ? "Good" : overallRating === "needs-improvement" ? "Needs Improvement" : "Poor"}
+          </Badge>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="h-[100px] flex items-center justify-center">
-            <p className="text-sm text-muted-foreground">Loading performance data...</p>
-          </div>
-        ) : error ? (
-          <div className="h-[100px] flex items-center justify-center">
-            <p className="text-sm text-red-500">Error: {error}</p>
-          </div>
-        ) : data.length === 0 ? (
-          <div className="h-[100px] flex items-center justify-center">
-            <p className="text-sm text-muted-foreground">No performance data available</p>
-          </div>
-        ) : (
-          <>
-            <div className="mb-2">
-              <div className="text-2xl font-bold">{Math.round(avgLCP)}ms</div>
-              <p className="text-xs text-muted-foreground">Avg. Largest Contentful Paint</p>
+        <div className="space-y-4">
+          <div>
+            <div className="flex justify-between mb-2">
+              <span>CPU Usage</span>
+              <span>{data.cpu.usage}%</span>
             </div>
-            <div className="h-[100px]">
-              <LineChart
-                data={chartData}
-                index="date"
-                categories={["LCP"]}
-                colors={["emerald"]}
-                showLegend={false}
-                showXAxis={true}
-                showYAxis={true}
-                showGridLines={false}
-                valueFormatter={(value) => `${value.toFixed(0)}ms`}
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${
+                  cpuRating === "good" ? "bg-green-500" : cpuRating === "needs-improvement" ? "bg-yellow-500" : "bg-red-500"
+                }`}
+                style={{ width: `${data.cpu.usage}%` }}
               />
             </div>
-          </>
-        )}
+          </div>
+
+          <div>
+            <div className="flex justify-between mb-2">
+              <span>Memory Usage</span>
+              <span>{data.memory.used}GB / {data.memory.total}GB</span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${
+                  memoryRating === "good" ? "bg-green-500" : memoryRating === "needs-improvement" ? "bg-yellow-500" : "bg-red-500"
+                }`}
+                style={{ width: `${(data.memory.used / data.memory.total) * 100}%` }}
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex justify-between mb-2">
+              <span>Disk Usage</span>
+              <span>{data.disk.used}GB / {data.disk.total}GB</span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className={`h-full rounded-full ${
+                  diskRating === "good" ? "bg-green-500" : diskRating === "needs-improvement" ? "bg-yellow-500" : "bg-red-500"
+                }`}
+                style={{ width: `${(data.disk.used / data.disk.total) * 100}%` }}
+              />
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   )

@@ -1,16 +1,23 @@
 import { createClient } from "@supabase/supabase-js"
 import type { Database } from "../types/database"
+import { createStaticClient } from "./supabase-static"
 
 /**
  * Creates a Supabase client with service role privileges
  * This should only be used in server-side contexts
  */
 export const getServiceSupabase = () => {
+  // For GitHub Pages deployment, return a mock client
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+    return createStaticClient()
+  }
+
   const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
   if (!supabaseUrl || !supabaseServiceKey) {
-    throw new Error("Missing Supabase environment variables for service role")
+    console.warn("Missing Supabase environment variables for service role, using mock client")
+    return createStaticClient()
   }
 
   return createClient<Database>(supabaseUrl, supabaseServiceKey, {
@@ -26,19 +33,7 @@ export const getServiceSupabase = () => {
  * This can be used in both client and server contexts
  */
 export const getClientSupabase = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Missing Supabase environment variables for anon key")
-  }
-
-  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-    },
-  })
+  return createStaticClient()
 }
 
 /**
@@ -67,44 +62,10 @@ export async function withRetry<T>(fn: () => Promise<T>, maxRetries = 3, delay =
 
 // Create and export the client-side Supabase instance
 // This is a singleton that can be imported throughout the app
-let _supabase: ReturnType<typeof getClientSupabase> | null = null
-
-export const supabase = (() => {
-  if (typeof window === "undefined") {
-    // Server-side: Create a new instance each time
-    try {
-      return getClientSupabase()
-    } catch (error) {
-      console.warn("Failed to initialize server-side Supabase client:", error)
-      // Return a mock client for SSR that won't throw errors
-      return createClient("https://placeholder.supabase.co", "placeholder-key")
-    }
-  }
-
-  // Client-side: Use singleton pattern
-  if (!_supabase) {
-    try {
-      _supabase = getClientSupabase()
-    } catch (error) {
-      console.error("Failed to initialize client-side Supabase client:", error)
-      // Return a mock client that won't throw errors
-      _supabase = createClient("https://placeholder.supabase.co", "placeholder-key")
-    }
-  }
-
-  return _supabase
-})()
+export const supabase = getClientSupabase()
 
 // Export the admin client as a named export
-export const supabaseAdmin = (() => {
-  try {
-    return getServiceSupabase()
-  } catch (error) {
-    console.warn("Failed to initialize admin Supabase client:", error)
-    // Return a mock client for SSR that won't throw errors
-    return createClient("https://placeholder.supabase.co", "placeholder-key")
-  }
-})()
+export const supabaseAdmin = getServiceSupabase()
 
 // Re-export createClient
 export { createClient }

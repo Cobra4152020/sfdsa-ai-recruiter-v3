@@ -1,29 +1,20 @@
-import { createClient as createSupabaseClient } from "@supabase/supabase-js"
-import type { Database } from "../types/database"
+import { createStaticClient } from "./supabase-static"
 
 /**
  * Creates a Supabase client that works with static exports
  * This is the main client creation function used throughout the application
  */
 export function createClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn("Missing Supabase environment variables, using mock client")
-    return getMockClient()
-  }
-
-  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-    },
-  })
+  return createStaticClient()
 }
 
 // Export aliases for backward compatibility
-export const getServerClient = createClient
+export function createServerClient() {
+  return createClient()
+}
+
+// Export a singleton instance
+export const supabase = createClient()
 
 /**
  * Returns a mock Supabase client that won't throw errors

@@ -2,36 +2,23 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { setupAdminUser } from "@/app/actions/setup-admin-user"
-import { useToast } from "@/components/ui/use-toast"
-import { Loader2 } from "lucide-react"
+import { setupAdminUser } from "@/lib/actions/setup-admin-user"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { AlertCircle, CheckCircle2 } from "lucide-react"
 
-export function SetupAdminUserButton({ userId, email, name }: { userId: string; email: string; name: string }) {
+export function SetupAdminUserButton() {
   const [isLoading, setIsLoading] = useState(false)
-  const { toast } = useToast()
+  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
 
-  const handleSetupAdmin = async () => {
+  const handleSetup = async () => {
     setIsLoading(true)
     try {
-      const result = await setupAdminUser(userId, email, name)
-
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: result.message,
-        })
-      } else {
-        toast({
-          title: "Error",
-          description: result.message,
-          variant: "destructive",
-        })
-      }
+      const result = await setupAdminUser({})
+      setResult(result)
     } catch (error) {
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
-        variant: "destructive",
+      setResult({
+        success: false,
+        message: error instanceof Error ? error.message : "An unexpected error occurred",
       })
     } finally {
       setIsLoading(false)
@@ -39,15 +26,18 @@ export function SetupAdminUserButton({ userId, email, name }: { userId: string; 
   }
 
   return (
-    <Button onClick={handleSetupAdmin} disabled={isLoading} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-      {isLoading ? (
-        <>
-          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-          Setting up admin...
-        </>
-      ) : (
-        "Setup Admin User"
+    <div className="space-y-4">
+      {result && (
+        <Alert variant={result.success ? "default" : "destructive"}>
+          {result.success ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+          <AlertTitle>{result.success ? "Success" : "Error"}</AlertTitle>
+          <AlertDescription>{result.message}</AlertDescription>
+        </Alert>
       )}
-    </Button>
+
+      <Button onClick={handleSetup} disabled={isLoading} className="w-full">
+        {isLoading ? "Setting up..." : "Set Up Admin User"}
+      </Button>
+    </div>
   )
 }

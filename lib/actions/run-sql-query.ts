@@ -1,26 +1,25 @@
-export async function runSqlQuery(query: string, revalidatePaths: string[] = []) {
+export async function runSqlQuery(params: any) {
   try {
-    const response = await fetch("/api/actions/run-sql-query", {
+    const response = await fetch(`/api/admin-actions/run-sql-query`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ query, revalidatePaths }),
-    })
+      body: JSON.stringify(params),
+    });
 
-    const data = await response.json()
+    const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Failed to execute SQL query")
+      throw new Error(data.error || `Failed to execute runSqlQuery`);
     }
 
-    return data
+    return data;
   } catch (error) {
-    console.error("Error executing SQL query:", error)
+    console.error(`Error in runSqlQuery:`, error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "An unexpected error occurred",
-      query,
-    }
+    };
   }
-} 
+}

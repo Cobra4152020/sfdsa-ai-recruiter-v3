@@ -1,113 +1,177 @@
-
-export const dynamic = 'force-static';
-export const revalidate = 3600; // Revalidate every hour;
-
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
 
-export async function GET(req: Request) {
-  try {
-    const url = new URL(req.url)
-    const gameId = url.searchParams.get("gameId") || "sf-football"
+export const dynamic = 'force-static'
 
-    const supabase = getServiceSupabase()
+type GameId = 'sf-football' | 'sf-baseball' | 'sf-basketball' | 'sf-districts' | 'sf-tourist-spots' | 'sf-day-trips'
 
-    // Query to get leaderboard data for a specific game
-    const { data, error } = await supabase
-      .from("users")
-      .select(`
-        id,
-        name,
-        avatar_url,
-        trivia_attempts:trivia_attempts(
-          id,
-          score,
-          total_questions,
-          correct_answers,
-          time_spent,
-          created_at
-        )
-      `)
-      .eq("trivia_attempts.game_id", gameId)
-      .limit(10)
-
-    if (error) {
-      throw error
-    }
-
-    // Process the data to match the expected format
-    const leaderboard = data.map((user) => {
-      const attempts = user.trivia_attempts || []
-      const attemptsCount = attempts.length
-      const totalCorrectAnswers = attempts.reduce((sum, attempt) => sum + (attempt.correct_answers || attempt.score), 0)
-      const totalQuestions = attempts.reduce((sum, attempt) => sum + attempt.total_questions, 0)
-      const accuracyPercent = totalQuestions > 0 ? (totalCorrectAnswers / totalQuestions) * 100 : 0
-      const perfectGames = attempts.filter((attempt) => attempt.score === attempt.total_questions).length
-      const lastAttemptAt =
-        attempts.length > 0
-          ? attempts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
-          : null
-
-      return {
-        user_id: user.id,
-        name: user.name,
-        avatar_url: user.avatar_url,
-        attempts_count: attemptsCount,
-        total_correct_answers: totalCorrectAnswers,
-        total_questions: totalQuestions,
-        accuracy_percent: Number.parseFloat(accuracyPercent.toFixed(1)),
-        perfect_games: perfectGames,
-        last_attempt_at: lastAttemptAt,
-      }
-    })
-
-    // Sort by total correct answers descending
-    leaderboard.sort((a, b) => b.total_correct_answers - a.total_correct_answers)
-
-    return NextResponse.json({ leaderboard: leaderboard || [] })
-  } catch (error) {
-    console.error("Error fetching trivia leaderboard:", error)
-
-    // Generate mock data as fallback
-    const mockLeaderboard = getMockLeaderboard()
-
-    return NextResponse.json({
-      leaderboard: mockLeaderboard,
-      isMock: true,
-    })
-  }
+interface LeaderboardEntry {
+  id: string
+  userId: string
+  name: string
+  score: number
+  totalQuestions: number
+  gameMode: string
+  completedAt: string
 }
 
-function getMockLeaderboard() {
-  const names = [
-    "John Smith",
-    "Maria Garcia",
-    "James Johnson",
-    "David Williams",
-    "Sarah Brown",
-    "Michael Jones",
-    "Jessica Miller",
-    "Robert Davis",
-    "Jennifer Wilson",
-    "Thomas Moore",
+// Mock leaderboard data
+const STATIC_LEADERBOARDS: Record<GameId, LeaderboardEntry[]> = {
+  'sf-football': [
+    {
+      id: "1",
+      userId: "user1",
+      name: "John Smith",
+      score: 95,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "2",
+      userId: "user2",
+      name: "Jane Doe",
+      score: 90,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-02T00:00:00Z"
+    }
+  ],
+  'sf-baseball': [
+    {
+      id: "1",
+      userId: "user1",
+      name: "John Smith",
+      score: 85,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "2",
+      userId: "user2",
+      name: "Jane Doe",
+      score: 80,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-02T00:00:00Z"
+    }
+  ],
+  'sf-basketball': [
+    {
+      id: "1",
+      userId: "user1",
+      name: "John Smith",
+      score: 75,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "2",
+      userId: "user2",
+      name: "Jane Doe",
+      score: 70,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-02T00:00:00Z"
+    }
+  ],
+  'sf-districts': [
+    {
+      id: "1",
+      userId: "user1",
+      name: "John Smith",
+      score: 65,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "2",
+      userId: "user2",
+      name: "Jane Doe",
+      score: 60,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-02T00:00:00Z"
+    }
+  ],
+  'sf-tourist-spots': [
+    {
+      id: "1",
+      userId: "user1",
+      name: "John Smith",
+      score: 55,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "2",
+      userId: "user2",
+      name: "Jane Doe",
+      score: 50,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-02T00:00:00Z"
+    }
+  ],
+  'sf-day-trips': [
+    {
+      id: "1",
+      userId: "user1",
+      name: "John Smith",
+      score: 45,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "2",
+      userId: "user2",
+      name: "Jane Doe",
+      score: 40,
+      totalQuestions: 100,
+      gameMode: "normal",
+      completedAt: "2024-01-02T00:00:00Z"
+    }
   ]
+}
 
-  return names
-    .map((name, index) => {
-      const totalQuestions = Math.floor(Math.random() * 50) + 10
-      const correctAnswers = Math.floor(Math.random() * totalQuestions)
+export async function GET(request: Request) {
+  try {
+    const url = new URL(request.url)
+    const gameId = url.searchParams.get("gameId") as GameId | null
+    const limit = Number(url.searchParams.get("limit") || "10")
+    const offset = Number(url.searchParams.get("offset") || "0")
 
-      return {
-        user_id: `mock-${index}`,
-        name,
-        avatar_url: `/placeholder.svg?height=40&width=40&query=avatar ${index + 1}`,
-        attempts_count: Math.floor(Math.random() * 20) + 1,
-        total_correct_answers: correctAnswers,
-        total_questions: totalQuestions,
-        accuracy_percent: Number.parseFloat(((correctAnswers / totalQuestions) * 100).toFixed(1)),
-        perfect_games: Math.floor(Math.random() * 3),
-        last_attempt_at: new Date().toISOString(),
-      }
+    if (!gameId || !STATIC_LEADERBOARDS[gameId]) {
+      return NextResponse.json({ error: "Invalid game ID" }, { status: 400 })
+    }
+
+    // Get leaderboard for the specified game
+    let entries = [...STATIC_LEADERBOARDS[gameId]]
+
+    // Sort by score descending
+    entries.sort((a, b) => b.score - a.score)
+
+    // Get total count before pagination
+    const total = entries.length
+
+    // Apply pagination
+    entries = entries.slice(offset, offset + limit)
+
+    return NextResponse.json({
+      success: true,
+      entries,
+      total,
+      source: 'static'
     })
-    .sort((a, b) => b.total_correct_answers - a.total_correct_answers)
+  } catch (error) {
+    console.error("Error fetching trivia game leaderboard:", error)
+    return NextResponse.json(
+      { success: false, message: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
+    )
+  }
 }

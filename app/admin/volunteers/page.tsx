@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { getPendingVolunteerRecruiters } from "@/app/actions/admin-actions"
+import { adminActions } from "@/lib/actions/admin-actions"
 import { VolunteerApprovalList } from "@/components/admin/volunteer-approval-list"
 
 export default function AdminVolunteersPage() {
@@ -11,7 +11,7 @@ export default function AdminVolunteersPage() {
 
   useEffect(() => {
     const fetchVolunteers = async () => {
-      const { data, success, error } = await getPendingVolunteerRecruiters()
+      const { data, success, error } = await adminActions({ action: 'getPendingVolunteerRecruiters' })
       setPendingVolunteers(data || [])
       setSuccess(success)
       setError(error)

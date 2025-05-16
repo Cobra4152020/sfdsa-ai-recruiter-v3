@@ -1,72 +1,192 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
 
-// Fully optimized trivia questions with verified image paths
-const fallbackQuestions = [
+interface TriviaQuestion {
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+  difficulty: string;
+  category: string;
+  imageUrl: string;
+  imageAlt: string;
+}
+
+// Generate static paths for common parameter combinations
+export function generateStaticParams() {
+  const counts = [5, 10, 15, 20];
+  return counts.map(count => ({ count: count.toString() }));
+}
+
+// Static fallback questions
+const fallbackQuestions: TriviaQuestion[] = [
   {
-    id: "sf-1",
-    question: "What year was the Golden Gate Bridge completed?",
-    options: ["1937", "1927", "1947", "1957"],
+    id: "1",
+    question: "What is the primary role of a San Francisco Deputy Sheriff?",
+    options: [
+      "Maintain security in courts and jails",
+      "Direct traffic",
+      "Issue parking tickets",
+      "Patrol beaches"
+    ],
     correctAnswer: 0,
-    explanation: "The Golden Gate Bridge was completed in 1937 after four years of construction.",
+    explanation: "San Francisco Deputy Sheriffs primarily maintain security in courts and jails, ensuring public safety in these critical facilities.",
     difficulty: "easy",
-    category: "landmarks",
-    imageUrl: "/golden-gate-bridge.png",
-    imageAlt: "The Golden Gate Bridge in San Francisco",
+    category: "general",
+    imageUrl: "/images/courthouse.jpg",
+    imageAlt: "San Francisco courthouse"
   },
   {
-    id: "sf-2",
-    question: "Which famous prison is located on an island in San Francisco Bay?",
-    options: ["Rikers Island", "San Quentin", "Alcatraz", "Folsom"],
-    correctAnswer: 2,
-    explanation: "Alcatraz Federal Penitentiary operated from 1934 to 1963 on Alcatraz Island in San Francisco Bay.",
+    id: "2",
+    question: "Which of these is a requirement to become a San Francisco Deputy Sheriff?",
+    options: [
+      "Must be at least 18 years old",
+      "Must be at least 21 years old",
+      "Must be at least 25 years old",
+      "Must be at least 30 years old"
+    ],
+    correctAnswer: 1,
+    explanation: "Candidates must be at least 21 years old to become a San Francisco Deputy Sheriff.",
     difficulty: "easy",
-    category: "landmarks",
-    imageUrl: "/alcatraz-prison-san-francisco.png",
-    imageAlt: "Alcatraz prison on its island in San Francisco Bay",
+    category: "requirements",
+    imageUrl: "/images/badge.jpg",
+    imageAlt: "San Francisco Deputy Sheriff badge"
   },
   {
-    id: "sf-3",
-    question: "What was the name of the 1906 natural disaster that devastated San Francisco?",
-    options: ["Great Quake", "San Francisco Tremor", "Golden Gate Disaster", "California Shaker"],
+    id: "3",
+    question: "What is the minimum education requirement for a San Francisco Deputy Sheriff?",
+    options: [
+      "High school diploma or equivalent",
+      "Associate's degree",
+      "Bachelor's degree",
+      "Master's degree"
+    ],
     correctAnswer: 0,
-    explanation: "The Great Quake of 1906 caused devastating fires and destroyed over 80% of the city.",
-    difficulty: "medium",
-    category: "history",
-    imageUrl: "/1906-san-francisco-earthquake.png",
-    imageAlt: "Aftermath of the 1906 San Francisco earthquake",
-  },
-  {
-    id: "sf-4",
-    question: "Which famous San Francisco neighborhood is known for its LGBT history and activism?",
-    options: ["Haight-Ashbury", "Mission District", "Castro", "North Beach"],
-    correctAnswer: 2,
-    explanation:
-      "The Castro District has been the center of LGBT activism and culture in San Francisco since the 1960s.",
-    difficulty: "medium",
-    category: "culture",
-    imageUrl: "/castro-district-san-francisco.png",
-    imageAlt: "The iconic Castro Theater in San Francisco's Castro District",
-  },
-  {
-    id: "sf-5",
-    question: "What is the name of San Francisco's famous cable car system?",
-    options: ["Market Street Railway", "Muni Metro", "BART", "San Francisco Municipal Railway"],
-    correctAnswer: 3,
-    explanation:
-      "San Francisco Municipal Railway (Muni) operates the historic cable car system, which is the last manually operated cable car system in the world.",
+    explanation: "A high school diploma or equivalent is the minimum education requirement for becoming a San Francisco Deputy Sheriff.",
     difficulty: "easy",
-    category: "transportation",
-    imageUrl: "/san-francisco-cable-car.png",
-    imageAlt: "A San Francisco cable car climbing up a hill",
+    category: "requirements",
+    imageUrl: "/images/diploma.jpg",
+    imageAlt: "High school diploma"
   },
-]
+  {
+    id: "4",
+    question: "Which of these is NOT a typical duty of a San Francisco Deputy Sheriff?",
+    options: [
+      "Court security",
+      "Jail operations",
+      "Traffic enforcement",
+      "Civil process service"
+    ],
+    correctAnswer: 2,
+    explanation: "Traffic enforcement is primarily handled by SFPD, not the Sheriff's Department.",
+    difficulty: "medium",
+    category: "duties",
+    imageUrl: "/images/courthouse-security.jpg",
+    imageAlt: "Deputy providing courthouse security"
+  },
+  {
+    id: "5",
+    question: "What is the San Francisco Sheriff's Department's primary jurisdiction?",
+    options: [
+      "City and County of San Francisco",
+      "Bay Area",
+      "Northern California",
+      "State of California"
+    ],
+    correctAnswer: 0,
+    explanation: "The San Francisco Sheriff's Department's primary jurisdiction is the City and County of San Francisco.",
+    difficulty: "easy",
+    category: "general",
+    imageUrl: "/images/sf-map.jpg",
+    imageAlt: "Map of San Francisco"
+  },
+  {
+    id: "6",
+    question: "Which physical fitness test is required for Deputy Sheriff candidates?",
+    options: [
+      "POST",
+      "SFPD fitness test",
+      "Military fitness test",
+      "FBI fitness test"
+    ],
+    correctAnswer: 0,
+    explanation: "Candidates must pass the POST (Peace Officer Standards and Training) physical fitness test.",
+    difficulty: "medium",
+    category: "requirements",
+    imageUrl: "/images/fitness-test.jpg",
+    imageAlt: "Physical fitness test"
+  },
+  {
+    id: "7",
+    question: "What is the length of the Deputy Sheriff training academy?",
+    options: [
+      "3 months",
+      "6 months",
+      "9 months",
+      "12 months"
+    ],
+    correctAnswer: 1,
+    explanation: "The Deputy Sheriff training academy is approximately 6 months long.",
+    difficulty: "medium",
+    category: "training",
+    imageUrl: "/images/academy.jpg",
+    imageAlt: "Sheriff's academy training"
+  },
+  {
+    id: "8",
+    question: "Which of these is a key responsibility of Deputy Sheriffs in civil law enforcement?",
+    options: [
+      "Serving eviction notices",
+      "Writing traffic tickets",
+      "Investigating homicides",
+      "Conducting drug raids"
+    ],
+    correctAnswer: 0,
+    explanation: "Serving eviction notices and other civil papers is a key civil law enforcement responsibility of Deputy Sheriffs.",
+    difficulty: "medium",
+    category: "duties",
+    imageUrl: "/images/civil-service.jpg",
+    imageAlt: "Deputy serving civil papers"
+  },
+  {
+    id: "9",
+    question: "What type of driver's license is required to become a Deputy Sheriff?",
+    options: [
+      "Standard Class C",
+      "Commercial Class A",
+      "Commercial Class B",
+      "Motorcycle license"
+    ],
+    correctAnswer: 0,
+    explanation: "A valid standard Class C driver's license is required to become a Deputy Sheriff.",
+    difficulty: "easy",
+    category: "requirements",
+    imageUrl: "/images/drivers-license.jpg",
+    imageAlt: "California driver's license"
+  },
+  {
+    id: "10",
+    question: "Which facility does the San Francisco Sheriff's Department NOT operate?",
+    options: [
+      "County Jail #2",
+      "County Jail #4",
+      "Juvenile Hall",
+      "County Jail #5"
+    ],
+    correctAnswer: 2,
+    explanation: "Juvenile Hall is operated by the Juvenile Probation Department, not the Sheriff's Department.",
+    difficulty: "hard",
+    category: "facilities",
+    imageUrl: "/images/jail.jpg",
+    imageAlt: "San Francisco County Jail"
+  }
+];
 
 // Add fallback images for any missing image paths
-const ensureImageUrls = (questions) => {
+const ensureImageUrls = (questions: TriviaQuestion[]): TriviaQuestion[] => {
   return questions.map((question) => {
     if (!question.imageUrl || question.imageUrl.includes("placeholder.svg")) {
       // Generate a placeholder image based on question content
@@ -88,9 +208,9 @@ export async function GET(req: Request) {
     // Ensure all questions have valid image URLs
     const questionsWithImages = ensureImageUrls(fallbackQuestions)
 
-    // Shuffle the questions and select the requested number
-    const shuffled = [...questionsWithImages].sort(() => 0.5 - Math.random())
-    const selected = shuffled.slice(0, Math.min(count, questionsWithImages.length))
+    // For static generation, we'll return a deterministic set based on count
+    // This ensures the same questions are returned for the same count parameter
+    const selected = questionsWithImages.slice(0, Math.min(count, questionsWithImages.length))
 
     // Return the selected questions as JSON
     return NextResponse.json({

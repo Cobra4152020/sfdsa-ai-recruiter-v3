@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "./supabase-service"
 import { format, subDays, startOfMonth, endOfMonth, eachMonthOfInterval } from "date-fns"
+import { mockAnalyticsData } from './mock-analytics-data';
 
 // Types for analytics data
 export interface UserGrowthData {
@@ -57,236 +58,83 @@ export interface UserActivitySummary {
   percentage: number
 }
 
+type Period = 'week' | 'month' | 'quarter' | 'year';
+
 /**
  * Get user growth data for the specified period
  */
-export async function getUserGrowthData(
-  period: "week" | "month" | "quarter" | "year" = "month",
-): Promise<UserGrowthData[]> {
-  let startDate: Date
-  const endDate = new Date()
-
-  // Calculate start date based on period
-  switch (period) {
-    case "week":
-      startDate = subDays(endDate, 7)
-      break
-    case "month":
-      startDate = subDays(endDate, 30)
-      break
-    case "quarter":
-      startDate = subDays(endDate, 90)
-      break
-    case "year":
-      startDate = subDays(endDate, 365)
-      break
-    default:
-      startDate = subDays(endDate, 30)
+export async function getUserGrowthData(period: Period): Promise<UserGrowthData[]> {
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+    return mockAnalyticsData.growth[period];
   }
-
-  try {
-    // Query for user growth data
-    const { data, error } = await supabaseAdmin.rpc("get_user_growth_data", {
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-      period_interval: period,
-    })
-
-    if (error) throw error
-
-    return data || []
-  } catch (error) {
-    console.error("Error fetching user growth data:", error)
-    throw error
-  }
+  // Add your actual data fetching logic here
+  return mockAnalyticsData.growth[period];
 }
 
 /**
  * Get user engagement data for the specified period
  */
-export async function getUserEngagementData(
-  period: "week" | "month" | "quarter" | "year" = "month",
-): Promise<UserEngagementData[]> {
-  let startDate: Date
-  const endDate = new Date()
-
-  // Calculate start date based on period
-  switch (period) {
-    case "week":
-      startDate = subDays(endDate, 7)
-      break
-    case "month":
-      startDate = subDays(endDate, 30)
-      break
-    case "quarter":
-      startDate = subDays(endDate, 90)
-      break
-    case "year":
-      startDate = subDays(endDate, 365)
-      break
-    default:
-      startDate = subDays(endDate, 30)
+export async function getUserEngagementData(period: Period): Promise<UserEngagementData[]> {
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+    return mockAnalyticsData.engagement[period];
   }
-
-  try {
-    // Query for user engagement data
-    const { data, error } = await supabaseAdmin.rpc("get_user_engagement_data", {
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-      period_interval: period,
-    })
-
-    if (error) throw error
-
-    return data || []
-  } catch (error) {
-    console.error("Error fetching user engagement data:", error)
-    throw error
-  }
+  // Add your actual data fetching logic here
+  return mockAnalyticsData.engagement[period];
 }
 
 /**
  * Get conversion data for volunteer recruiters
  */
-export async function getConversionData(
-  period: "month" | "quarter" | "year" = "month",
-  limit = 10,
-): Promise<ConversionData[]> {
-  let startDate: Date
-  const endDate = new Date()
-
-  // Calculate start date based on period
-  switch (period) {
-    case "month":
-      startDate = subDays(endDate, 30)
-      break
-    case "quarter":
-      startDate = subDays(endDate, 90)
-      break
-    case "year":
-      startDate = subDays(endDate, 365)
-      break
-    default:
-      startDate = subDays(endDate, 30)
+export async function getConversionData(period: Period): Promise<ConversionData[]> {
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+    return mockAnalyticsData.conversion;
   }
-
-  try {
-    // Query for conversion data
-    const { data, error } = await supabaseAdmin.rpc("get_volunteer_conversion_data", {
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-      result_limit: limit,
-    })
-
-    if (error) throw error
-
-    return data || []
-  } catch (error) {
-    console.error("Error fetching conversion data:", error)
-    throw error
-  }
+  // Add your actual data fetching logic here
+  return mockAnalyticsData.conversion;
 }
 
 /**
  * Get geographic distribution of users
  */
-export async function getGeographicData(userType: "all" | "recruit" | "volunteer" = "all"): Promise<GeographicData[]> {
-  try {
-    // Query for geographic data
-    const { data, error } = await supabaseAdmin.rpc("get_geographic_distribution", {
-      user_type: userType,
-    })
-
-    if (error) throw error
-
-    return data || []
-  } catch (error) {
-    console.error("Error fetching geographic data:", error)
-    throw error
+export async function getGeographicData(): Promise<GeographicData[]> {
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+    return mockAnalyticsData.geographic;
   }
+  // Add your actual data fetching logic here
+  return mockAnalyticsData.geographic;
 }
 
 /**
  * Get user retention data
  */
-export async function getRetentionData(months = 6): Promise<RetentionData[]> {
-  try {
-    const endDate = new Date()
-    const startDate = subDays(endDate, months * 30)
-
-    // Query for retention data
-    const { data, error } = await supabaseAdmin.rpc("get_user_retention_data", {
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-    })
-
-    if (error) throw error
-
-    return data || []
-  } catch (error) {
-    console.error("Error fetching retention data:", error)
-    throw error
+export async function getRetentionData(weeks: number): Promise<RetentionData[]> {
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+    return mockAnalyticsData.retention.slice(0, weeks);
   }
+  // Add your actual data fetching logic here
+  return mockAnalyticsData.retention.slice(0, weeks);
 }
 
 /**
  * Get badge distribution data
  */
 export async function getBadgeDistributionData(): Promise<BadgeDistributionData[]> {
-  try {
-    // Query for badge distribution data
-    const { data, error } = await supabaseAdmin.rpc("get_badge_distribution_data")
-
-    if (error) throw error
-
-    return data || []
-  } catch (error) {
-    console.error("Error fetching badge distribution data:", error)
-    throw error
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+    return mockAnalyticsData.badges;
   }
+  // Add your actual data fetching logic here
+  return mockAnalyticsData.badges;
 }
 
 /**
  * Get user activity summary
  */
-export async function getUserActivitySummary(
-  period: "week" | "month" | "quarter" | "year" = "month",
-): Promise<UserActivitySummary[]> {
-  let startDate: Date
-  const endDate = new Date()
-
-  // Calculate start date based on period
-  switch (period) {
-    case "week":
-      startDate = subDays(endDate, 7)
-      break
-    case "month":
-      startDate = subDays(endDate, 30)
-      break
-    case "quarter":
-      startDate = subDays(endDate, 90)
-      break
-    case "year":
-      startDate = subDays(endDate, 365)
-      break
-    default:
-      startDate = subDays(endDate, 30)
+export async function getUserActivitySummary(period: Period): Promise<UserActivitySummary[]> {
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+    return mockAnalyticsData.activity[period];
   }
-
-  try {
-    // Query for user activity summary
-    const { data, error } = await supabaseAdmin.rpc("get_user_activity_summary", {
-      start_date: startDate.toISOString(),
-      end_date: endDate.toISOString(),
-    })
-
-    if (error) throw error
-
-    return data || []
-  } catch (error) {
-    console.error("Error fetching user activity summary:", error)
-    throw error
-  }
+  // Add your actual data fetching logic here
+  return mockAnalyticsData.activity[period];
 }
 
 /**

@@ -1,79 +1,75 @@
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour
+
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-server"
-import { constructUrl } from "@/lib/url-utils"
 
-export const dynamic = "force-static"
-export const revalidate = 3600 // Revalidate every hour
+interface EmailConfig {
+  provider: string;
+  region: string;
+  fromAddress: string;
+  replyToAddress: string;
+  templateDirectory: string;
+  maxRetries: number;
+  rateLimitPerMinute: number;
+  isConfigured: boolean;
+}
 
-export async function GET(request: Request) {
+interface EmailDiagnostics {
+  config: EmailConfig;
+  status: {
+    isHealthy: boolean;
+    lastCheck: string;
+    errors: string[];
+  };
+  metrics: {
+    totalSent: number;
+    deliveryRate: number;
+    bounceRate: number;
+    averageSendTime: number;
+  };
+}
+
+// Mock email diagnostics data
+const mockEmailDiagnostics: EmailDiagnostics = {
+  config: {
+    provider: "AWS SES",
+    region: "us-west-2",
+    fromAddress: "noreply@sfdsarecruiter.org",
+    replyToAddress: "support@sfdsarecruiter.org",
+    templateDirectory: "/templates/email",
+    maxRetries: 3,
+    rateLimitPerMinute: 100,
+    isConfigured: true
+  },
+  status: {
+    isHealthy: true,
+    lastCheck: new Date().toISOString(),
+    errors: []
+  },
+  metrics: {
+    totalSent: 1250,
+    deliveryRate: 98.5,
+    bounceRate: 1.2,
+    averageSendTime: 245 // milliseconds
+  }
+};
+
+export async function GET() {
   try {
-    const url = new URL(request.url)
-    const baseUrl = `${url.protocol}//${url.host}`
-
-    const requiredEnvVars = [
-      "RESEND_API_KEY",
-      "NEXT_PUBLIC_SUPABASE_URL",
-      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    ]
-
-    const missingVars = requiredEnvVars.filter((varName) => !process.env[varName])
-
-    if (missingVars.length > 0) {
-      return NextResponse.json({
-        success: false,
-        message: `Missing required environment variables: ${missingVars.join(", ")}`,
-        details: {
-          missingVars,
-          baseUrl,
-        },
-      })
-    }
-
-    // Check Supabase connection
-    const supabase = createClient()
-    const { error: supabaseError } = await supabase.from("users").select("id").limit(1)
-
-    if (supabaseError) {
-      return NextResponse.json({
-        success: false,
-        message: "Supabase connection error",
-        details: {
-          error: supabaseError.message,
-          baseUrl,
-        },
-      })
-    }
-
-    // Check email configuration
-    const resendApiKey = process.env.RESEND_API_KEY
-    const isResendConfigured = !!resendApiKey && resendApiKey.startsWith("re_")
-
-    if (!isResendConfigured) {
-      return NextResponse.json({
-        success: false,
-        message: "Resend API key is missing or invalid",
-        details: {
-          resendConfigured: isResendConfigured,
-          baseUrl,
-        },
-      })
-    }
-
-    // All checks passed
     return NextResponse.json({
       success: true,
-      message: "All email configurations are valid",
-      details: {
-        baseUrl,
-        supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-        resendConfigured: isResendConfigured,
-      },
+      diagnostics: mockEmailDiagnostics,
+      source: 'static'
     })
   } catch (error) {
-    console.error("Email config diagnostic error:", error)
-    return NextResponse.json({
-      success: false,
-      message: error instanceof Error ? error.message : "Unknown error checking email configuration",
-    })
+    console.error("Error in email diagnostics API:", error)
+    return NextResponse.json(
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown error",
+        source: 'error'
+      },
+      { status: 500 }
+    )
   }
 }

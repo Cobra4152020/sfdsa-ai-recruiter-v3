@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import type { DateRange } from "react-day-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -33,16 +34,87 @@ type FilterOptions = {
   metricTypes: string[]
 }
 
+// Add static mock data for export build
+const STATIC_MOCK_DATA = {
+  aggregatedMetrics: [
+    {
+      metric_name: "LCP",
+      avg_value: 2100,
+      p75_value: 2400,
+      p95_value: 2800,
+      sample_count: 1000
+    },
+    {
+      metric_name: "FID",
+      avg_value: 80,
+      p75_value: 95,
+      p95_value: 120,
+      sample_count: 1000
+    },
+    {
+      metric_name: "CLS",
+      avg_value: 0.08,
+      p75_value: 0.12,
+      p95_value: 0.15,
+      sample_count: 1000
+    },
+    {
+      metric_name: "FCP",
+      avg_value: 1500,
+      p75_value: 1800,
+      p95_value: 2200,
+      sample_count: 1000
+    },
+    {
+      metric_name: "TTFB",
+      avg_value: 600,
+      p75_value: 750,
+      p95_value: 900,
+      sample_count: 1000
+    }
+  ],
+  timeSeriesData: Array.from({ length: 7 }, (_, i) => ({
+    date: new Date(Date.now() - (6 - i) * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    LCP: 2000 + Math.random() * 200,
+    FID: 75 + Math.random() * 20,
+    CLS: 0.07 + Math.random() * 0.02,
+    FCP: 1400 + Math.random() * 200,
+    TTFB: 550 + Math.random() * 100
+  })),
+  pagePerformance: [
+    {
+      path: "/",
+      LCP: 1900,
+      FID: 70,
+      CLS: 0.06,
+      FCP: 1300,
+      TTFB: 500
+    },
+    {
+      path: "/dashboard",
+      LCP: 2200,
+      FID: 85,
+      CLS: 0.09,
+      FCP: 1600,
+      TTFB: 650
+    }
+  ],
+  filterOptions: {
+    pages: ["/", "/dashboard", "/profile", "/settings"],
+    metricTypes: ["LCP", "FID", "CLS", "FCP", "TTFB"]
+  }
+};
+
 export function PerformanceDashboard() {
   // Date range state
-  const [dateRange, setDateRange] = useState({
+  const [dateRange, setDateRange] = useState<DateRange>({
     from: addDays(new Date(), -7),
     to: new Date(),
   })
 
   // Filter states
-  const [metricType, setMetricType] = useState("all")
-  const [page, setPage] = useState("all")
+  const [metricType, setMetricType] = useState<string>("all")
+  const [page, setPage] = useState<string>("all")
 
   // Data states
   const [loading, setLoading] = useState(true)
@@ -57,6 +129,15 @@ export function PerformanceDashboard() {
     try {
       setLoading(true)
       setError(null)
+
+      // Use static data for export build
+      if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+        setAggregatedMetrics(STATIC_MOCK_DATA.aggregatedMetrics)
+        setTimeSeriesData(STATIC_MOCK_DATA.timeSeriesData)
+        setPagePerformance(STATIC_MOCK_DATA.pagePerformance)
+        setFilterOptions(STATIC_MOCK_DATA.filterOptions)
+        return
+      }
 
       const startDate = dateRange.from?.toISOString() || addDays(new Date(), -7).toISOString()
       const endDate = dateRange.to?.toISOString() || new Date().toISOString()
@@ -164,6 +245,11 @@ export function PerformanceDashboard() {
     return path.replace(/^\//, "").replace(/-/g, " ").replace(/\//g, " › ")
   }
 
+  // Handle date range change
+  const handleDateRangeChange = (newDateRange: DateRange) => {
+    setDateRange(newDateRange)
+  }
+
   return (
     <div className="space-y-6">
       {/* Filters */}
@@ -176,7 +262,10 @@ export function PerformanceDashboard() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">Date Range</label>
-              <DatePickerWithRange dateRange={dateRange} setDateRange={setDateRange} />
+              <DatePickerWithRange 
+                date={dateRange} 
+                onDateChange={handleDateRangeChange}
+              />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Metric Type</label>
@@ -348,7 +437,7 @@ export function PerformanceDashboard() {
                       data={timeSeriesData}
                       xField="date"
                       series={getAvailableMetrics(timeSeriesData, ["LCP", "FID", "CLS", "FCP", "TTFB", "INP"])}
-                      tooltipFormat={(value, name) => formatMetricValue(name, value)}
+                      tooltipFormat={(value, name) => formatMetricValue(name || "", value)}
                     />
                   </div>
                 </CardContent>
@@ -368,7 +457,7 @@ export function PerformanceDashboard() {
                         xField="date"
                         series={getAvailableMetrics(
                           timeSeriesData,
-                          filterOptions.metricTypes.filter((m) => m.startsWith("resource-")),
+                          filterOptions.metricTypes.filter(m => m.startsWith("resource-"))
                         )}
                         tooltipFormat={(value) => `${value.toFixed(0)}ms`}
                       />
@@ -455,13 +544,11 @@ function getThreshold(metricName: string, level: "good" | "needs-improvement"): 
 // Helper function to get available metrics from time series data
 function getAvailableMetrics(data: TimeSeriesData, metricNames: string[]): string[] {
   if (data.length === 0) return []
-
-  return metricNames.filter((name) => name in data[0])
+  return metricNames.filter(name => name in data[0])
 }
 
 // Helper function to check if resource metrics exist in time series data
 function hasResourceMetrics(data: TimeSeriesData): boolean {
   if (data.length === 0) return false
-
   return Object.keys(data[0]).some((key) => key.startsWith("resource-"))
 }

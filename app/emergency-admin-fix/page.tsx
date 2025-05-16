@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { publicFixAdminProfile } from "@/app/actions/public-fix-admin-alt"
+import { publicFixAdminAlt } from "@/lib/actions/public-fix-admin-alt"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -25,7 +25,7 @@ export default function EmergencyAdminFixPage() {
     setError(null)
 
     try {
-      const result = await publicFixAdminProfile(userId, email, securityCode)
+      const result = await publicFixAdminAlt({ userId, email, securityCode })
       setResult(result)
     } catch (error) {
       setError(error instanceof Error ? error.message : "An unexpected error occurred")

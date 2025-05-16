@@ -1,9 +1,53 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase-client"
+
+interface PerformanceMetric {
+  day: string;
+  metric_name: string;
+  value: number;
+  count: number;
+}
+
+interface StaticParam {
+  timeRange?: string;
+}
+
+// Generate static parameters for common time ranges
+export function generateStaticParams() {
+  const timeRanges = ['1d', '7d', '30d', '90d'];
+  
+  return timeRanges.map(timeRange => ({ timeRange }));
+}
+
+// Mock data for static generation
+const mockCoreVitals: PerformanceMetric[] = [
+  {
+    day: "2024-01-01",
+    metric_name: "LCP",
+    value: 2.5,
+    count: 1000
+  },
+  {
+    day: "2024-01-01",
+    metric_name: "FCP",
+    value: 1.2,
+    count: 1000
+  },
+  {
+    day: "2024-01-01",
+    metric_name: "CLS",
+    value: 0.1,
+    count: 1000
+  },
+  {
+    day: "2024-01-01",
+    metric_name: "TTFB",
+    value: 0.8,
+    count: 1000
+  }
+];
 
 export async function GET(request: Request) {
   try {
@@ -37,145 +81,57 @@ export async function GET(request: Request) {
         startDate.setDate(now.getDate() - 7)
     }
 
-    // Format dates for SQL query
-    const startDateStr = startDate.toISOString()
-    const endDateStr = now.toISOString()
-
-    // Get core web vitals data
-    const { data: coreVitalsData, error: coreVitalsError } = await supabase
-      .from("performance_metrics_daily")
-      .select("*")
-      .in("metric_name", ["LCP", "FCP", "CLS", "TTFB"])
-      .gte("day", startDateStr)
-      .lte("day", endDateStr)
-      .order("day", { ascending: true })
-
-    if (coreVitalsError) {
-      console.error("Error fetching core vitals:", coreVitalsError)
-      return NextResponse.json({ success: false, message: "Failed to fetch core vitals data" }, { status: 500 })
-    }
-
-    // Get resource metrics data
-    const { data: resourceData, error: resourceError } = await supabase
-      .from("performance_metrics")
-      .select("*")
-      .like("metric_name", "resource-%")
-      .gte("timestamp", startDateStr)
-      .lte("timestamp", endDateStr)
-
-    if (resourceError) {
-      console.error("Error fetching resource metrics:", resourceError)
-      return NextResponse.json({ success: false, message: "Failed to fetch resource metrics data" }, { status: 500 })
-    }
-
-    // Get page metrics data
-    const { data: pageData, error: pageError } = await supabase
-      .from("performance_metrics_by_page")
-      .select("*")
-      .in("metric_name", ["LCP", "FCP", "CLS", "TTFB"])
-      .gte("day", startDateStr)
-      .lte("day", endDateStr)
-
-    if (pageError) {
-      console.error("Error fetching page metrics:", pageError)
-      return NextResponse.json({ success: false, message: "Failed to fetch page metrics data" }, { status: 500 })
-    }
-
-    // Process core vitals data
-    const coreVitals = processWebVitalsData(coreVitalsData || [])
-
-    // Process resource metrics data
-    const resourceMetrics = processResourceData(resourceData || [])
-
-    // Process page metrics data
-    const pageMetrics = processPageData(pageData || [])
+    // Generate mock data for the time range
+    const mockData = generateMockData(startDate, now);
 
     return NextResponse.json({
       success: true,
-      coreVitals,
-      resourceMetrics,
-      pageMetrics,
+      data: {
+        coreVitals: mockData,
+        timeRange,
+        source: 'static'
+      }
     })
   } catch (error) {
-    console.error("Error processing performance dashboard data:", error)
-    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 })
+    console.error("Error in performance dashboard API:", error)
+    return NextResponse.json({
+      success: false,
+      message: error instanceof Error ? error.message : "Unknown error",
+      source: 'error'
+    }, { status: 500 })
   }
 }
 
-// Helper functions to process the data
-function processWebVitalsData(data: any[]) {
-  const metricsByName: Record<string, any[]> = {}
-
-  // Group by metric name
-  data.forEach((item) => {
-    if (!metricsByName[item.metric_name]) {
-      metricsByName[item.metric_name] = []
-    }
-
-    metricsByName[item.metric_name].push({
-      date: formatDate(item.day),
-      value: item.avg_value,
-    })
-  })
-
-  // Convert to array format
-  return Object.entries(metricsByName).map(([name, data]) => ({
-    name,
-    data,
-  }))
+function generateMockData(startDate: Date, endDate: Date): PerformanceMetric[] {
+  const metrics = ['LCP', 'FCP', 'CLS', 'TTFB'];
+  const data: PerformanceMetric[] = [];
+  
+  // Generate daily data points
+  for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+    metrics.forEach(metric => {
+      data.push({
+        day: date.toISOString().split('T')[0],
+        metric_name: metric,
+        value: getRandomValue(metric),
+        count: Math.floor(Math.random() * 1000) + 500
+      });
+    });
+  }
+  
+  return data;
 }
 
-function processResourceData(data: any[]) {
-  const resourceTypes: Record<string, number[]> = {}
-
-  // Group by resource type
-  data.forEach((item) => {
-    if (!resourceTypes[item.metric_name]) {
-      resourceTypes[item.metric_name] = []
-    }
-
-    resourceTypes[item.metric_name].push(item.metric_value)
-  })
-
-  // Calculate average for each resource type
-  return Object.entries(resourceTypes).map(([name, values]) => {
-    const avg = values.reduce((sum, val) => sum + val, 0) / values.length
-
-    return {
-      name,
-      data: [{ date: "Current", value: avg }],
-    }
-  })
-}
-
-function processPageData(data: any[]) {
-  const pageMetrics: Record<string, Record<string, any>> = {}
-
-  // Group by page path and metric name
-  data.forEach((item) => {
-    const path = item.path || "/"
-
-    if (!pageMetrics[path]) {
-      pageMetrics[path] = {}
-    }
-
-    pageMetrics[path][item.metric_name] = {
-      avg: item.avg_value,
-      p75: item.p75_value,
-      p95: item.p95_value,
-      samples: item.sample_count,
-      rating: item.common_rating,
-    }
-  })
-
-  // Convert to array format
-  return Object.entries(pageMetrics).map(([path, metrics]) => ({
-    path,
-    metrics,
-  }))
-}
-
-function formatDate(dateStr: string) {
-  const date = new Date(dateStr)
-  return `${date.getMonth() + 1}/${date.getDate()}`
+function getRandomValue(metric: string): number {
+  switch (metric) {
+    case 'LCP':
+      return 2 + Math.random() * 1; // 2-3s
+    case 'FCP':
+      return 1 + Math.random() * 0.5; // 1-1.5s
+    case 'CLS':
+      return 0.05 + Math.random() * 0.1; // 0.05-0.15
+    case 'TTFB':
+      return 0.5 + Math.random() * 0.5; // 0.5-1s
+    default:
+      return Math.random();
+  }
 }

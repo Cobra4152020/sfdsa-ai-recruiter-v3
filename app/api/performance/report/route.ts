@@ -1,4 +1,3 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
@@ -8,9 +7,23 @@ import type { PerformanceMetric } from "@/lib/performance-monitoring"
 
 export async function POST(request: Request) {
   try {
-    // Only allow in production or when explicitly enabled
-    if (process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING !== "true") {
-      return NextResponse.json({ success: false, message: "Performance monitoring is disabled" }, { status: 400 })
+    // For static export or when monitoring is disabled, log to console in development
+    if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true" || 
+        (process.env.NODE_ENV !== "production" && process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING !== "true")) {
+      
+      // Parse the metric
+      const metric: PerformanceMetric = await request.json()
+
+      // Log to console in development
+      if (process.env.NODE_ENV === "development") {
+        console.log("[Performance Metric]", metric)
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        message: "Performance metric logged (static mode)",
+        source: 'static'
+      })
     }
 
     // Parse the request body
@@ -18,7 +31,11 @@ export async function POST(request: Request) {
 
     // Validate the metric
     if (!metric || !metric.name || typeof metric.value !== "number") {
-      return NextResponse.json({ success: false, message: "Invalid metric data" }, { status: 400 })
+      return NextResponse.json({ 
+        success: false, 
+        message: "Invalid metric data",
+        source: 'error'
+      }, { status: 400 })
     }
 
     try {
@@ -58,7 +75,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: "Metric logged to console (database error)" })
     }
   } catch (error) {
-    console.error("Error processing performance metric:", error)
-    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 })
+    console.error("Error recording performance metric:", error)
+    return NextResponse.json({ 
+      success: false, 
+      message: error instanceof Error ? error.message : "Failed to record metric",
+      source: 'error'
+    }, { status: 500 })
   }
 }

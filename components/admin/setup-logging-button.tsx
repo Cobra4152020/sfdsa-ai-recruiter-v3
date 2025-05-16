@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { setupLoggingSystem } from "@/app/actions/setup-logging-system"
+import { setupLoggingSystem } from "@/lib/actions/setup-logging-system"
 import { AlertCircle, CheckCircle, Database } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -21,7 +21,7 @@ export function SetupLoggingButton() {
     setResult(null)
 
     try {
-      const setupResult = await setupLoggingSystem()
+      const setupResult = await setupLoggingSystem({})
       setResult(setupResult)
 
       toast({

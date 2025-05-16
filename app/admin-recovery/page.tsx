@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle } from "lucide-react"
-import { recoverAdminUser } from "@/app/actions/public-admin-recovery"
+import { publicAdminRecovery } from "@/lib/actions/public-admin-recovery"
 import Link from "next/link"
 
 export default function AdminRecoveryPage() {
@@ -29,7 +29,7 @@ export default function AdminRecoveryPage() {
     setSuccess(null)
 
     try {
-      const result = await recoverAdminUser(email, recoveryCode)
+      const result = await publicAdminRecovery({ email, recoveryCode })
 
       if (result.success) {
         setSuccess(result.message)

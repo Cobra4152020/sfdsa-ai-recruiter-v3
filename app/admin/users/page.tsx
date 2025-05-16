@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,14 +12,48 @@ import { UserTable } from "@/components/admin/user-table"
 import { UserStats } from "@/components/admin/user-stats"
 import { PendingVolunteers } from "@/components/admin/pending-volunteers"
 import { Pagination } from "@/components/ui/pagination"
-import {
-  getAllUsers,
-  getUserStats,
-  type UserWithRole,
-  type UserRole,
-  type UserStatus,
-} from "@/lib/user-management-service"
-import { Search, RefreshCw, Filter, X } from "lucide-react"
+import { Search, Filter, X } from "lucide-react"
+import type { UserWithRole, UserRole, UserStatus, UserStats as UserStatsType } from "@/types/user"
+
+// Static mock data
+const mockUsers: UserWithRole[] = [
+  {
+    id: "1",
+    name: "John Smith",
+    email: "john@example.com",
+    role: "recruit",
+    status: "active",
+    created_at: "2024-01-01T00:00:00Z",
+    type: "recruit",
+    has_applied: false,
+    has_completed_profile: true,
+    has_verified_email: true
+  },
+  {
+    id: "2",
+    name: "Jane Doe",
+    email: "jane@example.com",
+    role: "volunteer",
+    status: "active",
+    created_at: "2024-01-02T00:00:00Z",
+    type: "volunteer",
+    has_applied: true,
+    has_completed_profile: true,
+    has_verified_email: true,
+    is_active: true
+  }
+];
+
+// Static mock stats
+const mockStats: UserStatsType = {
+  total_users: 100,
+  active_users: 80,
+  recruits: 60,
+  volunteers: 30,
+  admins: 10,
+  pending_volunteers: 5,
+  recent_signups: 15
+};
 
 export default function AdminUsersPage() {
   const router = useRouter()
@@ -36,24 +68,15 @@ export default function AdminUsersPage() {
   const tabParam = searchParams.get("tab") || "all"
 
   // State
-  const [users, setUsers] = useState<UserWithRole[]>([])
-  const [stats, setStats] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState<UserWithRole[]>(mockUsers)
+  const [stats] = useState<UserStatsType>(mockStats)
+  const [loading] = useState(false)
   const [searchTerm, setSearchTerm] = useState(searchParam || "")
   const [role, setRole] = useState<UserRole | "">(roleParam || "")
   const [status, setStatus] = useState<UserStatus | "">(statusParam || "")
   const [page, setPage] = useState(pageParam ? Number.parseInt(pageParam) : 1)
-  const [totalUsers, setTotalUsers] = useState(0)
+  const [totalUsers] = useState(mockStats.total_users)
   const [activeTab, setActiveTab] = useState(tabParam)
-  const [isRefreshing, setIsRefreshing] = useState(false)
-
-  const limit = 10
-
-  // Load users and stats
-  useEffect(() => {
-    loadUsers()
-    loadStats()
-  }, [page, role, status, searchTerm, activeTab])
 
   // Update URL when filters change
   useEffect(() => {
@@ -68,74 +91,19 @@ export default function AdminUsersPage() {
     router.push(queryString ? `?${queryString}` : "/admin/users")
   }, [page, searchTerm, role, status, activeTab, router])
 
-  const loadUsers = async () => {
-    setLoading(true)
-    try {
-      // Set role based on active tab
-      let tabRole: UserRole | undefined
-      if (activeTab === "recruits") tabRole = "recruit"
-      else if (activeTab === "volunteers") tabRole = "volunteer"
-      else if (activeTab === "admins") tabRole = "admin"
+  // Filter users based on search term, role, and status
+  useEffect(() => {
+    const filteredUsers = mockUsers.filter(user => {
+      const matchesSearch = !searchTerm || 
+        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        user.email.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesRole = !role || user.role === role;
+      const matchesStatus = !status || user.status === status;
+      return matchesSearch && matchesRole && matchesStatus;
+    });
 
-      const { users, total } = await getAllUsers({
-        page,
-        limit,
-        search: searchTerm,
-        role: tabRole || (role as UserRole) || undefined,
-        status: status as UserStatus,
-      })
-
-      setUsers(users)
-      setTotalUsers(total)
-    } catch (error) {
-      console.error("Error loading users:", error)
-      toast({
-        title: "Error",
-        description: "Failed to load users. Please try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const loadStats = async () => {
-    try {
-      const stats = await getUserStats()
-      setStats(stats)
-    } catch (error) {
-      console.error("Error loading stats:", error)
-    }
-  }
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true)
-    await Promise.all([loadUsers(), loadStats()])
-    setIsRefreshing(false)
-    toast({
-      title: "Refreshed",
-      description: "User data has been refreshed.",
-    })
-  }
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    setPage(1) // Reset to first page on new search
-  }
-
-  const handleClearFilters = () => {
-    setSearchTerm("")
-    setRole("")
-    setStatus("")
-    setPage(1)
-  }
-
-  const handleTabChange = (value: string) => {
-    setActiveTab(value)
-    setPage(1) // Reset to first page on tab change
-  }
-
-  const totalPages = Math.ceil(totalUsers / limit)
+    setUsers(filteredUsers);
+  }, [searchTerm, role, status]);
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -144,24 +112,11 @@ export default function AdminUsersPage() {
           <h1 className="text-3xl font-bold text-[#0A3C1F]">User Management</h1>
           <p className="text-gray-600">Manage users, roles, and permissions</p>
         </div>
-        <Button onClick={handleRefresh} variant="outline" className="mt-4 md:mt-0" disabled={isRefreshing}>
-          {isRefreshing ? (
-            <>
-              <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-              Refreshing...
-            </>
-          ) : (
-            <>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </>
-          )}
-        </Button>
       </div>
 
       {stats && <UserStats stats={stats} />}
 
-      <Tabs defaultValue={activeTab} onValueChange={handleTabChange} className="mt-8">
+      <Tabs defaultValue={activeTab} onValueChange={(value) => setActiveTab(value)} className="mt-8">
         <TabsList className="mb-6">
           <TabsTrigger value="all">All Users</TabsTrigger>
           <TabsTrigger value="recruits">Recruits</TabsTrigger>
@@ -180,7 +135,7 @@ export default function AdminUsersPage() {
             </CardHeader>
             <CardContent>
               <div className="flex flex-col md:flex-row gap-4">
-                <form onSubmit={handleSearch} className="flex-1">
+                <form onSubmit={(e) => e.preventDefault()} className="flex-1">
                   <div className="relative">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
                     <Input
@@ -199,7 +154,7 @@ export default function AdminUsersPage() {
                       <SelectValue placeholder="Role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Roles</SelectItem>
+                      <SelectItem value="">All Roles</SelectItem>
                       <SelectItem value="recruit">Recruits</SelectItem>
                       <SelectItem value="volunteer">Volunteers</SelectItem>
                       <SelectItem value="admin">Admins</SelectItem>
@@ -211,7 +166,7 @@ export default function AdminUsersPage() {
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="">All Statuses</SelectItem>
                       <SelectItem value="active">Active</SelectItem>
                       <SelectItem value="pending">Pending</SelectItem>
                       <SelectItem value="inactive">Inactive</SelectItem>
@@ -219,7 +174,12 @@ export default function AdminUsersPage() {
                   </Select>
 
                   {(searchTerm || role || status) && (
-                    <Button variant="outline" onClick={handleClearFilters} className="flex items-center">
+                    <Button variant="outline" onClick={() => {
+                      setSearchTerm("")
+                      setRole("")
+                      setStatus("")
+                      setPage(1)
+                    }} className="flex items-center">
                       <X className="h-4 w-4 mr-2" />
                       Clear
                     </Button>
@@ -231,35 +191,38 @@ export default function AdminUsersPage() {
         </div>
 
         <TabsContent value="all">
-          <UserTable users={users} loading={loading} onRefresh={loadUsers} />
-          {totalPages > 1 && (
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} className="mt-6" />
+          <UserTable users={users} loading={loading} onRefresh={() => {}} />
+          {totalUsers > 10 && (
+            <Pagination currentPage={page} totalPages={Math.ceil(totalUsers / 10)} onPageChange={setPage} className="mt-6" />
           )}
         </TabsContent>
 
         <TabsContent value="recruits">
-          <UserTable users={users} loading={loading} onRefresh={loadUsers} />
-          {totalPages > 1 && (
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} className="mt-6" />
-          )}
+          <UserTable 
+            users={users.filter(u => u.role === "recruit")} 
+            loading={loading} 
+            onRefresh={() => {}} 
+          />
         </TabsContent>
 
         <TabsContent value="volunteers">
-          <UserTable users={users} loading={loading} onRefresh={loadUsers} />
-          {totalPages > 1 && (
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} className="mt-6" />
-          )}
+          <UserTable 
+            users={users.filter(u => u.role === "volunteer")} 
+            loading={loading} 
+            onRefresh={() => {}} 
+          />
         </TabsContent>
 
         <TabsContent value="admins">
-          <UserTable users={users} loading={loading} onRefresh={loadUsers} />
-          {totalPages > 1 && (
-            <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} className="mt-6" />
-          )}
+          <UserTable 
+            users={users.filter(u => u.role === "admin")} 
+            loading={loading} 
+            onRefresh={() => {}} 
+          />
         </TabsContent>
 
         <TabsContent value="pending">
-          <PendingVolunteers onApproved={loadUsers} />
+          <PendingVolunteers />
         </TabsContent>
       </Tabs>
     </div>

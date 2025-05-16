@@ -7,15 +7,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
-import {
+import { 
+  databaseSchemaVerification,
   verifySchema,
   fixAllIssues,
   fixTableIssuesAction,
   fixSpecificIssues,
   runCustomFix,
-} from "@/app/actions/database-schema-verification"
+} from "@/lib/actions/database-schema-verification"
 import type { SchemaVerificationResult } from "@/lib/schema-verification"
-import { AlertCircle, CheckCircle, XCircle, Database, Table, RefreshCw, Code, Wrench, FileText } from "lucide-react"
+import { AlertCircle, CheckCircle, XCircle, Database, Table, RefreshCw, Code, Wrench, FileText, CheckCircle2 } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { SchemaDiagram } from "./schema-diagram"
 
@@ -27,6 +28,8 @@ export function SchemaVerificationTool() {
   const [customSql, setCustomSql] = useState("")
   const [activeTab, setActiveTab] = useState("verification")
   const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(false)
+  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
 
   // Run verification on component mount
   useEffect(() => {
@@ -35,8 +38,8 @@ export function SchemaVerificationTool() {
 
   // Verify database schema
   const verifyDatabaseSchema = async () => {
+    setIsVerifying(true)
     try {
-      setIsVerifying(true)
       const result = await verifySchema()
       setVerificationResult(result)
     } catch (error) {
@@ -262,15 +265,37 @@ export function SchemaVerificationTool() {
     }
   }
 
+  const handleVerify = async () => {
+    setIsLoading(true)
+    try {
+      const result = await databaseSchemaVerification({})
+      setResult(result)
+    } catch (error) {
+      setResult({
+        success: false,
+        message: error instanceof Error ? error.message : "An unexpected error occurred",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Database Schema Verification Tool</h1>
-        <Button onClick={verifyDatabaseSchema} disabled={isVerifying} variant="outline">
-          <RefreshCw className={`mr-2 h-4 w-4 ${isVerifying ? "animate-spin" : ""}`} />
-          {isVerifying ? "Verifying..." : "Verify Schema"}
+        <Button onClick={handleVerify} disabled={isLoading} variant="outline">
+          {isLoading ? "Verifying..." : "Verify Schema"}
         </Button>
       </div>
+
+      {result && (
+        <Alert variant={result.success ? "default" : "destructive"}>
+          {result.success ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
+          <AlertTitle>{result.success ? "Success" : "Error"}</AlertTitle>
+          <AlertDescription>{result.message}</AlertDescription>
+        </Alert>
+      )}
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-4">

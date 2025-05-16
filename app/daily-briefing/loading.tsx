@@ -1,3 +1,5 @@
+"use client"
+
 import { Loader2 } from "lucide-react"
 import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"

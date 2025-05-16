@@ -1,26 +1,46 @@
 "use client"
 
 import { useState } from "react"
-import { setupAdminRpcFunction } from "@/app/actions/setup-admin-rpc"
-import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle2, Database } from "lucide-react"
+import { AlertCircle, CheckCircle, Database } from "lucide-react"
+import { setupAdminRpc } from "@/lib/actions/setup-admin-rpc"
+import Link from "next/link"
 
 export default function AdminSetupPage() {
+  const [email, setEmail] = useState("")
+  const [setupCode, setSetupCode] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   const handleSetup = async () => {
+    if (!email || !setupCode) {
+      setError("Email and setup code are required")
+      return
+    }
+
     setIsLoading(true)
+    setError(null)
+    setSuccess(null)
+
     try {
-      const result = await setupAdminRpcFunction()
-      setResult(result)
-    } catch (error) {
-      setResult({
-        success: false,
-        message: error instanceof Error ? error.message : "An unexpected error occurred",
-      })
+      const result = await setupAdminRpc({ email, setupCode })
+
+      if (result.success) {
+        setSuccess(result.message)
+        if (result.userId) {
+          setUserId(result.userId)
+        }
+      } else {
+        setError(result.message)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred")
     } finally {
       setIsLoading(false)
     }
@@ -39,11 +59,19 @@ export default function AdminSetupPage() {
           <CardDescription className="text-center">Set up required SQL functions for the admin system</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {result && (
-            <Alert variant={result.success ? "default" : "destructive"}>
-              {result.success ? <CheckCircle2 className="h-4 w-4" /> : <AlertCircle className="h-4 w-4" />}
-              <AlertTitle>{result.success ? "Success" : "Error"}</AlertTitle>
-              <AlertDescription>{result.message}</AlertDescription>
+          {success && (
+            <Alert variant="default">
+              <CheckCircle className="h-4 w-4" />
+              <AlertTitle>Success</AlertTitle>
+              <AlertDescription>{success}</AlertDescription>
+            </Alert>
+          )}
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Error</AlertTitle>
+              <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
 
@@ -59,7 +87,7 @@ export default function AdminSetupPage() {
         </CardFooter>
       </Card>
 
-      {result?.success && (
+      {success && (
         <div className="mt-4 text-center">
           <p className="text-green-600 font-medium mb-2">Setup completed successfully!</p>
           <Button variant="outline" onClick={() => (window.location.href = "/emergency-admin-fix")} className="mr-2">

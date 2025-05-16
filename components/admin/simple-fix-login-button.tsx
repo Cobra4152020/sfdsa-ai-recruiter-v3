@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { simpleLoginFix } from "@/app/actions/simple-login-fix"
+import { simpleLoginFix } from "@/lib/actions/simple-login-fix"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle } from "lucide-react"
@@ -15,7 +15,7 @@ export function SimpleFixLoginButton() {
   const handleFix = async () => {
     setIsLoading(true)
     try {
-      const result = await simpleLoginFix()
+      const result = await simpleLoginFix({})
       setResult(result)
     } catch (error) {
       console.error("Error fixing login issues:", error)

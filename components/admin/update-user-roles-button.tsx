@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { updateUserRolesSchema } from "@/app/actions/update-user-roles-schema"
+import { updateUserRolesSchema } from "@/lib/actions/update-user-roles-schema"
 import { AlertCircle, CheckCircle } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
@@ -15,7 +15,7 @@ export function UpdateUserRolesButton() {
     setResult(null)
 
     try {
-      const updateResult = await updateUserRolesSchema()
+      const updateResult = await updateUserRolesSchema({})
       setResult(updateResult)
     } catch (error) {
       setResult({

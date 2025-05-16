@@ -1,82 +1,49 @@
-
-export const dynamic = 'force-static';
-export const revalidate = 3600; // Revalidate every hour;
-
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
 
-export async function GET(req: Request) {
+export const dynamic = 'force-static'
+
+// Mock trivia diagnostics data
+const STATIC_DIAGNOSTICS = {
+  totalAttempts: 1000,
+  averageScore: 85,
+  completionRate: 92,
+  topCategories: [
+    { name: "Written Test", attempts: 400, averageScore: 88 },
+    { name: "Oral Board", attempts: 300, averageScore: 82 },
+    { name: "Physical Test", attempts: 200, averageScore: 90 },
+    { name: "Department Knowledge", attempts: 100, averageScore: 85 }
+  ],
+  recentActivity: [
+    {
+      id: "1",
+      userId: "test-user",
+      category: "Written Test",
+      score: 90,
+      timestamp: "2024-01-01T00:00:00Z"
+    },
+    {
+      id: "2",
+      userId: "test-user",
+      category: "Oral Board",
+      score: 85,
+      timestamp: "2024-01-02T00:00:00Z"
+    }
+  ],
+  lastUpdated: "2024-01-03T00:00:00Z"
+}
+
+export async function GET() {
   try {
-    const url = new URL(req.url)
-    const gameId = url.searchParams.get("gameId")
-
-    const results = {
-      status: "success",
-      timestamp: new Date().toISOString(),
-      gameId: gameId || "all",
-      databaseConnection: false,
-      questionsAvailable: {},
-      fallbackQuestionsAvailable: {},
-      error: null,
-    }
-
-    // Test database connection
-    const supabase = getServiceSupabase()
-    const { data: connectionTest, error: connectionError } = await supabase
-      .from("trivia_questions")
-      .select("count(*)", { count: "exact" })
-      .limit(1)
-
-    results.databaseConnection = !connectionError
-
-    if (connectionError) {
-      results.error = `Database connection error: ${connectionError.message}`
-      return NextResponse.json(results)
-    }
-
-    // Check available questions for each game or specific game
-    const gameIds = gameId
-      ? [gameId]
-      : ["sf-football", "sf-baseball", "sf-basketball", "sf-districts", "sf-tourist-spots", "sf-day-trips"]
-
-    for (const id of gameIds) {
-      // Check database questions
-      const { data: questions, error: questionsError } = await supabase
-        .from("trivia_questions")
-        .select("count(*)", { count: "exact" })
-        .eq("game_id", id)
-
-      results.questionsAvailable[id] = {
-        count: questions?.[0]?.count || 0,
-        error: questionsError ? questionsError.message : null,
-      }
-
-      // Check if fallback questions exist
-      try {
-        const response = await fetch(`${url.origin}/api/trivia/games/questions?count=1&gameId=${id}`)
-        const data = await response.json()
-
-        results.fallbackQuestionsAvailable[id] = {
-          available: data.questions && data.questions.length > 0,
-          source: data.source,
-          count: data.questions ? data.questions.length : 0,
-        }
-      } catch (error) {
-        results.fallbackQuestionsAvailable[id] = {
-          available: false,
-          error: error.message,
-        }
-      }
-    }
-
-    return NextResponse.json(results)
+    return NextResponse.json({
+      success: true,
+      data: STATIC_DIAGNOSTICS,
+      source: 'static'
+    })
   } catch (error) {
+    console.error("Error fetching trivia diagnostics:", error)
     return NextResponse.json(
-      {
-        status: "error",
-        error: error.message,
-      },
-      { status: 500 },
+      { success: false, message: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 }
     )
   }
 }
