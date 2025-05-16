@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-clients"
 
+export const dynamic = 'force-dynamic';
+
 // Update the GET handler to use the correct column names
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
@@ -79,10 +81,7 @@ export async function POST(request: Request, { params }: { params: { id: string 
     }
 
     // Prepare update data
-    const updateData: { participation_count?: number;
-export const dynamic = 'force-dynamic';
-
- has_applied?: boolean } = {}
+    const updateData: { participation_count?: number; has_applied?: boolean } = {}
 
     if (participationPoints !== undefined) {
       updateData.participation_count = (user?.participation_count || 0) + participationPoints
