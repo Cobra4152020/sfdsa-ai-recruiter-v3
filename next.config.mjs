@@ -27,12 +27,8 @@ const nextConfig = {
     unoptimized: true,
   },
   experimental: {
-    serverActions: true,
-  },
-  // Configure output for Vercel deployment
-  output: 'standalone',
-  // Disable client reference manifest generation
-  generateClientManifest: false,
-};
+    serverActions: true
+  }
+}
 
 export default nextConfig;
