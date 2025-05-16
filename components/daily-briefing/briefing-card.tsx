@@ -11,14 +11,23 @@ import { useToast } from "@/components/ui/use-toast"
 import { motion } from "framer-motion"
 
 interface BriefingCardProps {
-  briefing?: any
+  briefing?: {
+    id: string
+    title: string
+    content: string
+    theme: string
+    date: string
+    created_at: string
+    cycle_day?: number
+    keyPoints?: string[]
+  }
 }
 
 export function BriefingCard({ briefing }: BriefingCardProps) {
   const [isAttended, setIsAttended] = useState(false)
   const [isShareOpen, setIsShareOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { isLoggedIn } = useUser()
+  const { currentUser } = useUser()
   const { toast } = useToast()
 
   // Ensure we have valid data to display
@@ -86,7 +95,7 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
 
   // Handle share button click
   const handleShare = () => {
-    if (isLoggedIn) {
+    if (currentUser) {
       setIsShareOpen(true)
     } else {
       toast({
@@ -155,17 +164,24 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
       <Card className="h-full shadow-lg border-t-4 border-t-[#0A3C1F] dark:border-t-[#FFD700]">
         <CardHeader className="pb-2">
           <div className="flex justify-between items-start">
-            <CardTitle className="text-2xl">{validBriefing.title || "Daily Briefing"}</CardTitle>
-            <Badge variant="outline" className="ml-2 bg-[#0A3C1F]/10 text-[#0A3C1F] border-[#0A3C1F]/20">
-              {validBriefing.theme || "General"}
-            </Badge>
+            <CardTitle className="text-2xl">{validBriefing?.title || "Daily Briefing"}</CardTitle>
+            <div className="flex items-center gap-2">
+              {validBriefing?.cycle_day && (
+                <Badge variant="outline" className="bg-[#0A3C1F]/5 text-[#0A3C1F] border-[#0A3C1F]/20">
+                  Day {validBriefing.cycle_day}/365
+                </Badge>
+              )}
+              <Badge variant="outline" className="bg-[#0A3C1F]/10 text-[#0A3C1F] border-[#0A3C1F]/20">
+                {validBriefing?.theme || "General"}
+              </Badge>
+            </div>
           </div>
           <div className="flex items-center text-sm text-muted-foreground mt-1">
             <Calendar className="h-4 w-4 mr-1" />
             <span>{formattedDate}</span>
             <Clock className="h-4 w-4 ml-4 mr-1" />
             <span>
-              {validBriefing.created_at
+              {validBriefing?.created_at
                 ? new Date(validBriefing.created_at).toLocaleTimeString("en-US", {
                     hour: "numeric",
                     minute: "numeric",

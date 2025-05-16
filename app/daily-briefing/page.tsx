@@ -1,63 +1,55 @@
 "use client"
 
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { BriefingCard } from "@/components/daily-briefing/briefing-card"
 import { BriefingStats } from "@/components/daily-briefing/briefing-stats"
 import { BriefingLeaderboard } from "@/components/daily-briefing/briefing-leaderboard"
-
-// Static briefing data for demo purposes
-const staticBriefing = {
-  id: "static-briefing",
-  title: "San Francisco Deputy Sheriff's Daily Briefing",
-  content: `
-    <h3>Today's Focus: Community Safety</h3>
-    <p>
-      Welcome to today's briefing. We continue our commitment to serving the San Francisco 
-      community with dedication and integrity.
-    </p>
-    
-    <h4>Safety Reminders:</h4>
-    <ul>
-      <li>Always be aware of your surroundings</li>
-      <li>Check your equipment before starting your shift</li>
-      <li>Report any safety concerns immediately</li>
-    </ul>
-    
-    <h4>Community Engagement:</h4>
-    <p>
-      Our presence in the community is vital for building trust and ensuring safety. 
-      Remember to engage positively with community members and be a visible presence 
-      in your assigned areas.
-    </p>
-    
-    <h4>Department Updates:</h4>
-    <p>
-      Regular training sessions continue next week. Please ensure all required documentation 
-      is completed properly and promptly.
-    </p>
-  `,
-  date: new Date().toISOString(),
-  location: "Department HQ",
-  keyPoints: [
-    "Always be aware of your surroundings",
-    "Check your equipment before starting your shift",
-    "Report any safety concerns immediately",
-    "Complete all required documentation promptly",
-  ],
-}
-
-// Static stats for demo purposes
-const staticStats = {
-  total_attendees: 42,
-  total_shares: 15,
-  user_attended: false,
-  user_shared: false,
-  user_platforms_shared: [],
-}
+import { useToast } from "@/components/ui/use-toast"
+import type { DailyBriefing, BriefingStats as BriefingStatsType } from "@/lib/daily-briefing-service"
 
 // Main page component
 export default function DailyBriefingPage() {
+  const [briefing, setBriefing] = useState<DailyBriefing | null>(null)
+  const [stats, setStats] = useState<BriefingStatsType>({
+    total_attendees: 0,
+    total_shares: 0,
+    user_attended: false,
+    user_shared: false,
+    user_platforms_shared: [],
+  })
+  const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
+
+  useEffect(() => {
+    const fetchBriefingData = async () => {
+      try {
+        setLoading(true)
+        // Fetch today's briefing
+        const response = await fetch('/api/daily-briefing/today')
+        const data = await response.json()
+
+        if (data.error) {
+          throw new Error(data.error)
+        }
+
+        setBriefing(data.briefing)
+        setStats(data.stats)
+      } catch (error) {
+        console.error('Error fetching briefing:', error)
+        toast({
+          title: "Error",
+          description: "Failed to load today's briefing. Please try again later.",
+          variant: "destructive",
+        })
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchBriefingData()
+  }, [toast])
+
   return (
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Daily Briefing</h1>
@@ -73,7 +65,11 @@ export default function DailyBriefingPage() {
             }
           >
             <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
-              <BriefingCard briefing={staticBriefing} />
+              {loading ? (
+                <div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>
+              ) : (
+                <BriefingCard briefing={briefing} />
+              )}
             </Suspense>
           </ErrorBoundary>
         </div>
@@ -88,7 +84,11 @@ export default function DailyBriefingPage() {
             }
           >
             <Suspense fallback={<div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>}>
-              <BriefingStats stats={staticStats} userStreak={0} />
+              {loading ? (
+                <div className="h-32 bg-gray-100 animate-pulse rounded-lg"></div>
+              ) : (
+                <BriefingStats stats={stats} userStreak={briefing?.userStreak || 0} />
+              )}
             </Suspense>
           </ErrorBoundary>
 

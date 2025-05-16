@@ -1,10 +1,9 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase-clients"
-import { getBriefingStats } from "@/lib/daily-briefing-service"
+import { getBriefingStats, updateBriefingCycle, calculateCycleDay } from "@/lib/daily-briefing-service"
 
 // Fallback briefing data
 const fallbackBriefing = {
@@ -47,10 +46,17 @@ export async function GET(request: Request) {
     const supabase = createClient()
 
     // Get today's date in YYYY-MM-DD format
-    const today = new Date().toISOString().split("T")[0]
+    const today = new Date()
+    const todayStr = today.toISOString().split("T")[0]
+
+    // Check if we need to update the cycle
+    await updateBriefingCycle()
+
+    // Calculate the current cycle day
+    const cycleDay = calculateCycleDay(today)
 
     // Query the daily_briefings table for today's briefing
-    const { data, error } = await supabase.from("daily_briefings").select("*").eq("date", today).single()
+    const { data, error } = await supabase.from("daily_briefings").select("*").eq("date", todayStr).single()
 
     if (error) {
       console.error("Error fetching today's briefing:", error)
@@ -65,14 +71,17 @@ export async function GET(request: Request) {
 
       if (recentError) {
         console.error("Error fetching recent briefing:", recentError)
-        return NextResponse.json({ briefing: fallbackBriefing, error: "Failed to load briefing from database" })
+        return NextResponse.json({ 
+          briefing: { ...fallbackBriefing, cycle_day: cycleDay }, 
+          error: "Failed to load briefing from database" 
+        })
       }
 
       // Get stats for the briefing
       const stats = await getBriefingStats(recentData.id)
 
       return NextResponse.json({
-        briefing: { ...recentData, userStreak: 0 },
+        briefing: { ...recentData, userStreak: 0, cycle_day: cycleDay },
         stats,
         error: null,
       })
@@ -82,14 +91,15 @@ export async function GET(request: Request) {
     const stats = await getBriefingStats(data.id)
 
     return NextResponse.json({
-      briefing: { ...data, userStreak: 0 },
+      briefing: { ...data, userStreak: 0, cycle_day: cycleDay },
       stats,
       error: null,
     })
   } catch (error) {
     console.error("Exception in GET /api/daily-briefing/today:", error)
+    const today = new Date()
     return NextResponse.json({
-      briefing: fallbackBriefing,
+      briefing: { ...fallbackBriefing, cycle_day: calculateCycleDay(today) },
       error: "An unexpected error occurred",
     })
   }

@@ -3,6 +3,36 @@ import { getServiceSupabase } from "@/lib/supabase-service"
 import { NFT_AWARD_TIERS } from "@/lib/nft-utils"
 import { generateUserStaticParams } from "@/lib/static-params"
 
+// Helper function to validate UUID format
+function isValidUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+  return uuidRegex.test(str)
+}
+
+// Helper function to ensure valid UUID
+function ensureValidUUID(id: string): string {
+  if (isValidUUID(id)) {
+    return id
+  }
+  // For non-UUID strings, generate a deterministic UUID using the string
+  const encoder = new TextEncoder()
+  const data = encoder.encode(id)
+  let hash = 0
+  for (let i = 0; i < data.length; i++) {
+    hash = ((hash << 5) - hash) + data[i]
+    hash = hash & hash // Convert to 32-bit integer
+  }
+  return `00000000-0000-4000-8000-${hash.toString(16).padStart(12, '0')}`
+}
+
+interface NFTAwardRecord {
+  nft_award_id: string
+  token_id: string
+  contract_address: string
+  awarded_at: string
+  points_at_award: number
+}
+
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
@@ -13,7 +43,7 @@ export async function generateStaticParams() {
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {
-    const userId = params.id
+    const userId = ensureValidUUID(params.id)
 
     if (!userId) {
       return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
@@ -34,7 +64,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
     }
 
     // Format the awards
-    const awards = data.map((item) => {
+    const awards = (data as NFTAwardRecord[]).map((item) => {
       const awardDetails = NFT_AWARD_TIERS.find((award) => award.id === item.nft_award_id)
 
       return {
@@ -67,7 +97,7 @@ export async function GET(request: Request, { params }: { params: { id: string }
 
     // Get next available award
     const currentPoints = user?.participation_count || 0
-    const earnedThresholds = data.map((item) => {
+    const earnedThresholds = (data as NFTAwardRecord[]).map((item) => {
       const award = NFT_AWARD_TIERS.find((a) => a.id === item.nft_award_id)
       return award?.pointThreshold || 0
     })

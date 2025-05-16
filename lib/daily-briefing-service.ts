@@ -8,6 +8,8 @@ export interface DailyBriefing {
   theme: string
   title: string
   created_at: string
+  userStreak?: number
+  cycle_day?: number
 }
 
 export interface BriefingAttendance {
@@ -265,5 +267,69 @@ export async function getBriefingStats(briefingId: string, userId?: string): Pro
       user_shared: false,
       user_platforms_shared: [],
     }
+  }
+}
+
+/**
+ * Calculate the day number (1-365) for a given date within the current cycle
+ */
+export function calculateCycleDay(date: Date): number {
+  const startOfYear = new Date(date.getFullYear(), 0, 1)
+  const dayOfYear = Math.floor((date.getTime() - startOfYear.getTime()) / (24 * 60 * 60 * 1000)) + 1
+  return ((dayOfYear - 1) % 365) + 1
+}
+
+/**
+ * Update briefing dates for the next cycle
+ */
+export async function updateBriefingCycle(): Promise<boolean> {
+  try {
+    const supabase = createClient()
+    const today = new Date()
+    const cycleDay = calculateCycleDay(today)
+
+    // If we're not at day 365, no need to update
+    if (cycleDay !== 365) {
+      return true
+    }
+
+    // Get all briefings ordered by their original dates
+    const { data: briefings, error: fetchError } = await supabase
+      .from("daily_briefings")
+      .select("*")
+      .order("date", { ascending: true })
+
+    if (fetchError) {
+      console.error("Error fetching briefings:", fetchError)
+      return false
+    }
+
+    // Calculate the start date for the new cycle (tomorrow)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    // Update each briefing with a new date
+    for (let i = 0; i < briefings.length; i++) {
+      const newDate = new Date(tomorrow)
+      newDate.setDate(newDate.getDate() + i)
+      
+      const { error: updateError } = await supabase
+        .from("daily_briefings")
+        .update({ 
+          date: newDate.toISOString().split("T")[0],
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", briefings[i].id)
+
+      if (updateError) {
+        console.error(`Error updating briefing ${briefings[i].id}:`, updateError)
+        return false
+      }
+    }
+
+    return true
+  } catch (error) {
+    console.error("Exception in updateBriefingCycle:", error)
+    return false
   }
 }

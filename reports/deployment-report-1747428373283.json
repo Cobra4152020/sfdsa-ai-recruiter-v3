@@ -1,0 +1,11 @@
+{
+  "timestamp": "2025-05-16T20:46:13.282Z",
+  "environment": "unknown",
+  "buildId": "unknown",
+  "features": {
+    "leaderboard": false,
+    "badges": false,
+    "points": false,
+    "debug": false
+  }
+}
