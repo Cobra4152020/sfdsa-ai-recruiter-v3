@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import type { ReactNode, JSX } from "react"
 import Link from "next/link"
 import type { Route } from "next"
@@ -45,12 +45,26 @@ interface DropdownNavProps {
 
 function DropdownNav({ label, icon, items }: DropdownNavProps): JSX.Element {
   const [isOpen, setIsOpen] = useState(false)
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    setIsOpen(true)
+  }
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setIsOpen(false)
+    }, 150) // Small delay to allow moving to dropdown content
+  }
 
   return (
     <div 
       className="relative group"
-      onMouseEnter={() => setIsOpen(true)}
-      onMouseLeave={() => setIsOpen(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <button 
         className="flex items-center text-white hover:text-[#FFD700] py-2 transition-all duration-200 group"
@@ -64,8 +78,8 @@ function DropdownNav({ label, icon, items }: DropdownNavProps): JSX.Element {
       {isOpen && (
         <div
           className="absolute left-0 mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden z-50 border border-gray-100 dark:border-gray-700"
-          onMouseEnter={() => setIsOpen(true)}
-          onMouseLeave={() => setIsOpen(false)}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           {items.map((item) => (
             <Link 

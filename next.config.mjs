@@ -14,6 +14,7 @@ try {
 const nextConfig = {
   basePath: process.env.GITHUB_ACTIONS ? '/sfdsa-ai-recruiter-v3' : '', // Set base path for GitHub Pages
   reactStrictMode: true,
+  output: 'export', // Enable static exports
   typescript: {
     // Temporarily ignore TypeScript errors during build
     ignoreBuildErrors: true,
@@ -23,6 +24,7 @@ const nextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
+    unoptimized: true, // Required for static export
     domains: [
       'fonts.googleapis.com', 
       'fonts.gstatic.com',

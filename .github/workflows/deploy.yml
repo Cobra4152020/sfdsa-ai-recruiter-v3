@@ -3,7 +3,7 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Set your default branch here
+      - main
   workflow_dispatch:
 
 permissions:
@@ -35,10 +35,13 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: /sfdsa-ai-recruiter-v3
       
+      - name: Create .nojekyll file
+        run: touch ./out/.nojekyll
+      
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: .next/server
+          path: out
 
   deploy:
     environment:
