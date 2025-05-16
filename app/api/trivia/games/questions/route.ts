@@ -25,7 +25,7 @@ const STATIC_QUESTIONS: Record<GameId, Question[]> = {
       options: ["49ers", "Raiders", "Giants", "Warriors"],
       correctAnswer: "49ers",
       explanation: "The San Francisco 49ers are the NFL team based in San Francisco.",
-      difficulty: "easy",
+    difficulty: "easy",
       category: "Sports"
     }
   ],
@@ -37,7 +37,7 @@ const STATIC_QUESTIONS: Record<GameId, Question[]> = {
       options: ["Giants", "Athletics", "Dodgers", "Padres"],
       correctAnswer: "Giants",
       explanation: "The San Francisco Giants play their home games at Oracle Park.",
-      difficulty: "easy",
+    difficulty: "easy",
       category: "Sports"
     }
   ],
@@ -49,7 +49,7 @@ const STATIC_QUESTIONS: Record<GameId, Question[]> = {
       options: ["Warriors", "Kings", "Lakers", "Clippers"],
       correctAnswer: "Warriors",
       explanation: "The Golden State Warriors moved from Oakland to the Chase Center in San Francisco.",
-      difficulty: "easy",
+    difficulty: "easy",
       category: "Sports"
     }
   ],
@@ -61,7 +61,7 @@ const STATIC_QUESTIONS: Record<GameId, Question[]> = {
       options: ["North Beach", "Mission", "Castro", "Haight"],
       correctAnswer: "North Beach",
       explanation: "North Beach is San Francisco's Little Italy, known for its Italian restaurants and cafes.",
-      difficulty: "easy",
+    difficulty: "easy",
       category: "Geography"
     }
   ],
@@ -73,7 +73,7 @@ const STATIC_QUESTIONS: Record<GameId, Question[]> = {
       options: ["Alcatraz Federal Penitentiary", "San Quentin", "Folsom Prison", "Pelican Bay"],
       correctAnswer: "Alcatraz Federal Penitentiary",
       explanation: "Alcatraz Federal Penitentiary was a maximum security federal prison on Alcatraz Island.",
-      difficulty: "easy",
+    difficulty: "easy",
       category: "History"
     }
   ],
@@ -85,7 +85,7 @@ const STATIC_QUESTIONS: Record<GameId, Question[]> = {
       options: ["Napa Valley", "Sonoma Valley", "Both A and B", "Neither"],
       correctAnswer: "Both A and B",
       explanation: "Both Napa Valley and Sonoma Valley are famous wine regions north of San Francisco.",
-      difficulty: "easy",
+    difficulty: "easy",
       category: "Geography"
     }
   ]
