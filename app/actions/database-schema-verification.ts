@@ -1,0 +1,153 @@
+"use server"
+
+import { revalidatePath } from "next/cache"
+import {
+  verifyDatabaseSchema,
+  fixDatabaseSchemaIssues,
+  fixTableIssues,
+  type SchemaIssue,
+} from "@/lib/schema-verification"
+
+/**
+ * Verifies the database schema
+ */
+export async function verifySchema() {
+  try {
+    const result = await verifyDatabaseSchema()
+    return result
+  } catch (error) {
+    console.error("Error in verifySchema action:", error)
+    return {
+      tables: [],
+      globalIssues: [
+        {
+          type: "other" as const,
+          description: `Server action error: ${error instanceof Error ? error.message : String(error)}`,
+          severity: "high" as const,
+        },
+      ],
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    }
+  }
+}
+
+/**
+ * Fixes all database schema issues
+ */
+export async function fixAllIssues() {
+  try {
+    const verificationResult = await verifyDatabaseSchema()
+
+    // Collect all issues
+    const allIssues: SchemaIssue[] = [
+      ...verificationResult.globalIssues,
+      ...verificationResult.tables.flatMap((table) => table.issues),
+    ]
+
+    // Fix issues
+    const result = await fixDatabaseSchemaIssues(allIssues)
+
+    // Revalidate paths
+    revalidatePath("/admin/database-schema")
+    revalidatePath("/admin/database-health")
+
+    return result
+  } catch (error) {
+    console.error("Error in fixAllIssues action:", error)
+    return {
+      success: false,
+      fixed: [],
+      error: error instanceof Error ? error.message : String(error),
+    }
+  }
+}
+
+/**
+ * Fixes issues for a specific table
+ */
+export async function fixTableIssuesAction(tableName: string) {
+  try {
+    const result = await fixTableIssues(tableName)
+
+    // Revalidate paths
+    revalidatePath("/admin/database-schema")
+    revalidatePath("/admin/database-health")
+
+    return result
+  } catch (error) {
+    console.error(`Error in fixTableIssues action for table ${tableName}:`, error)
+    return {
+      success: false,
+      fixed: [],
+      error: error instanceof Error ? error.message : String(error),
+    }
+  }
+}
+
+/**
+ * Fixes specific issues by their indices
+ */
+export async function fixSpecificIssues(issueIndices: number[]) {
+  try {
+    const verificationResult = await verifyDatabaseSchema()
+
+    // Collect all issues
+    const allIssues: SchemaIssue[] = [
+      ...verificationResult.globalIssues,
+      ...verificationResult.tables.flatMap((table) => table.issues),
+    ]
+
+    // Filter issues by indices
+    const issuesToFix = issueIndices.map((index) => allIssues[index]).filter(Boolean)
+
+    // Fix issues
+    const result = await fixDatabaseSchemaIssues(issuesToFix)
+
+    // Revalidate paths
+    revalidatePath("/admin/database-schema")
+    revalidatePath("/admin/database-health")
+
+    return result
+  } catch (error) {
+    console.error("Error in fixSpecificIssues action:", error)
+    return {
+      success: false,
+      fixed: [],
+      error: error instanceof Error ? error.message : String(error),
+    }
+  }
+}
+
+/**
+ * Runs a custom SQL query to fix issues
+ */
+export async function runCustomFix(sql: string) {
+  try {
+    const { getServiceSupabase } = await import("@/lib/supabase-service")
+    const supabase = getServiceSupabase()
+
+    const { error } = await supabase.rpc("exec_sql", { sql_query: sql })
+
+    if (error) {
+      return {
+        success: false,
+        error: error.message,
+      }
+    }
+
+    // Revalidate paths
+    revalidatePath("/admin/database-schema")
+    revalidatePath("/admin/database-health")
+
+    return {
+      success: true,
+    }
+  } catch (error) {
+    console.error("Error in runCustomFix action:", error)
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    }
+  }
+}

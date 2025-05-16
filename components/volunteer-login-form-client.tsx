@@ -1,0 +1,162 @@
+"use client"
+
+import type React from "react"
+
+import { useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useToast } from "@/components/ui/use-toast"
+import { Mail, Lock, Eye, EyeOff, AlertCircle, InfoIcon } from "lucide-react"
+import { authService } from "@/lib/unified-auth-service"
+
+export function VolunteerLoginFormClient() {
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const needsConfirmation = searchParams.get("needsConfirmation") === "true"
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const { toast } = useToast()
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const result = await authService.signInWithPassword(email, password)
+
+      if (!result.success) {
+        throw new Error(result.message)
+      }
+
+      // Verify this is a volunteer account
+      if (result.userType !== "volunteer") {
+        throw new Error("This account is not registered as a volunteer recruiter. Please use the regular login page.")
+      }
+
+      toast({
+        title: "Login successful",
+        description: `Welcome back${result.name ? ", " + result.name : ""}!`,
+      })
+
+      // Redirect to the volunteer dashboard or pending page
+      window.location.href = result.redirectUrl || "/volunteer-dashboard"
+    } catch (error) {
+      console.error("Login error:", error)
+      setError(error instanceof Error ? error.message : "Failed to sign in")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <>
+      {needsConfirmation && (
+        <Alert className="mb-6 bg-blue-50 border-blue-200">
+          <InfoIcon className="h-4 w-4 text-blue-600" />
+          <AlertDescription className="text-blue-700">
+            Please check your email to confirm your account before logging in. The confirmation link will expire in 24
+            hours.
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      <form onSubmit={handleLogin} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="pl-10"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Password</Label>
+            <Link href="/forgot-password" className="text-sm text-[#0A3C1F] hover:underline">
+              Forgot password?
+            </Link>
+          </div>
+          <div className="relative">
+            <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="pl-10 pr-10"
+              required
+            />
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1"
+              onClick={() => setShowPassword(!showPassword)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox id="remember" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(!!checked)} />
+          <Label htmlFor="remember" className="text-sm">
+            Remember me
+          </Label>
+        </div>
+
+        <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" disabled={isLoading}>
+          {isLoading ? (
+            <span className="flex items-center">
+              <span className="animate-spin mr-2">⟳</span>
+              Signing in...
+            </span>
+          ) : (
+            "Sign In"
+          )}
+        </Button>
+      </form>
+
+      <div className="text-center space-y-2 mt-4">
+        <p className="text-sm text-gray-600">
+          Don&apos;t have an account?{" "}
+          <Link href="/volunteer-register" className="text-[#0A3C1F] hover:underline font-medium">
+            Register as a Volunteer Recruiter
+          </Link>
+        </p>
+        <p className="text-sm text-gray-600">
+          <Link href="/resend-confirmation" className="text-[#0A3C1F] hover:underline">
+            Resend confirmation email
+          </Link>
+        </p>
+      </div>
+    </>
+  )
+}

@@ -1,0 +1,87 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Light mode - Sheriff green and tan */
+  --background: 48 33% 94%; /* Light tan */
+  --foreground: 142 69% 14%; /* Sheriff green */
+
+  --card: 48 33% 94%; /* Changed from white to light tan */
+  --card-foreground: 142 69% 14%;
+
+  --popover: 48 33% 94%; /* Changed from white to light tan */
+  --popover-foreground: 142 69% 14%;
+
+  --primary: 142 69% 14%; /* Sheriff green */
+  --primary-foreground: 48 33% 94%;
+
+  --secondary: 48 33% 94%; /* Light tan */
+  --secondary-foreground: 142 69% 14%;
+
+  --muted: 48 20% 88%;
+  --muted-foreground: 142 40% 30%;
+
+  --accent: 48 40% 85%; /* Darker tan */
+  --accent-foreground: 142 69% 14%;
+
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 48 33% 94%;
+
+  --border: 48 30% 80%;
+  --input: 48 30% 80%;
+  --ring: 142 69% 14%;
+
+  --radius: 0.5rem;
+}
+
+.dark {
+  /* Dark mode - Black and yellow */
+  --background: 0 0% 10%; /* Near black */
+  --foreground: 51 100% 50%; /* Gold/yellow */
+
+  --card: 0 0% 15%;
+  --card-foreground: 51 100% 50%;
+
+  --popover: 0 0% 15%;
+  --popover-foreground: 51 100% 50%;
+
+  --primary: 51 100% 50%; /* Gold/yellow */
+  --primary-foreground: 0 0% 10%;
+
+  --secondary: 0 0% 20%;
+  --secondary-foreground: 51 100% 50%;
+
+  --muted: 0 0% 25%;
+  --muted-foreground: 51 70% 70%;
+
+  --accent: 51 80% 45%; /* Darker gold */
+  --accent-foreground: 0 0% 10%;
+
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 51 100% 50%;
+
+  --border: 0 0% 25%;
+  --input: 0 0% 25%;
+  --ring: 51 100% 50%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground transition-colors duration-300;
+  }
+}
+
+@layer utilities {
+  .hide-scrollbar {
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+}
