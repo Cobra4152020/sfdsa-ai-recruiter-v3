@@ -52,6 +52,41 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_BASE_PATH: process.env.GITHUB_ACTIONS ? '/sfdsa-ai-recruiter-v3' : '',
   },
+  // Skip API route generation in static export
+  skipApiRoutes: true,
+  // Exclude API routes from static export
+  exportPathMap: async function() {
+    const paths = {
+      '/': { page: '/' },
+      '/404': { page: '/404' },
+    };
+    
+    // Add other static routes
+    const staticRoutes = [
+      '/mission-briefing',
+      '/daily-briefing',
+      '/mission-briefing/requirements',
+      '/mission-briefing/process',
+      '/badges',
+      '/nft-awards',
+      '/gamification',
+      '/trivia',
+      '/tiktok-challenges',
+      '/games',
+      '/chat-with-sgt-ken',
+      '/contact',
+      '/accessibility',
+      '/dashboard',
+      '/profile',
+      '/profile/settings'
+    ];
+
+    staticRoutes.forEach(route => {
+      paths[route] = { page: route };
+    });
+
+    return paths;
+  }
 };
 
 if (userConfig) {
