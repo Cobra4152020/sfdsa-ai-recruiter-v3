@@ -5,11 +5,19 @@ import { Button } from "@/components/ui/button"
 import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
 import { UserProvider } from "@/context/user-context"
+import { getAllBadgeIds } from "@/lib/badge-utils"
 
 interface UserBadgePageProps {
   params: {
     id: string
   }
+}
+
+export async function generateStaticParams() {
+  const badgeIds = await getAllBadgeIds()
+  return badgeIds.map((id) => ({
+    id: id,
+  }))
 }
 
 export async function generateMetadata({ params }: UserBadgePageProps): Promise<Metadata> {

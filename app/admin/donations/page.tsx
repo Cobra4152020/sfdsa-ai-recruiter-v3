@@ -1,72 +1,116 @@
-export const dynamic = "force-dynamic"
+"use client"
 
-import type { Metadata } from "next"
+import { useEffect, useState } from "react"
 import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { createServerClient } from "@/lib/supabase-server"
+import { createClient } from "@/lib/supabase-server"
 
-export const metadata: Metadata = {
-  title: "Donation Management | Admin Dashboard",
-  description: "Manage and track donations to the SF Deputy Sheriff's Association.",
+interface DonationStats {
+  total_amount: number
+  total_count: number
+  month_amount: number
+  month_count: number
+  recurring_amount: number
+  recurring_count: number
 }
 
-export default async function DonationsAdminPage() {
-  const supabase = createServerClient()
+interface Donation {
+  id: string
+  created_at: string
+  donor_name: string | null
+  donor_email: string | null
+  amount: number
+  status: string
+  subscription_id: string | null
+}
 
-  // Get recent donations
-  const { data: recentDonations, error: donationsError } = await supabase
-    .from("donations")
-    .select("*")
-    .order("created_at", { ascending: false })
-    .limit(10)
+interface DonationAmount {
+  amount: number | null
+}
 
-  // Get donation stats - using a safer approach that doesn't rely on RPC
-  const stats = {
+export default function DonationsAdminPage() {
+  const [stats, setStats] = useState<DonationStats>({
     total_amount: 0,
     total_count: 0,
     month_amount: 0,
     month_count: 0,
     recurring_amount: 0,
     recurring_count: 0,
-  }
+  })
+  const [recentDonations, setRecentDonations] = useState<Donation[]>([])
+  const [donationsError, setDonationsError] = useState<Error | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
-  try {
-    // Get total stats
-    const { data: totalStats } = await supabase.from("donations").select("amount").eq("status", "completed")
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const supabase = createClient()
 
-    if (totalStats) {
-      stats.total_count = totalStats.length
-      stats.total_amount = totalStats.reduce((sum, donation) => sum + (donation.amount || 0), 0)
+        // Get recent donations
+        const { data: donations, error } = await supabase
+          .from("donations")
+          .select("*")
+          .order("created_at", { ascending: false })
+          .limit(10)
+
+        if (error) throw error
+        setRecentDonations(donations || [])
+
+        // Get total stats
+        const { data: totalStats } = await supabase.from("donations").select("amount").eq("status", "completed")
+
+        const newStats = { ...stats }
+
+        if (totalStats) {
+          newStats.total_count = totalStats.length
+          newStats.total_amount = totalStats.reduce((sum: number, donation: DonationAmount) => sum + (donation.amount || 0), 0)
+        }
+
+        // Get this month's stats
+        const now = new Date()
+        const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
+        const { data: monthStats } = await supabase
+          .from("donations")
+          .select("amount")
+          .eq("status", "completed")
+          .gte("created_at", firstDayOfMonth)
+
+        if (monthStats) {
+          newStats.month_count = monthStats.length
+          newStats.month_amount = monthStats.reduce((sum: number, donation: DonationAmount) => sum + (donation.amount || 0), 0)
+        }
+
+        // Get recurring stats
+        const { data: recurringStats } = await supabase
+          .from("donations")
+          .select("amount")
+          .not("subscription_id", "is", null)
+          .eq("status", "active")
+
+        if (recurringStats) {
+          newStats.recurring_count = recurringStats.length
+          newStats.recurring_amount = recurringStats.reduce((sum: number, donation: DonationAmount) => sum + (donation.amount || 0), 0)
+        }
+
+        setStats(newStats)
+      } catch (error) {
+        console.error("Error fetching donation data:", error)
+        setDonationsError(error instanceof Error ? error : new Error("Failed to fetch donation data"))
+      } finally {
+        setIsLoading(false)
+      }
     }
 
-    // Get this month's stats
-    const now = new Date()
-    const firstDayOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
-    const { data: monthStats } = await supabase
-      .from("donations")
-      .select("amount")
-      .eq("status", "completed")
-      .gte("created_at", firstDayOfMonth)
+    fetchData()
+  }, [])
 
-    if (monthStats) {
-      stats.month_count = monthStats.length
-      stats.month_amount = monthStats.reduce((sum, donation) => sum + (donation.amount || 0), 0)
-    }
-
-    // Get recurring stats
-    const { data: recurringStats } = await supabase
-      .from("donations")
-      .select("amount")
-      .not("subscription_id", "is", null)
-      .eq("status", "active")
-
-    if (recurringStats) {
-      stats.recurring_count = recurringStats.length
-      stats.recurring_amount = recurringStats.reduce((sum, donation) => sum + (donation.amount || 0), 0)
-    }
-  } catch (error) {
-    console.error("Error fetching donation stats:", error)
+  if (isLoading) {
+    return (
+      <div className="container py-10">
+        <div className="text-center">Loading...</div>
+      </div>
+    )
   }
 
   return (

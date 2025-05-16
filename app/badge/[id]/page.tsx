@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
 import { UserProvider } from "@/context/user-context"
-import { getBadgeById } from "@/lib/badge-utils"
+import { getBadgeById, getAllBadgeIds } from "@/lib/badge-utils"
 
 interface BadgePageProps {
   params: {
@@ -44,6 +44,13 @@ export async function generateMetadata({ params }: BadgePageProps): Promise<Meta
       images: [badge?.icon || "/generic-badge.png"],
     },
   }
+}
+
+export async function generateStaticParams() {
+  const badgeIds = await getAllBadgeIds()
+  return badgeIds.map((id) => ({
+    id: id,
+  }))
 }
 
 export default async function BadgePage({ params }: BadgePageProps) {

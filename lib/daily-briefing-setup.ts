@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "./supabase-server"
+import { createClient } from "./supabase-server"
 
 export interface DailyBriefing {
   id: string
@@ -12,7 +12,7 @@ export interface DailyBriefing {
 }
 
 export async function setupDailyBriefingsTable() {
-  const supabase = getServiceSupabase()
+  const supabase = createClient()
 
   try {
     // Check if the table exists
@@ -125,7 +125,7 @@ export async function setupDailyBriefingsTable() {
 }
 
 export async function addSampleBriefing() {
-  const supabase = getServiceSupabase()
+  const supabase = createClient()
 
   try {
     const today = new Date().toISOString().split("T")[0]

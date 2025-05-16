@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
-import { createServerClient } from "@/lib/supabase-server"
+import { createClient } from "@/lib/supabase-server"
 import { API_CACHE_HEADERS } from "@/lib/cache-utils"
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-static"
+export const revalidate = 3600 // Revalidate every hour
 
 interface TableCheckResult {
   table: string
@@ -11,10 +12,15 @@ interface TableCheckResult {
   responseTimeMs?: number
 }
 
+interface PermissionsCheck {
+  success: boolean
+  error: string | null
+}
+
 export async function GET() {
   const startTime = Date.now()
   try {
-    const supabase = createServerClient()
+    const supabase = createClient()
     const connectionTime = Date.now() - startTime
 
     // Test database connection with a simple query
@@ -66,7 +72,7 @@ export async function GET() {
     const missingTables = tableChecks.filter((check) => !check.exists)
 
     // Check permissions by attempting a write operation to a test table
-    let permissionsCheck = { success: true, error: null }
+    let permissionsCheck: PermissionsCheck = { success: true, error: null }
     try {
       // Try to insert and immediately delete a test record
       const testTable = "performance_metrics" // Using an existing table that should allow writes

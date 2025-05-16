@@ -1,5 +1,6 @@
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
 import { getRecruiterPoints, awardRecruiterPoints, RecruiterActivityType } from "@/lib/recruiter-rewards-service"

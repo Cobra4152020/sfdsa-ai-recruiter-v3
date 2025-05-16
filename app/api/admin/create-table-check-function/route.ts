@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-server"
+import { createClient } from "@/lib/supabase-server"
 
 export async function POST() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = createClient()
 
     // Create the check_table_exists function
     const { error } = await supabase.rpc("exec_sql", {
@@ -15,9 +15,6 @@ export async function POST() {
         AS $$
         DECLARE
           table_exists boolean;
-
-export const dynamic = 'force-dynamic';
-
         BEGIN
           SELECT EXISTS (
             SELECT FROM information_schema.tables 

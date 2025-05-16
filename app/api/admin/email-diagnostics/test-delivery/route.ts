@@ -18,7 +18,8 @@ export async function POST(request: Request) {
       subject: "Email Delivery Test",
       html: `
         <div style="font-family: Arial, sans-serif;
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour;
 
  padding: 20px; max-width: 600px; margin: 0 auto;">
           <h1 style="color: #0A3C1F;">Email Delivery Test</h1>

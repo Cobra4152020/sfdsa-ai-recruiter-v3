@@ -19,4 +19,5 @@ export async function POST(request: Request) {
 }
 
 // Support all HTTP methods
-export const dynamic = "force-dynamic"
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour

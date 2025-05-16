@@ -1,16 +1,19 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { createClient } from "@/lib/supabase-server"
 import { constructUrl } from "@/lib/url-utils"
 
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-static"
+export const revalidate = 3600 // Revalidate every hour
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const url = new URL(request.url)
+    const baseUrl = `${url.protocol}//${url.host}`
+
     const requiredEnvVars = [
       "RESEND_API_KEY",
       "NEXT_PUBLIC_SUPABASE_URL",
       "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-      "SUPABASE_SERVICE_ROLE_KEY",
     ]
 
     const missingVars = requiredEnvVars.filter((varName) => !process.env[varName])
@@ -21,13 +24,13 @@ export async function GET() {
         message: `Missing required environment variables: ${missingVars.join(", ")}`,
         details: {
           missingVars,
-          baseUrl: constructUrl(),
+          baseUrl,
         },
       })
     }
 
     // Check Supabase connection
-    const supabase = getServiceSupabase()
+    const supabase = createClient()
     const { error: supabaseError } = await supabase.from("users").select("id").limit(1)
 
     if (supabaseError) {
@@ -36,7 +39,7 @@ export async function GET() {
         message: "Supabase connection error",
         details: {
           error: supabaseError.message,
-          baseUrl: constructUrl(),
+          baseUrl,
         },
       })
     }
@@ -51,7 +54,7 @@ export async function GET() {
         message: "Resend API key is missing or invalid",
         details: {
           resendConfigured: isResendConfigured,
-          baseUrl: constructUrl(),
+          baseUrl,
         },
       })
     }
@@ -61,7 +64,7 @@ export async function GET() {
       success: true,
       message: "All email configurations are valid",
       details: {
-        baseUrl: constructUrl(),
+        baseUrl,
         supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
         resendConfigured: isResendConfigured,
       },

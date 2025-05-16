@@ -1,5 +1,6 @@
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour;
 
 import { type NextRequest, NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-service"

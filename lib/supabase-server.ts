@@ -1,115 +1,29 @@
 import { createClient as createSupabaseClient } from "@supabase/supabase-js"
-import { cookies } from "next/headers"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import type { Database } from "../types/database"
 
 /**
- * Creates a Supabase client for Server Components
- * This is the function expected by most of the application
+ * Creates a Supabase client that works with static exports
+ * This is the main client creation function used throughout the application
  */
-export function createServerClient() {
-  try {
-    // Try to get cookies, but handle the case when they're not available (static rendering)
-    let cookieStore
-    try {
-      cookieStore = cookies()
-    } catch (error) {
-      // If cookies() fails (during static rendering), fall back to direct client
-      console.warn("Cookies not available, falling back to direct client")
-      return getDirectClient()
-    }
+export function createClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
-    // First try to use the auth-helpers method
-    try {
-      return createServerComponentClient<Database>({ cookies: () => cookieStore })
-    } catch (error) {
-      console.warn("Failed to create server component client, falling back to direct client:", error)
-      return getDirectClient()
-    }
-  } catch (error) {
-    console.error("Error creating Supabase client:", error)
-    return getMockClient() // Return a mock client instead of throwing
-  }
-}
-
-// Helper function to create a direct client without cookies
-function getDirectClient() {
-  const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseKey = process.env.SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseKey) {
+  if (!supabaseUrl || !supabaseAnonKey) {
     console.warn("Missing Supabase environment variables, using mock client")
-    // Return a mock client that won't throw errors
     return getMockClient()
   }
 
-  return createSupabaseClient<Database>(supabaseUrl, supabaseKey, {
+  return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
     auth: {
-      persistSession: false,
-      autoRefreshToken: false,
+      persistSession: true,
+      autoRefreshToken: true,
     },
   })
 }
 
 // Export aliases for backward compatibility
-export const getServerClient = createServerClient
-export const createClient = createServerClient
-
-/**
- * Creates a Supabase client with service role privileges
- * This should only be used in server-side contexts
- */
-export const getServiceSupabase = () => {
-  try {
-    const supabaseUrl = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-
-    if (!supabaseUrl || !supabaseServiceKey) {
-      console.warn("Missing Supabase environment variables for service role, using mock client")
-      return getMockClient()
-    }
-
-    return createSupabaseClient<Database>(supabaseUrl, supabaseServiceKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-      },
-    })
-  } catch (error) {
-    console.error("Error creating service Supabase client:", error)
-    return getMockClient()
-  }
-}
-
-// Export aliases for backward compatibility
-export const getServerSupabase = getServiceSupabase
-export const getAdminSupabase = getServiceSupabase
-
-/**
- * Creates a Supabase client with anonymous privileges
- * This can be used in both client and server contexts
- */
-export const getAnonSupabase = () => {
-  try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseAnonKey) {
-      console.warn("Missing Supabase environment variables for anon client, using mock client")
-      return getMockClient()
-    }
-
-    return createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-      },
-    })
-  } catch (error) {
-    console.error("Error creating anon Supabase client:", error)
-    return getMockClient()
-  }
-}
+export const getServerClient = createClient
 
 /**
  * Returns a mock Supabase client that won't throw errors

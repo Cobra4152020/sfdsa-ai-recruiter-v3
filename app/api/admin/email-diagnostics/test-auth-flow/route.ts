@@ -2,7 +2,8 @@ import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-clients"
 import { constructUrl } from "@/lib/url-utils"
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour;
 
 export async function GET() {
   try {

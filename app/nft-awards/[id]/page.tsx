@@ -7,6 +7,12 @@ import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
 import { UserProvider } from "@/context/user-context"
 
+export async function generateStaticParams() {
+  return NFT_AWARD_TIERS.map((award) => ({
+    id: award.id,
+  }))
+}
+
 export default function NFTAwardPage({ params }: { params: { id: string } }) {
   const awardId = params.id
   const award = NFT_AWARD_TIERS.find((award) => award.id === awardId)

@@ -1,8 +1,5 @@
-
-export const dynamic = 'force-dynamic';
-
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { createClient } from "@/lib/supabase-server"
 import { diagnoseUserAuth } from "@/lib/auth-diagnostic"
 
 export async function POST(request: Request) {
@@ -19,7 +16,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = getServiceSupabase()
+    const supabase = createClient()
     const diagnostic = await diagnoseUserAuth(email)
     const fixes: string[] = []
 

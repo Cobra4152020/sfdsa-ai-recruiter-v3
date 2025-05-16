@@ -1,7 +1,14 @@
 import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-clients"
+import { generateUserStaticParams } from "@/lib/static-params"
 
-export const dynamic = 'force-dynamic';
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour;
+
+export async function generateStaticParams() {
+  // Add dummy params for testing
+  return [{ id: "user1" }, { id: "user2" }, { id: "user3" }]
+}
 
 // Update the GET handler to use the correct column names
 export async function GET(request: Request, { params }: { params: { id: string } }) {
@@ -12,39 +19,29 @@ export async function GET(request: Request, { params }: { params: { id: string }
       return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
     }
 
-    const serviceClient = getServiceSupabase()
+    const supabase = getServiceSupabase()
 
-    // Get user data
-    const { data: user, error: userError } = await serviceClient
-      .from("users")
-      .select("participation_count, has_applied")
-      .eq("id", userId)
-      .single()
-
-    if (userError) {
-      console.error("Error fetching user data:", userError)
-      return NextResponse.json({ success: false, message: "Failed to fetch user data" }, { status: 500 })
-    }
-
-    // Count badges
-    const { count: badgeCount, error: countError } = await serviceClient
+    // Get user's badges
+    const { data: badges, error } = await supabase
       .from("badges")
-      .select("id", { count: "exact", head: true })
+      .select("badge_type")
       .eq("user_id", userId)
 
-    if (countError) {
-      console.error("Error counting badges:", countError)
-      return NextResponse.json({ success: false, message: "Failed to count badges" }, { status: 500 })
+    if (error) {
+      console.error("Error fetching user badges:", error)
+      return NextResponse.json({ success: false, message: "Failed to fetch badges" }, { status: 500 })
     }
 
-    return NextResponse.json({
-      success: true,
-      stats: {
-        participationCount: user?.participation_count || 0,
-        hasApplied: user?.has_applied || false,
-        badgeCount: badgeCount || 0,
-      },
-    })
+    // Calculate badge stats
+    const stats = {
+      total: badges.length,
+      byType: badges.reduce((acc: Record<string, number>, badge) => {
+        acc[badge.badge_type] = (acc[badge.badge_type] || 0) + 1
+        return acc
+      }, {}),
+    }
+
+    return NextResponse.json({ success: true, stats })
   } catch (error) {
     console.error("Unexpected error:", error)
     return NextResponse.json({ success: false, message: "An unexpected error occurred" }, { status: 500 })

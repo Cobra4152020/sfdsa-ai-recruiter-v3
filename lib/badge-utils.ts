@@ -340,3 +340,77 @@ export async function assignBadgeToUser(userId: string, badgeId: string) {
     return { success: false, error }
   }
 }
+
+// Get all available badge IDs
+export async function getAllBadgeIds(): Promise<string[]> {
+  // Get all predefined badges
+  const allBadges: Badge[] = [
+    // Application badges
+    {
+      id: "written",
+      name: "Written Test",
+      description: "Completed written test preparation",
+      category: "application",
+      color: "bg-blue-500",
+      icon: "/placeholder.svg?key=t6kke",
+    },
+    {
+      id: "oral",
+      name: "Oral Board",
+      description: "Prepared for oral board interviews",
+      category: "application",
+      color: "bg-green-700",
+      icon: "/placeholder.svg?key=409vx",
+    },
+    {
+      id: "physical",
+      name: "Physical Test",
+      description: "Completed physical test preparation",
+      category: "application",
+      color: "bg-blue-700",
+      icon: "/placeholder.svg?key=j0utq",
+    },
+    {
+      id: "polygraph",
+      name: "Polygraph",
+      description: "Learned about the polygraph process",
+      category: "application",
+      color: "bg-teal-500",
+      icon: "/placeholder.svg?key=4jay9",
+    },
+    {
+      id: "psychological",
+      name: "Psychological",
+      description: "Prepared for psychological evaluation",
+      category: "application",
+      color: "bg-purple-600",
+      icon: "/placeholder.svg?key=237g2",
+    },
+    {
+      id: "full-process",
+      name: "Full Process",
+      description: "Completed all preparation areas",
+      category: "application",
+      color: "bg-[#0A3C1F]",
+      icon: "/placeholder.svg?key=n3str",
+    },
+  ]
+
+  // Get IDs from predefined badges
+  const predefinedIds = allBadges.map(badge => badge.id)
+
+  // Get IDs from database
+  try {
+    const { data, error } = await supabase.from("badges").select("id")
+    if (error) throw error
+
+    const dbIds = data.map(badge => badge.id)
+
+    // Combine and deduplicate IDs
+    return [...new Set([...predefinedIds, ...dbIds])]
+  } catch (error) {
+    console.error("Error fetching badge IDs from database:", error)
+    // Return just predefined IDs if database fetch fails
+    return predefinedIds
+  }
+}

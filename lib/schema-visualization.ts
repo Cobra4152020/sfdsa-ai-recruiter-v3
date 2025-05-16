@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "./supabase-service"
+import { createClient } from "./supabase-server"
 
 export type TableSchema = {
   name: string
@@ -34,7 +34,7 @@ export type DatabaseSchema = {
  */
 export async function fetchDatabaseSchema(): Promise<DatabaseSchema> {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = createClient()
 
     // Get all tables in the public schema
     const { data: tables, error: tablesError } = await supabase.rpc("exec_sql", {

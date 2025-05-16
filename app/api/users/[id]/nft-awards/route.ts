@@ -1,9 +1,15 @@
-
-export const dynamic = 'force-dynamic';
-
 import { NextResponse } from "next/server"
 import { getServiceSupabase } from "@/lib/supabase-service"
 import { NFT_AWARD_TIERS } from "@/lib/nft-utils"
+import { generateUserStaticParams } from "@/lib/static-params"
+
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour;
+
+export async function generateStaticParams() {
+  // Add dummy params for testing
+  return [{ id: "user1" }, { id: "user2" }, { id: "user3" }]
+}
 
 export async function GET(request: Request, { params }: { params: { id: string } }) {
   try {

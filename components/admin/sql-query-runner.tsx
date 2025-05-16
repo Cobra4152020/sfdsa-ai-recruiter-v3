@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CheckCircle, AlertCircle, Database, Play, Save, Trash } from "lucide-react"
-import { runSqlQuery } from "@/app/actions/run-sql-query"
+import { runSqlQuery } from "@/lib/actions/run-sql-query"
 import { Input } from "@/components/ui/input"
 
 export function SqlQueryRunner() {

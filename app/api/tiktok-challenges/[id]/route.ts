@@ -1,9 +1,15 @@
-
-export const dynamic = 'force-dynamic';
-
 import { NextResponse } from "next/server"
 import { TikTokChallengeService } from "@/lib/tiktok-challenge-service"
 import { verifyAdminAccess } from "@/lib/user-management-service"
+import { generateTikTokChallengeStaticParams } from "@/lib/static-params"
+
+export const dynamic = 'force-static';
+export const revalidate = 3600; // Revalidate every hour;
+
+export async function generateStaticParams() {
+  // Add dummy params for testing
+  return [{ id: "1" }, { id: "2" }, { id: "3" }]
+}
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
