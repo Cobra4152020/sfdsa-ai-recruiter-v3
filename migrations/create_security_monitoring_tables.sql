@@ -1,176 +1,160 @@
--- Create security events table
-CREATE TABLE IF NOT EXISTS security_events (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  type TEXT NOT NULL CHECK (type IN ('login_attempt', 'api_access', 'admin_action', 'data_modification')),
-  severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
-  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  ip_address TEXT NOT NULL,
-  user_agent TEXT,
-  details JSONB NOT NULL DEFAULT '{}'::jsonb,
-  timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+-- Create security monitoring tables
+CREATE TABLE IF NOT EXISTS public.security_events (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type TEXT NOT NULL CHECK (type IN ('login_attempt', 'api_access', 'admin_action', 'data_modification')),
+    severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    ip_address TEXT NOT NULL,
+    user_agent TEXT,
+    details JSONB NOT NULL DEFAULT '{}',
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
--- Create security alerts table
-CREATE TABLE IF NOT EXISTS security_alerts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  event_id UUID REFERENCES security_events(id) ON DELETE SET NULL,
-  type TEXT NOT NULL,
-  message TEXT NOT NULL,
-  severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
-  timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
-  resolved BOOLEAN NOT NULL DEFAULT false,
-  resolved_at TIMESTAMP WITH TIME ZONE,
-  resolved_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  resolution_notes TEXT
+CREATE TABLE IF NOT EXISTS public.security_alerts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    event_id UUID REFERENCES public.security_events(id) ON DELETE CASCADE,
+    type TEXT NOT NULL,
+    message TEXT NOT NULL,
+    severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    metadata JSONB NOT NULL DEFAULT '{}',
+    timestamp TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ,
+    resolved_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
 
--- Create blocked IPs table
-CREATE TABLE IF NOT EXISTS blocked_ips (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  ip_address TEXT NOT NULL,
-  blocked_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  expires_at TIMESTAMP WITH TIME ZONE,
-  reason TEXT NOT NULL,
-  blocked_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  unblocked_at TIMESTAMP WITH TIME ZONE,
-  unblocked_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+CREATE TABLE IF NOT EXISTS public.blocked_ips (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ip_address TEXT NOT NULL UNIQUE,
+    reason TEXT NOT NULL,
+    blocked_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    blocked_until TIMESTAMPTZ,
+    blocked_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
 
--- Create monitored IPs table
-CREATE TABLE IF NOT EXISTS monitored_ips (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  ip_address TEXT NOT NULL,
-  monitoring_level TEXT NOT NULL CHECK (monitoring_level IN ('low', 'medium', 'high')),
-  started_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  ends_at TIMESTAMP WITH TIME ZONE,
-  reason TEXT,
-  added_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+CREATE TABLE IF NOT EXISTS public.monitored_ips (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ip_address TEXT NOT NULL UNIQUE,
+    reason TEXT NOT NULL,
+    monitoring_started_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    monitoring_level TEXT NOT NULL CHECK (monitoring_level IN ('low', 'medium', 'high')),
+    added_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
 
--- Create security notifications table
-CREATE TABLE IF NOT EXISTS security_notifications (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  alert_id UUID NOT NULL REFERENCES security_alerts(id) ON DELETE CASCADE,
-  severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
-  message TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  notified_at TIMESTAMP WITH TIME ZONE,
-  acknowledged_at TIMESTAMP WITH TIME ZONE,
-  acknowledged_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
+CREATE TABLE IF NOT EXISTS public.security_notifications (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    alert_id UUID REFERENCES public.security_alerts(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    sent_at TIMESTAMPTZ,
+    acknowledged_at TIMESTAMPTZ,
+    acknowledged_by UUID REFERENCES auth.users(id) ON DELETE SET NULL
 );
 
--- Create security review queue table
-CREATE TABLE IF NOT EXISTS security_review_queue (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  alert_id UUID NOT NULL REFERENCES security_alerts(id) ON DELETE CASCADE,
-  severity TEXT NOT NULL CHECK (severity IN ('low', 'medium', 'high', 'critical')),
-  message TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-  assigned_to UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  assigned_at TIMESTAMP WITH TIME ZONE,
-  reviewed_at TIMESTAMP WITH TIME ZONE,
-  reviewed_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
-  review_notes TEXT,
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'in_progress', 'reviewed', 'escalated'))
+CREATE TABLE IF NOT EXISTS public.security_review_queue (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    alert_id UUID REFERENCES public.security_alerts(id) ON DELETE CASCADE,
+    priority TEXT NOT NULL CHECK (priority IN ('low', 'medium', 'high', 'critical')),
+    assigned_to UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    status TEXT NOT NULL CHECK (status IN ('pending', 'in_progress', 'resolved', 'dismissed')),
+    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    resolved_at TIMESTAMPTZ,
+    resolution_notes TEXT
 );
 
--- Create indexes for better query performance
-CREATE INDEX IF NOT EXISTS idx_security_events_timestamp ON security_events(timestamp);
-CREATE INDEX IF NOT EXISTS idx_security_events_type ON security_events(type);
-CREATE INDEX IF NOT EXISTS idx_security_events_ip_address ON security_events(ip_address);
-CREATE INDEX IF NOT EXISTS idx_security_events_user_id ON security_events(user_id);
+-- Create indexes
+CREATE INDEX IF NOT EXISTS idx_security_events_type ON public.security_events(type);
+CREATE INDEX IF NOT EXISTS idx_security_events_severity ON public.security_events(severity);
+CREATE INDEX IF NOT EXISTS idx_security_events_user_id ON public.security_events(user_id);
+CREATE INDEX IF NOT EXISTS idx_security_events_ip_address ON public.security_events(ip_address);
+CREATE INDEX IF NOT EXISTS idx_security_events_timestamp ON public.security_events(timestamp);
 
-CREATE INDEX IF NOT EXISTS idx_security_alerts_timestamp ON security_alerts(timestamp);
-CREATE INDEX IF NOT EXISTS idx_security_alerts_type ON security_alerts(type);
-CREATE INDEX IF NOT EXISTS idx_security_alerts_severity ON security_alerts(severity);
-CREATE INDEX IF NOT EXISTS idx_security_alerts_resolved ON security_alerts(resolved);
+CREATE INDEX IF NOT EXISTS idx_security_alerts_event_id ON public.security_alerts(event_id);
+CREATE INDEX IF NOT EXISTS idx_security_alerts_type ON public.security_alerts(type);
+CREATE INDEX IF NOT EXISTS idx_security_alerts_severity ON public.security_alerts(severity);
+CREATE INDEX IF NOT EXISTS idx_security_alerts_timestamp ON public.security_alerts(timestamp);
 
-CREATE INDEX IF NOT EXISTS idx_blocked_ips_ip_address ON blocked_ips(ip_address);
-CREATE INDEX IF NOT EXISTS idx_blocked_ips_blocked_at ON blocked_ips(blocked_at);
-CREATE INDEX IF NOT EXISTS idx_blocked_ips_expires_at ON blocked_ips(expires_at);
+CREATE INDEX IF NOT EXISTS idx_blocked_ips_ip_address ON public.blocked_ips(ip_address);
+CREATE INDEX IF NOT EXISTS idx_blocked_ips_blocked_until ON public.blocked_ips(blocked_until);
 
-CREATE INDEX IF NOT EXISTS idx_monitored_ips_ip_address ON monitored_ips(ip_address);
-CREATE INDEX IF NOT EXISTS idx_monitored_ips_monitoring_level ON monitored_ips(monitoring_level);
-CREATE INDEX IF NOT EXISTS idx_monitored_ips_started_at ON monitored_ips(started_at);
+CREATE INDEX IF NOT EXISTS idx_monitored_ips_ip_address ON public.monitored_ips(ip_address);
+CREATE INDEX IF NOT EXISTS idx_monitored_ips_monitoring_level ON public.monitored_ips(monitoring_level);
 
-CREATE INDEX IF NOT EXISTS idx_security_notifications_created_at ON security_notifications(created_at);
-CREATE INDEX IF NOT EXISTS idx_security_notifications_severity ON security_notifications(severity);
-CREATE INDEX IF NOT EXISTS idx_security_notifications_alert_id ON security_notifications(alert_id);
+CREATE INDEX IF NOT EXISTS idx_security_notifications_alert_id ON public.security_notifications(alert_id);
+CREATE INDEX IF NOT EXISTS idx_security_notifications_severity ON public.security_notifications(severity);
+CREATE INDEX IF NOT EXISTS idx_security_notifications_created_at ON public.security_notifications(created_at);
 
-CREATE INDEX IF NOT EXISTS idx_security_review_queue_created_at ON security_review_queue(created_at);
-CREATE INDEX IF NOT EXISTS idx_security_review_queue_severity ON security_review_queue(severity);
-CREATE INDEX IF NOT EXISTS idx_security_review_queue_status ON security_review_queue(status);
+CREATE INDEX IF NOT EXISTS idx_security_review_queue_alert_id ON public.security_review_queue(alert_id);
+CREATE INDEX IF NOT EXISTS idx_security_review_queue_priority ON public.security_review_queue(priority);
+CREATE INDEX IF NOT EXISTS idx_security_review_queue_status ON public.security_review_queue(status);
+CREATE INDEX IF NOT EXISTS idx_security_review_queue_assigned_to ON public.security_review_queue(assigned_to);
 
--- Enable Row Level Security
-ALTER TABLE security_events ENABLE ROW LEVEL SECURITY;
-ALTER TABLE security_alerts ENABLE ROW LEVEL SECURITY;
-ALTER TABLE blocked_ips ENABLE ROW LEVEL SECURITY;
-ALTER TABLE monitored_ips ENABLE ROW LEVEL SECURITY;
-ALTER TABLE security_notifications ENABLE ROW LEVEL SECURITY;
-ALTER TABLE security_review_queue ENABLE ROW LEVEL SECURITY;
+-- Enable RLS
+ALTER TABLE public.security_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.security_alerts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blocked_ips ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.monitored_ips ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.security_notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.security_review_queue ENABLE ROW LEVEL SECURITY;
 
 -- Create RLS policies
-CREATE POLICY "Security events are viewable by admins only"
-  ON security_events FOR SELECT
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY security_events_policy ON public.security_events
+    USING (auth.uid()::text IN (SELECT id::text FROM public.admins));
 
-CREATE POLICY "Security alerts are viewable by admins only"
-  ON security_alerts FOR SELECT
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY security_alerts_policy ON public.security_alerts
+    USING (auth.uid()::text IN (SELECT id::text FROM public.admins));
 
-CREATE POLICY "Blocked IPs are viewable by admins only"
-  ON blocked_ips FOR SELECT
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY blocked_ips_policy ON public.blocked_ips
+    USING (auth.uid()::text IN (SELECT id::text FROM public.admins));
 
-CREATE POLICY "Monitored IPs are viewable by admins only"
-  ON monitored_ips FOR SELECT
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY monitored_ips_policy ON public.monitored_ips
+    USING (auth.uid()::text IN (SELECT id::text FROM public.admins));
 
-CREATE POLICY "Security notifications are viewable by admins only"
-  ON security_notifications FOR SELECT
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY security_notifications_policy ON public.security_notifications
+    USING (auth.uid()::text IN (SELECT id::text FROM public.admins));
 
-CREATE POLICY "Security review queue is viewable by admins only"
-  ON security_review_queue FOR SELECT
-  USING (auth.jwt() ->> 'role' = 'admin');
+CREATE POLICY security_review_queue_policy ON public.security_review_queue
+    USING (auth.uid()::text IN (SELECT id::text FROM public.admins));
 
--- Create function to clean up old security events
+-- Create cleanup function
 CREATE OR REPLACE FUNCTION cleanup_old_security_data()
-RETURNS void AS $$
+RETURNS void
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
 BEGIN
-  -- Delete security events older than 90 days
-  DELETE FROM security_events
-  WHERE timestamp < NOW() - INTERVAL '90 days';
+    -- Delete security events older than 90 days
+    DELETE FROM security_events
+    WHERE timestamp < NOW() - INTERVAL '90 days';
 
-  -- Delete resolved alerts older than 90 days
-  DELETE FROM security_alerts
-  WHERE resolved = true
-    AND resolved_at < NOW() - INTERVAL '90 days';
+    -- Delete resolved alerts older than 30 days
+    DELETE FROM security_alerts
+    WHERE resolved_at IS NOT NULL
+    AND resolved_at < NOW() - INTERVAL '30 days';
 
-  -- Delete expired IP blocks
-  DELETE FROM blocked_ips
-  WHERE expires_at < NOW();
+    -- Delete acknowledged notifications older than 30 days
+    DELETE FROM security_notifications
+    WHERE acknowledged_at IS NOT NULL
+    AND acknowledged_at < NOW() - INTERVAL '30 days';
 
-  -- Delete old notifications that have been acknowledged
-  DELETE FROM security_notifications
-  WHERE acknowledged_at < NOW() - INTERVAL '90 days';
-
-  -- Delete old reviewed items from the queue
-  DELETE FROM security_review_queue
-  WHERE status = 'reviewed'
-    AND reviewed_at < NOW() - INTERVAL '90 days';
+    -- Delete resolved review items older than 30 days
+    DELETE FROM security_review_queue
+    WHERE resolved_at IS NOT NULL
+    AND resolved_at < NOW() - INTERVAL '30 days';
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
--- Create a scheduled job to clean up old data
+-- Create scheduled job if pg_cron is available
 DO $$
 BEGIN
-  IF EXISTS (
-    SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'
-  ) THEN
-    PERFORM cron.schedule('0 0 * * *', 'SELECT cleanup_old_security_data()');
-  END IF;
-EXCEPTION WHEN OTHERS THEN
-  RAISE NOTICE 'pg_cron extension not available, skipping scheduled cleanup job';
-END $$; 
+    IF EXISTS (
+        SELECT 1 FROM pg_extension WHERE extname = 'pg_cron'
+    ) THEN
+        PERFORM cron.schedule('0 0 * * *', 'SELECT cleanup_old_security_data()');
+    END;
+EXCEPTION WHEN undefined_table THEN
+    RAISE NOTICE 'pg_cron extension not available, skipping scheduled cleanup job';
+END;
+$$; 
