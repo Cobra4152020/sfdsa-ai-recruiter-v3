@@ -3,6 +3,8 @@ import { supabaseAdmin } from "@/lib/supabase-service"
 import { createClient } from "@/lib/supabase-clients"
 import { addParticipationPoints } from "@/lib/points-service"
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get("code")
