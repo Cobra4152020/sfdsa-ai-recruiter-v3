@@ -13,13 +13,6 @@ export const volunteerAuthService = {
    */
   async login(email: string, password: string): Promise<VolunteerLoginResult> {
     try {
-      if (!supabase) {
-        return {
-          success: false,
-          message: "Database connection not available",
-        }
-      }
-
       // Sign in with Supabase
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -72,14 +65,44 @@ export const volunteerAuthService = {
   },
 
   /**
+   * Send a magic link to the volunteer recruiter
+   */
+  async sendMagicLink(email: string, redirectUrl: string): Promise<VolunteerLoginResult> {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: redirectUrl,
+        },
+      })
+
+      if (error) {
+        return {
+          success: false,
+          message: error.message,
+          error,
+        }
+      }
+
+      return {
+        success: true,
+        message: "Magic link sent successfully",
+      }
+    } catch (error) {
+      console.error("Magic link error:", error)
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to send magic link",
+        error,
+      }
+    }
+  },
+
+  /**
    * Check if a user is a volunteer recruiter
    */
   async isVolunteerRecruiter(userId: string): Promise<boolean> {
     try {
-      if (!supabase) {
-        return false
-      }
-
       const { data, error } = await supabase
         .from("user_roles")
         .select("role")

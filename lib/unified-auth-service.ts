@@ -439,6 +439,58 @@ export const authService = {
   },
 
   /**
+   * Sign in with magic link (passwordless)
+   */
+  async signInWithMagicLink(email: string, redirectUrl?: string): Promise<AuthResult> {
+    try {
+      // Check if user exists and get user type
+      const { data: userData } = await supabaseAdmin
+        .from("user_types")
+        .select("user_id, user_type")
+        .eq("email", email)
+        .maybeSingle()
+
+      // Determine appropriate redirect URL
+      let finalRedirectUrl = redirectUrl
+      if (!finalRedirectUrl && userData) {
+        finalRedirectUrl = this.getRedirectUrlForUserType(userData.user_type as UserType)
+      }
+
+      // Default to recruit dashboard if no redirect specified
+      finalRedirectUrl = finalRedirectUrl || constructUrl("/dashboard")
+
+      // Send magic link
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: finalRedirectUrl,
+        },
+      })
+
+      if (error) {
+        return {
+          success: false,
+          message: error.message,
+          error,
+        }
+      }
+
+      return {
+        success: true,
+        message: "Magic link sent successfully. Please check your email.",
+        email,
+      }
+    } catch (error) {
+      console.error("Magic link error:", error)
+      return {
+        success: false,
+        message: error instanceof Error ? error.message : "Failed to send magic link",
+        error,
+      }
+    }
+  },
+
+  /**
    * Register a new recruit user
    */
   async registerRecruit(email: string, password: string, name: string): Promise<AuthResult> {

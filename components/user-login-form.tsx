@@ -45,10 +45,38 @@ export function UserLoginForm() {
       })
 
       // Redirect to the appropriate dashboard based on user type
-      window.location.href = result.redirectUrl || "/dashboard"
+      router.push(result.redirectUrl || "/dashboard")
     } catch (error) {
       console.error("Login error:", error)
       setError(error instanceof Error ? error.message : "Failed to sign in")
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleMagicLinkLogin = async () => {
+    if (!email) {
+      setError("Please enter your email address")
+      return
+    }
+
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const result = await authService.signInWithMagicLink(email)
+
+      if (!result.success) {
+        throw new Error(result.message)
+      }
+
+      toast({
+        title: "Magic link sent",
+        description: "Check your email for a link to sign in",
+      })
+    } catch (error) {
+      console.error("Magic link error:", error)
+      setError(error instanceof Error ? error.message : "Failed to send magic link")
     } finally {
       setIsLoading(false)
     }
@@ -149,6 +177,25 @@ export function UserLoginForm() {
           )}
         </Button>
       </form>
+
+      <div className="relative my-4">
+        <div className="absolute inset-0 flex items-center">
+          <div className="w-full border-t border-gray-300"></div>
+        </div>
+        <div className="relative flex justify-center text-xs uppercase">
+          <span className="bg-white px-2 text-gray-500">Or</span>
+        </div>
+      </div>
+
+      <Button
+        type="button"
+        variant="outline"
+        className="w-full border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10"
+        onClick={handleMagicLinkLogin}
+        disabled={isLoading}
+      >
+        Sign in with Magic Link
+      </Button>
 
       <div className="text-center space-y-2 mt-4">
         <p className="text-sm text-gray-600">

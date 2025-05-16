@@ -3,16 +3,11 @@ let userConfig = undefined;
 
 try {
   userConfig = await import('./v0-user-next.config.mjs');
-  console.log('Successfully loaded user config from v0-user-next.config.mjs');
 } catch (e) {
   try {
     userConfig = await import('./v0-user-next.config');
-    console.log('Successfully loaded user config from v0-user-next.config');
-  } catch (error) {
-    console.log('No user config found. Using default configuration.');
-    if (process.env.NODE_ENV === 'development') {
-      console.debug('User config load error:', error);
-    }
+  } catch (_) {
+    // ignore if not found
   }
 }
 
@@ -72,6 +67,9 @@ const nextConfig = {
       fallback: [],
     };
   },
+  output: 'export',  // Enable static HTML export
+  basePath: process.env.NODE_ENV === 'production' ? '/sfdsa-ai-recruiter-v3' : '', // Add repo name for GitHub Pages
+  assetPrefix: process.env.NODE_ENV === 'production' ? '/sfdsa-ai-recruiter-v3/' : '',
 };
 
 if (userConfig) {

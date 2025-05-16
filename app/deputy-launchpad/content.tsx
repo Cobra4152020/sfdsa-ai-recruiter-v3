@@ -299,7 +299,25 @@ function PointsSystemExplainer() {
       description: "Test your knowledge about San Francisco and law enforcement",
       points: "10 points per correct answer, 25 bonus points for perfect scores",
       icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
-    }
+    },
+    {
+      name: "Word Constructor",
+      description: "Build words related to law enforcement and public safety",
+      points: "5 points per word, bonus points for longer words",
+      icon: <FileText className="h-5 w-5 text-green-500" />,
+    },
+    {
+      name: "Memory Match",
+      description: "Match pairs of cards featuring law enforcement concepts",
+      points: "2 points per match, time bonuses available",
+      icon: <Star className="h-5 w-5 text-yellow-500" />,
+    },
+    {
+      name: "Spin to Win",
+      description: "Daily opportunity to spin for random point rewards",
+      points: "10-100 random points per day",
+      icon: <Zap className="h-5 w-5 text-purple-500" />,
+    },
   ]
 
   return (
