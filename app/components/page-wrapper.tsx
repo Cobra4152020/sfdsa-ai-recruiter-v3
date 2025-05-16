@@ -1,4 +1,4 @@
-import { ExactHeaderMatch } from "@/components/exact-header-match"
+import { ImprovedHeader } from "@/components/improved-header"
 import { ImprovedFooter } from "@/components/improved-footer"
 
 interface PageWrapperProps {
@@ -9,7 +9,7 @@ export function PageWrapper({ children }: PageWrapperProps) {
   return (
     <>
       <div className="flex flex-col min-h-screen">
-        <ExactHeaderMatch />
+        <ImprovedHeader />
         <main className="flex-1 bg-white dark:bg-gray-900">
           {children}
         </main>
