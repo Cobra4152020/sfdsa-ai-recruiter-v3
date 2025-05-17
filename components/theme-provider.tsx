@@ -1,11 +1,13 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext } from "react"
-import { Sun } from "lucide-react"
+import { createContext, useContext, useEffect, useState } from "react"
+import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { type VariantProps } from "class-variance-authority"
+import { buttonVariants } from "@/components/ui/button"
 
-type Theme = "light" | "dark"
+type Theme = "light" | "dark" | "system"
 
 type ThemeProviderProps = {
   children: React.ReactNode
@@ -20,7 +22,7 @@ type ThemeProviderState = {
 }
 
 const initialState: ThemeProviderState = {
-  theme: "light",
+  theme: "system",
   setTheme: () => null,
   toggleTheme: () => null,
 }
@@ -29,20 +31,54 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({
   children,
+  defaultTheme = "system",
+  storageKey = "app-theme",
   ...props
 }: ThemeProviderProps) {
-  // Force light theme
-  const value: ThemeProviderState = {
-    theme: "light",
-    setTheme: () => null, // No-op since we're forcing light theme
-    toggleTheme: () => null, // No-op since we're forcing light theme
-  }
+  const [theme, setTheme] = useState<Theme>(defaultTheme)
 
-  // Apply light theme to document
-  if (typeof window !== "undefined") {
+  useEffect(() => {
     const root = window.document.documentElement
-    root.classList.remove("dark")
-    root.classList.add("light")
+    root.classList.remove("light", "dark")
+
+    if (theme === "system") {
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+      root.classList.add(systemTheme)
+    } else {
+      root.classList.add(theme)
+    }
+  }, [theme])
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    const handleChange = () => {
+      if (theme === "system") {
+        const root = window.document.documentElement
+        root.classList.remove("light", "dark")
+        root.classList.add(mediaQuery.matches ? "dark" : "light")
+      }
+    }
+
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
+  }, [theme])
+
+  const value = {
+    theme,
+    setTheme: (theme: Theme) => {
+      setTheme(theme)
+      // Save the theme preference
+      if (typeof window !== "undefined") {
+        localStorage.setItem(storageKey, theme)
+      }
+    },
+    toggleTheme: () => {
+      const newTheme = theme === "dark" ? "light" : "dark"
+      setTheme(newTheme)
+      if (typeof window !== "undefined") {
+        localStorage.setItem(storageKey, newTheme)
+      }
+    }
   }
 
   return (
@@ -61,15 +97,23 @@ export const useTheme = () => {
 }
 
 export function ThemeToggle() {
+  const { theme, toggleTheme } = useTheme()
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
+
   return (
     <Button
-      variant="ghost"
+      onClick={toggleTheme}
+      variant="outline"
       size="icon"
-      disabled={true}
-      aria-label="Theme is locked to light mode"
+      className="rounded-full"
+      aria-label="Toggle theme"
     >
-      <Sun className="h-5 w-5 text-gray-400" />
-      <span className="sr-only">Theme is locked to light mode</span>
+      {isDark ? (
+        <Sun className="h-4 w-4 text-yellow-400" />
+      ) : (
+        <Moon className="h-4 w-4" />
+      )}
+      <span className="sr-only">Toggle theme</span>
     </Button>
   )
 }

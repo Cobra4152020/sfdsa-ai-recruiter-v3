@@ -28,23 +28,19 @@ export function PageWrapper({ children }: PageWrapperProps) {
   }
 
   return (
-    <UserProvider>
-      <AuthModalProvider>
-        <div className="min-h-screen flex flex-col bg-[#F8F5EE]">
-          <ImprovedHeader showOptInForm={showOptInForm} />
-          <main id="main-content" className="flex-1 pt-16 pb-12">
-            {children}
-          </main>
-          <ImprovedFooter />
+    <div className="min-h-screen flex flex-col bg-[#F8F5EE]">
+      <ImprovedHeader showOptInForm={showOptInForm} />
+      <main id="main-content" className="flex-1 pt-16 pb-12">
+        {children}
+      </main>
+      <ImprovedFooter />
 
-          {isOptInFormOpen && (
-            <OptInForm onClose={handleCloseOptInForm} isApplying={isApplying} isOpen={isOptInFormOpen} />
-          )}
-          <div className="fixed bottom-6 right-6 z-50">
-            <AskSgtKenButton position="fixed" variant="secondary" />
-          </div>
-        </div>
-      </AuthModalProvider>
-    </UserProvider>
+      {isOptInFormOpen && (
+        <OptInForm onClose={handleCloseOptInForm} isApplying={isApplying} isOpen={isOptInFormOpen} />
+      )}
+      <div className="fixed bottom-6 right-6 z-50">
+        <AskSgtKenButton position="fixed" variant="secondary" />
+      </div>
+    </div>
   )
 }

@@ -123,7 +123,7 @@ export function TikTokChallengeSubmissionViewer({
                 </div>
 
                 <div>
-                  <Badge className={getStatusBadgeStyle(submission.status)}>{getStatusLabel(submission.status)}</Badge>
+                  <Badge className={getStatusBadgeStyle(submission.status, false)}>{getStatusLabel(submission.status)}</Badge>
                 </div>
               </div>
 
@@ -236,15 +236,28 @@ function getStatusLabel(status: string): string {
   }
 }
 
-function getStatusBadgeStyle(status: string): string {
-  switch (status) {
-    case "pending":
-      return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
-    case "approved":
-      return "bg-green-100 text-green-800 hover:bg-green-200"
-    case "rejected":
-      return "bg-red-100 text-red-800 hover:bg-red-200"
-    default:
-      return "bg-gray-100 text-gray-800 hover:bg-gray-200"
+function getStatusBadgeStyle(status: string, isDark: boolean = false): string {
+  if (isDark) {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-900/30 text-yellow-300 hover:bg-yellow-900/40"
+      case "approved":
+        return "bg-green-900/30 text-green-300 hover:bg-green-900/40"
+      case "rejected":
+        return "bg-red-900/30 text-red-300 hover:bg-red-900/40"
+      default:
+        return "bg-gray-900/30 text-gray-300 hover:bg-gray-900/40"
+    }
+  } else {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-200"
+      case "approved":
+        return "bg-green-100 text-green-800 hover:bg-green-200"
+      case "rejected":
+        return "bg-red-100 text-red-800 hover:bg-red-200"
+      default:
+        return "bg-gray-100 text-gray-800 hover:bg-gray-200"
+    }
   }
 }

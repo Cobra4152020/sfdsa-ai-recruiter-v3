@@ -694,12 +694,12 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
 
       {/* Add challenge mode warning */}
       {mode === "challenge" && (
-        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <h3 className="text-red-600 font-medium flex items-center">
+        <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-900/30 rounded-lg">
+          <h3 className="text-red-600 dark:text-red-300 font-medium flex items-center">
             <AlertCircle className="w-4 h-4 mr-2" />
             Challenge Mode Active
           </h3>
-          <p className="text-sm text-red-600 mt-1">
+          <p className="text-sm text-red-600 dark:text-red-300 mt-1">
             You have only 15 seconds per question, but earn double points! Stay focused!
           </p>
         </div>

@@ -14,6 +14,7 @@ import { Share2, Facebook, Twitter, Linkedin } from "lucide-react"
 import { useToast } from "@/components/ui/use-toast"
 import { addParticipationPoints } from "@/lib/points-service"
 import { useUser } from "@/context/user-context"
+import { useAuthModal } from "@/context/auth-modal-context"
 
 interface GameShareProps {
   score: number
@@ -24,49 +25,74 @@ interface GameShareProps {
 
 export function GameShare({ score, gameName, gameDescription, onPointsAdded }: GameShareProps) {
   const [showShareDialog, setShowShareDialog] = useState(false)
+  const [isSharing, setIsSharing] = useState(false)
   const { toast } = useToast()
-  const { user, isLoggedIn } = useUser()
+  const { currentUser } = useUser()
+  const { openModal } = useAuthModal()
 
   const handleShare = async (platform: string) => {
-    const shareText = `I scored ${score} points in the ${gameName} game! Try to beat my score!`
-    const shareUrl = window.location.href
+    if (!currentUser) {
+      openModal("signin", "recruit")
+      return
+    }
 
-    // Simulate sharing
+    setIsSharing(true)
+
     try {
-      // In a real implementation, this would use the Web Share API or platform-specific sharing
-      console.log(`Sharing to ${platform}: ${shareText} - ${shareUrl}`)
+      // Add participation points - 10 points for sharing
+      const success = await addParticipationPoints(
+        currentUser.id,
+        10,
+        "game_share",
+        `Shared ${gameName} score on ${platform}`
+      )
 
-      toast({
-        title: `Shared on ${platform}!`,
-        description: "Thanks for sharing your achievement!",
-        duration: 3000,
-      })
-
-      // Award extra points if logged in
-      if (isLoggedIn && user?.id) {
-        const sharingPoints = 50
-        await addParticipationPoints(user.id, sharingPoints, "game_share", `Shared ${gameName} score on ${platform}`)
-
+      if (success) {
+        onPointsAdded?.(10)
         toast({
-          title: "Bonus Points!",
-          description: `You earned ${sharingPoints} points for sharing!`,
-          duration: 3000,
+          title: "Points added!",
+          description: "You earned 10 points for sharing your score.",
         })
+      }
 
-        if (onPointsAdded) {
-          onPointsAdded(sharingPoints)
-        }
+      // Create share text
+      const shareText = `I scored ${score} points in ${gameName} on the SF Deputy Sheriff recruitment site! ${gameDescription}`
+      const shareUrl = `https://sfdeputysheriff.com/games/${gameName.toLowerCase()}`
+
+      // Handle platform-specific sharing
+      switch (platform) {
+        case "Facebook":
+          window.open(
+            `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(
+              shareText,
+            )}`,
+            "_blank",
+          )
+          break
+        case "Twitter":
+          window.open(
+            `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+            "_blank",
+          )
+          break
+        case "LinkedIn":
+          window.open(
+            `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+            "_blank",
+          )
+          break
       }
 
       setShowShareDialog(false)
     } catch (error) {
       console.error("Error sharing:", error)
       toast({
-        title: "Sharing Error",
-        description: "There was a problem sharing your result. Please try again.",
         variant: "destructive",
-        duration: 3000,
+        title: "Error",
+        description: "Failed to share your score. Please try again.",
       })
+    } finally {
+      setIsSharing(false)
     }
   }
 
@@ -78,7 +104,7 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
       </Button>
 
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md dialog-gold-border">
           <DialogHeader>
             <DialogTitle>Share Your Score</DialogTitle>
             <DialogDescription>
@@ -90,6 +116,7 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
             <Button
               className="flex items-center justify-center gap-2 bg-[#1877F2] hover:bg-[#1877F2]/90"
               onClick={() => handleShare("Facebook")}
+              disabled={isSharing}
             >
               <Facebook className="h-4 w-4" />
               Facebook
@@ -97,6 +124,7 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
             <Button
               className="flex items-center justify-center gap-2 bg-[#1DA1F2] hover:bg-[#1DA1F2]/90"
               onClick={() => handleShare("Twitter")}
+              disabled={isSharing}
             >
               <Twitter className="h-4 w-4" />
               Twitter
@@ -104,6 +132,7 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
             <Button
               className="flex items-center justify-center gap-2 bg-[#0A66C2] hover:bg-[#0A66C2]/90"
               onClick={() => handleShare("LinkedIn")}
+              disabled={isSharing}
             >
               <Linkedin className="h-4 w-4" />
               LinkedIn
@@ -111,7 +140,7 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowShareDialog(false)}>
+            <Button onClick={() => setShowShareDialog(false)} className="bg-gray-100 hover:bg-gray-200 text-gray-900">
               Cancel
             </Button>
           </DialogFooter>

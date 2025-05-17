@@ -166,9 +166,16 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
   )
 }
 
-function getColorForRetention(retention: number) {
-  if (retention >= 75) return "#10b981" // green-500
-  if (retention >= 50) return "#3b82f6" // blue-500
-  if (retention >= 25) return "#f59e0b" // amber-500
-  return "#ef4444" // red-500
+function getColorForRetention(retention: number, isDark: boolean = false): string {
+  if (isDark) {
+    if (retention >= 75) return "#34D399" // emerald-400
+    if (retention >= 50) return "#60A5FA" // blue-400
+    if (retention >= 25) return "#FBBF24" // amber-400
+    return "#F87171" // red-400
+  } else {
+    if (retention >= 75) return "#059669" // emerald-600
+    if (retention >= 50) return "#2563EB" // blue-600
+    if (retention >= 25) return "#D97706" // amber-600
+    return "#DC2626" // red-600
+  }
 }

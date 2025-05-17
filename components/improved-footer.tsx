@@ -27,19 +27,19 @@ export function ImprovedFooter() {
             </p>
           </div>
           <div className="flex space-x-4">
-            <Link href="https://facebook.com" className="text-white hover:text-[#FFD700] transition-colors">
+            <Link href="https://www.facebook.com/SFDeputySheriff" className="text-white hover:text-[#FFD700] transition-colors">
               <Facebook size={20} />
             </Link>
-            <Link href="https://twitter.com" className="text-white hover:text-[#FFD700] transition-colors">
+            <Link href="https://twitter.com/SFDeputySheriff" className="text-white hover:text-[#FFD700] transition-colors">
               <Twitter size={20} />
             </Link>
-            <Link href="https://youtube.com" className="text-white hover:text-[#FFD700] transition-colors">
+            <Link href="https://www.youtube.com/@SFDeputySheriff" className="text-white hover:text-[#FFD700] transition-colors">
               <Youtube size={20} />
             </Link>
-            <Link href="https://instagram.com" className="text-white hover:text-[#FFD700] transition-colors">
+            <Link href="https://www.instagram.com/sfdeputysheriff" className="text-white hover:text-[#FFD700] transition-colors">
               <Instagram size={20} />
             </Link>
-            <Link href="https://linkedin.com" className="text-white hover:text-[#FFD700] transition-colors">
+            <Link href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs-association" className="text-white hover:text-[#FFD700] transition-colors">
               <Linkedin size={20} />
             </Link>
           </div>
@@ -60,10 +60,10 @@ export function ImprovedFooter() {
               <Link href="/badges" className="text-white/80 hover:text-[#FFD700] transition-colors">
                 Badge Gallery
               </Link>
-              <Link href="/gi-bill" className="text-white/80 hover:text-[#FFD700] transition-colors">
+              <Link href="/benefits/gi-bill" className="text-white/80 hover:text-[#FFD700] transition-colors">
                 G.I. Bill
               </Link>
-              <Link href="/housing" className="text-white/80 hover:text-[#FFD700] transition-colors">
+              <Link href="/benefits/housing" className="text-white/80 hover:text-[#FFD700] transition-colors">
                 Discounted Housing
               </Link>
             </div>
@@ -73,19 +73,19 @@ export function ImprovedFooter() {
           <div className="col-span-3">
             <h3 className="font-semibold text-lg mb-4 text-[#FFD700]">Resources</h3>
             <div className="grid grid-cols-1 gap-2">
-              <Link href="/trivia" className="text-white/80 hover:text-[#FFD700] transition-colors">
+              <Link href="/games/trivia" className="text-white/80 hover:text-[#FFD700] transition-colors">
                 SF Trivia
               </Link>
-              <Link href="/donors" className="text-white/80 hover:text-[#FFD700] transition-colors">
+              <Link href="/donor-recognition" className="text-white/80 hover:text-[#FFD700] transition-colors">
                 Donor Recognition
               </Link>
-              <Link href="/volunteer" className="text-white/80 hover:text-[#FFD700] transition-colors">
+              <Link href="/volunteer-recruiter" className="text-white/80 hover:text-[#FFD700] transition-colors">
                 Volunteer Recruiter
               </Link>
               <Link href="/faq" className="text-white/80 hover:text-[#FFD700] transition-colors">
                 FAQ
               </Link>
-              <Link href="/contact" className="text-white/80 hover:text-[#FFD700] transition-colors">
+              <Link href="/support" className="text-white/80 hover:text-[#FFD700] transition-colors">
                 Contact Support
               </Link>
             </div>
@@ -97,7 +97,7 @@ export function ImprovedFooter() {
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <Image
-                  src="/sfdsa-logo.png"
+                  src="/images/sfdsa-logo.png"
                   alt="San Francisco Deputy Sheriffs' Association"
                   width={120}
                   height={120}
@@ -105,14 +105,14 @@ export function ImprovedFooter() {
                 />
                 <p className="text-sm text-white/80">San Francisco Deputy Sheriffs' Association 501(c)5</p>
                 <address className="text-sm text-white/80 not-italic mt-4">
-                  <p>35 Gilbert Street</p>
+                  <p>680 8th Street, Suite 200</p>
                   <p>San Francisco, CA 94103</p>
                   <p className="mt-2">Phone: (415) 696-2428</p>
                 </address>
               </div>
               <div>
                 <Image
-                  src="/protecting-sf-logo.png"
+                  src="/images/protecting-sf-logo.png"
                   alt="Protecting San Francisco"
                   width={120}
                   height={120}
@@ -120,9 +120,9 @@ export function ImprovedFooter() {
                 />
                 <p className="text-sm text-white/80">Protecting San Francisco 501(c)3</p>
                 <p className="text-sm text-white/80 mt-4">
-                  Email: email@protectingsanfrancisco.com
+                  Email: info@sfdeputysheriff.com
                 </p>
-                <Link href="https://www.sfdsa.org/donate" className="block mt-4">
+                <Link href="/donate" className="block mt-4">
                   <Button className="w-full bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90">
                     Support Our Mission
                   </Button>

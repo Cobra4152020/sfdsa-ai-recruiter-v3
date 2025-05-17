@@ -45,7 +45,19 @@ export function BadgeShareStats({ shares }: BadgeShareStatsProps) {
 }
 
 // Helper function to get colors
-function getColorForIndex(index: number): string {
-  const colors = ["#0A3C1F", "#2E7D32", "#43A047", "#66BB6A", "#81C784"]
+function getColorForIndex(index: number, isDark: boolean = false): string {
+  const colors = isDark ? [
+    "#FFD700", // Gold
+    "#60A5FA", // Blue-400
+    "#FBBF24", // Amber-400
+    "#F87171", // Red-400
+    "#A78BFA"  // Purple-400
+  ] : [
+    "#0A3C1F", // Primary green
+    "#2563EB", // Blue-600
+    "#D97706", // Amber-600
+    "#DC2626", // Red-600
+    "#7C3AED"  // Purple-600
+  ]
   return colors[index % colors.length]
 }

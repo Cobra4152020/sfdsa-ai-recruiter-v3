@@ -24,8 +24,17 @@ type ChartProps = {
 }
 
 // Generate a color for each series
-const getSeriesColor = (index: number): string => {
-  const colors = [
+const getSeriesColor = (index: number, isDark: boolean = false): string => {
+  const colors = isDark ? [
+    "#FFD700", // Gold
+    "#60A5FA", // Light Blue
+    "#F59E0B", // Amber
+    "#EF4444", // Red
+    "#A78BFA", // Light Purple
+    "#34D399", // Light Emerald
+    "#F472B6", // Light Pink
+    "#38BDF8", // Light Sky
+  ] : [
     "#0A3C1F", // Primary green
     "#2563EB", // Blue
     "#D97706", // Amber

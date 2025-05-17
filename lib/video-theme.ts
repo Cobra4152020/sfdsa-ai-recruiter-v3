@@ -1,23 +1,53 @@
 export const videoTheme = {
   colors: {
-    primary: '#0A3C1F',
-    accent: '#FFD700',
-    white: '#FFFFFF',
-    background: {
-      primary: '#0A3C1F',
-      gradient: [
-        { position: 0, color: '#0A3C1F' },
-        { position: 1, color: '#072815' }
-      ]
+    primary: {
+      light: '#0A3C1F',
+      dark: '#FFD700'
     },
-    text: {
-      primary: '#FFFFFF',
-      accent: '#FFD700',
+    accent: {
+      light: '#FFD700',
       dark: '#0A3C1F'
     },
+    white: '#FFFFFF',
+    background: {
+      primary: {
+        light: '#0A3C1F',
+        dark: '#121212'
+      },
+      gradient: {
+        light: [
+          { position: 0, color: '#0A3C1F' },
+          { position: 1, color: '#072815' }
+        ],
+        dark: [
+          { position: 0, color: '#121212' },
+          { position: 1, color: '#000000' }
+        ]
+      }
+    },
+    text: {
+      primary: {
+        light: '#FFFFFF',
+        dark: '#FFD700'
+      },
+      accent: {
+        light: '#FFD700',
+        dark: '#FFFFFF'
+      },
+      dark: {
+        light: '#0A3C1F',
+        dark: '#FFD700'
+      }
+    },
     particles: {
-      primary: '#FFD700',
-      secondary: '#FFFFFF'
+      primary: {
+        light: '#FFD700',
+        dark: '#FFD700'
+      },
+      secondary: {
+        light: '#FFFFFF',
+        dark: '#0A3C1F'
+      }
     }
   },
   effects: {
@@ -25,7 +55,10 @@ export const videoTheme = {
       opacity: 0.3
     },
     particles: {
-      defaultColor: '#FFD700'
+      defaultColor: {
+        light: '#FFD700',
+        dark: '#FFD700'
+      }
     }
   }
 };

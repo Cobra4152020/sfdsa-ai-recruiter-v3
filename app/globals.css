@@ -7,6 +7,7 @@
     /* Sheriff's Department Colors */
     --sheriff-green: #0A3C1F;
     --sheriff-gold: #FFD700;
+    --sheriff-black: #121212;
     --sheriff-tan: #F8F5EE;
 
     /* Light mode */
@@ -42,22 +43,30 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --background: var(--sheriff-black);
+    --foreground: var(--sheriff-gold);
+
+    --card: var(--sheriff-black);
+    --card-foreground: var(--sheriff-gold);
+
+    --popover: var(--sheriff-black);
+    --popover-foreground: var(--sheriff-gold);
+
     --primary: var(--sheriff-gold);
-    --primary-foreground: var(--sheriff-green);
+    --primary-foreground: var(--sheriff-black);
+
     --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary-foreground: var(--sheriff-gold);
+
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
+
     --accent: var(--sheriff-gold);
-    --accent-foreground: var(--sheriff-green);
+    --accent-foreground: var(--sheriff-black);
+
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
+
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: var(--sheriff-gold);
@@ -66,11 +75,11 @@
 
 /* Custom header styles */
 .header-nav {
-  @apply bg-[#0A3C1F] text-white;
+  @apply bg-[#0A3C1F] text-white dark:bg-black dark:text-[#FFD700];
 }
 
 .header-nav-item {
-  @apply text-white hover:text-[#FFD700] transition-colors duration-200;
+  @apply text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200;
 }
 
 @layer base {
@@ -78,7 +87,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground transition-colors duration-300;
+    @apply bg-background text-foreground;
   }
 }
 
@@ -91,4 +100,97 @@
   .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
   }
+}
+
+/* Dialog/Modal styles */
+.dialog-gold-border {
+  @apply border-2 border-[#FFD700] dark:border-[#FFD700];
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[#0A3C1F] dark:bg-[#FFD700] rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[#0A3C1F]/80 dark:bg-[#FFD700]/80;
+}
+
+/* Selection styles */
+::selection {
+  @apply bg-[#0A3C1F] text-white dark:bg-[#FFD700] dark:text-[#121212];
+}
+
+/* Focus outline styles */
+:focus {
+  @apply outline-none ring-2 ring-[#0A3C1F] dark:ring-[#FFD700];
+}
+
+/* Link hover styles */
+a:not(.no-underline):hover {
+  @apply underline decoration-[#0A3C1F] dark:decoration-[#FFD700];
+}
+
+/* Code block styles */
+pre {
+  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto;
+}
+
+code {
+  @apply font-mono text-sm;
+}
+
+/* Table styles */
+table {
+  @apply w-full border-collapse;
+}
+
+th, td {
+  @apply border border-gray-200 dark:border-gray-700 p-2;
+}
+
+th {
+  @apply bg-gray-100 dark:bg-gray-800;
+}
+
+/* Form element styles */
+input, textarea, select {
+  @apply bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2;
+}
+
+input:focus, textarea:focus, select:focus {
+  @apply border-[#0A3C1F] dark:border-[#FFD700] ring-2 ring-[#0A3C1F]/20 dark:ring-[#FFD700]/20;
+}
+
+/* Button hover effects */
+button:not(.no-hover):hover {
+  @apply transform transition-transform duration-200 scale-[1.02];
+}
+
+/* Custom animations */
+@keyframes pulse-yellow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-yellow {
+  animation: pulse-yellow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Custom utilities */
+.text-balance {
+  text-wrap: balance;
 }

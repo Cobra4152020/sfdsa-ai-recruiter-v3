@@ -20,12 +20,18 @@ import {
   User,
   Settings,
   HelpCircle,
-  LucideIcon
+  LucideIcon,
+  Menu,
+  X
 } from "lucide-react"
 import { useTheme } from "@/components/theme-provider"
 import { useAuthModal } from "@/context/auth-modal-context"
 import { useUser } from "@/context/user-context"
 import { ShieldLogo } from "@/components/shield-logo"
+import { Button } from "@/components/ui/button"
+import { ThemeToggle } from "@/components/theme-provider"
+import { UserNav } from "@/components/user-nav"
+import { cn } from "@/lib/utils"
 
 interface ImprovedHeaderProps {
   showOptInForm?: (isApplying?: boolean) => void
@@ -194,186 +200,201 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
   } : null
 
   return (
-    <header className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${scrolled ? 'shadow-lg' : ''}`}>
+    <header className={cn(
+      "fixed w-full z-50 transition-all duration-200",
+      scrolled ? "bg-white/95 dark:bg-[#121212]/95 shadow-md backdrop-blur-sm" : "bg-transparent"
+    )}>
       {/* Top bar */}
-      <div className="bg-[#0A3C1F] text-white">
-        <div className="container mx-auto px-4 py-2 flex justify-between items-center">
-          <Link href="/" className="flex items-center">
-            <div className="mr-2 text-[#FFD700]">
-              <ShieldLogo className="w-7 h-7" />
+      <div className="bg-[#0A3C1F] dark:bg-black text-white dark:text-[#FFD700] py-2">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center space-x-4">
+              <span className="text-sm">
+                Join the San Francisco Deputy Sheriff's Department
+              </span>
             </div>
-            <div>
-              <div className="font-bold text-sm md:text-base">SF Deputy Sheriff</div>
-              <div className="text-[#FFD700] text-xs -mt-1">AI Recruitment</div>
-            </div>
-          </Link>
-
-          <div className="flex items-center space-x-3">
-            <div className="hidden md:flex items-center space-x-3">
-              <Link href="https://facebook.com" aria-label="Facebook" className="text-white hover:text-[#FFD700] transition-colors duration-200">
-                <Facebook size={16} />
-              </Link>
-              <Link href="https://twitter.com" aria-label="Twitter" className="text-white hover:text-[#FFD700] transition-colors duration-200">
-                <Twitter size={16} />
-              </Link>
-              <Link href="https://youtube.com" aria-label="YouTube" className="text-white hover:text-[#FFD700] transition-colors duration-200">
-                <Youtube size={16} />
-              </Link>
-              <Link href="https://instagram.com" aria-label="Instagram" className="text-white hover:text-[#FFD700] transition-colors duration-200">
-                <Instagram size={16} />
-              </Link>
-              <Link href="https://linkedin.com" aria-label="LinkedIn" className="text-white hover:text-[#FFD700] transition-colors duration-200">
-                <Linkedin size={16} />
-              </Link>
-              <button 
-                onClick={toggleTheme} 
-                className="text-white hover:text-[#FFD700] transition-colors duration-200" 
-                aria-label="Toggle dark mode"
-              >
-                <Moon size={16} />
-              </button>
+            <div className="flex items-center space-x-3">
+              <div className="hidden md:flex items-center space-x-3">
+                <Link href="https://facebook.com" aria-label="Facebook" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                  <Facebook size={16} />
+                </Link>
+                <Link href="https://twitter.com" aria-label="Twitter" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                  <Twitter size={16} />
+                </Link>
+                <Link href="https://youtube.com" aria-label="YouTube" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                  <Youtube size={16} />
+                </Link>
+                <Link href="https://instagram.com" aria-label="Instagram" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                  <Instagram size={16} />
+                </Link>
+                <Link href="https://linkedin.com" aria-label="LinkedIn" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                  <Linkedin size={16} />
+                </Link>
+                <ThemeToggle />
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Navigation bar */}
-      <div className={`bg-[#0A3C1F] text-white border-t border-white/10 transition-all duration-200 ${scrolled ? 'bg-opacity-95 backdrop-blur-sm' : ''}`}>
-        <div className="container mx-auto px-4 py-2">
-          <div className="flex justify-between items-center">
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-6">
-              <DropdownNav {...mainNavItems.mission} />
-              <DropdownNav {...mainNavItems.gamification} />
-              <DropdownNav {...mainNavItems.games} />
-              <DropdownNav {...mainNavItems.support} />
-              {userNavItems && <DropdownNav {...userNavItems} />}
-            </nav>
+      {/* Main navigation */}
+      <div className={cn(
+        "py-4 transition-colors duration-200",
+        scrolled ? "bg-white dark:bg-[#121212]" : "bg-white/0 dark:bg-transparent"
+      )}>
+        <div className="container mx-auto px-4">
+          <nav className="flex justify-between items-center">
+            <Link href="/" className="flex items-center space-x-2">
+              <ShieldLogo className="w-8 h-8" />
+              <span className="text-xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">SFDSA</span>
+            </Link>
+
+            {/* Desktop navigation */}
+            <div className="hidden md:flex items-center space-x-8">
+              <Link href="/about" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                About
+              </Link>
+              <Link href="/benefits" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                Benefits
+              </Link>
+              <Link href="/requirements" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                Requirements
+              </Link>
+              <Link href="/training" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                Training
+              </Link>
+              <Link href="/faq" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                FAQ
+              </Link>
+              <Link href="/contact" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+                Contact
+              </Link>
+            </div>
+
+            {/* Action buttons */}
+            <div className="hidden md:flex items-center space-x-4">
+              {!currentUser ? (
+                <>
+                  <Button
+                    variant="ghost"
+                    onClick={handleLogin}
+                    className="text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/10 dark:hover:bg-[#FFD700]/10"
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    onClick={handleApplyNow}
+                    className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white dark:bg-[#FFD700] dark:hover:bg-[#FFD700]/90 dark:text-black"
+                  >
+                    Apply Now
+                  </Button>
+                </>
+              ) : (
+                <UserNav />
+              )}
+            </div>
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden text-white hover:text-[#FFD700] transition-colors duration-200"
               onClick={toggleMobileMenu}
+              className="md:hidden p-2 rounded-md text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/10 dark:hover:bg-[#FFD700]/10"
               aria-label="Toggle mobile menu"
             >
-              <svg className={`w-6 h-6 transition-transform duration-300 ${isMobileMenuOpen ? 'rotate-90' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
+          </nav>
+        </div>
+      </div>
 
-            {/* Auth buttons */}
-            <div className="hidden md:flex items-center space-x-4">
-              {!currentUser && (
-                <>
-                  <button
-                    onClick={handleLogin}
-                    className="px-4 py-2 text-sm font-medium text-white hover:text-[#FFD700] transition-all duration-200 border border-transparent hover:border-[#FFD700] rounded-lg hover:shadow-[0_0_15px_rgba(255,215,0,0.3)]"
-                  >
-                    Sign In
-                  </button>
-                  <a
-                    href="https://www.sfdsa.org/donate"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
-                  >
-                    Support SFDSA
-                  </a>
-                  <button
-                    onClick={handleApplyNow}
-                    className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
-                  >
-                    Apply Now
-                  </button>
-                </>
-              )}
-              {currentUser && (
-                <button
+      {/* Mobile menu */}
+      <div
+        className={cn(
+          "md:hidden fixed inset-x-0 top-[calc(4rem+2.5rem)] bottom-0 z-50 bg-white dark:bg-[#121212] transition-transform duration-300 ease-in-out transform",
+          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
+        )}
+      >
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex flex-col space-y-4">
+            <Link
+              href="/about"
+              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              About
+            </Link>
+            <Link
+              href="/benefits"
+              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Benefits
+            </Link>
+            <Link
+              href="/requirements"
+              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Requirements
+            </Link>
+            <Link
+              href="/training"
+              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Training
+            </Link>
+            <Link
+              href="/faq"
+              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              FAQ
+            </Link>
+            <Link
+              href="/contact"
+              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Contact
+            </Link>
+
+            {/* Mobile social links */}
+            <div className="flex items-center space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <Link href="https://facebook.com" aria-label="Facebook" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+                <Facebook size={20} />
+              </Link>
+              <Link href="https://twitter.com" aria-label="Twitter" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+                <Twitter size={20} />
+              </Link>
+              <Link href="https://youtube.com" aria-label="YouTube" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+                <Youtube size={20} />
+              </Link>
+              <Link href="https://instagram.com" aria-label="Instagram" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+                <Instagram size={20} />
+              </Link>
+              <Link href="https://linkedin.com" aria-label="LinkedIn" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+                <Linkedin size={20} />
+              </Link>
+            </div>
+
+            {/* Mobile action buttons */}
+            {!currentUser && (
+              <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+                <Button
+                  variant="ghost"
+                  onClick={handleLogin}
+                  className="text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/10 dark:hover:bg-[#FFD700]/10"
+                >
+                  Sign In
+                </Button>
+                <Button
                   onClick={handleApplyNow}
-                  className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
+                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white dark:bg-[#FFD700] dark:hover:bg-[#FFD700]/90 dark:text-black"
                 >
                   Apply Now
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Mobile Navigation Menu */}
-          <div 
-            className={`md:hidden transition-all duration-300 ease-in-out overflow-hidden ${
-              isMobileMenuOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0'
-            }`}
-          >
-            <div className="mt-4 pb-4 space-y-2">
-              {Object.values(mainNavItems).map((item, index) => (
-                <div 
-                  key={item.label} 
-                  className={`py-2 transform transition-all duration-300 ${
-                    isMobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
-                  }`}
-                  style={{ transitionDelay: `${index * 50}ms` }}
-                >
-                  <div className="flex items-center px-4 py-2 text-white font-medium rounded-lg hover:bg-white/10 transition-all duration-200">
-                    <span className="transform transition-transform duration-200 text-[#FFD700]">
-                      {item.icon}
-                    </span>
-                    <span className="ml-2">{item.label}</span>
-                  </div>
-                  <div className="pl-8 space-y-1 mt-1">
-                    {item.items.map((subItem, subIndex) => (
-                      <Link
-                        key={subItem.href}
-                        href={subItem.href}
-                        className={`block px-4 py-2 text-sm text-white hover:text-[#FFD700] transition-all duration-200 hover:bg-white/10 rounded-lg transform ${
-                          isMobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
-                        }`}
-                        style={{ transitionDelay: `${(index * 50) + (subIndex * 30)}ms` }}
-                      >
-                        <span className="flex items-center">
-                          <span className="transform transition-transform duration-200 text-[#FFD700]">
-                            {subItem.icon}
-                          </span>
-                          <span className="ml-2">{subItem.label}</span>
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-              ))}
-              {!currentUser && (
-                <div className="mt-6 px-4 space-y-3">
-                  <button
-                    onClick={handleLogin}
-                    className={`w-full px-4 py-2.5 text-sm font-medium text-white hover:text-[#FFD700] transition-all duration-200 border border-transparent hover:border-[#FFD700] rounded-lg transform ${
-                      isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                    }`}
-                    style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 100}ms` }}
-                  >
-                    Sign In
-                  </button>
-                  <a
-                    href="https://www.sfdsa.org/donate"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={`block w-full px-4 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg text-center transform ${
-                      isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                    }`}
-                    style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 150}ms` }}
-                  >
-                    Support SFDSA
-                  </a>
-                  <button
-                    onClick={handleApplyNow}
-                    className={`w-full px-4 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg transform ${
-                      isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
-                    }`}
-                    style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 200}ms` }}
-                  >
-                    Apply Now
-                  </button>
-                </div>
-              )}
-            </div>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>

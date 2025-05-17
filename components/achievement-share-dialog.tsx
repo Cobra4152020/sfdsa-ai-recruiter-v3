@@ -26,6 +26,7 @@ import { useUser } from "@/context/user-context"
 import Image from "next/image"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
+import { useAuthModal } from "@/context/auth-modal-context"
 
 // TikTok icon component
 const TikTokIcon = (props: React.SVGProps<SVGSVGElement>) => (
@@ -59,19 +60,19 @@ interface AchievementShareDialogProps {
 }
 
 export function AchievementShareDialog({ isOpen, onClose, achievement }: AchievementShareDialogProps) {
-  const [copied, setCopied] = useState(false)
-  const [activeTab, setActiveTab] = useState<"social" | "preview">("social")
+  const { currentUser } = useUser()
+  const { openModal } = useAuthModal()
   const [isSharing, setIsSharing] = useState(false)
-  const [instagramImageUrl, setInstagramImageUrl] = useState<string | null>(null)
-  const [tiktokVideoUrl, setTiktokVideoUrl] = useState<string | null>(null)
-  const [showInstagramInstructions, setShowInstagramInstructions] = useState(false)
-  const [showTikTokInstructions, setShowTikTokInstructions] = useState(false)
-  const [isAnimated, setIsAnimated] = useState(true)
-  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false)
+  const [copied, setCopied] = useState(false)
+  const [shareUrl, setShareUrl] = useState("")
   const [isPreviewAnimated, setIsPreviewAnimated] = useState(false)
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null)
-  const [isGeneratingTikTok, setIsGeneratingTikTok] = useState(false)
-  const { currentUser } = useUser()
+  const [isGeneratingPreview, setIsGeneratingPreview] = useState(false)
+  const [isAnimated, setIsAnimated] = useState(true)
+  const [showInstagramInstructions, setShowInstagramInstructions] = useState(false)
+  const [instagramImageUrl, setInstagramImageUrl] = useState<string | null>(null)
+  const [showTikTokInstructions, setShowTikTokInstructions] = useState(false)
+  const [tiktokVideoUrl, setTiktokVideoUrl] = useState<string | null>(null)
 
   // Add this function to handle fallback responses
   const handleFallbackResponse = async (response: any, platform: string) => {
@@ -94,7 +95,10 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
   }
 
   const handleShare = async (platform: SocialPlatform) => {
-    if (!currentUser) return
+    if (!currentUser) {
+      openModal("signin", "recruit")
+      return
+    }
 
     setIsSharing(true)
 
@@ -342,8 +346,15 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-md dialog-gold-border">
+        <DialogHeader>
+          <DialogTitle>Share Achievement</DialogTitle>
+          <DialogDescription>
+            Share your achievement with friends and family!
+          </DialogDescription>
+        </DialogHeader>
+
         {showInstagramInstructions && instagramImageUrl ? (
           <>
             <DialogHeader>
@@ -437,18 +448,9 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
           </>
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle>Share Your Achievement</DialogTitle>
-              <DialogDescription>
-                Share your achievement with friends and family to show your progress in the SF Sheriff's recruitment
-                process.
-              </DialogDescription>
-            </DialogHeader>
-
             <Tabs
               defaultValue="social"
-              value={activeTab}
-              onValueChange={(value) => setActiveTab(value as "social" | "preview")}
+              value="social"
             >
               <TabsList className="grid grid-cols-2">
                 <TabsTrigger value="social">Share</TabsTrigger>
@@ -497,7 +499,7 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
                     className="flex flex-col items-center h-auto py-3 bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45]"
                     disabled={isSharing}
                   >
-                    {isSharing && activeTab === "instagram" ? (
+                    {isSharing && "instagram" ? (
                       <Loader2 className="h-5 w-5 mb-1 animate-spin" />
                     ) : (
                       <Instagram className="h-5 w-5 mb-1" />
@@ -510,7 +512,7 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
                     className="flex flex-col items-center h-auto py-3 bg-black hover:bg-black/90"
                     disabled={isSharing}
                   >
-                    {isSharing && activeTab === "tiktok" ? (
+                    {isSharing && "tiktok" ? (
                       <Loader2 className="h-5 w-5 mb-1 animate-spin" />
                     ) : (
                       <TikTokIcon className="h-5 w-5 mb-1" />
@@ -554,94 +556,92 @@ export function AchievementShareDialog({ isOpen, onClose, achievement }: Achieve
               </TabsContent>
 
               <TabsContent value="preview" className="py-4">
-                {activeTab === "preview" && (
-                  <div className="flex flex-col items-center space-y-4">
-                    {previewImageUrl ? (
-                      <div className="relative w-full max-w-[250px] aspect-[9/16] border rounded overflow-hidden">
-                        {isPreviewAnimated ? (
-                          <img
-                            src={previewImageUrl || "/placeholder.svg"}
-                            alt="Instagram Story Preview"
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <Image
-                            src={previewImageUrl || "/placeholder.svg"}
-                            alt="Instagram Story Preview"
-                            fill
-                            className="object-cover"
-                          />
-                        )}
-                      </div>
-                    ) : (
-                      <div className="border rounded-md p-4 mb-4 bg-gray-50 dark:bg-gray-900 w-full">
-                        <div className="flex items-start space-x-4">
-                          <div className="flex-shrink-0 w-12 h-12 relative">
-                            {achievement.imageUrl ? (
-                              <Image
-                                src={achievement.imageUrl || "/placeholder.svg"}
-                                alt={achievement.title}
-                                width={48}
-                                height={48}
-                                className="rounded-md object-cover"
-                              />
-                            ) : (
-                              <div className="w-12 h-12 bg-[#0A3C1F] rounded-md flex items-center justify-center">
-                                <Share2 className="h-6 w-6 text-white" />
-                              </div>
-                            )}
-                          </div>
+                <div className="flex flex-col items-center space-y-4">
+                  {previewImageUrl ? (
+                    <div className="relative w-full max-w-[250px] aspect-[9/16] border rounded overflow-hidden">
+                      {isPreviewAnimated ? (
+                        <img
+                          src={previewImageUrl || "/placeholder.svg"}
+                          alt="Instagram Story Preview"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Image
+                          src={previewImageUrl || "/placeholder.svg"}
+                          alt="Instagram Story Preview"
+                          fill
+                          className="object-cover"
+                        />
+                      )}
+                    </div>
+                  ) : (
+                    <div className="border rounded-md p-4 mb-4 bg-gray-50 dark:bg-gray-900 w-full">
+                      <div className="flex items-start space-x-4">
+                        <div className="flex-shrink-0 w-12 h-12 relative">
+                          {achievement.imageUrl ? (
+                            <Image
+                              src={achievement.imageUrl || "/placeholder.svg"}
+                              alt={achievement.title}
+                              width={48}
+                              height={48}
+                              className="rounded-md object-cover"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-[#0A3C1F] rounded-md flex items-center justify-center">
+                              <Share2 className="h-6 w-6 text-white" />
+                            </div>
+                          )}
+                        </div>
 
-                          <div className="flex-1">
-                            <h3 className="font-semibold text-sm">San Francisco Sheriff's Department</h3>
-                            <p className="text-xs text-muted-foreground mb-2">Achievement Unlocked</p>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-sm">San Francisco Sheriff's Department</h3>
+                          <p className="text-xs text-muted-foreground mb-2">Achievement Unlocked</p>
 
-                            <h4 className="font-medium text-sm">{achievement.title}</h4>
-                            <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
+                          <h4 className="font-medium text-sm">{achievement.title}</h4>
+                          <p className="text-xs text-muted-foreground mt-1">{achievement.description}</p>
 
-                            <div className="mt-3 text-xs text-blue-600 dark:text-blue-400">sfdeputysheriff.com</div>
-                          </div>
+                          <div className="mt-3 text-xs text-blue-600 dark:text-blue-400">sfdeputysheriff.com</div>
                         </div>
                       </div>
-                    )}
-
-                    <Button onClick={generatePreview} disabled={isGeneratingPreview} className="w-full">
-                      {isGeneratingPreview ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Generating Preview...
-                        </>
-                      ) : (
-                        <>
-                          {previewImageUrl ? (
-                            <>
-                              <Play className="h-4 w-4 mr-2" />
-                              Regenerate {isAnimated ? "Animated" : "Static"} Preview
-                            </>
-                          ) : (
-                            <>
-                              <Play className="h-4 w-4 mr-2" />
-                              Generate {isAnimated ? "Animated" : "Static"} Preview
-                            </>
-                          )}
-                        </>
-                      )}
-                    </Button>
-
-                    <div className="flex items-center justify-between w-full mt-2">
-                      <Label htmlFor="preview-animated" className="text-sm">
-                        {isAnimated ? "Animated Content" : "Static Content"}
-                      </Label>
-                      <Switch id="preview-animated" checked={isAnimated} onCheckedChange={handleAnimationToggle} />
                     </div>
+                  )}
 
-                    <p className="text-xs text-center text-muted-foreground mt-2">
-                      {isAnimated
-                        ? "Animated content is more eye-catching but may take longer to generate."
-                        : "Static images load faster but don't include animations."}
-                    </p>
+                  <Button onClick={generatePreview} disabled={isGeneratingPreview} className="w-full">
+                    {isGeneratingPreview ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating Preview...
+                      </>
+                    ) : (
+                      <>
+                        {previewImageUrl ? (
+                          <>
+                            <Play className="h-4 w-4 mr-2" />
+                            Regenerate {isAnimated ? "Animated" : "Static"} Preview
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-4 w-4 mr-2" />
+                            Generate {isAnimated ? "Animated" : "Static"} Preview
+                          </>
+                        )}
+                      </>
+                    )}
+                  </Button>
+
+                  <div className="flex items-center justify-between w-full mt-2">
+                    <Label htmlFor="preview-animated" className="text-sm">
+                      {isAnimated ? "Animated Content" : "Static Content"}
+                    </Label>
+                    <Switch id="preview-animated" checked={isAnimated} onCheckedChange={handleAnimationToggle} />
                   </div>
-                )}
+
+                  <p className="text-xs text-center text-muted-foreground mt-2">
+                    {isAnimated
+                      ? "Animated content is more eye-catching but may take longer to generate."
+                      : "Static images load faster but don't include animations."}
+                  </p>
+                </div>
               </TabsContent>
             </Tabs>
           </>
