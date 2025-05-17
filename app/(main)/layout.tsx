@@ -1,6 +1,5 @@
 import type React from "react"
 import type { Metadata } from "next"
-import MainLayoutClient from "./MainLayoutClient"
 
 // Define metadata for SEO
 export const metadata: Metadata = {
@@ -40,5 +39,21 @@ export default function MainLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  return <MainLayoutClient>{children}</MainLayoutClient>
+  return (
+    <div className="min-h-screen flex flex-col">
+      <header className="bg-white shadow-sm py-4">
+        <div className="container mx-auto px-4">
+          <h1 className="text-2xl font-bold">SF Deputy Sheriff</h1>
+        </div>
+      </header>
+      
+      {children}
+      
+      <footer className="bg-gray-100 py-8">
+        <div className="container mx-auto px-4">
+          <p className="text-center">© {new Date().getFullYear()} San Francisco Deputy Sheriff's Association</p>
+        </div>
+      </footer>
+    </div>
+  )
 }

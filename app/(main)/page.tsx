@@ -1,76 +1,41 @@
-"use client"
-import { useUser } from "@/context/user-context"
-import { HeroSection } from "@/components/hero-section"
-import { BenefitsSection } from "@/components/benefits-section"
-import { TestimonialsSection } from "@/components/testimonials-section"
-import { FAQSection } from "@/components/faq-section"
-import { CTASection } from "@/components/cta-section"
-import { DebugUser } from "@/components/debug-user"
-import { TopRecruitsScroll } from "@/components/top-recruits-scroll"
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
-import { ApplicationProgressGamification } from "@/components/application-progress-gamification"
-import { PointsIntroduction } from "@/components/points-introduction"
-import { useRegistration } from "@/context/registration-context"
+import { Suspense } from "react"
 
+// Create a simplified version that can be rendered as a static page
 export default function Home() {
-  const { isLoggedIn = false } = useUser()
-  const { openRegistrationPopup } = useRegistration()
-
-  const showOptInForm = (applying = false) => {
-    openRegistrationPopup({
-      applying,
-      initialTab: applying ? "optin" : "signin",
-    })
-  }
-
   return (
-    <>
+    <Suspense fallback={<div>Loading...</div>}>
       <main className="flex-1">
-        <HeroSection onGetStarted={() => showOptInForm(true)} showOptInForm={showOptInForm} />
-
-        {/* Top Recruits section moved to top, right after hero */}
-        <TopRecruitsScroll />
-
-        {/* Add Application Progress Gamification for logged in users */}
-        {isLoggedIn && (
-          <section className="py-12 bg-[#F8F5EE] dark:bg-[#121212]">
-            <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
-                <ApplicationProgressGamification />
-              </div>
+        <div className="container mx-auto px-4 py-12">
+          <h1 className="text-4xl font-bold mb-6">SF Deputy Sheriff Recruitment</h1>
+          <p className="text-lg mb-8">
+            Join the San Francisco Sheriff's Office. Competitive salary, benefits, and career advancement opportunities. 
+            Apply now for a rewarding career in law enforcement.
+          </p>
+          
+          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+            <div className="p-6 border rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold mb-2">Competitive Salary</h3>
+              <p>Starting salaries begin at $92,560 with regular increases.</p>
             </div>
-          </section>
-        )}
-
-        {/* Introduction to Points and Rewards System */}
-        <section className="py-12 bg-white dark:bg-[#1A1A1A]">
-          <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
-              <PointsIntroduction />
+            <div className="p-6 border rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold mb-2">Great Benefits</h3>
+              <p>Comprehensive healthcare, retirement plans, and paid time off.</p>
+            </div>
+            <div className="p-6 border rounded-lg shadow-sm">
+              <h3 className="text-xl font-semibold mb-2">Career Advancement</h3>
+              <p>Opportunities for promotion and specialized assignments.</p>
             </div>
           </div>
-        </section>
-
-        <section id="benefits" className="scroll-mt-20">
-          <BenefitsSection />
-        </section>
-
-        <section id="testimonials" className="scroll-mt-20">
-          <TestimonialsSection />
-        </section>
-
-        <section id="faq" className="scroll-mt-20">
-          <FAQSection />
-        </section>
-
-        <CTASection showOptInForm={showOptInForm} />
+          
+          <div className="mt-12">
+            <h2 className="text-3xl font-bold mb-6">How to Apply</h2>
+            <p className="mb-4">
+              Register on our platform to start your application process. 
+              Our team will guide you through each step of becoming a deputy sheriff.
+            </p>
+          </div>
+        </div>
       </main>
-
-      {/* Only show debug component in development or when explicitly enabled */}
-      {process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true" ? <DebugUser /> : null}
-
-      {/* Fixed Ask Sgt. Ken button */}
-      <AskSgtKenButton position="fixed" variant="secondary" />
-    </>
+    </Suspense>
   )
 }
