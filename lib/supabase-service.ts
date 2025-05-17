@@ -2,13 +2,20 @@ import { createClient } from "@supabase/supabase-js"
 import type { Database } from "../types/database"
 import { createStaticClient } from "./supabase-static"
 
+// Check if we should use static client during build
+const isBuildTime = () => {
+  return process.env.DISABLE_DB_DURING_BUILD === 'true' || 
+         process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === 'true' ||
+         (process.env.VERCEL_ENV && !process.env.VERCEL_ENV.includes('development'));
+}
+
 /**
  * Creates a Supabase client with service role privileges
  * This should only be used in server-side contexts
  */
 export const getServiceSupabase = () => {
-  // For GitHub Pages deployment, return a mock client
-  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
+  // For GitHub Pages deployment or during build, return a mock client
+  if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true" || isBuildTime()) {
     return createStaticClient()
   }
 
@@ -33,7 +40,25 @@ export const getServiceSupabase = () => {
  * This can be used in both client and server contexts
  */
 export const getClientSupabase = () => {
-  return createStaticClient()
+  // Always use static client during build or if explicitly configured
+  if (isBuildTime()) {
+    return createStaticClient()
+  }
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.warn("Missing Supabase environment variables, using mock client")
+    return createStaticClient()
+  }
+
+  return createClient<Database>(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    },
+  })
 }
 
 /**

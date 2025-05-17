@@ -1,29 +1,34 @@
-import { createClient } from "@supabase/supabase-js"
-import type { Database } from "../types/database"
+/**
+ * Singleton instance of the Supabase client.
+ */
 
-// Create a single instance of the Supabase client to be used throughout the app
-let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/types/supabase';
 
-export function getSupabaseClient() {
-  if (supabaseInstance) return supabaseInstance
+const STATIC_BUILD = process.env.NEXT_PUBLIC_STATIC_BUILD === 'true';
+const DISABLE_DATABASE_CHECKS = process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === 'true';
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+let supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+let supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    throw new Error("Missing Supabase environment variables")
-  }
-
-  supabaseInstance = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-    },
-  })
-
-  return supabaseInstance
+// Fallback for static builds to prevent errors
+if (!supabaseUrl && (typeof window === 'undefined' || STATIC_BUILD || DISABLE_DATABASE_CHECKS)) {
+  supabaseUrl = 'https://placeholder-url.supabase.co';
+  supabaseKey = 'placeholder-key';
+  console.warn('Supabase URL/key not found, using placeholder for static build');
 }
 
-// Export the singleton instance
-export const supabase = getSupabaseClient()
+// Default export for more consistent imports
+const supabase = createClient<Database>(supabaseUrl, supabaseKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  },
+});
+
+// Export the supabase client instance
+export { supabase };
+
+// For backward compatibility with old imports
+export default supabase;

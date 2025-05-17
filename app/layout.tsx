@@ -7,9 +7,14 @@ import { ErrorMonitor } from "@/components/error-monitor"
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
 import { RegistrationProvider } from "@/context/registration-context"
 import { AuthModalProvider } from "@/context/auth-modal-context"
-import Head from 'next/head'
 
 const inter = Inter({ subsets: ["latin"] })
+
+export const metadata = {
+  title: "SFDSA AI Recruiter",
+  description: "San Francisco Deputy Sheriffs' Association AI Recruiter",
+  generator: "v0.dev"
+}
 
 export default function RootLayout({
   children,
@@ -18,11 +23,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <Head>
+      <head>
         <title>SFDSA AI Recruiter</title>
         <meta name="description" content="San Francisco Deputy Sheriffs' Association AI Recruiter" />
         <meta name="generator" content="v0.dev" />
-      </Head>
+      </head>
       <body className={inter.className}>
         <ThemeProvider defaultTheme="light" storageKey="app-theme">
           <RegistrationProvider>
@@ -37,4 +42,4 @@ export default function RootLayout({
       </body>
     </html>
   )
-}
+} 

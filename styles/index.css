@@ -1,0 +1,11 @@
+/* 
+ * This file explicitly imports Tailwind CSS styles
+ * It will be built into tailwind-output.css during the build process
+ */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Import the global styles from app/globals.css */
+@import '../app/globals.css'; 

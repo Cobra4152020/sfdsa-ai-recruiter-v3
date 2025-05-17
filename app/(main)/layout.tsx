@@ -1,3 +1,4 @@
+import "../globals.css"
 import type React from "react"
 import type { Metadata } from "next"
 import MainLayoutClient from "./MainLayoutClient"

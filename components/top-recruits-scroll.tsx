@@ -132,56 +132,61 @@ export function TopRecruitsScroll() {
   const handleMouseLeave = () => setIsPaused(false)
 
   return (
-    <div
-      ref={scrollRef}
-      className="flex overflow-x-auto pb-4 hide-scrollbar"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onTouchStart={handleMouseEnter}
-      onTouchEnd={handleMouseLeave}
-    >
-      <div className="flex space-x-4 px-2">
-        {recruits.map((user, index) => (
-          <Card key={user.id} className="min-w-[280px] bg-[#0A3C1F]/10 border-[#0A3C1F]/20">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-4">
-                <div className="relative">
-                  <div className="h-16 w-16 rounded-full overflow-hidden bg-[#0A3C1F]/20 relative">
-                    <Image
-                      src={getProfileImage(user.id) || "/placeholder.svg"}
-                      alt={user.name || `Recruit #${user.id}`}
-                      fill
-                      className="object-cover"
-                      sizes="64px"
-                    />
-                  </div>
-                  {index < 3 && (
-                    <div className="absolute -top-2 -right-2 bg-[#FFD700] rounded-full p-1">
-                      {index === 0 ? (
-                        <Trophy className="h-4 w-4 text-[#0A3C1F]" />
-                      ) : index === 1 ? (
-                        <Star className="h-4 w-4 text-[#0A3C1F]" />
-                      ) : (
-                        <Award className="h-4 w-4 text-[#0A3C1F]" />
+    <section className="w-full py-8 bg-background text-foreground">
+      <div className="container mx-auto px-4">
+        <h2 className="text-2xl font-bold mb-4 text-primary">Top Recruits</h2>
+        <div
+          ref={scrollRef}
+          className="flex overflow-x-auto pb-4 hide-scrollbar"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          onTouchStart={handleMouseEnter}
+          onTouchEnd={handleMouseLeave}
+        >
+          <div className="flex space-x-4 px-2">
+            {recruits.map((user, index) => (
+              <Card key={user.id} className="min-w-[280px] bg-card border border-border">
+                <CardContent className="p-4">
+                  <div className="flex items-center space-x-4">
+                    <div className="relative">
+                      <div className="h-16 w-16 rounded-full overflow-hidden bg-primary/10 relative">
+                        <Image
+                          src={getProfileImage(user.id) || "/placeholder.svg"}
+                          alt={user.name || `Recruit #${user.id}`}
+                          fill
+                          className="object-cover"
+                          sizes="64px"
+                        />
+                      </div>
+                      {index < 3 && (
+                        <div className="absolute -top-2 -right-2 bg-secondary rounded-full p-1">
+                          {index === 0 ? (
+                            <Trophy className="h-4 w-4 text-secondary-foreground" />
+                          ) : index === 1 ? (
+                            <Star className="h-4 w-4 text-secondary-foreground" />
+                          ) : (
+                            <Award className="h-4 w-4 text-secondary-foreground" />
+                          )}
+                        </div>
                       )}
                     </div>
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white">{user.name || `Recruit #${user.id}`}</h3>
-                  <p className="text-sm text-gray-300">{user.title || "Recruit Applicant"}</p>
-                  <div className="flex items-center mt-2">
-                    <Badge className="bg-[#0A3C1F] text-[#FFD700]">{user.points || 0} points</Badge>
-                    {user.badges && user.badges > 0 && (
-                      <Badge className="ml-2 bg-[#FFD700] text-[#0A3C1F]">{user.badges} badges</Badge>
-                    )}
+                    <div>
+                      <h3 className="font-semibold text-primary-foreground">{user.name || `Recruit #${user.id}`}</h3>
+                      <p className="text-sm text-muted-foreground">{user.title || "Recruit Applicant"}</p>
+                      <div className="flex items-center mt-2">
+                        <Badge className="bg-primary text-primary-foreground">{user.points || 0} points</Badge>
+                        {user.badges && user.badges > 0 && (
+                          <Badge className="ml-2 bg-secondary text-secondary-foreground">{user.badges} badges</Badge>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }

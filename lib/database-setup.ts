@@ -50,6 +50,12 @@ export async function createColumnCheckFunction() {
  * Sets up the database schema, including migrations and sample data population
  */
 export async function setupDatabase() {
+  // Skip database setup during build time on Vercel
+  if (process.env.VERCEL_ENV === 'production' && process.env.DISABLE_DB_DURING_BUILD === 'true') {
+    console.log('Skipping database setup during build on Vercel');
+    return { success: true, message: 'Database setup skipped during build' };
+  }
+
   try {
     const migrations = [
       "create_awards_system_schema.sql",
@@ -157,4 +163,13 @@ export async function createPerformanceMetricsTable() {
     console.error("Error creating performance_metrics table:", error)
     return false
   }
+}
+
+// Also modify any other database initialization functions to check for build environment
+export function shouldSkipDatabaseOps() {
+  return (
+    process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === 'true' || 
+    process.env.DISABLE_DB_DURING_BUILD === 'true' ||
+    (process.env.VERCEL_ENV && process.env.NODE_ENV === 'production')
+  );
 }

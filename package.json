@@ -4,12 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/direct-build.js",
+    "deploy": "node scripts/deploy-build.js",
     "start": "next start",
     "lint": "next lint",
     "setup-db": "tsx scripts/setup-database.ts",
     "fix-tables": "tsx scripts/fix-table-checks.ts",
-    "run-migrations": "tsx scripts/run-migrations.ts"
+    "run-migrations": "tsx scripts/run-migrations.ts",
+    "vercel-build": "node scripts/deploy-build.js"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.2",
@@ -47,7 +49,6 @@
     "@stripe/stripe-js": "^3.0.10",
     "@supabase/auth-helpers-nextjs": "^0.9.0",
     "@supabase/supabase-js": "^2.39.8",
-    "autoprefixer": "^10.4.20",
     "canvas": "^2.11.2",
     "canvas-confetti": "^1.9.2",
     "class-variance-authority": "^0.7.1",
@@ -92,6 +93,8 @@
     "@types/node": "^20.11.30",
     "@types/react": "^18.2.67",
     "@types/react-dom": "^18.2.22",
+    "@vercel/style-guide": "^6.0.0",
+    "autoprefixer": "^10.4.20",
     "critters": "^0.0.25",
     "glob": "^11.0.2",
     "postcss": "^8.4.38",
