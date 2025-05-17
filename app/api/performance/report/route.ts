@@ -1,4 +1,5 @@
-export const dynamic = 'force-dynamic';
+// Remove dynamic export for static compatibility
+// export const dynamic = 'force-dynamic';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
