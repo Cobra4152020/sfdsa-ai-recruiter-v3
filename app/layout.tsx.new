@@ -1,21 +1,51 @@
 import type React from "react"
+import type { Metadata } from "next"
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
+import { UserProvider } from "@/context/user-context"
+import { RegistrationProvider } from "@/context/registration-context"
+import { AuthModalProvider } from "@/context/auth-modal-context"
 import PerformanceMonitor from "@/components/performance-monitor"
 import { ErrorMonitor } from "@/components/error-monitor"
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
-import { RegistrationProvider } from "@/context/registration-context"
-import { AuthModalProvider } from "@/context/auth-modal-context"
 import TailwindCDN from "@/components/tailwind-cdn"
 import Script from "next/script"
+import MainLayoutClient from "@/components/MainLayoutClient"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata = {
-  title: "SFDSA AI Recruiter",
-  description: "San Francisco Deputy Sheriffs' Association AI Recruiter",
-  generator: "v0.dev"
+// Define metadata for SEO
+export const metadata: Metadata = {
+  title: "SF Deputy Sheriff Recruitment | Join Our Team",
+  description:
+    "Join the San Francisco Sheriff's Office. Competitive salary, benefits, and career advancement opportunities. Apply now for a rewarding career in law enforcement.",
+  keywords:
+    "deputy sheriff, san francisco sheriff, law enforcement career, sheriff recruitment, police jobs, public safety careers",
+  openGraph: {
+    title: "SF Deputy Sheriff Recruitment | Join Our Team",
+    description:
+      "Join the San Francisco Sheriff's Office. Competitive salary, benefits, and career advancement opportunities. Apply now for a rewarding career in law enforcement.",
+    url: "https://sfdeputysheriff.com",
+    siteName: "San Francisco Deputy Sheriff Recruitment",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "San Francisco Deputy Sheriff Recruitment",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SF Deputy Sheriff Recruitment | Join Our Team",
+    description:
+      "Join the San Francisco Sheriff's Office. Competitive salary, benefits, and career advancement opportunities. Apply now for a rewarding career in law enforcement.",
+    images: ["/twitter-image.jpg"],
+  },
 }
 
 export default function RootLayout({
@@ -103,14 +133,16 @@ export default function RootLayout({
         {/* TailwindCDN component adds the Tailwind CSS dynamically on the client side as backup */}
         <TailwindCDN />
         <ThemeProvider defaultTheme="light" storageKey="app-theme">
-          <RegistrationProvider>
-            <AuthModalProvider>
-              <WebSocketErrorHandler />
-              <ErrorMonitor />
-              <PerformanceMonitor />
-              {children}
-            </AuthModalProvider>
-          </RegistrationProvider>
+          <UserProvider>
+            <RegistrationProvider>
+              <AuthModalProvider>
+                <WebSocketErrorHandler />
+                <ErrorMonitor />
+                <PerformanceMonitor />
+                <MainLayoutClient>{children}</MainLayoutClient>
+              </AuthModalProvider>
+            </RegistrationProvider>
+          </UserProvider>
         </ThemeProvider>
       </body>
     </html>

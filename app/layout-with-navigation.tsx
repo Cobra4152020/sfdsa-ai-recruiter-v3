@@ -1,6 +1,5 @@
 import type React from "react"
-import { HeaderWrapper } from "@/components/header-wrapper"
-import { ImprovedFooter } from "@/components/improved-footer"
+import { PageWrapper } from "@/components/page-wrapper"
 
 export default function LayoutWithNavigation({
   children,
@@ -8,10 +7,8 @@ export default function LayoutWithNavigation({
   children: React.ReactNode
 }) {
   return (
-    <>
-      <HeaderWrapper />
+    <PageWrapper>
       <main className="min-h-screen pt-20 pb-16">{children}</main>
-      <ImprovedFooter />
-    </>
+    </PageWrapper>
   )
 }

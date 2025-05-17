@@ -1,40 +1,71 @@
-import { PageWrapper } from "@/components/page-wrapper"
+"use client"
+import { useUser } from "@/context/user-context"
+import { HeroSection } from "@/components/hero-section"
+import { BenefitsSection } from "@/components/benefits-section"
+import { TestimonialsSection } from "@/components/testimonials-section"
+import { FAQSection } from "@/components/faq-section"
+import { CTASection } from "@/components/cta-section"
+import { DebugUser } from "@/components/debug-user"
+import { TopRecruitsScroll } from "@/components/top-recruits-scroll"
+import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
+import { ApplicationProgressGamification } from "@/components/application-progress-gamification"
+import { PointsIntroduction } from "@/components/points-introduction"
+import { useRegistration } from "@/context/registration-context"
 
-export default function HomePage() {
+export default function Home() {
+  const { currentUser } = useUser()
+  const { openRegistrationPopup } = useRegistration()
+
+  const showOptInForm = (applying = false) => {
+    openRegistrationPopup({
+      applying,
+      initialTab: applying ? "optin" : "signin",
+    })
+  }
+
   return (
-    <PageWrapper>
-      <div className="container mx-auto px-4 py-8">
-        <section className="mb-12">
-          <h1 className="text-4xl font-bold text-primary mb-4">San Francisco Deputy Sheriff</h1>
-          <p className="text-lg mb-6">Join our team and make a difference in our community.</p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-card p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-3">Competitive Salary</h2>
-              <p>Starting salary ranges from $89,648 to $108,914 annually.</p>
+    <>
+      <main className="flex-1">
+        <HeroSection onGetStarted={() => showOptInForm(true)} showOptInForm={showOptInForm} />
+
+        <TopRecruitsScroll />
+
+        {currentUser && (
+          <section className="py-12 bg-[#F8F5EE] dark:bg-[#121212]">
+            <div className="container mx-auto px-4">
+              <div className="max-w-4xl mx-auto">
+                <ApplicationProgressGamification />
+              </div>
             </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-3">Benefits</h2>
-              <p>Medical, dental, vision coverage, and retirement plans.</p>
-            </div>
-            
-            <div className="bg-card p-6 rounded-lg shadow-md">
-              <h2 className="text-xl font-semibold mb-3">Career Growth</h2>
-              <p>Opportunities for advancement and specialized training.</p>
+          </section>
+        )}
+
+        <section className="py-12 bg-white dark:bg-[#1A1A1A]">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <PointsIntroduction />
             </div>
           </div>
         </section>
-        
-        <section className="my-12">
-          <h2 className="text-3xl font-bold text-primary mb-6">Ready to Serve?</h2>
-          <div className="flex justify-center">
-            <a href="/apply" className="bg-primary text-primary-foreground px-6 py-3 rounded-md text-lg font-medium hover:bg-primary/90 transition-colors">
-              Apply Now
-            </a>
-          </div>
+
+        <section id="benefits" className="scroll-mt-20">
+          <BenefitsSection />
         </section>
-      </div>
-    </PageWrapper>
+
+        <section id="testimonials" className="scroll-mt-20">
+          <TestimonialsSection />
+        </section>
+
+        <section id="faq" className="scroll-mt-20">
+          <FAQSection />
+        </section>
+
+        <CTASection showOptInForm={showOptInForm} />
+      </main>
+
+      {process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true" ? <DebugUser /> : null}
+
+      <AskSgtKenButton position="fixed" variant="secondary" />
+    </>
   )
 } 

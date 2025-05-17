@@ -1,9 +1,8 @@
 "use client"
 
 import type React from "react"
-
-import { createContext, useContext, useEffect, useState } from "react"
-import { Moon, Sun } from "lucide-react"
+import { createContext, useContext } from "react"
+import { Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
 type Theme = "light" | "dark"
@@ -30,41 +29,20 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
 
 export function ThemeProvider({
   children,
-  defaultTheme = "light",
-  storageKey = "theme",
   ...props
 }: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme)
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem(storageKey) as Theme | null
-
-    if (savedTheme) {
-      setTheme(savedTheme)
-    } else {
-      // Check for system preference if no saved theme
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-      setTheme(prefersDark ? "dark" : "light")
-    }
-  }, [storageKey])
-
-  useEffect(() => {
-    const root = window.document.documentElement
-
-    root.classList.remove("light", "dark")
-    root.classList.add(theme)
-
-    localStorage.setItem(storageKey, theme)
-  }, [theme, storageKey])
-
-  const toggleTheme = () => {
-    setTheme(theme === "light" ? "dark" : "light")
+  // Force light theme
+  const value: ThemeProviderState = {
+    theme: "light",
+    setTheme: () => null, // No-op since we're forcing light theme
+    toggleTheme: () => null, // No-op since we're forcing light theme
   }
 
-  const value = {
-    theme,
-    setTheme,
-    toggleTheme,
+  // Apply light theme to document
+  if (typeof window !== "undefined") {
+    const root = window.document.documentElement
+    root.classList.remove("dark")
+    root.classList.add("light")
   }
 
   return (
@@ -83,17 +61,15 @@ export const useTheme = () => {
 }
 
 export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme()
-
   return (
     <Button
       variant="ghost"
       size="icon"
-      onClick={toggleTheme}
-      aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+      disabled={true}
+      aria-label="Theme is locked to light mode"
     >
-      {theme === "light" ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
-      <span className="sr-only">Toggle theme</span>
+      <Sun className="h-5 w-5 text-gray-400" />
+      <span className="sr-only">Theme is locked to light mode</span>
     </Button>
   )
 }

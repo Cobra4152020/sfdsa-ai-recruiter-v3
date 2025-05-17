@@ -5,8 +5,7 @@ import { NFTAwardCard } from "@/components/nft-award-card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
+import { PageWrapper } from "@/components/page-wrapper"
 import { UserProvider } from "@/context/user-context"
 import type { NFTAward } from "@/lib/nft-utils"
 
@@ -20,9 +19,8 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
   if (!award) {
     return (
       <UserProvider>
-        <div className="min-h-screen flex flex-col">
-          <ImprovedHeader showOptInForm={() => setShowOptInForm(true)} />
-          <main className="flex-1 pt-40 pb-12 bg-[#F8F5EE] dark:bg-[#121212] flex items-center justify-center">
+        <PageWrapper>
+          <main className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
             <div className="text-center">
               <h1 className="text-3xl font-bold mb-4">NFT Award Not Found</h1>
               <p className="mb-8">The NFT award you're looking for doesn't exist.</p>
@@ -34,8 +32,7 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
               </Link>
             </div>
           </main>
-          <ImprovedFooter />
-        </div>
+        </PageWrapper>
       </UserProvider>
     )
   }
@@ -46,7 +43,7 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
 
   return (
     <UserProvider>
-      <div className="min-h-screen flex flex-col">
+      <PageWrapper>
         <head>
           <title>{title}</title>
           <meta name="description" content={description} />
@@ -66,9 +63,7 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
           />
         </head>
 
-        <ImprovedHeader showOptInForm={() => setShowOptInForm(true)} />
-
-        <main className="flex-1 pt-40 pb-12 bg-[#F8F5EE] dark:bg-[#121212]">
+        <main className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
           <div className="container mx-auto px-4">
             <Link href="/" prefetch={false}>
               <Button variant="ghost" className="mb-8">
@@ -111,9 +106,7 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
             </div>
           </div>
         </main>
-
-        <ImprovedFooter />
-      </div>
+      </PageWrapper>
     </UserProvider>
   )
 } 

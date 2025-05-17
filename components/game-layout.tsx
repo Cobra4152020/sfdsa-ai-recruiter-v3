@@ -1,6 +1,5 @@
 import type { ReactNode } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { type ImprovedfooterProps, ImprovedFooter } from "@/components/improved-footer"
 import { SkipToContent } from "@/components/skip-to-content"
 import { PageWrapper } from "@/components/page-wrapper"
 
@@ -8,10 +7,9 @@ interface GameLayoutProps {
   children: ReactNode
   title: string
   description: string
-  footerProps?: ImprovedfooterProps
 }
 
-export function GameLayout({ children, title, description, footerProps }: GameLayoutProps) {
+export function GameLayout({ children, title, description }: GameLayoutProps) {
   return (
     <PageWrapper>
       <SkipToContent />
@@ -26,7 +24,6 @@ export function GameLayout({ children, title, description, footerProps }: GameLa
           </Card>
         </div>
       </main>
-      <ImprovedFooter {...footerProps} />
     </PageWrapper>
   )
 }

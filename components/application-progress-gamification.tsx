@@ -149,30 +149,30 @@ export function ApplicationProgressGamification() {
           <Trophy className="mr-2 h-5 w-5 text-[#FFD700]" />
           Your Application Journey
         </CardTitle>
-        <CardDescription className="text-gray-200">Complete each step to earn points and badges</CardDescription>
+        <CardDescription className="text-white/80">Complete each step to earn points and badges</CardDescription>
       </CardHeader>
       <CardContent className="p-6">
         <div className="mb-6">
           <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium">Application Progress</span>
-            <span className="text-sm font-medium">{progressPercentage}%</span>
+            <span className="text-sm font-medium text-[#0A3C1F]">Application Progress</span>
+            <span className="text-sm font-medium text-[#0A3C1F]">{progressPercentage}%</span>
           </div>
-          <Progress value={progressPercentage} className="h-2" />
+          <Progress value={progressPercentage} className="h-2 bg-[#0A3C1F]/10" />
 
           <div className="mt-4 flex justify-between items-center">
             <div>
-              <span className="text-sm text-gray-500">Points Earned</span>
+              <span className="text-sm text-[#0A3C1F]/70">Points Earned</span>
               <div className="text-2xl font-bold text-[#0A3C1F]">{totalPointsEarned}</div>
             </div>
             <div>
-              <span className="text-sm text-gray-500">Badges Earned</span>
+              <span className="text-sm text-[#0A3C1F]/70">Badges Earned</span>
               <div className="text-2xl font-bold text-[#0A3C1F]">
                 {applicationSteps.filter((step) => step.completed && step.badgeAwarded).length}
               </div>
             </div>
             <Button
               variant="outline"
-              className="text-[#0A3C1F] border-[#0A3C1F]"
+              className="text-[#0A3C1F] border-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
               onClick={() => {
                 toast({
                   title: "Share Your Progress",
@@ -197,40 +197,43 @@ export function ApplicationProgressGamification() {
               <div className="flex items-start">
                 <div
                   className={`p-2 rounded-full ${
-                    step.completed ? "bg-[#0A3C1F] text-white" : "bg-gray-100 text-gray-400"
+                    step.completed ? "bg-[#0A3C1F] text-white" : "bg-[#0A3C1F]/10 text-[#0A3C1F]/40"
                   }`}
                 >
-                  {step.completed ? (
-                    <CheckCircle className="h-5 w-5" />
-                  ) : (
-                    <span className="h-5 w-5 flex items-center justify-center font-medium">{index + 1}</span>
-                  )}
+                  <CheckCircle className="h-5 w-5" />
                 </div>
-
                 <div className="ml-4 flex-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-medium">{step.title}</h3>
-                    <div className="flex items-center">
-                      <span className="text-sm font-medium text-[#0A3C1F] mr-2">+{step.points} pts</span>
+                    <h3 className="font-semibold text-[#0A3C1F]">{step.title}</h3>
+                    <div className="flex items-center space-x-2">
                       {step.badgeAwarded && (
                         <Badge
-                          className={`${step.completed ? "bg-[#FFD700] text-[#0A3C1F]" : "bg-gray-100 text-gray-500"}`}
+                          variant="outline"
+                          className={`${
+                            step.completed
+                              ? "border-[#FFD700] text-[#FFD700] bg-[#FFD700]/10"
+                              : "border-[#0A3C1F]/20 text-[#0A3C1F]/40"
+                          }`}
                         >
-                          <Award className="h-3 w-3 mr-1" />
+                          <Award className="mr-1 h-3 w-3" />
                           {step.badgeAwarded}
                         </Badge>
                       )}
+                      <span className={`text-sm ${step.completed ? "text-[#0A3C1F]" : "text-[#0A3C1F]/40"}`}>
+                        {step.points} pts
+                      </span>
                     </div>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">{step.description}</p>
-
+                  <p className={`mt-1 text-sm ${step.completed ? "text-[#0A3C1F]/70" : "text-[#0A3C1F]/40"}`}>
+                    {step.description}
+                  </p>
                   {!step.completed && (
                     <Button
                       variant="link"
-                      className="text-[#0A3C1F] p-0 h-auto mt-2"
+                      className="mt-2 text-[#0A3C1F] hover:text-[#0A3C1F]/70 p-0"
                       onClick={() => completeStep(step.id)}
                     >
-                      Complete this step <ArrowRight className="ml-1 h-3 w-3" />
+                      Complete Step <ArrowRight className="ml-1 h-4 w-4" />
                     </Button>
                   )}
                 </div>

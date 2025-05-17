@@ -2,68 +2,84 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  /* Light mode - Sheriff green and tan */
-  --background: 48 33% 94%; /* Light tan */
-  --foreground: 142 69% 14%; /* Sheriff green */
+@layer base {
+  :root {
+    /* Base colors */
+    --sheriff-green: 142 69% 14%;
+    --sheriff-green-light: 142 69% 94%;
+    --sheriff-gold: 51 100% 50%;
 
-  --card: 48 33% 94%; /* Changed from white to light tan */
-  --card-foreground: 142 69% 14%;
+    /* Light mode */
+    --background: var(--sheriff-green-light);
+    --foreground: var(--sheriff-green);
 
-  --popover: 48 33% 94%; /* Changed from white to light tan */
-  --popover-foreground: 142 69% 14%;
+    --card: var(--sheriff-green-light);
+    --card-foreground: var(--sheriff-green);
 
-  --primary: 142 69% 14%; /* Sheriff green */
-  --primary-foreground: 48 33% 94%;
+    --popover: var(--sheriff-green-light);
+    --popover-foreground: var(--sheriff-green);
 
-  --secondary: 48 33% 94%; /* Light tan */
-  --secondary-foreground: 142 69% 14%;
+    --primary: var(--sheriff-green);
+    --primary-foreground: var(--sheriff-gold);
 
-  --muted: 48 20% 88%;
-  --muted-foreground: 142 40% 30%;
+    --secondary: var(--sheriff-green-light);
+    --secondary-foreground: var(--sheriff-green);
 
-  --accent: 48 40% 85%; /* Darker tan */
-  --accent-foreground: 142 69% 14%;
+    --muted: 142 20% 88%;
+    --muted-foreground: 142 40% 30%;
 
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 48 33% 94%;
+    --accent: var(--sheriff-gold);
+    --accent-foreground: var(--sheriff-green);
 
-  --border: 48 30% 80%;
-  --input: 48 30% 80%;
-  --ring: 142 69% 14%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: var(--sheriff-green-light);
 
-  --radius: 0.5rem;
+    --border: 142 30% 80%;
+    --input: 142 30% 80%;
+    --ring: var(--sheriff-green);
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    /* Dark mode */
+    --background: 142 69% 8%;
+    --foreground: var(--sheriff-gold);
+
+    --card: 142 69% 12%;
+    --card-foreground: var(--sheriff-gold);
+
+    --popover: 142 69% 12%;
+    --popover-foreground: var(--sheriff-gold);
+
+    --primary: var(--sheriff-green);
+    --primary-foreground: var(--sheriff-gold);
+
+    --secondary: 142 69% 18%;
+    --secondary-foreground: var(--sheriff-gold);
+
+    --muted: 142 69% 20%;
+    --muted-foreground: 51 70% 70%;
+
+    --accent: var(--sheriff-gold);
+    --accent-foreground: var(--sheriff-green);
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: var(--sheriff-gold);
+
+    --border: 142 69% 20%;
+    --input: 142 69% 20%;
+    --ring: var(--sheriff-gold);
+  }
 }
 
-.dark {
-  /* Dark mode - Black and yellow */
-  --background: 0 0% 10%; /* Near black */
-  --foreground: 51 100% 50%; /* Gold/yellow */
+/* Custom header styles */
+.header-nav {
+  @apply bg-[#0A3C1F] text-white;
+}
 
-  --card: 0 0% 15%;
-  --card-foreground: 51 100% 50%;
-
-  --popover: 0 0% 15%;
-  --popover-foreground: 51 100% 50%;
-
-  --primary: 51 100% 50%; /* Gold/yellow */
-  --primary-foreground: 0 0% 10%;
-
-  --secondary: 0 0% 20%;
-  --secondary-foreground: 51 100% 50%;
-
-  --muted: 0 0% 25%;
-  --muted-foreground: 51 70% 70%;
-
-  --accent: 51 80% 45%; /* Darker gold */
-  --accent-foreground: 0 0% 10%;
-
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 51 100% 50%;
-
-  --border: 0 0% 25%;
-  --input: 0 0% 25%;
-  --ring: 51 100% 50%;
+.header-nav-item {
+  @apply text-white hover:text-[#FFD700] transition-colors duration-200;
 }
 
 @layer base {

@@ -1,7 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
+import { PageWrapper } from "@/components/page-wrapper"
 
 export const metadata: Metadata = {
   title: "User Dashboard | SF Deputy Sheriff Recruitment",
@@ -14,10 +13,8 @@ export default function UserDashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <ImprovedHeader />
+    <PageWrapper>
       <main className="flex-1 bg-[#F8F5EE] dark:bg-[#121212] pt-20">{children}</main>
-      <ImprovedFooter />
-    </div>
+    </PageWrapper>
   )
 }

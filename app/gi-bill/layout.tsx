@@ -1,6 +1,6 @@
 import type React from "react"
 import type { Metadata } from "next"
-import MainLayoutClient from "../(main)/MainLayoutClient"
+import MainLayoutClient from "@/components/MainLayoutClient"
 
 export const metadata: Metadata = {
   title: "G.I. Bill Benefits | SF Deputy Sheriff Recruitment",

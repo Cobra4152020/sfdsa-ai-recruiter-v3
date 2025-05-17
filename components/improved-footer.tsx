@@ -10,13 +10,13 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className={`bg-primary text-primary-foreground border-t border-primary-foreground/10 py-8 ${className}`}>
+    <footer className={`bg-[#0A3C1F] text-white border-t border-white/10 py-8 ${className}`}>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and description */}
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center mb-4">
-              <Shield className="h-6 w-6 text-primary mr-2" aria-hidden="true" />
+              <Shield className="h-6 w-6 text-[#FFD700] mr-2" aria-hidden="true" />
               <span className="font-bold">SF Deputy Sheriff</span>
             </div>
             <p className="text-sm text-gray-300 mb-4">
@@ -28,7 +28,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Facebook"
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-white hover:text-[#FFD700] transition-colors"
               >
                 <Facebook className="h-5 w-5" />
               </a>
@@ -37,7 +37,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Twitter"
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-white hover:text-[#FFD700] transition-colors"
               >
                 <Twitter className="h-5 w-5" />
               </a>
@@ -46,7 +46,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Subscribe to our YouTube channel"
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-white hover:text-[#FFD700] transition-colors"
               >
                 <Youtube className="h-5 w-5" />
               </a>
@@ -55,7 +55,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Instagram"
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-white hover:text-[#FFD700] transition-colors"
               >
                 <Instagram className="h-5 w-5" />
               </a>
@@ -64,7 +64,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Connect with us on LinkedIn"
-                className="text-foreground hover:text-primary transition-colors"
+                className="text-white hover:text-[#FFD700] transition-colors"
               >
                 <Linkedin className="h-5 w-5" />
               </a>
@@ -73,47 +73,47 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
 
           {/* Quick Links */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4 text-primary">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/awards" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/awards" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Top Recruit Awards
                 </Link>
               </li>
               <li>
-                <Link href="/badges" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/badges" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Badge Gallery
                 </Link>
               </li>
               <li>
-                <Link href="/gi-bill" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/gi-bill" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   G.I. Bill
                 </Link>
               </li>
               <li>
-                <Link href="/discounted-housing" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/discounted-housing" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Discounted Housing
                 </Link>
               </li>
               <li>
-                <Link href="/trivia" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/trivia" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   SF Trivia
                 </Link>
               </li>
               <li>
-                <Link href="/donor-recognition" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/donor-recognition" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Donor Recognition
                 </Link>
               </li>
               <li>
                 <Link
                   href="/volunteer-recruiter"
-                  className="text-gray-300 hover:text-white transition-colors flex items-center"
+                  className="text-gray-300 hover:text-[#FFD700] transition-colors flex items-center"
                 >
                   <UserPlus className="h-4 w-4 mr-1.5" aria-hidden="true" />
                   Volunteer Recruiter
@@ -124,14 +124,14 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
 
           {/* Contact Info */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4 text-primary">Contact Us</h3>
+            <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Contact Us</h3>
             <address className="not-italic text-sm text-gray-300 space-y-4">
               <div className="flex items-center">
                 <a
                   href="https://sanfranciscodsa.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center hover:text-white transition-colors group"
+                  className="flex items-center hover:text-[#FFD700] transition-colors group"
                 >
                   <div className="w-12 h-12 mr-3 flex-shrink-0">
                     <Image
@@ -142,7 +142,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                       className="object-contain"
                     />
                   </div>
-                  <span className="group-hover:text-white transition-colors">
+                  <span className="group-hover:text-[#FFD700] transition-colors">
                     San Francisco Deputy Sheriffs' Association 501(c)5
                   </span>
                 </a>
@@ -153,7 +153,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                   href="https://protectingsanfrancisco.com/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center hover:text-white transition-colors group"
+                  className="flex items-center hover:text-[#FFD700] transition-colors group"
                 >
                   <div className="w-12 h-12 mr-3 flex-shrink-0">
                     <Image
@@ -164,14 +164,14 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                       className="object-contain"
                     />
                   </div>
-                  <span className="group-hover:text-white transition-colors">Protecting San Francisco 501(c)3</span>
+                  <span className="group-hover:text-[#FFD700] transition-colors">Protecting San Francisco 501(c)3</span>
                 </a>
               </div>
 
               <div className="mt-4">
                 <Link
                   href="/donate"
-                  className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-md transition-colors shadow-md"
+                  className="inline-flex items-center px-4 py-2 bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold rounded-md transition-colors shadow-md"
                 >
                   <Heart className="h-4 w-4 mr-2" aria-hidden="true" />
                   <span>Support Our Mission</span>
@@ -181,12 +181,12 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
               <p className="mt-4">35 Gilbert Street</p>
               <p>San Francisco, CA 94103</p>
               <p>
-                <a href="tel:+14156962428" className="hover:text-white transition-colors">
+                <a href="tel:+14156962428" className="hover:text-[#FFD700] transition-colors">
                   Phone: (415) 696-2428
                 </a>
               </p>
               <p>
-                <a href="mailto:email@protectingsanfrancisco.com" className="hover:text-white transition-colors">
+                <a href="mailto:email@protectingsanfrancisco.com" className="hover:text-[#FFD700] transition-colors">
                   Email: email@protectingsanfrancisco.com
                 </a>
               </p>
@@ -195,25 +195,25 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
 
           {/* Legal */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4 text-primary">Legal</h3>
+            <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Legal</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/privacy-policy" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/privacy-policy" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Privacy Policy
                 </Link>
               </li>
               <li>
-                <Link href="/terms-of-service" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/terms-of-service" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Terms of Service
                 </Link>
               </li>
               <li>
-                <Link href="/accessibility" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/accessibility" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Accessibility
                 </Link>
               </li>
               <li>
-                <Link href="/sitemap.xml" className="text-gray-300 hover:text-white transition-colors">
+                <Link href="/sitemap.xml" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                   Sitemap
                 </Link>
               </li>
@@ -221,20 +221,20 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
           </div>
           <div className="col-span-1">
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold mb-4 text-primary">Resources</h3>
+              <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Resources</h3>
               <ul className="space-y-2">
                 <li>
-                  <Link href="/faq" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/faq" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                     FAQ
                   </Link>
                 </li>
                 <li>
-                  <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/contact" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                     Contact
                   </Link>
                 </li>
                 <li>
-                  <Link href="/volunteer-login" className="text-gray-300 hover:text-white transition-colors">
+                  <Link href="/volunteer-login" className="text-gray-300 hover:text-[#FFD700] transition-colors">
                     Volunteer Portal
                   </Link>
                 </li>

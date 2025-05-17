@@ -1,13 +1,11 @@
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
+import { PageWrapper } from "@/components/page-wrapper"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { LoginForm } from "@/components/login-form"
 import { User } from "lucide-react"
 
 export default function LoginPage() {
   return (
-    <>
-      <ImprovedHeader />
+    <PageWrapper>
       <main className="container mx-auto px-4 py-8 md:py-12">
         <div className="max-w-md mx-auto">
           <Card className="border-t-4 border-t-[#0A3C1F] shadow-lg">
@@ -34,7 +32,6 @@ export default function LoginPage() {
           </div>
         </div>
       </main>
-      <ImprovedFooter />
-    </>
+    </PageWrapper>
   )
 }

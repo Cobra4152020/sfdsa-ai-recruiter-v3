@@ -1,6 +1,5 @@
 import MissionBriefingContent from "./content"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
+import { PageWrapper } from "@/components/page-wrapper"
 import type { Metadata } from "next"
 
 export const metadata: Metadata = {
@@ -11,14 +10,10 @@ export const metadata: Metadata = {
 
 export default function MissionBriefingPage() {
   return (
-    <>
-      <div className="flex flex-col min-h-screen">
-        <ImprovedHeader />
-        <main className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
-          <MissionBriefingContent />
-        </main>
-        <ImprovedFooter />
-      </div>
-    </>
+    <PageWrapper>
+      <main className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
+        <MissionBriefingContent />
+      </main>
+    </PageWrapper>
   )
 }

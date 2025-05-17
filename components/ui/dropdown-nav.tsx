@@ -75,14 +75,14 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
-        {icon && <span className="mr-1">{icon}</span>}
+        {icon && <span className="mr-1 text-[#FFD700]">{icon}</span>}
         <span>{label}</span>
         <ChevronDown className={cn("ml-1 h-4 w-4 transition-transform duration-200", isOpen ? "rotate-180" : "")} />
       </button>
 
       {isOpen && (
         <div
-          className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-50 animate-in fade-in slide-in-from-top-5 duration-200"
+          className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-[#0A3C1F] ring-1 ring-[#FFD700]/20 z-50 animate-in fade-in slide-in-from-top-5 duration-200"
           role="menu"
           aria-orientation="vertical"
         >
@@ -91,7 +91,7 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
               <Link
                 key={index}
                 href={item.href}
-                className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                className="block px-4 py-2 text-sm text-white hover:text-[#FFD700] hover:bg-white/10 transition-colors"
                 role="menuitem"
                 onClick={() => setIsOpen(false)}
                 style={{ transitionDelay: `${50 + index * 25}ms` }}

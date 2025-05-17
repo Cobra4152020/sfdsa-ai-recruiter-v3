@@ -54,16 +54,16 @@ export function FAQSection() {
   }
 
   return (
-    <section className="w-full py-12 md:py-20 bg-background text-foreground">
+    <section className="w-full py-12 md:py-20 bg-white text-[#0A3C1F]">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-primary">Frequently Asked Questions</h2>
+        <h2 className="text-3xl md:text-4xl font-bold mb-8 text-[#0A3C1F]">Frequently Asked Questions</h2>
         <div className="text-center mb-12">
-          <p className="text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
+          <p className="text-[#0A3C1F]/70 max-w-2xl mx-auto">
             Find answers to common questions about becoming a San Francisco Deputy Sheriff.
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="max-w-3xl mx-auto divide-y divide-[#0A3C1F]/10">
           {faqs.map((faq, index) => (
             <div key={index} className="py-5">
               <button
@@ -72,12 +72,12 @@ export function FAQSection() {
                 aria-expanded={openIndex === index}
                 aria-controls={`faq-answer-${index}`}
               >
-                <h3 className="text-lg font-medium text-primary">{faq.question}</h3>
+                <h3 className="text-lg font-medium text-[#0A3C1F]">{faq.question}</h3>
                 <span className="ml-6 flex-shrink-0">
                   {openIndex === index ? (
-                    <ChevronUp className="h-5 w-5 text-primary" />
+                    <ChevronUp className="h-5 w-5 text-[#0A3C1F]" />
                   ) : (
-                    <ChevronDown className="h-5 w-5 text-primary" />
+                    <ChevronDown className="h-5 w-5 text-[#0A3C1F]" />
                   )}
                 </span>
               </button>
@@ -85,7 +85,7 @@ export function FAQSection() {
                 id={`faq-answer-${index}`}
                 className={`mt-2 transition-all duration-300 overflow-hidden ${openIndex === index ? "max-h-96" : "max-h-0"}`}
               >
-                <p className="text-foreground">{faq.answer}</p>
+                <p className="text-[#0A3C1F]/70">{faq.answer}</p>
               </div>
             </div>
           ))}

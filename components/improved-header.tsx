@@ -57,7 +57,7 @@ function DropdownNav({ label, icon, items }: DropdownNavProps): JSX.Element {
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setIsOpen(false)
-    }, 150) // Small delay to allow moving to dropdown content
+    }, 150)
   }
 
   return (
@@ -67,38 +67,39 @@ function DropdownNav({ label, icon, items }: DropdownNavProps): JSX.Element {
       onMouseLeave={handleMouseLeave}
     >
       <button 
-        className="flex items-center text-foreground hover:text-primary py-2 transition-all duration-200 group"
+        className="flex items-center text-white hover:text-[#FFD700] py-2 transition-all duration-200 group"
       >
         <span className="flex items-center transform group-hover:scale-105 transition-transform duration-200">
-          {icon}
+          <span className="text-[#FFD700]">{icon}</span>
           <span className="mx-1">{label}</span>
           <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
         </span>
       </button>
-      {isOpen && (
-        <div
-          className="absolute left-0 mt-2 w-64 bg-background dark:bg-background rounded-lg shadow-lg overflow-hidden z-50 border border-border"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          {items.map((item) => (
-            <Link 
-              key={item.href} 
-              href={item.href} 
-              className="flex items-center px-4 py-3 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-150 group"
-            >
-              {item.icon && (
-                <span className="mr-2 transform group-hover:scale-110 transition-transform duration-200 text-gray-500 dark:text-gray-400 group-hover:text-primary">
-                  {item.icon}
-                </span>
-              )}
-              <span className="transform group-hover:translate-x-1 transition-transform duration-200">
-                {item.label}
+      
+      <div
+        className={`absolute left-0 mt-2 w-64 bg-[#0A3C1F] dark:bg-[#0A3C1F] rounded-lg shadow-lg overflow-hidden z-50 border border-[#FFD700]/20 ${
+          isOpen ? 'block' : 'hidden'
+        }`}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+      >
+        {items.map((item) => (
+          <Link 
+            key={item.href} 
+            href={item.href} 
+            className="flex items-center px-4 py-3 text-sm text-white hover:text-[#FFD700] hover:bg-[#FFD700]/10 transition-all duration-150 group"
+          >
+            {item.icon && (
+              <span className="mr-2 transform group-hover:scale-110 transition-transform duration-200 text-[#FFD700]">
+                {item.icon}
               </span>
-            </Link>
-          ))}
-        </div>
-      )}
+            )}
+            <span className="transform group-hover:translate-x-1 transition-transform duration-200">
+              {item.label}
+            </span>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }
@@ -195,38 +196,38 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
   return (
     <header className={`w-full fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${scrolled ? 'shadow-lg' : ''}`}>
       {/* Top bar */}
-      <div className="bg-primary text-primary-foreground">
+      <div className="bg-[#0A3C1F] text-white">
         <div className="container mx-auto px-4 py-2 flex justify-between items-center">
           <Link href="/" className="flex items-center">
-            <div className="mr-2 text-primary">
+            <div className="mr-2 text-[#FFD700]">
               <ShieldLogo className="w-7 h-7" />
             </div>
             <div>
               <div className="font-bold text-sm md:text-base">SF Deputy Sheriff</div>
-              <div className="text-primary text-xs -mt-1">AI Recruitment</div>
+              <div className="text-[#FFD700] text-xs -mt-1">AI Recruitment</div>
             </div>
           </Link>
 
           <div className="flex items-center space-x-3">
             <div className="hidden md:flex items-center space-x-3">
-              <Link href="https://facebook.com" aria-label="Facebook" className="text-primary-foreground hover:text-accent transition-colors duration-200">
+              <Link href="https://facebook.com" aria-label="Facebook" className="text-white hover:text-[#FFD700] transition-colors duration-200">
                 <Facebook size={16} />
               </Link>
-              <Link href="https://twitter.com" aria-label="Twitter" className="text-primary-foreground hover:text-accent transition-colors duration-200">
+              <Link href="https://twitter.com" aria-label="Twitter" className="text-white hover:text-[#FFD700] transition-colors duration-200">
                 <Twitter size={16} />
               </Link>
-              <Link href="https://youtube.com" aria-label="YouTube" className="text-primary-foreground hover:text-accent transition-colors duration-200">
+              <Link href="https://youtube.com" aria-label="YouTube" className="text-white hover:text-[#FFD700] transition-colors duration-200">
                 <Youtube size={16} />
               </Link>
-              <Link href="https://instagram.com" aria-label="Instagram" className="text-primary-foreground hover:text-accent transition-colors duration-200">
+              <Link href="https://instagram.com" aria-label="Instagram" className="text-white hover:text-[#FFD700] transition-colors duration-200">
                 <Instagram size={16} />
               </Link>
-              <Link href="https://linkedin.com" aria-label="LinkedIn" className="text-primary-foreground hover:text-accent transition-colors duration-200">
+              <Link href="https://linkedin.com" aria-label="LinkedIn" className="text-white hover:text-[#FFD700] transition-colors duration-200">
                 <Linkedin size={16} />
               </Link>
               <button 
                 onClick={toggleTheme} 
-                className="text-primary-foreground hover:text-accent transition-colors duration-200" 
+                className="text-white hover:text-[#FFD700] transition-colors duration-200" 
                 aria-label="Toggle dark mode"
               >
                 <Moon size={16} />
@@ -237,7 +238,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       </div>
 
       {/* Navigation bar */}
-      <div className={`bg-primary text-primary-foreground border-t border-primary/30 transition-all duration-200 ${scrolled ? 'bg-opacity-95 backdrop-blur-sm' : ''}`}>
+      <div className={`bg-[#0A3C1F] text-white border-t border-white/10 transition-all duration-200 ${scrolled ? 'bg-opacity-95 backdrop-blur-sm' : ''}`}>
         <div className="container mx-auto px-4 py-2">
           <div className="flex justify-between items-center">
             {/* Desktop Navigation */}
@@ -251,7 +252,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden text-primary-foreground hover:text-accent transition-colors duration-200"
+              className="md:hidden text-white hover:text-[#FFD700] transition-colors duration-200"
               onClick={toggleMobileMenu}
               aria-label="Toggle mobile menu"
             >
@@ -266,7 +267,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                 <>
                   <button
                     onClick={handleLogin}
-                    className="px-4 py-2 text-sm font-medium text-foreground hover:text-primary transition-all duration-200 border border-transparent hover:border-primary rounded-lg hover:shadow-[0_0_15px_rgba(var(--primary),0.3)]"
+                    className="px-4 py-2 text-sm font-medium text-white hover:text-[#FFD700] transition-all duration-200 border border-transparent hover:border-[#FFD700] rounded-lg hover:shadow-[0_0_15px_rgba(255,215,0,0.3)]"
                   >
                     Sign In
                   </button>
@@ -274,13 +275,13 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                     href="https://www.sfdsa.org/donate"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-6 py-2.5 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
+                    className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
                   >
                     Support SFDSA
                   </a>
                   <button
                     onClick={handleApplyNow}
-                    className="px-6 py-2.5 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
+                    className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
                   >
                     Apply Now
                   </button>
@@ -289,7 +290,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               {currentUser && (
                 <button
                   onClick={handleApplyNow}
-                  className="px-6 py-2.5 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
+                  className="px-6 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transform"
                 >
                   Apply Now
                 </button>
@@ -312,8 +313,8 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                   }`}
                   style={{ transitionDelay: `${index * 50}ms` }}
                 >
-                  <div className="flex items-center px-4 py-2 text-primary-foreground font-medium rounded-lg hover:bg-primary/30 transition-all duration-200">
-                    <span className="transform transition-transform duration-200 text-primary">
+                  <div className="flex items-center px-4 py-2 text-white font-medium rounded-lg hover:bg-white/10 transition-all duration-200">
+                    <span className="transform transition-transform duration-200 text-[#FFD700]">
                       {item.icon}
                     </span>
                     <span className="ml-2">{item.label}</span>
@@ -323,13 +324,13 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                       <Link
                         key={subItem.href}
                         href={subItem.href}
-                        className={`block px-4 py-2 text-sm text-primary-foreground hover:text-accent transition-all duration-200 hover:bg-primary/50 rounded-lg transform ${
+                        className={`block px-4 py-2 text-sm text-white hover:text-[#FFD700] transition-all duration-200 hover:bg-white/10 rounded-lg transform ${
                           isMobileMenuOpen ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
                         }`}
                         style={{ transitionDelay: `${(index * 50) + (subIndex * 30)}ms` }}
                       >
                         <span className="flex items-center">
-                          <span className="transform transition-transform duration-200 text-gray-400 group-hover:text-primary">
+                          <span className="transform transition-transform duration-200 text-[#FFD700]">
                             {subItem.icon}
                           </span>
                           <span className="ml-2">{subItem.label}</span>
@@ -343,7 +344,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                 <div className="mt-6 px-4 space-y-3">
                   <button
                     onClick={handleLogin}
-                    className={`w-full px-4 py-2.5 text-sm font-medium text-foreground hover:text-primary transition-all duration-200 border border-transparent hover:border-primary rounded-lg transform ${
+                    className={`w-full px-4 py-2.5 text-sm font-medium text-white hover:text-[#FFD700] transition-all duration-200 border border-transparent hover:border-[#FFD700] rounded-lg transform ${
                       isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                     }`}
                     style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 100}ms` }}
@@ -354,7 +355,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                     href="https://www.sfdsa.org/donate"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`block w-full px-4 py-2.5 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 rounded-lg text-center transform ${
+                    className={`block w-full px-4 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg text-center transform ${
                       isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                     }`}
                     style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 150}ms` }}
@@ -363,7 +364,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                   </a>
                   <button
                     onClick={handleApplyNow}
-                    className={`w-full px-4 py-2.5 text-sm font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition-all duration-200 rounded-lg transform ${
+                    className={`w-full px-4 py-2.5 text-sm font-semibold bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 transition-all duration-200 rounded-lg transform ${
                       isMobileMenuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
                     }`}
                     style={{ transitionDelay: `${Object.keys(mainNavItems).length * 50 + 200}ms` }}
