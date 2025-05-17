@@ -1,12 +1,8 @@
 {
-  "buildCommand": "NEXT_PUBLIC_DISABLE_DATABASE_CHECKS=true next build",
   "framework": "nextjs",
-  "regions": ["iad1"],
   "outputDirectory": "out",
   "env": {
     "NEXT_PUBLIC_DISABLE_DATABASE_CHECKS": "true",
-    "NEXT_PUBLIC_STATIC_BUILD": "true",
-    "NEXT_PUBLIC_SUPABASE_URL": "https://placeholder-for-build.supabase.co",
-    "NEXT_PUBLIC_SUPABASE_ANON_KEY": "placeholder-for-static-build"
+    "NEXT_PUBLIC_STATIC_BUILD": "true"
   }
 } 
