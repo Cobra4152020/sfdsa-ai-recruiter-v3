@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 
 export function PointsIntroduction() {
   return (
-    <div className="bg-gradient-to-r from-[#0A3C1F]/5 to-transparent p-6 rounded-lg border border-[#0A3C1F]/20">
+    <div className="bg-white p-6 rounded-lg">
       <h2 className="text-2xl font-bold text-[#0A3C1F] mb-4">Explore the Deputy Sheriff Position</h2>
       <p className="text-[#0A3C1F]/70 mb-4">
         Our platform is designed to help you learn about the San Francisco Deputy Sheriff role and prepare for the
@@ -41,11 +41,10 @@ export function PointsIntroduction() {
           </p>
         </div>
       </div>
-      <div className="mt-6 text-center">
+      <div className="mt-8 text-center">
         <Link href="/deputy-launchpad">
-          <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
-            <Rocket className="mr-2 h-4 w-4" />
-            Visit Deputy Launchpad
+          <Button className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90">
+            <Rocket className="mr-2 h-4 w-4" /> Visit Deputy Launchpad
           </Button>
         </Link>
       </div>

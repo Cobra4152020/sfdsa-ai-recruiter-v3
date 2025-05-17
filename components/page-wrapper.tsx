@@ -33,11 +33,7 @@ export function PageWrapper({ children }: PageWrapperProps) {
         <div className="min-h-screen flex flex-col bg-[#F8F5EE]">
           <ImprovedHeader showOptInForm={showOptInForm} />
           <main id="main-content" className="flex-1 pt-16 pb-12">
-            <div className="container mx-auto px-4">
-              <div className="content-area p-6">
-                {children}
-              </div>
-            </div>
+            {children}
           </main>
           <ImprovedFooter />
 

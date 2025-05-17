@@ -25,38 +25,38 @@ export default function Home() {
 
   return (
     <>
-      <main className="flex-1">
+      <main className="flex-1 w-full">
         <HeroSection onGetStarted={() => showOptInForm(true)} showOptInForm={showOptInForm} />
 
         <TopRecruitsScroll />
 
         {currentUser && (
-          <section className="py-12 bg-[#F8F5EE] dark:bg-[#121212]">
+          <section className="w-full py-12 bg-[#0A3C1F] dark:bg-[#121212]">
             <div className="container mx-auto px-4">
-              <div className="max-w-4xl mx-auto">
+              <div className="max-w-7xl mx-auto">
                 <ApplicationProgressGamification />
               </div>
             </div>
           </section>
         )}
 
-        <section className="py-12 bg-white dark:bg-[#1A1A1A]">
+        <section className="w-full py-12 bg-[#0A3C1F] dark:bg-[#1A1A1A]">
           <div className="container mx-auto px-4">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-7xl mx-auto">
               <PointsIntroduction />
             </div>
           </div>
         </section>
 
-        <section id="benefits" className="scroll-mt-20">
+        <section id="benefits" className="w-full scroll-mt-20">
           <BenefitsSection />
         </section>
 
-        <section id="testimonials" className="scroll-mt-20">
+        <section id="testimonials" className="w-full scroll-mt-20">
           <TestimonialsSection />
         </section>
 
-        <section id="faq" className="scroll-mt-20">
+        <section id="faq" className="w-full scroll-mt-20">
           <FAQSection />
         </section>
 

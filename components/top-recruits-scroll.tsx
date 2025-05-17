@@ -132,9 +132,9 @@ export function TopRecruitsScroll() {
   const handleMouseLeave = () => setIsPaused(false)
 
   return (
-    <section className="w-full py-8 bg-white text-[#0A3C1F]">
+    <section className="w-full py-8 bg-[#0A3C1F] text-white">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-4 text-[#0A3C1F]">Top Recruits</h2>
+        <h2 className="text-2xl font-bold mb-4 text-[#F8F5EE]">Top Recruits</h2>
         <div
           ref={scrollRef}
           className="flex overflow-x-auto pb-4 hide-scrollbar"
@@ -143,9 +143,9 @@ export function TopRecruitsScroll() {
           onTouchStart={handleMouseEnter}
           onTouchEnd={handleMouseLeave}
         >
-          <div className="flex space-x-4 px-2">
+          <div className="flex space-x-4 px-2 md:space-x-6">
             {recruits.map((user, index) => (
-              <Card key={user.id} className="min-w-[280px] bg-white border border-[#0A3C1F]/10">
+              <Card key={user.id} className="min-w-[280px] md:min-w-[320px] bg-white border border-[#0A3C1F]/10">
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-4">
                     <div className="relative">
@@ -155,7 +155,9 @@ export function TopRecruitsScroll() {
                           alt={user.name || `Recruit #${user.id}`}
                           fill
                           className="object-cover"
-                          sizes="64px"
+                          sizes="(max-width: 640px) 64px, (max-width: 768px) 96px, 128px"
+                          loading="lazy"
+                          quality={80}
                         />
                       </div>
                       {index < 3 && (

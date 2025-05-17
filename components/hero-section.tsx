@@ -34,9 +34,14 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
           </p>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto items-stretch">
           {/* Benefits Box */}
-          <div className="flex-1 bg-[#0A3C1F]/50 backdrop-blur-sm p-8 rounded-xl border border-white/20">
+          <div 
+            className="transform-gpu bg-[#0A3C1F]/50 backdrop-blur-sm p-8 rounded-xl border border-white/20 
+            shadow-[4px_4px_10px_0px_rgba(0,0,0,0.3),0_8px_10px_-6px_rgba(0,0,0,0.3),0_-2px_6px_0px_rgba(255,215,0,0.1)] 
+            hover:shadow-[8px_8px_20px_0px_rgba(0,0,0,0.4),0_12px_16px_-8px_rgba(0,0,0,0.4),0_-4px_12px_0px_rgba(255,215,0,0.15)] 
+            transition-all duration-300 ease-out hover:translate-y-[-4px]"
+          >
             <h2 className="text-2xl font-bold mb-6 flex items-center">
               <span className="text-[#FFD700] mr-2" aria-hidden="true">
                 ✓
@@ -68,14 +73,18 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
             <div className="mt-6 space-y-3">
               <Button
                 onClick={() => showOptInForm(true)}
-                className="w-full bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold text-lg py-6"
+                className="w-full bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold text-lg py-6 
+                transform-gpu transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]
+                shadow-[0_4px_8px_0px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_12px_0px_rgba(0,0,0,0.3)]"
               >
                 Apply Now
               </Button>
               <Button
                 onClick={() => showOptInForm(false)}
                 variant="outline"
-                className="w-full bg-white/5 hover:bg-white/10 text-[#FFD700] border-[#FFD700] font-medium text-lg py-6"
+                className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-[#FFD700] border-[#FFD700] font-medium text-lg py-6 
+                transform-gpu transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]
+                shadow-[0_4px_8px_0px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_12px_0px_rgba(0,0,0,0.3)]"
               >
                 Get More Information
               </Button>
@@ -83,19 +92,24 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
           </div>
 
           {/* Image Box */}
-          <div className="flex-1">
-            <div className="relative rounded-xl overflow-hidden shadow-2xl h-full min-h-[400px]">
+          <div className="transform-gpu h-full">
+            <div 
+              className="relative rounded-xl overflow-hidden h-full min-h-[500px]
+              shadow-[4px_4px_10px_0px_rgba(0,0,0,0.3),0_8px_10px_-6px_rgba(0,0,0,0.3),0_-2px_6px_0px_rgba(255,215,0,0.1)]
+              hover:shadow-[8px_8px_20px_0px_rgba(0,0,0,0.4),0_12px_16px_-8px_rgba(0,0,0,0.4),0_-4px_12px_0px_rgba(255,215,0,0.15)]
+              transition-all duration-300 ease-out hover:translate-y-[-4px]"
+            >
               <Image
-                src="/sf-city-hall.jpg"
-                alt="San Francisco City Hall with Deputy Sheriffs"
+                src="/sf-sheriff-deputies.png"
+                alt="San Francisco Deputy Sheriffs"
                 fill
                 className="object-cover"
                 priority
                 quality={90}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0A3C1F] to-transparent">
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0A3C1F] via-[#0A3C1F]/20 to-transparent">
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <p className="text-white text-lg font-medium">
+                  <p className="text-white text-lg font-medium drop-shadow-lg">
                     Join our diverse team of law enforcement professionals
                   </p>
                 </div>

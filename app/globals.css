@@ -64,11 +64,6 @@
   }
 }
 
-/* Custom styles for content areas */
-.content-area {
-  @apply bg-white rounded-lg shadow-sm;
-}
-
 /* Custom header styles */
 .header-nav {
   @apply bg-[#0A3C1F] text-white;
