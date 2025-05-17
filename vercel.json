@@ -1,6 +1,5 @@
 {
   "framework": "nextjs",
-  "outputDirectory": "out",
   "env": {
     "NEXT_PUBLIC_DISABLE_DATABASE_CHECKS": "true",
     "NEXT_PUBLIC_STATIC_BUILD": "true"

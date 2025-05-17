@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export',
+  // Let Vercel handle the output mode
+  // output: 'export',
   images: {
     unoptimized: true,
   },
