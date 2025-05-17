@@ -26,7 +26,25 @@ const nextConfig = {
     ],
     unoptimized: true,
   },
-  output: 'standalone'
+  // Handle client component references properly
+  experimental: {
+    serverComponentsExternalPackages: [],
+    missingSuspenseWithCSRBailout: false
+  },
+  // Skip generation of database-dependent API routes
+  async exportPathMap(defaultPathMap) {
+    // Remove all dynamic API routes from static export
+    const filteredPaths = {};
+    
+    for (const [path, page] of Object.entries(defaultPathMap)) {
+      // Skip API routes to avoid database issues during static generation
+      if (!path.startsWith('/api/')) {
+        filteredPaths[path] = page;
+      }
+    }
+    
+    return filteredPaths;
+  },
 }
 
 export default nextConfig;
