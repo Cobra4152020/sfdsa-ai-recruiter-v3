@@ -4,73 +4,69 @@
 
 @layer base {
   :root {
-    /* Base colors */
-    --sheriff-green: 142 69% 14%;
-    --sheriff-green-light: 142 69% 94%;
-    --sheriff-gold: 51 100% 50%;
+    /* Sheriff's Department Colors */
+    --sheriff-green: #0A3C1F;
+    --sheriff-gold: #FFD700;
+    --sheriff-tan: #F8F5EE;
 
     /* Light mode */
-    --background: var(--sheriff-green-light);
+    --background: var(--sheriff-tan);
     --foreground: var(--sheriff-green);
 
-    --card: var(--sheriff-green-light);
+    --card: 0 0% 100%;
     --card-foreground: var(--sheriff-green);
 
-    --popover: var(--sheriff-green-light);
+    --popover: 0 0% 100%;
     --popover-foreground: var(--sheriff-green);
 
     --primary: var(--sheriff-green);
     --primary-foreground: var(--sheriff-gold);
 
-    --secondary: var(--sheriff-green-light);
+    --secondary: 0 0% 100%;
     --secondary-foreground: var(--sheriff-green);
 
-    --muted: 142 20% 88%;
-    --muted-foreground: 142 40% 30%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
     --accent: var(--sheriff-gold);
     --accent-foreground: var(--sheriff-green);
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: var(--sheriff-green-light);
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 142 30% 80%;
-    --input: 142 30% 80%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
     --ring: var(--sheriff-green);
 
     --radius: 0.5rem;
   }
 
   .dark {
-    /* Dark mode */
-    --background: 142 69% 8%;
-    --foreground: var(--sheriff-gold);
-
-    --card: 142 69% 12%;
-    --card-foreground: var(--sheriff-gold);
-
-    --popover: 142 69% 12%;
-    --popover-foreground: var(--sheriff-gold);
-
-    --primary: var(--sheriff-green);
-    --primary-foreground: var(--sheriff-gold);
-
-    --secondary: 142 69% 18%;
-    --secondary-foreground: var(--sheriff-gold);
-
-    --muted: 142 69% 20%;
-    --muted-foreground: 51 70% 70%;
-
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: var(--sheriff-gold);
+    --primary-foreground: var(--sheriff-green);
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
     --accent: var(--sheriff-gold);
     --accent-foreground: var(--sheriff-green);
-
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: var(--sheriff-gold);
-
-    --border: 142 69% 20%;
-    --input: 142 69% 20%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
     --ring: var(--sheriff-gold);
   }
+}
+
+/* Custom styles for content areas */
+.content-area {
+  @apply bg-white rounded-lg shadow-sm;
 }
 
 /* Custom header styles */

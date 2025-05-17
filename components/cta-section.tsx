@@ -25,7 +25,7 @@ export function CTASection({ showOptInForm }: CTASectionProps) {
             onClick={() => showOptInForm(false)}
             size="lg"
             variant="outline"
-            className="border-white text-white font-medium text-lg px-8 hover:bg-white/10"
+            className="border-2 border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700]/10 font-medium text-lg px-8"
           >
             Get More Information <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />
           </Button>
