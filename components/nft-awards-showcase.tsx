@@ -5,23 +5,39 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { NFTAwardCard } from "@/components/nft-award-card"
 import { useUser } from "@/context/user-context"
-import { NFT_AWARD_TIERS } from "@/lib/nft-utils"
+import { NFT_AWARD_TIERS, type NFTAward } from "@/lib/nft-utils"
 
 interface NFTAwardsShowcaseProps {
   className?: string
+  awardTiers?: typeof NFT_AWARD_TIERS
+  showUserProgress?: boolean
 }
 
-export function NFTAwardsShowcase({ className }: NFTAwardsShowcaseProps) {
+interface UserAward extends NFTAward {
+  tokenId?: string
+  contractAddress?: string
+  awardedAt?: string
+  pointsAtAward?: number
+  blockchainExplorerUrl?: string
+  pointsNeeded?: number
+  pointThreshold: number
+}
+
+export function NFTAwardsShowcase({ 
+  className, 
+  awardTiers = NFT_AWARD_TIERS, 
+  showUserProgress = true 
+}: NFTAwardsShowcaseProps) {
   const { currentUser } = useUser()
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [awards, setAwards] = useState<any[]>([])
+  const [userAwards, setUserAwards] = useState<UserAward[]>([])
   const [currentPoints, setCurrentPoints] = useState(0)
-  const [nextAward, setNextAward] = useState<any | null>(null)
+  const [nextAward, setNextAward] = useState<UserAward | null>(null)
 
   useEffect(() => {
     const fetchAwards = async () => {
-      if (!currentUser?.id) {
+      if (!currentUser?.id || !showUserProgress) {
         setIsLoading(false)
         return
       }
@@ -37,7 +53,7 @@ export function NFTAwardsShowcase({ className }: NFTAwardsShowcaseProps) {
           throw new Error(data.message || "Failed to fetch NFT awards")
         }
 
-        setAwards(data.awards || [])
+        setUserAwards(data.awards || [])
         setCurrentPoints(data.currentPoints || 0)
         setNextAward(data.nextAward || null)
       } catch (err) {
@@ -49,10 +65,7 @@ export function NFTAwardsShowcase({ className }: NFTAwardsShowcaseProps) {
     }
 
     fetchAwards()
-  }, [currentUser?.id])
-
-  // Get awarded IDs to determine which awards have been earned
-  const awardedIds = awards.map((award) => award.id)
+  }, [currentUser?.id, showUserProgress])
 
   return (
     <Card className={className}>
@@ -70,7 +83,7 @@ export function NFTAwardsShowcase({ className }: NFTAwardsShowcaseProps) {
           <div className="text-center py-8 text-red-500">{error}</div>
         ) : (
           <>
-            {nextAward && (
+            {showUserProgress && nextAward && (
               <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <h3 className="font-medium mb-2">Next NFT Award: {nextAward.name}</h3>
                 <p className="text-sm text-muted-foreground mb-3">{nextAward.description}</p>
@@ -82,34 +95,29 @@ export function NFTAwardsShowcase({ className }: NFTAwardsShowcaseProps) {
                 </div>
                 <Progress value={(currentPoints / nextAward.pointThreshold) * 100} className="h-2" />
                 <p className="text-xs text-muted-foreground mt-2">
-                  {nextAward.pointsNeeded.toLocaleString()} more points needed
+                  {nextAward.pointsNeeded?.toLocaleString()} more points needed
                 </p>
               </div>
             )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              {NFT_AWARD_TIERS.map((tier) => {
-                // Find the awarded version if it exists
-                const awardedVersion = awards.find((award) => award.id === tier.id)
-
+              {awardTiers.map((tier) => {
+                const userAward = userAwards.find((award) => award.id === tier.id)
                 return (
                   <NFTAwardCard
                     key={tier.id}
-                    id={tier.id}
-                    name={tier.name}
-                    description={tier.description}
-                    imageUrl={tier.imageUrl}
-                    tokenId={awardedVersion?.tokenId}
-                    contractAddress={awardedVersion?.contractAddress}
-                    awardedAt={awardedVersion?.awardedAt}
-                    pointsAtAward={awardedVersion?.pointsAtAward}
-                    blockchainExplorerUrl={awardedVersion?.blockchainExplorerUrl}
+                    {...tier}
+                    tokenId={userAward?.tokenId}
+                    contractAddress={userAward?.contractAddress}
+                    awardedAt={userAward?.awardedAt}
+                    pointsAtAward={userAward?.pointsAtAward}
+                    blockchainExplorerUrl={userAward?.blockchainExplorerUrl}
                   />
                 )
               })}
             </div>
 
-            {awards.length === 0 && (
+            {showUserProgress && userAwards.length === 0 && (
               <div className="text-center py-8 text-muted-foreground">
                 <p>You haven't earned any NFT awards yet.</p>
                 <p className="mt-2">

@@ -11,6 +11,55 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Search, Award, Filter, BadgeCheck } from "lucide-react"
+import { EarnedBadges } from "@/components/earned-badges"
+
+function BadgeProgress() {
+  const { currentUser } = useUser()
+  const {
+    badges,
+    userProgress,
+    isLoading,
+    activeCategory,
+    setActiveCategory,
+    searchQuery,
+    setSearchQuery,
+    sortOption,
+    setSortOption,
+    handleShare,
+  } = useBadgeGallery()
+
+  if (!currentUser) {
+    return null
+  }
+
+  // Calculate stats
+  const totalBadges = badges.length
+  const earnedBadges = Object.values(userProgress).filter((p) => p.earned).length
+  const inProgressBadges = Object.values(userProgress).filter((p) => p.progress > 0 && !p.earned).length
+
+  return (
+    <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-6 mb-8">
+      <h2 className="text-xl font-semibold text-primary mb-4 flex items-center">
+        <BadgeCheck className="h-6 w-6 mr-2" />
+        Your Badge Progress
+      </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="bg-card rounded-lg p-4 shadow-sm border border-primary/20">
+          <div className="text-3xl font-bold text-primary">{earnedBadges}</div>
+          <div className="text-sm text-gray-600">Badges Earned</div>
+        </div>
+        <div className="bg-card rounded-lg p-4 shadow-sm border border-primary/20">
+          <div className="text-3xl font-bold text-primary">{inProgressBadges}</div>
+          <div className="text-sm text-gray-600">Badges In Progress</div>
+        </div>
+        <div className="bg-card rounded-lg p-4 shadow-sm border border-primary/20">
+          <div className="text-3xl font-bold text-primary">{totalBadges - earnedBadges - inProgressBadges}</div>
+          <div className="text-sm text-gray-600">Badges to Discover</div>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 export default function BadgesGalleryPage() {
   const [mounted, setMounted] = useState(false)
@@ -47,35 +96,16 @@ export default function BadgesGalleryPage() {
 
       <main className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">Badge Gallery</h1>
+          <h1 className="text-3xl font-bold text-primary mb-2">Badge Gallery</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             Explore all available badges and their requirements. Share your progress to earn badges and climb the
             leaderboard.
           </p>
         </div>
 
-        {currentUser && (
-          <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-[#0A3C1F]/5 rounded-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-4 flex items-center">
-              <BadgeCheck className="h-6 w-6 mr-2" />
-              Your Badge Progress
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white rounded-lg p-4 shadow-sm border border-[#0A3C1F]/20">
-                <div className="text-3xl font-bold text-[#0A3C1F]">{earnedBadges}</div>
-                <div className="text-sm text-gray-600">Badges Earned</div>
-              </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm border border-[#0A3C1F]/20">
-                <div className="text-3xl font-bold text-[#0A3C1F]">{inProgressBadges}</div>
-                <div className="text-sm text-gray-600">Badges In Progress</div>
-              </div>
-              <div className="bg-white rounded-lg p-4 shadow-sm border border-[#0A3C1F]/20">
-                <div className="text-3xl font-bold text-[#0A3C1F]">{totalBadges - earnedBadges - inProgressBadges}</div>
-                <div className="text-sm text-gray-600">Badges to Discover</div>
-              </div>
-            </div>
-          </div>
-        )}
+        <BadgeProgress />
+
+        <EarnedBadges />
 
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <Tabs defaultValue="all" value={activeCategory} onValueChange={(value) => setActiveCategory(value as any)}>

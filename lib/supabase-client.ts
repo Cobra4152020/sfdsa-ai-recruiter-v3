@@ -1,13 +1,28 @@
 "use client"
 
-import { supabase as supabaseClient } from "./supabase-client-singleton"
-import { createStaticClient } from "./supabase-static"
+import { createClient as createSupabaseClient, SupabaseClient } from '@supabase/supabase-js'
+import { Database } from '@/types/supabase'
 
-// Check if we're in a browser environment
-const isBrowser = typeof window !== 'undefined';
+let supabaseInstance: SupabaseClient<Database> | null = null
 
-// Export a client that's appropriate for the context
-export const supabase = isBrowser && supabaseClient ? supabaseClient : createStaticClient();
+export function getSupabaseClient(): SupabaseClient<Database> {
+  if (supabaseInstance) return supabaseInstance
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+
+  supabaseInstance = createSupabaseClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+    }
+  })
+
+  return supabaseInstance
+}
+
+// Export a singleton instance
+export const supabase: SupabaseClient<Database> = getSupabaseClient()
 
 // For backward compatibility with existing code
 export function createClient() {

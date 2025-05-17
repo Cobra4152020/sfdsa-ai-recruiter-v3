@@ -1,3 +1,5 @@
+import { emailTheme, getEmailThemeValue } from '../theme';
+
 interface ApplicationStatusTemplateProps {
   recipientName: string
   statusUpdate: string
@@ -22,54 +24,54 @@ export function applicationStatus({
         body {
           font-family: Arial, sans-serif;
           line-height: 1.6;
-          color: #333;
+          color: ${emailTheme.colors.text.primary};
           margin: 0;
           padding: 0;
         }
         .container {
           max-width: 600px;
           margin: 0 auto;
-          padding: 20px;
+          padding: ${emailTheme.spacing.padding};
         }
         .header {
-          background-color: #0A3C1F;
+          background-color: ${emailTheme.colors.primary};
           color: white;
-          padding: 20px;
+          padding: ${emailTheme.spacing.padding};
           text-align: center;
         }
         .content {
-          padding: 20px;
-          background-color: #f9f9f9;
+          padding: ${emailTheme.spacing.padding};
+          background-color: ${emailTheme.colors.background};
         }
         .status-update {
           background-color: white;
-          border-radius: 8px;
+          border-radius: ${emailTheme.borderRadius};
           padding: 15px;
-          margin: 20px 0;
+          margin: ${emailTheme.spacing.margin} 0;
           box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .next-steps {
           background-color: white;
-          border-radius: 8px;
+          border-radius: ${emailTheme.borderRadius};
           padding: 15px;
-          margin: 20px 0;
+          margin: ${emailTheme.spacing.margin} 0;
           box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .button {
           display: inline-block;
-          background-color: #FFD700;
-          color: #0A3C1F;
+          background-color: ${emailTheme.colors.accent};
+          color: ${emailTheme.colors.primary};
           text-decoration: none;
           padding: 10px 20px;
-          border-radius: 4px;
-          margin-top: 20px;
+          border-radius: ${emailTheme.borderRadius};
+          margin-top: ${emailTheme.spacing.margin};
           font-weight: bold;
         }
         .footer {
           text-align: center;
-          padding: 20px;
+          padding: ${emailTheme.spacing.padding};
           font-size: 12px;
-          color: #666;
+          color: ${emailTheme.colors.text.secondary};
         }
       </style>
     </head>

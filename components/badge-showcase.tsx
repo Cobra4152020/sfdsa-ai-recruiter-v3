@@ -168,8 +168,8 @@ export function BadgeShowcase() {
   })
 
   return (
-    <Card className="border border-[#0A3C1F]/20 dark:border-[#FFD700]/20">
-      <CardHeader className="pb-2 bg-[#0A3C1F] text-white dark:bg-[#0A3C1F] dark:text-[#FFD700]">
+    <Card className="border border-primary/20 dark:border-accent/20">
+      <CardHeader className="pb-2 bg-primary text-primary-foreground dark:bg-primary dark:text-accent">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <CardTitle className="flex items-center">
             <span className="mr-2">🏅</span> Badge Legend
@@ -186,7 +186,7 @@ export function BadgeShowcase() {
       <CardContent>
         {isLoading ? (
           <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A3C1F]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : error ? (
           <div className="text-center py-8 text-red-500">{error}</div>
@@ -194,7 +194,7 @@ export function BadgeShowcase() {
           <>
             {category === "application" && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2 text-[#0A3C1F] dark:text-[#FFD700]">Achievement Badges</h3>
+                <h3 className="text-lg font-semibold mb-2 text-primary dark:text-accent">Achievement Badges</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Earn these badges by completing specific milestones in your recruitment journey.
                 </p>
@@ -224,7 +224,7 @@ export function BadgeShowcase() {
 
             {(category === "all" || category === "application") && (
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-2 text-[#0A3C1F] dark:text-[#FFD700]">Process Badges</h3>
+                <h3 className="text-lg font-semibold mb-2 text-primary dark:text-accent">Process Badges</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   Track your progress through the application process with these badges.
                 </p>
@@ -260,7 +260,7 @@ export function BadgeShowcase() {
 
             {(category === "all" || category === "participation") && (
               <div>
-                <h3 className="text-lg font-semibold mb-2 text-[#0A3C1F] dark:text-[#FFD700]">Participant Badges</h3>
+                <h3 className="text-lg font-semibold mb-2 text-primary dark:text-accent">Participant Badges</h3>
                 <p className="text-sm text-muted-foreground mb-4">
                   These badges recognize your engagement style and participation patterns.
                 </p>

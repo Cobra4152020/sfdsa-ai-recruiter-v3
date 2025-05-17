@@ -101,13 +101,7 @@ export function ApplicationProgressGamification() {
     setApplicationSteps(updatedSteps)
 
     // Show confetti for celebration
-    setShowConfetti(true)
-    confetti({
-      particleCount: 100,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
-    })
+    triggerConfetti()
 
     // Award points
     await incrementParticipation(applicationSteps[stepIndex].points)
@@ -122,9 +116,6 @@ export function ApplicationProgressGamification() {
       }`,
       duration: 5000,
     })
-
-    // Reset confetti after a delay
-    setTimeout(() => setShowConfetti(false), 2000)
   }
 
   // For demo purposes, let's simulate some completed steps
@@ -139,6 +130,17 @@ export function ApplicationProgressGamification() {
 
     simulateProgress()
   }, [])
+
+  const triggerConfetti = () => {
+    setShowConfetti(true)
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { x: 0.5, y: 0.6 },
+      colors: ["#FFD700", "#0A3C1F", "#FFFFFF"]
+    })
+    setTimeout(() => setShowConfetti(false), 3000)
+  }
 
   return (
     <Card className="w-full shadow-md">

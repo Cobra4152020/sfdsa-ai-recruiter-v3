@@ -19,33 +19,35 @@ export function DonationPrompt({ className = "", variant = "inline" }: DonationP
 
   if (variant === "card") {
     return (
-      <div className={`bg-[#FFD700]/20 border border-[#FFD700] rounded-lg p-4 ${className}`}>
-        <div className="flex items-start">
-          <div className="bg-[#FFD700]/30 p-2 rounded-full mr-3">
-            <Coffee className="h-5 w-5 text-[#0A3C1F]" />
+      <div className={`bg-accent/20 border border-accent rounded-lg p-4 ${className}`}>
+        <div className="flex items-center">
+          <div className="bg-accent/30 p-2 rounded-full mr-3">
+            <Coffee className="h-5 w-5 text-primary" />
           </div>
-          <div className="flex-1">
-            <h3 className="font-medium text-[#0A3C1F]">Support Sgt. Ken</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              If you appreciate this site and my assistance, consider buying me a coffee! Your donation helps maintain
-              this platform.
-            </p>
-            <div className="flex flex-wrap gap-2">
-              <Link href="/donate">
-                <Button size="sm" className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
-                  Donate Now
-                </Button>
-              </Link>
-              <Button
-                size="sm"
-                variant="outline"
-                className="border-[#0A3C1F] text-[#0A3C1F]"
-                onClick={() => setDismissed(true)}
-              >
-                Maybe Later
-              </Button>
-            </div>
+          <div>
+            <h3 className="font-medium text-primary">Support Sgt. Ken</h3>
+            <p className="text-sm text-muted-foreground">Help support our mission</p>
           </div>
+        </div>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Button size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            Donate Now
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            className="border-primary text-primary"
+            onClick={() => setDismissed(true)}
+          >
+            Maybe Later
+          </Button>
+        </div>
+        <div className="mt-4 text-sm text-muted-foreground">
+          <Coffee className="h-4 w-4 text-primary inline-block mr-1" />
+          Want to make a bigger impact?{" "}
+          <Link href="/donate" className="text-primary font-medium hover:underline">
+            View donor tiers
+          </Link>
         </div>
       </div>
     )

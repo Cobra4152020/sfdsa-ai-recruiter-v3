@@ -1,9 +1,42 @@
-import { Canvas, loadImage } from "canvas"
+import { Canvas, loadImage, CanvasRenderingContext2D as NodeCanvasRenderingContext2D, Image as NodeImage } from "canvas"
 import fs from "fs"
 import path from "path"
 import { spawn } from "child_process"
 import { v4 as uuidv4 } from "uuid"
 import os from "os"
+import { videoTheme } from "./video-theme"
+
+// Declare module for uuid
+declare module 'uuid' {
+  export function v4(): string;
+}
+
+// Type for our canvas context that includes only the methods we use
+type CustomCanvasContext = Pick<
+  CanvasRenderingContext2D,
+  | 'clearRect'
+  | 'fillStyle'
+  | 'fillRect'
+  | 'createLinearGradient'
+  | 'save'
+  | 'restore'
+  | 'translate'
+  | 'rotate'
+  | 'drawImage'
+  | 'globalAlpha'
+  | 'globalCompositeOperation'
+  | 'beginPath'
+  | 'arc'
+  | 'fill'
+  | 'font'
+  | 'textAlign'
+  | 'shadowColor'
+  | 'shadowBlur'
+  | 'shadowOffsetX'
+  | 'shadowOffsetY'
+  | 'measureText'
+  | 'fillText'
+>;
 
 export interface VideoFrame {
   background?: {
@@ -128,7 +161,7 @@ export async function generateVideo(frames: VideoFrame[], config: VideoConfig): 
     // Save frame as PNG
     const frameFilePath = path.join(tempDir, `frame-${i.toString().padStart(6, "0")}.png`)
     const buffer = canvas.toBuffer("image/png")
-    fs.writeFileSync(frameFilePath, buffer)
+    fs.writeFileSync(frameFilePath, buffer.toString('binary'))
   }
 
   console.log("Frames generated, creating video...")
@@ -146,7 +179,7 @@ export async function generateVideo(frames: VideoFrame[], config: VideoConfig): 
  * Draws a single video frame
  */
 async function drawVideoFrame(
-  ctx: CanvasRenderingContext2D,
+  ctx: NodeCanvasRenderingContext2D,
   frame: VideoFrame,
   width: number,
   height: number,
@@ -259,11 +292,16 @@ async function drawVideoFrame(
 /**
  * Draws text with specified configuration
  */
-function drawText(ctx: CanvasRenderingContext2D, textConfig: VideoFrame["texts"][0], canvasWidth: number): void {
+function drawText(
+  ctx: NodeCanvasRenderingContext2D,
+  textConfig: NonNullable<VideoFrame['texts']>[number],
+  canvasWidth: number
+): void {
   ctx.save()
 
   // Set text properties
-  ctx.font = `${textConfig.fontWeight || "normal"} ${textConfig.fontSize || 30}px ${textConfig.fontFamily || "Arial"}`
+  const fontSize = textConfig.fontSize || 30
+  ctx.font = `${textConfig.fontWeight || "normal"} ${fontSize}px ${textConfig.fontFamily || "Arial"}`
   ctx.fillStyle = textConfig.color || "white"
   ctx.textAlign = textConfig.align || "center"
 
@@ -305,7 +343,7 @@ function drawText(ctx: CanvasRenderingContext2D, textConfig: VideoFrame["texts"]
     lines.push(line)
 
     // Draw each line
-    const lineHeight = textConfig.lineHeight || textConfig.fontSize * 1.2 || 36
+    const lineHeight = textConfig.lineHeight || fontSize * 1.2
 
     lines.forEach((line, index) => {
       ctx.fillText(line.trim(), x, y + index * lineHeight)
@@ -322,10 +360,10 @@ function drawText(ctx: CanvasRenderingContext2D, textConfig: VideoFrame["texts"]
  * Adds a watermark to the video frame
  */
 function addWatermark(
-  ctx: CanvasRenderingContext2D,
+  ctx: NodeCanvasRenderingContext2D,
   width: number,
   height: number,
-  watermark: VideoConfig["watermark"],
+  watermark: NonNullable<VideoConfig['watermark']>,
 ): void {
   if (!watermark) return
 
@@ -468,7 +506,7 @@ export function generateBadgeTikTokFrames(
     const background = {
       gradient: {
         stops: [
-          { position: 0, color: "#0A3C1F" },
+          { position: 0, color: videoTheme.colors.background.gradient[0].color },
           { position: 1, color: `rgba(10, 60, 31, ${0.5 + progress * 0.3})` },
         ],
       },
@@ -537,7 +575,7 @@ export function generateBadgeTikTokFrames(
           fontSize: 60,
           fontWeight: "bold",
           y: 800,
-          color: "#FFFFFF",
+          color: videoTheme.colors.text.primary,
           opacity: titleOpacity,
           shadow: {
             color: "rgba(0, 0, 0, 0.5)",
@@ -549,7 +587,7 @@ export function generateBadgeTikTokFrames(
           fontSize: 70,
           fontWeight: "bold",
           y: 900,
-          color: "#FFD700",
+          color: videoTheme.colors.text.accent,
           opacity: badgeNameOpacity,
           maxWidth: 900,
           lineHeight: 80,
@@ -562,7 +600,7 @@ export function generateBadgeTikTokFrames(
           text: badgeDescription,
           fontSize: 40,
           y: 1050,
-          color: "#FFFFFF",
+          color: videoTheme.colors.text.primary,
           opacity: descriptionOpacity,
           maxWidth: 880,
           lineHeight: 50,
@@ -572,7 +610,7 @@ export function generateBadgeTikTokFrames(
           fontSize: 40,
           fontWeight: "bold",
           y: 1720,
-          color: "#FFFFFF",
+          color: videoTheme.colors.text.primary,
           opacity: i > 70 ? (i - 70) / 20 : 0,
         },
         {
@@ -580,7 +618,7 @@ export function generateBadgeTikTokFrames(
           fontSize: 50,
           fontWeight: "bold",
           y: 1800,
-          color: "#FFD700",
+          color: videoTheme.colors.text.accent,
           opacity: i > 75 ? (i - 75) / 15 : 0,
           shadow: {
             color: "rgba(0, 0, 0, 0.8)",
@@ -596,16 +634,16 @@ export function generateBadgeTikTokFrames(
                 y: 350,
                 width: 200,
                 height: 400,
-                opacity: 0.7,
+                opacity: videoTheme.effects.shine.opacity,
               }
             : undefined,
         particles: particlesVisible
           ? {
-              color: "rgba(255, 215, 0, 0.7)",
-              items: Array.from({ length: 20 }, (_, j) => ({
-                x: Math.random() * 1080,
-                y: 400 + Math.random() * 800,
-                size: 2 + Math.random() * 4,
+              color: videoTheme.colors.particles.primary,
+              items: Array.from({ length: 20 }, () => ({
+                x: Math.random() * 1920,
+                y: Math.random() * 1080,
+                size: Math.random() * 4 + 2,
               })),
             }
           : undefined,
@@ -636,7 +674,7 @@ export function generateNFTTikTokFrames(
     const background = {
       gradient: {
         stops: [
-          { position: 0, color: "#0A3C1F" },
+          { position: 0, color: videoTheme.colors.background.gradient[0].color },
           { position: 1, color: `rgba(10, 60, 31, ${0.5 + progress * 0.3})` },
         ],
       },
@@ -645,23 +683,26 @@ export function generateNFTTikTokFrames(
     // Logo animation
     const logoOpacity = i < 15 ? i / 15 : i > 75 ? 1 - (i - 75) / 15 : 1
 
-    // NFT animation (zoom and pulse effect)
+    // NFT image animation
     let nftScale = 0
-    let nftOpacity = 0
+    let nftRotation = 0
 
     if (i < 15) {
       // Not visible yet
       nftScale = 0
-      nftOpacity = 0
     } else if (i < 30) {
-      // Zoom in
-      const zoomProgress = (i - 15) / 15
-      nftScale = zoomProgress
-      nftOpacity = zoomProgress
+      // Grow with bounce
+      const bounceProgress = (i - 15) / 15
+      nftScale = Math.min(1.2 * Math.sin((bounceProgress * Math.PI) / 2), 1)
+      nftRotation = 15 * (1 - bounceProgress)
+    } else if (i < 45) {
+      // Settle with slight bounce
+      const bounceProgress = (i - 30) / 15
+      nftScale = 1 + 0.1 * Math.sin(bounceProgress * Math.PI)
+      nftRotation = 0
     } else {
-      // Pulsing effect
-      nftScale = 1 + 0.05 * Math.sin((i - 30) * 0.1)
-      nftOpacity = 1
+      // Stable
+      nftScale = 1
     }
 
     // Text animations
@@ -669,8 +710,8 @@ export function generateNFTTikTokFrames(
     const nftNameOpacity = i < 45 ? 0 : i < 60 ? (i - 45) / 15 : 1
     const descriptionOpacity = i < 60 ? 0 : (i - 60) / 15
 
-    // Glow effect that pulses
-    const glowIntensity = i > 30 ? 0.5 + 0.3 * Math.sin((i - 30) * 0.1) : 0
+    // Shine effect that moves across the NFT
+    const shinePosition = i < 45 ? -400 : ((i - 45) / 30) * 1200 - 400
 
     frames.push({
       background,
@@ -687,18 +728,19 @@ export function generateNFTTikTokFrames(
           path: nftImagePath,
           centered: true,
           y: 500,
-          width: 450 * nftScale,
-          height: 450 * nftScale,
-          opacity: nftOpacity,
+          width: 400 * nftScale,
+          height: 400 * nftScale,
+          opacity: i < 15 ? 0 : 1,
+          rotation: nftRotation,
         },
       ],
       texts: [
         {
-          text: "NFT Award Earned!",
+          text: "Exclusive NFT Unlocked!",
           fontSize: 60,
           fontWeight: "bold",
           y: 800,
-          color: "#FFFFFF",
+          color: videoTheme.colors.text.primary,
           opacity: titleOpacity,
           shadow: {
             color: "rgba(0, 0, 0, 0.5)",
@@ -710,7 +752,7 @@ export function generateNFTTikTokFrames(
           fontSize: 70,
           fontWeight: "bold",
           y: 900,
-          color: "#FFD700",
+          color: videoTheme.colors.text.accent,
           opacity: nftNameOpacity,
           maxWidth: 900,
           lineHeight: 80,
@@ -723,7 +765,7 @@ export function generateNFTTikTokFrames(
           text: nftDescription,
           fontSize: 40,
           y: 1050,
-          color: "#FFFFFF",
+          color: videoTheme.colors.text.primary,
           opacity: descriptionOpacity,
           maxWidth: 880,
           lineHeight: 50,
@@ -733,7 +775,7 @@ export function generateNFTTikTokFrames(
           fontSize: 40,
           fontWeight: "bold",
           y: 1720,
-          color: "#FFFFFF",
+          color: videoTheme.colors.text.primary,
           opacity: i > 70 ? (i - 70) / 20 : 0,
         },
         {
@@ -741,7 +783,7 @@ export function generateNFTTikTokFrames(
           fontSize: 50,
           fontWeight: "bold",
           y: 1800,
-          color: "#FFD700",
+          color: videoTheme.colors.text.accent,
           opacity: i > 75 ? (i - 75) / 15 : 0,
           shadow: {
             color: "rgba(0, 0, 0, 0.8)",
@@ -753,24 +795,23 @@ export function generateNFTTikTokFrames(
         shine:
           i >= 45 && i <= 75
             ? {
-                x: 340 + 200 * Math.sin((i - 45) * 0.1),
+                x: shinePosition,
                 y: 350,
-                width: 400,
-                height: 300,
-                opacity: 0.4,
+                width: 200,
+                height: 400,
+                opacity: videoTheme.effects.shine.opacity,
               }
             : undefined,
-        particles:
-          i > 50
-            ? {
-                color: "rgba(255, 215, 0, 0.7)",
-                items: Array.from({ length: 30 }, (_, j) => ({
-                  x: Math.random() * 1080,
-                  y: 400 + Math.random() * 800,
-                  size: 1 + Math.random() * 5,
-                })),
-              }
-            : undefined,
+        particles: i > 60
+          ? {
+              color: videoTheme.colors.particles.primary,
+              items: Array.from({ length: 20 }, () => ({
+                x: Math.random() * 1920,
+                y: Math.random() * 1080,
+                size: Math.random() * 4 + 2,
+              })),
+            }
+          : undefined,
       },
     })
   }

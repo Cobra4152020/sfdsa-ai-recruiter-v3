@@ -247,7 +247,7 @@ export function RecruiterRewards() {
                           size="sm"
                           disabled={!canRedeem || isLimitReached}
                           onClick={() => handleRedeemClick(reward)}
-                          className="bg-[#0A3C1F] hover:bg-[#072915]"
+                          className="bg-primary hover:bg-primary/90"
                         >
                           {isLimitReached ? (
                             <>
@@ -317,7 +317,7 @@ export function RecruiterRewards() {
             <Button variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={handleRedeemSubmit} disabled={isSubmitting} className="bg-[#0A3C1F] hover:bg-[#072915]">
+            <Button onClick={handleRedeemSubmit} disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
               {isSubmitting ? "Processing..." : "Confirm Redemption"}
             </Button>
           </DialogFooter>

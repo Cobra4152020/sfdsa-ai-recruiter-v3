@@ -22,24 +22,6 @@ async function buildProject() {
       fs.rmSync(path.join(process.cwd(), '.next'), { recursive: true, force: true });
     }
     
-    // Create public/css directory if it doesn't exist
-    const publicCssDir = path.join(process.cwd(), 'public', 'css');
-    if (!fs.existsSync(publicCssDir)) {
-      fs.mkdirSync(publicCssDir, { recursive: true });
-    }
-    
-    // Create a static CSS file with basic styles to ensure something exists
-    log('Creating static CSS file...');
-    fs.writeFileSync(path.join(publicCssDir, 'tailwind-basic.css'), `
-/* Basic styles for Tailwind components */
-.container { width: 100%; }
-@media (min-width: 640px) { .container { max-width: 640px; } }
-@media (min-width: 768px) { .container { max-width: 768px; } }
-@media (min-width: 1024px) { .container { max-width: 1024px; } }
-@media (min-width: 1280px) { .container { max-width: 1280px; } }
-@media (min-width: 1536px) { .container { max-width: 1536px; } }
-`);
-    
     // Set environment variables to skip problematic checks
     process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS = 'true';
     process.env.NEXT_PUBLIC_STATIC_BUILD = 'true';

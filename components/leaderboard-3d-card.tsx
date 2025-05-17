@@ -123,9 +123,9 @@ export function Leaderboard3DCard({
 
   // Get medal color based on rank
   const getMedalColor = () => {
-    if (rank === 1) return "bg-[#FFD700]"
-    if (rank === 2) return "bg-[#C0C0C0]"
-    if (rank === 3) return "bg-[#CD7F32]"
+    if (rank === 1) return "bg-accent"
+    if (rank === 2) return "bg-secondary"
+    if (rank === 3) return "bg-muted"
     return "bg-gray-200 dark:bg-gray-700"
   }
 
@@ -133,7 +133,7 @@ export function Leaderboard3DCard({
     <motion.div
       ref={cardRef}
       className={`relative rounded-xl overflow-hidden shadow-lg transition-all duration-300 ${
-        isCurrentUser ? "ring-2 ring-[#0A3C1F] bg-[#0A3C1F]/5" : "bg-white dark:bg-gray-800"
+        isCurrentUser ? "ring-2 ring-primary bg-primary/5" : "bg-card dark:bg-gray-800"
       }`}
       style={{
         transformStyle: "preserve-3d",
@@ -182,7 +182,7 @@ export function Leaderboard3DCard({
           {/* Avatar */}
           <div className="relative">
             <div
-              className="w-14 h-14 rounded-full bg-cover bg-center border-2 border-[#0A3C1F]"
+              className="w-14 h-14 rounded-full bg-cover bg-center border-2 border-primary"
               style={{
                 backgroundImage: `url(${avatarUrl || `/placeholder.svg?height=56&width=56&query=user-${id}`})`,
               }}
@@ -199,18 +199,18 @@ export function Leaderboard3DCard({
             <div className="flex items-center">
               <h3 className="font-bold text-lg">{name}</h3>
               {isCurrentUser && (
-                <Badge variant="outline" className="ml-2 bg-[#0A3C1F]/10 text-[#0A3C1F] border-[#0A3C1F]/20">
+                <Badge variant="outline" className="ml-2 bg-primary/10 text-primary border-primary/20">
                   You
                 </Badge>
               )}
             </div>
             <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
               <span className="flex items-center mr-3">
-                <Award className="h-3 w-3 mr-1 text-[#FFD700]" />
+                <Award className="h-3 w-3 mr-1 text-accent" />
                 {points.toLocaleString()} pts
               </span>
               <span className="flex items-center">
-                <Award className="h-3 w-3 mr-1 text-[#C0C0C0]" />
+                <Award className="h-3 w-3 mr-1 text-secondary" />
                 {badgeCount} badges
               </span>
             </div>

@@ -81,7 +81,7 @@ export function DonationPointsDisplay({ userId }: DonationPointsDisplayProps) {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Donation Points</CardTitle>
-          <DollarSign className="h-5 w-5 text-[#0A3C1F]" />
+          <DollarSign className="h-5 w-5 text-primary" />
         </div>
         <CardDescription>Your contribution makes a difference</CardDescription>
       </CardHeader>
@@ -89,7 +89,7 @@ export function DonationPointsDisplay({ userId }: DonationPointsDisplayProps) {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Gift className="h-5 w-5 mr-2 text-[#0A3C1F]" />
+              <Gift className="h-5 w-5 mr-2 text-primary" />
               <span className="text-sm font-medium">Total Donations:</span>
             </div>
             <span className="font-bold">{donationCount}</span>
@@ -97,7 +97,7 @@ export function DonationPointsDisplay({ userId }: DonationPointsDisplayProps) {
 
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <Award className="h-5 w-5 mr-2 text-[#0A3C1F]" />
+              <Award className="h-5 w-5 mr-2 text-primary" />
               <span className="text-sm font-medium">Donation Points:</span>
             </div>
             <span className="font-bold">{points.toLocaleString()}</span>
@@ -107,7 +107,7 @@ export function DonationPointsDisplay({ userId }: DonationPointsDisplayProps) {
             <div className="space-y-2 mt-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
-                  <TrendingUp className="h-5 w-5 mr-2 text-[#0A3C1F]" />
+                  <TrendingUp className="h-5 w-5 mr-2 text-primary" />
                   <span className="text-sm font-medium">Next Award:</span>
                 </div>
                 <span className="text-sm">{nextAward.name}</span>

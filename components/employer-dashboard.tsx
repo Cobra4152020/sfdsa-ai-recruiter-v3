@@ -281,19 +281,19 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
     return (
       <div className={className}>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </div>
     )
   }
 
-  const COLORS = ["#0A3C1F", "#2E7D32", "#66BB6A", "#A5D6A7", "#E8F5E9"]
+  const COLORS = ["primary", "secondary", "accent", "muted", "background"]
 
   return (
     <div className={className}>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">Employer Dashboard</h2>
+          <h2 className="text-2xl font-bold text-primary dark:text-accent">Employer Dashboard</h2>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="applicants">Applicants</TabsTrigger>
@@ -394,8 +394,8 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="applications" fill="#0A3C1F" name="Total Applications" />
-                      <Bar dataKey="approved" fill="#FFD700" name="Approved" />
+                      <Bar dataKey="applications" fill="var(--primary)" name="Total Applications" />
+                      <Bar dataKey="approved" fill="var(--accent)" name="Approved" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -471,11 +471,11 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       <div key={applicant.id} className="flex items-start space-x-4">
                         <div className="relative">
                           <div
-                            className="w-12 h-12 rounded-full bg-cover bg-center border-2 border-[#0A3C1F]"
+                            className="w-12 h-12 rounded-full bg-cover bg-center border-2 border-primary"
                             style={{ backgroundImage: `url(${applicant.avatar})` }}
                           ></div>
-                          <div className="absolute -bottom-1 -right-1 bg-[#FFD700] rounded-full p-1">
-                            <Star className="h-3 w-3 text-[#0A3C1F]" />
+                          <div className="absolute -bottom-1 -right-1 bg-accent rounded-full p-1">
+                            <Star className="h-3 w-3 text-primary" />
                           </div>
                         </div>
                         <div>
@@ -486,7 +486,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                                 <Star
                                   key={i}
                                   className={`h-3 w-3 ${
-                                    i < applicant.rating ? "text-[#FFD700] fill-[#FFD700]" : "text-gray-300"
+                                    i < applicant.rating ? "text-accent fill-accent" : "text-gray-300"
                                   }`}
                                 />
                               ))}
@@ -553,7 +553,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
                         <div className="flex items-center space-x-4">
                           <div
-                            className="w-12 h-12 rounded-full bg-cover bg-center border-2 border-[#0A3C1F]"
+                            className="w-12 h-12 rounded-full bg-cover bg-center border-2 border-primary"
                             style={{ backgroundImage: `url(${applicant.avatar})` }}
                           ></div>
                           <div>
@@ -725,7 +725,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                             <Star
                               key={i}
                               className={`h-4 w-4 ${
-                                i < selectedApplicant.rating ? "text-[#FFD700] fill-[#FFD700]" : "text-gray-300"
+                                i < selectedApplicant.rating ? "text-accent fill-accent" : "text-gray-300"
                               }`}
                             />
                           ))}
@@ -753,7 +753,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                           <option value="approved">Approved</option>
                           <option value="rejected">Rejected</option>
                         </select>
-                        <Button className="mt-2 w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                        <Button className="mt-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground">
                           Update Status
                         </Button>
                       </div>
@@ -768,7 +768,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                           onChange={(e) => setFeedbackText(e.target.value)}
                         />
                         <Button
-                          className="mt-2 w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                          className="mt-2 w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                           onClick={handleSendFeedback}
                         >
                           Send Feedback
@@ -826,8 +826,8 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="bg-[#0A3C1F]/10 rounded-full p-2">
-                          <CalendarIcon className="h-4 w-4 text-[#0A3C1F]" />
+                        <div className="bg-primary/10 rounded-full p-2">
+                          <CalendarIcon className="h-4 w-4 text-primary" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
@@ -975,7 +975,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                   </div>
 
                   <Button
-                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                     onClick={handleScheduleInterview}
                   >
                     Schedule Interview
@@ -1033,8 +1033,8 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="applications" fill="#0A3C1F" name="Total Applications" />
-                      <Bar dataKey="approved" fill="#FFD700" name="Approved" />
+                      <Bar dataKey="applications" fill="var(--primary)" name="Total Applications" />
+                      <Bar dataKey="approved" fill="var(--accent)" name="Approved" />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>

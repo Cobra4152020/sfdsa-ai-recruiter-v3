@@ -25,6 +25,8 @@ import {
   Eye,
   Star,
   TrendingUp,
+  Heart as HeartFilled,
+  Share2 as Share2Filled,
 } from "lucide-react"
 import { AuthForm } from "@/components/auth-form"
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog"
@@ -32,29 +34,60 @@ import { useUser } from "@/context/user-context"
 import { useToast } from "@/components/ui/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 import confetti from "canvas-confetti"
+import type { User } from "@/types/user"
+
+// Add types for canvas-confetti
+declare module 'canvas-confetti' {
+  interface Options {
+    particleCount?: number;
+    spread?: number;
+    startVelocity?: number;
+    decay?: number;
+    gravity?: number;
+    drift?: number;
+    ticks?: number;
+    origin?: {
+      x?: number;
+      y?: number;
+    };
+    colors?: string[];
+    shapes?: string[];
+    scalar?: number;
+    zIndex?: number;
+    disableForReducedMotion?: boolean;
+  }
+
+  interface ConfettiFunction {
+    (options?: Options): Promise<null>;
+    reset: () => void;
+  }
+
+  const confetti: ConfettiFunction;
+  export default confetti;
+}
 
 interface LeaderboardUser {
   id: string
   name: string
-  avatar_url?: string
+  avatar_url: string
   participation_count: number
   badge_count: number
   nft_count: number
   has_applied: boolean
-  rank?: number
+  rank: number
   is_current_user?: boolean
   likes?: number
   shares?: number
-  liked_by_user?: boolean
-  shared_by_user?: boolean
+  liked_by_user: boolean
+  shared_by_user: boolean
   progress?: {
     total: number
     current: number
     label: string
   }
-  trending?: boolean
+  trending: boolean
   spotlight?: boolean
-  referrals?: number
+  referrals: number
 }
 
 interface AdvancedLeaderboardProps {
@@ -294,7 +327,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
     setOffset(0) // Reset pagination when changing timeframe
   }
 
-  const handleSearch = (e: React.FormEvent) => {
+  const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setOffset(0) // Reset pagination when searching
     fetchData()
@@ -426,7 +459,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
   }
 
   const getRankIcon = (rank: number) => {
-    if (rank === 1) return <Trophy className="h-5 w-5 text-yellow-500" />
+    if (rank === 1) return <Trophy className="h-5 w-5 text-accent" />
     if (rank === 2) return <Medal className="h-5 w-5 text-gray-400" />
     if (rank === 3) return <Award className="h-5 w-5 text-amber-700" />
     return <span className="text-gray-500 font-medium">{rank}</span>
@@ -470,7 +503,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
         <CardContent className="p-6">
           <div className="flex flex-col space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-              <h2 className="text-2xl font-bold text-[#0A3C1F]">Leaderboard</h2>
+              <h2 className="text-2xl font-bold text-primary">Leaderboard</h2>
 
               <div className="flex items-center gap-2">
                 <Select value={timeframe} onValueChange={handleTimeframeChange}>
@@ -490,7 +523,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
                   size="icon"
                   onClick={fetchData}
                   title="Refresh leaderboard"
-                  className="text-[#0A3C1F]"
+                  className="text-primary"
                 >
                   <RefreshCw className="h-4 w-4" />
                 </Button>
@@ -501,14 +534,14 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
             {spotlightUser && (
               <div
                 ref={spotlightRef}
-                className="bg-gradient-to-r from-[#0A3C1F]/5 to-transparent border border-[#0A3C1F]/20 rounded-lg p-4 mb-4"
+                className="bg-gradient-to-r from-primary/5 to-transparent border border-primary/20 rounded-lg p-4 mb-4"
               >
                 <div className="flex items-center mb-3">
-                  <Star className="h-5 w-5 text-[#FFD700] mr-2" />
-                  <h3 className="font-semibold text-lg text-[#0A3C1F]">Recruiter Spotlight</h3>
+                  <Star className="h-5 w-5 text-accent mr-2" />
+                  <h3 className="font-semibold text-lg text-primary">Recruiter Spotlight</h3>
                 </div>
                 <div className="flex items-center">
-                  <Avatar className="h-16 w-16 mr-4 border-2 border-[#FFD700]">
+                  <Avatar className="h-16 w-16 mr-4 border-2 border-accent">
                     <AvatarImage
                       src={spotlightUser.avatar_url || "/placeholder.svg?height=64&width=64&query=avatar"}
                       alt={spotlightUser.name}
@@ -520,7 +553,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
                     <div className="flex items-center">
                       <span className="font-bold text-lg">{spotlightUser.name}</span>
                       {spotlightUser.trending && (
-                        <Badge className="ml-2 bg-[#0A3C1F] text-white">
+                        <Badge className="ml-2 bg-primary text-primary-foreground">
                           <TrendingUp className="h-3 w-3 mr-1" /> Trending
                         </Badge>
                       )}
@@ -528,7 +561,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
 
                     <div className="flex flex-wrap gap-2 mt-1 text-sm">
                       <span className="flex items-center mr-3">
-                        <Trophy className="h-4 w-4 text-[#FFD700] mr-1" />
+                        <Trophy className="h-4 w-4 text-accent mr-1" />
                         {spotlightUser.participation_count} points
                       </span>
                       <span className="flex items-center mr-3">
@@ -569,23 +602,19 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
                     <Button
                       size="sm"
                       variant={spotlightUser.liked_by_user ? "default" : "outline"}
-                      className={
-                        spotlightUser.liked_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"
-                      }
+                      className={`${spotlightUser.liked_by_user ? "bg-primary text-primary-foreground" : "border-primary text-primary"} transition-all`}
                       onClick={() => handleLike(spotlightUser.id)}
                     >
-                      <Heart className={`h-4 w-4 mr-1 ${spotlightUser.liked_by_user ? "fill-white" : ""}`} />
+                      <HeartFilled className={`h-4 w-4 mr-1 ${spotlightUser.liked_by_user ? "fill-white" : ""}`} />
                       <span>{spotlightUser.likes}</span>
                     </Button>
                     <Button
                       size="sm"
                       variant={spotlightUser.shared_by_user ? "default" : "outline"}
-                      className={
-                        spotlightUser.shared_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"
-                      }
+                      className={`${spotlightUser.shared_by_user ? "bg-primary text-primary-foreground" : "border-primary text-primary"} transition-all`}
                       onClick={() => handleShare(spotlightUser.id)}
                     >
-                      <Share2 className="h-4 w-4 mr-1" />
+                      <Share2Filled className="h-4 w-4 mr-1" />
                       <span>{spotlightUser.shares}</span>
                     </Button>
                   </div>
@@ -603,13 +632,13 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="flex-1"
                 />
-                <Button type="submit" size="sm" className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90">
+                <Button type="submit" size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
                   <Search className="h-4 w-4 mr-2" />
                   Search
                 </Button>
               </form>
 
-              <Button onClick={handleReferRecruit} className="bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90">
+              <Button onClick={handleReferRecruit} className="bg-accent text-accent-foreground hover:bg-accent/90">
                 <Eye className="h-4 w-4 mr-2" />
                 Refer a Recruit
               </Button>
@@ -652,9 +681,9 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
                           transition={{ duration: 0.3, delay: index * 0.05 }}
                           className={`flex flex-col p-3 rounded-lg transition-all ${
                             user.is_current_user
-                              ? "bg-[#0A3C1F]/5 border border-[#0A3C1F]/20"
-                              : "border hover:border-[#0A3C1F]/20 hover:bg-[#0A3C1F]/5"
-                          } ${index < 3 ? "border-[#FFD700]/30" : "border-gray-200"}`}
+                              ? "bg-primary/5 border border-primary/20"
+                              : "border hover:border-primary/20 hover:bg-primary/5"
+                          } ${index < 3 ? "border-accent/30" : "border-gray-200"}`}
                         >
                           <div className="flex items-center">
                             <div className="flex items-center justify-center w-8 mr-3">
@@ -673,12 +702,12 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
                               <div className="flex items-center">
                                 <span className="font-medium">{user.name}</span>
                                 {user.is_current_user && (
-                                  <Badge variant="outline" className="ml-2 bg-[#0A3C1F]/10 text-[#0A3C1F]">
+                                  <Badge variant="outline" className="ml-2 bg-primary/10 text-primary">
                                     You
                                   </Badge>
                                 )}
                                 {user.trending && (
-                                  <Badge variant="outline" className="ml-2 bg-[#FFD700]/10 text-[#0A3C1F]">
+                                  <Badge variant="outline" className="ml-2 bg-accent/10 text-primary">
                                     <TrendingUp className="h-3 w-3 mr-1" /> Trending
                                   </Badge>
                                 )}
@@ -691,7 +720,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
 
                               <div className="flex flex-wrap gap-1 mt-1 text-xs text-gray-500">
                                 <span className="flex items-center mr-2">
-                                  <Trophy className="h-3 w-3 text-[#FFD700] mr-1" />
+                                  <Trophy className="h-3 w-3 text-accent mr-1" />
                                   {user.participation_count} pts
                                 </span>
                                 <span className="flex items-center mr-2">
@@ -713,20 +742,20 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
                               <Button
                                 size="sm"
                                 variant={user.liked_by_user ? "default" : "outline"}
-                                className={`${user.liked_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"} transition-all`}
+                                className={`${user.liked_by_user ? "bg-primary text-primary-foreground" : "border-primary text-primary"} transition-all`}
                                 onClick={() => handleLike(user.id)}
                               >
-                                <Heart className={`h-4 w-4 mr-1 ${user.liked_by_user ? "fill-white" : ""}`} />
-                                <span>{user.likes}</span>
+                                {user.liked_by_user ? <HeartFilled className="h-4 w-4 mr-1" /> : <Heart className="h-4 w-4 mr-1" />}
+                                {user.liked_by_user ? "Liked" : "Like"}
                               </Button>
                               <Button
                                 size="sm"
                                 variant={user.shared_by_user ? "default" : "outline"}
-                                className={`${user.shared_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"} transition-all`}
+                                className={`${user.shared_by_user ? "bg-primary text-primary-foreground" : "border-primary text-primary"} transition-all`}
                                 onClick={() => handleShare(user.id)}
                               >
-                                <Share2 className="h-4 w-4 mr-1" />
-                                <span>{user.shares}</span>
+                                {user.shared_by_user ? <Share2Filled className="h-4 w-4 mr-1" /> : <Share2 className="h-4 w-4 mr-1" />}
+                                {user.shared_by_user ? "Shared" : "Share"}
                               </Button>
                             </div>
                           </div>
@@ -785,8 +814,8 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
       <Card className={`w-full shadow-md mt-6 ${className}`}>
         <CardContent className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-[#0A3C1F]">Top Referrers</h2>
-            <Button variant="link" className="text-[#0A3C1F]">
+            <h2 className="text-xl font-bold text-primary">Top Referrers</h2>
+            <Button variant="link" className="text-primary">
               View All
             </Button>
           </div>
@@ -805,13 +834,13 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
               : leaderboardData.slice(0, 3).map((user, index) => (
                   <div
                     key={user.id}
-                    className="flex items-center p-4 border rounded-lg hover:border-[#0A3C1F]/20 hover:bg-[#0A3C1F]/5 transition-all"
+                    className="flex items-center p-4 border rounded-lg hover:border-primary/20 hover:bg-primary/5 transition-all"
                   >
                     <div className="mr-3 text-center">
                       <div
                         className={`w-8 h-8 flex items-center justify-center rounded-full ${
                           index === 0
-                            ? "bg-[#FFD700]/20 text-[#FFD700]"
+                            ? "bg-accent/20 text-accent"
                             : index === 1
                               ? "bg-gray-200 text-gray-700"
                               : "bg-amber-100 text-amber-700"
@@ -841,7 +870,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
 
                     <Button
                       size="sm"
-                      className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90"
+                      className="bg-primary text-primary-foreground hover:bg-primary/90"
                       onClick={() => handleShare(user.id)}
                     >
                       <Share2 className="h-4 w-4 mr-1" />
@@ -874,9 +903,9 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
           <DialogTitle>Share this profile</DialogTitle>
           <DialogDescription>
             {shareForUnlock ? (
-              <div className="bg-[#FFD700]/10 border border-[#FFD700] rounded-lg p-4 my-4">
-                <h4 className="font-bold text-[#0A3C1F] flex items-center">
-                  <Trophy className="h-4 w-4 text-[#FFD700] mr-2" />
+              <div className="bg-accent/10 border border-accent rounded-lg p-4 my-4">
+                <h4 className="font-bold text-primary flex items-center">
+                  <Trophy className="h-4 w-4 text-accent mr-2" />
                   Share to Unlock: {shareForUnlock.badge}
                 </h4>
                 <p className="mt-2 text-sm">{shareForUnlock.description}</p>

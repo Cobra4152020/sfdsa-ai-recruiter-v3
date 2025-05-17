@@ -41,15 +41,15 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
   }
 
   return (
-    <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-md border border-[#0A3C1F]/20 dark:border-[#FFD700]/20">
-      <CardHeader className="pb-2 bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white dark:from-[#0A3C1F] dark:to-[#0A3C1F]/90 dark:text-[#FFD700]">
+    <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-md border border-primary/20 dark:border-accent/20">
+      <CardHeader className="pb-2 bg-gradient-to-r from-primary to-primary/90 text-primary-foreground dark:from-primary dark:to-primary/90 dark:text-accent">
         <div className="flex justify-between items-start">
           <CardTitle className="text-lg font-semibold">{badge.name}</CardTitle>
           {earned && (
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <CheckCircle className="h-5 w-5 text-[#FFD700]" />
+                  <CheckCircle className="h-5 w-5 text-accent" />
                 </TooltipTrigger>
                 <TooltipContent>
                   <p>You've earned this badge!</p>
@@ -58,7 +58,7 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
             </TooltipProvider>
           )}
         </div>
-        <CardDescription className="text-white/80 dark:text-[#FFD700]/80">
+        <CardDescription className="text-primary-foreground/80 dark:text-accent/80">
           {badge.category === "application" ? "Application Achievement" : "Participation Recognition"}
         </CardDescription>
       </CardHeader>
@@ -96,7 +96,7 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full mt-2 text-xs border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10 dark:border-[#FFD700] dark:text-[#FFD700] dark:hover:bg-[#FFD700]/10"
+                className="w-full mt-2 text-xs border-primary text-primary hover:bg-primary/10 dark:border-accent dark:text-accent dark:hover:bg-accent/10"
               >
                 <Info className="h-3.5 w-3.5 mr-1" /> View Requirements
               </Button>
@@ -104,7 +104,7 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
             <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle className="flex items-center">
-                  <Trophy className="h-5 w-5 mr-2 text-[#0A3C1F] dark:text-[#FFD700]" />
+                  <Trophy className="h-5 w-5 mr-2 text-primary dark:text-accent" />
                   {badge.name} Requirements
                 </DialogTitle>
                 <DialogDescription>Complete these requirements to earn this badge</DialogDescription>
@@ -144,7 +144,7 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
                       onShare?.()
                       setIsDialogOpen(false)
                     }}
-                    className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white dark:bg-[#0A3C1F] dark:hover:bg-[#0A3C1F]/90 dark:text-[#FFD700]"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-primary dark:hover:bg-primary/90 dark:text-accent"
                   >
                     <Share2 className="h-4 w-4 mr-2" /> Share to Progress
                   </Button>
@@ -162,14 +162,14 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
             className={`w-full ${
               earned
                 ? "bg-green-600 hover:bg-green-700 text-white"
-                : "bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white dark:bg-[#0A3C1F] dark:hover:bg-[#0A3C1F]/90 dark:text-[#FFD700]"
+                : "bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-primary dark:hover:bg-primary/90 dark:text-accent"
             }`}
           >
             <Share2 className="h-4 w-4 mr-2" />
             {earned ? "Share Achievement" : "Share to Progress"}
           </Button>
         ) : (
-          <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white dark:bg-[#0A3C1F] dark:hover:bg-[#0A3C1F]/90 dark:text-[#FFD700]">
+          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-primary dark:hover:bg-primary/90 dark:text-accent">
             Sign In to Track Progress
           </Button>
         )}

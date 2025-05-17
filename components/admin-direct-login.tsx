@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/components/ui/use-toast"
-import { Shield, ArrowRight } from "lucide-react"
+import { Shield, ArrowRight, Loader2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
 import { supabase } from "@/lib/supabase-client-singleton" // Use the singleton
 
@@ -122,16 +122,14 @@ export function AdminDirectLogin() {
   }
 
   return (
-    <Card className="border-t-4 border-t-[#0A3C1F] shadow-lg">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">Admin Access</CardTitle>
-        <CardDescription className="text-center">Secure access for authorized administrators only</CardDescription>
+    <Card className="border-t-4 border-t-primary shadow-lg">
+      <CardHeader>
+        <CardTitle className="text-2xl font-bold text-center text-primary">Admin Access</CardTitle>
+        <CardDescription>Enter your credentials to access the admin dashboard</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="flex justify-center mb-6">
-          <div className="bg-[#0A3C1F]/10 p-6 rounded-full">
-            <Shield className="h-12 w-12 text-[#0A3C1F]" />
-          </div>
+      <CardContent>
+        <div className="bg-primary/10 p-6 rounded-full">
+          <Shield className="h-12 w-12 text-primary" />
         </div>
 
         {error && (
@@ -139,20 +137,17 @@ export function AdminDirectLogin() {
         )}
 
         <Button
-          className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
-          onClick={handleAdminAccess}
+          type="submit"
+          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
           disabled={isLoading}
         >
           {isLoading ? (
-            <span className="flex items-center">
-              <Spinner size="sm" className="mr-2" />
-              Verifying...
-            </span>
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Logging in...
+            </>
           ) : (
-            <span className="flex items-center">
-              Access Admin Dashboard
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </span>
+            "Log In"
           )}
         </Button>
 

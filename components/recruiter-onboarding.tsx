@@ -77,7 +77,7 @@ export function RecruiterOnboarding() {
   return (
     <div className="max-w-3xl mx-auto">
       <div className="text-center space-y-4 mb-8">
-        <h1 className="text-3xl md:text-4xl font-bold text-[#0A3C1F]">Volunteer Recruiter Program</h1>
+        <h1 className="text-3xl md:text-4xl font-bold text-primary">Volunteer Recruiter Program</h1>
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
           Join our team of volunteer recruiters and help build the future of the San Francisco Sheriff's Department.
         </p>
@@ -86,25 +86,25 @@ export function RecruiterOnboarding() {
       {/* Progress Steps */}
       <div className="flex justify-between mb-8 relative">
         <div className="absolute top-1/2 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 -translate-y-1/2 z-0"></div>
-        <div className={`relative z-10 flex flex-col items-center ${step >= 1 ? "text-[#0A3C1F]" : "text-gray-400"}`}>
+        <div className={`relative z-10 flex flex-col items-center ${step >= 1 ? "text-primary" : "text-muted-foreground"}`}>
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 1 ? "bg-[#0A3C1F] text-white" : "bg-gray-200 dark:bg-gray-700"}`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 1 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
           >
             <UserPlus className="h-5 w-5" />
           </div>
           <span className="mt-2 text-sm font-medium">Register</span>
         </div>
-        <div className={`relative z-10 flex flex-col items-center ${step >= 2 ? "text-[#0A3C1F]" : "text-gray-400"}`}>
+        <div className={`relative z-10 flex flex-col items-center ${step >= 2 ? "text-primary" : "text-muted-foreground"}`}>
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 2 ? "bg-[#0A3C1F] text-white" : "bg-gray-200 dark:bg-gray-700"}`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 2 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
           >
             <Shield className="h-5 w-5" />
           </div>
           <span className="mt-2 text-sm font-medium">Verify</span>
         </div>
-        <div className={`relative z-10 flex flex-col items-center ${step >= 3 ? "text-[#0A3C1F]" : "text-gray-400"}`}>
+        <div className={`relative z-10 flex flex-col items-center ${step >= 3 ? "text-primary" : "text-muted-foreground"}`}>
           <div
-            className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 3 ? "bg-[#0A3C1F] text-white" : "bg-gray-200 dark:bg-gray-700"}`}
+            className={`w-10 h-10 rounded-full flex items-center justify-center ${step >= 3 ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}
           >
             <GraduationCap className="h-5 w-5" />
           </div>
@@ -248,7 +248,7 @@ export function RecruiterOnboarding() {
                 />
               </div>
 
-              <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+              <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
                 Continue to Next Step
               </Button>
             </form>
@@ -312,7 +312,7 @@ export function RecruiterOnboarding() {
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     I agree to the{" "}
-                    <a href="/terms-of-service" className="text-[#0A3C1F] underline">
+                    <a href="/terms-of-service" className="text-primary underline">
                       Terms of Service
                     </a>{" "}
                     and acknowledge my responsibilities as a volunteer recruiter.
@@ -331,7 +331,7 @@ export function RecruiterOnboarding() {
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
                     I agree to the{" "}
-                    <a href="/privacy-policy" className="text-[#0A3C1F] underline">
+                    <a href="/privacy-policy" className="text-primary underline">
                       Privacy Policy
                     </a>{" "}
                     and consent to the collection and processing of my data.
@@ -346,7 +346,7 @@ export function RecruiterOnboarding() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || !formData.agreeTerms || !formData.agreePrivacy}
-                  className="sm:flex-1 bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="sm:flex-1 bg-primary hover:bg-primary/90"
                 >
                   {isSubmitting ? (
                     <>
@@ -383,14 +383,14 @@ export function RecruiterOnboarding() {
             </p>
 
             <div className="pt-4">
-              <Button onClick={() => (window.location.href = "/")} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+              <Button onClick={() => (window.location.href = "/")} className="bg-primary hover:bg-primary/90">
                 Return to Home Page
               </Button>
             </div>
           </CardContent>
           <CardFooter className="bg-gray-50 dark:bg-gray-800/50 border-t px-6 py-4 text-center text-sm text-gray-500">
             If you have any questions, please contact us at{" "}
-            <a href="mailto:email@protectingsanfrancisco.com" className="text-[#0A3C1F]">
+            <a href="mailto:email@protectingsanfrancisco.com" className="text-primary">
               email@protectingsanfrancisco.com
             </a>
           </CardFooter>

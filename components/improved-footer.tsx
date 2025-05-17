@@ -10,13 +10,13 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className={`bg-[#0A3C1F] text-white border-t border-white/10 py-8 ${className}`}>
+    <footer className={`bg-primary text-primary-foreground border-t border-primary-foreground/10 py-8 ${className}`}>
       <div className="container mx-auto px-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Logo and description */}
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center mb-4">
-              <Shield className="h-6 w-6 text-[#FFD700] mr-2" aria-hidden="true" />
+              <Shield className="h-6 w-6 text-primary mr-2" aria-hidden="true" />
               <span className="font-bold">SF Deputy Sheriff</span>
             </div>
             <p className="text-sm text-gray-300 mb-4">
@@ -28,7 +28,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Facebook"
-                className="text-white hover:text-[#FFD700] transition-colors"
+                className="text-foreground hover:text-primary transition-colors"
               >
                 <Facebook className="h-5 w-5" />
               </a>
@@ -37,7 +37,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Twitter"
-                className="text-white hover:text-[#FFD700] transition-colors"
+                className="text-foreground hover:text-primary transition-colors"
               >
                 <Twitter className="h-5 w-5" />
               </a>
@@ -46,7 +46,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Subscribe to our YouTube channel"
-                className="text-white hover:text-[#FFD700] transition-colors"
+                className="text-foreground hover:text-primary transition-colors"
               >
                 <Youtube className="h-5 w-5" />
               </a>
@@ -55,7 +55,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on Instagram"
-                className="text-white hover:text-[#FFD700] transition-colors"
+                className="text-foreground hover:text-primary transition-colors"
               >
                 <Instagram className="h-5 w-5" />
               </a>
@@ -64,7 +64,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Connect with us on LinkedIn"
-                className="text-white hover:text-[#FFD700] transition-colors"
+                className="text-foreground hover:text-primary transition-colors"
               >
                 <Linkedin className="h-5 w-5" />
               </a>
@@ -73,7 +73,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
 
           {/* Quick Links */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-primary">Quick Links</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/" className="text-gray-300 hover:text-white transition-colors">
@@ -124,7 +124,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
 
           {/* Contact Info */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Contact Us</h3>
+            <h3 className="text-lg font-semibold mb-4 text-primary">Contact Us</h3>
             <address className="not-italic text-sm text-gray-300 space-y-4">
               <div className="flex items-center">
                 <a
@@ -171,7 +171,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
               <div className="mt-4">
                 <Link
                   href="/donate"
-                  className="inline-flex items-center px-4 py-2 bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold rounded-md transition-colors shadow-md"
+                  className="inline-flex items-center px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-md transition-colors shadow-md"
                 >
                   <Heart className="h-4 w-4 mr-2" aria-hidden="true" />
                   <span>Support Our Mission</span>
@@ -195,7 +195,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
 
           {/* Legal */}
           <div className="col-span-1">
-            <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Legal</h3>
+            <h3 className="text-lg font-semibold mb-4 text-primary">Legal</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/privacy-policy" className="text-gray-300 hover:text-white transition-colors">
@@ -221,7 +221,7 @@ export function ImprovedFooter({ className }: ImprovedfooterProps = {}) {
           </div>
           <div className="col-span-1">
             <div className="space-y-2">
-              <h3 className="text-lg font-semibold mb-4 text-[#FFD700]">Resources</h3>
+              <h3 className="text-lg font-semibold mb-4 text-primary">Resources</h3>
               <ul className="space-y-2">
                 <li>
                   <Link href="/faq" className="text-gray-300 hover:text-white transition-colors">

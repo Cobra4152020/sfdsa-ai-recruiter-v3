@@ -13,7 +13,7 @@ export default function MissionBriefingContent() {
     <div className="container mx-auto px-4 py-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">Mission Briefing</h1>
+          <h1 className="text-3xl font-bold text-primary mb-2">Mission Briefing</h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
             Your comprehensive guide to becoming a San Francisco Deputy Sheriff. Learn about the role, requirements, and
             application process.
@@ -60,8 +60,8 @@ export default function MissionBriefingContent() {
           </TabsContent>
         </Tabs>
 
-        <Card className="mt-12 border-[#0A3C1F]/20">
-          <CardHeader className="bg-[#0A3C1F] text-white">
+        <Card className="mt-12 border-primary/20">
+          <CardHeader className="bg-primary text-primary-foreground">
             <CardTitle className="flex items-center">
               <Shield className="h-5 w-5 mr-2" /> Ready to Begin Your Journey?
             </CardTitle>
@@ -78,7 +78,7 @@ export default function MissionBriefingContent() {
                   Sheriff's Department.
                 </p>
                 <Link href={"/apply" as Route}>
-                  <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">Apply Now</Button>
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Apply Now</Button>
                 </Link>
               </div>
               <div>
@@ -87,7 +87,7 @@ export default function MissionBriefingContent() {
                   Learn about our points system, badges, and rewards as you progress through the recruitment process.
                 </p>
                 <Link href={"/deputy-launchpad" as Route}>
-                  <Button variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
+                  <Button variant="outline" className="border-primary text-primary">
                     <Rocket className="h-4 w-4 mr-2" />
                     Visit Deputy Launchpad
                   </Button>
@@ -106,30 +106,30 @@ function RoleExplainer() {
     {
       title: "Jail Operations",
       description: "Supervise inmates in county jails, ensuring safety and security",
-      icon: <Shield className="h-6 w-6 text-[#0A3C1F]" />,
+      icon: <Shield className="h-6 w-6 text-primary" />,
     },
     {
       title: "Court Security",
       description: "Maintain order in courtrooms and protect judicial officers",
-      icon: <Briefcase className="h-6 w-6 text-[#0A3C1F]" />,
+      icon: <Briefcase className="h-6 w-6 text-primary" />,
     },
     {
       title: "Inmate Transportation",
       description: "Safely transport inmates to and from court appearances and medical appointments",
-      icon: <Users className="h-6 w-6 text-[#0A3C1F]" />,
+      icon: <Users className="h-6 w-6 text-primary" />,
     },
     {
       title: "Civil Process",
       description: "Serve legal documents and enforce civil judgments",
-      icon: <FileText className="h-6 w-6 text-[#0A3C1F]" />,
+      icon: <FileText className="h-6 w-6 text-primary" />,
     },
   ]
 
   return (
     <Card>
-      <CardHeader className="bg-[#0A3C1F] text-white">
+      <CardHeader className="bg-primary text-primary-foreground">
         <CardTitle className="flex items-center">
-          <Shield className="h-5 w-5 text-[#FFD700] mr-2" />
+          <Shield className="h-5 w-5 text-accent mr-2" />
           The Deputy Sheriff Role
         </CardTitle>
         <CardDescription className="text-gray-200">
@@ -177,8 +177,8 @@ function RoleExplainer() {
             </div>
           </div>
 
-          <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-            <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">Career Growth</h3>
+          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+            <h3 className="font-semibold text-lg mb-2 text-primary">Career Growth</h3>
             <p className="mb-2">
               The San Francisco Sheriff's Department offers excellent opportunities for career advancement. Deputies can
               specialize in various areas, including:
@@ -217,51 +217,55 @@ export function RequirementsExplainer() {
   return (
     <div className="space-y-6">
       <Card>
-        <CardContent className="pt-6">
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Basic Requirements</h3>
-              <ul className="space-y-2">
-                {basicRequirements.map((req, index) => (
-                  <li key={index} className="flex items-start">
-                    <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                      <Shield className="h-4 w-4 text-[#0A3C1F]" />
-                    </div>
-                    <span>{req}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+        <CardHeader className="bg-primary text-primary-foreground">
+          <CardTitle>Requirements</CardTitle>
+          <CardDescription>These are the basic requirements to become a San Francisco Deputy Sheriff</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ul className="space-y-2">
+            {basicRequirements.map((req, index) => (
+              <li key={index} className="flex items-start">
+                <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+                  <Shield className="h-4 w-4 text-primary" />
+                </div>
+                <span>{req}</span>
+              </li>
+            ))}
+          </ul>
+        </CardContent>
+      </Card>
 
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Testing Requirements</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Written Exam</h4>
-                  <p className="text-sm text-gray-600">
-                    Tests basic reading comprehension, writing skills, and problem-solving abilities. Preparation materials
-                    are available through our platform.
-                  </p>
-                </div>
-                <div className="border rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Physical Ability Test</h4>
-                  <p className="text-sm text-gray-600">
-                    Includes push-ups, sit-ups, and a 1.5-mile run to assess physical fitness and endurance.
-                  </p>
-                </div>
-                <div className="border rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Oral Interview</h4>
-                  <p className="text-sm text-gray-600">
-                    Evaluates communication skills, judgment, and suitability for law enforcement work.
-                  </p>
-                </div>
-                <div className="border rounded-lg p-4">
-                  <h4 className="font-semibold mb-2">Background Check</h4>
-                  <p className="text-sm text-gray-600">
-                    Thorough investigation of personal history, employment, education, and criminal record.
-                  </p>
-                </div>
-              </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>Testing Requirements</CardTitle>
+          <CardDescription>These tests are required to become a San Francisco Deputy Sheriff</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="border rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Written Exam</h4>
+              <p className="text-sm text-gray-600">
+                Tests basic reading comprehension, writing skills, and problem-solving abilities. Preparation materials
+                are available through our platform.
+              </p>
+            </div>
+            <div className="border rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Physical Ability Test</h4>
+              <p className="text-sm text-gray-600">
+                Includes push-ups, sit-ups, and a 1.5-mile run to assess physical fitness and endurance.
+              </p>
+            </div>
+            <div className="border rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Oral Interview</h4>
+              <p className="text-sm text-gray-600">
+                Evaluates communication skills, judgment, and suitability for law enforcement work.
+              </p>
+            </div>
+            <div className="border rounded-lg p-4">
+              <h4 className="font-semibold mb-2">Background Check</h4>
+              <p className="text-sm text-gray-600">
+                Thorough investigation of personal history, employment, education, and criminal record.
+              </p>
             </div>
           </div>
         </CardContent>
@@ -275,26 +279,26 @@ export function RequirementsExplainer() {
         <CardContent>
           <ul className="space-y-2">
             <li className="flex items-start">
-              <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                <GraduationCap className="h-4 w-4 text-[#0A3C1F]" />
+              <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+                <GraduationCap className="h-4 w-4 text-primary" />
               </div>
               <span>College degree in Criminal Justice or related field</span>
             </li>
             <li className="flex items-start">
-              <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                <Briefcase className="h-4 w-4 text-[#0A3C1F]" />
+              <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+                <Briefcase className="h-4 w-4 text-primary" />
               </div>
               <span>Prior law enforcement or military experience</span>
             </li>
             <li className="flex items-start">
-              <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                <Users className="h-4 w-4 text-[#0A3C1F]" />
+              <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+                <Users className="h-4 w-4 text-primary" />
               </div>
               <span>Community service or volunteer experience</span>
             </li>
             <li className="flex items-start">
-              <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-                <FileText className="h-4 w-4 text-[#0A3C1F]" />
+              <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+                <FileText className="h-4 w-4 text-primary" />
               </div>
               <span>Bilingual abilities</span>
             </li>
@@ -308,9 +312,9 @@ export function RequirementsExplainer() {
 function BenefitsExplainer() {
   return (
     <Card>
-      <CardHeader className="bg-[#0A3C1F] text-white">
+      <CardHeader className="bg-primary text-primary-foreground">
         <CardTitle className="flex items-center">
-          <DollarSign className="h-5 w-5 text-[#FFD700] mr-2" />
+          <DollarSign className="h-5 w-5 text-accent mr-2" />
           Benefits & Compensation
         </CardTitle>
         <CardDescription className="text-gray-200">
@@ -321,7 +325,7 @@ function BenefitsExplainer() {
         <div className="space-y-6">
           <div>
             <h3 className="text-xl font-semibold mb-4">Salary</h3>
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
               <h4 className="font-semibold mb-2">Competitive Compensation</h4>
               <p className="mb-2">
                 San Francisco Deputy Sheriffs enjoy one of the most competitive salary packages in law enforcement:
@@ -393,8 +397,8 @@ function BenefitsExplainer() {
             </div>
           </div>
 
-          <div className="bg-[#FFD700]/10 p-4 rounded-lg border border-[#FFD700]/20">
-            <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">Special Opportunities</h3>
+          <div className="bg-accent/10 p-4 rounded-lg border border-accent/20">
+            <h3 className="font-semibold text-lg mb-2 text-primary">Special Opportunities</h3>
             <p className="mb-2">San Francisco Deputy Sheriffs may qualify for special programs:</p>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
               <li>G.I. Bill benefits for veterans</li>
@@ -403,7 +407,7 @@ function BenefitsExplainer() {
             </ul>
             <div className="mt-4">
               <Link href="/deputy-launchpad">
-                <Button variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
+                <Button variant="outline" className="border-primary text-primary">
                   Learn More in Deputy Launchpad
                 </Button>
               </Link>
@@ -459,9 +463,9 @@ export function ProcessExplainer() {
       <div className="grid gap-4">
         {applicationSteps.map((step) => (
           <Card key={step.step} className="overflow-hidden">
-            <CardHeader className="bg-[#0A3C1F]/5 pb-4">
+            <CardHeader className="bg-primary/5 pb-4">
               <div className="flex items-center">
-                <div className="bg-[#0A3C1F] text-white w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center mr-3">
                   {step.step}
                 </div>
                 <CardTitle>{step.title}</CardTitle>
@@ -474,36 +478,36 @@ export function ProcessExplainer() {
         ))}
       </div>
 
-      <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-        <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">Tips for Success</h3>
+      <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+        <h3 className="font-semibold text-lg mb-2 text-primary">Tips for Success</h3>
         <ul className="space-y-2">
           <li className="flex items-start">
-            <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-              <Shield className="h-4 w-4 text-[#0A3C1F]" />
+            <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary" />
             </div>
             <span>
               <strong>Prepare thoroughly</strong> for each step of the process, especially the written and physical tests.
             </span>
           </li>
           <li className="flex items-start">
-            <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-              <Shield className="h-4 w-4 text-[#0A3C1F]" />
+            <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary" />
             </div>
             <span>
               <strong>Be honest</strong> throughout the entire process, particularly during the background investigation.
             </span>
           </li>
           <li className="flex items-start">
-            <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-              <Shield className="h-4 w-4 text-[#0A3C1F]" />
+            <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary" />
             </div>
             <span>
               <strong>Stay in touch</strong> with your background investigator and respond promptly to requests for information.
             </span>
           </li>
           <li className="flex items-start">
-            <div className="rounded-full bg-[#0A3C1F]/10 p-1 mr-3 mt-0.5">
-              <Shield className="h-4 w-4 text-[#0A3C1F]" />
+            <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary" />
             </div>
             <span>
               <strong>Maintain physical fitness</strong> throughout the process to ensure you're ready for the academy.
@@ -518,9 +522,9 @@ export function ProcessExplainer() {
 function TrainingExplainer() {
   return (
     <Card>
-      <CardHeader className="bg-[#0A3C1F] text-white">
+      <CardHeader className="bg-primary text-primary-foreground">
         <CardTitle className="flex items-center">
-          <GraduationCap className="h-5 w-5 text-[#FFD700] mr-2" />
+          <GraduationCap className="h-5 w-5 text-accent mr-2" />
           Academy & Training
         </CardTitle>
         <CardDescription className="text-gray-200">
@@ -600,7 +604,7 @@ function TrainingExplainer() {
 
           <div>
             <h3 className="text-xl font-semibold mb-4">Academy Structure</h3>
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                   <h4 className="font-semibold mb-2">Duration</h4>
@@ -642,8 +646,8 @@ function TrainingExplainer() {
             </div>
           </div>
 
-          <div className="bg-[#FFD700]/10 p-4 rounded-lg border border-[#FFD700]/20">
-            <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">Continuing Education</h3>
+          <div className="bg-accent/10 p-4 rounded-lg border border-accent/20">
+            <h3 className="font-semibold text-lg mb-2 text-primary">Continuing Education</h3>
             <p className="mb-2">
               Your training doesn't end with the academy. The San Francisco Sheriff's Department offers ongoing
               professional development opportunities:
@@ -656,7 +660,7 @@ function TrainingExplainer() {
             </ul>
             <div className="mt-4">
               <Link href="/deputy-launchpad">
-                <Button variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
+                <Button variant="outline" className="border-primary text-primary">
                   Learn More in Deputy Launchpad
                 </Button>
               </Link>

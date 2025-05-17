@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { AchievementBadge } from "./achievement-badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Share2 } from "lucide-react"
+import { Share2, Trophy } from "lucide-react"
 import { BadgeSharingDialog } from "./badge-sharing-dialog"
 import { useUser } from "@/context/user-context"
 
@@ -94,29 +94,30 @@ export function EarnedBadges() {
 
   return (
     <>
-      <Card className="border border-[#0A3C1F]/20 dark:border-[#FFD700]/20">
-        <CardHeader className="pb-2 bg-[#0A3C1F] text-white dark:bg-[#0A3C1F] dark:text-[#FFD700]">
-          <div className="flex flex-row justify-between items-center">
-            <CardTitle className="flex items-center">
-              <span className="mr-2">🏆</span> Your Badges
-            </CardTitle>
+      <Card className="border border-primary/20 dark:border-accent/20">
+        <CardHeader className="pb-2 bg-primary text-primary-foreground dark:bg-primary dark:text-accent">
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center">
+              <Trophy className="h-5 w-5 mr-2" />
+              Earned Badges
+            </div>
             {badges.length > 0 && (
               <Button
-                variant="outline"
                 size="sm"
-                className="text-white border-white hover:bg-white/20 dark:text-[#FFD700] dark:border-[#FFD700] dark:hover:bg-[#FFD700]/20"
+                variant="outline"
+                className="text-primary-foreground border-primary-foreground hover:bg-primary-foreground/20 dark:text-accent dark:border-accent dark:hover:bg-accent/20"
                 onClick={() => setIsSharingOpen(true)}
               >
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
               </Button>
             )}
-          </div>
+          </CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="pt-4">
           {isLoading ? (
             <div className="flex justify-center py-8">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A3C1F]"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
             </div>
           ) : error ? (
             <div className="text-center py-8 text-red-500">{error}</div>
