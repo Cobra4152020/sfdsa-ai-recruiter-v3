@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "NEXT_PUBLIC_DISABLE_DATABASE_CHECKS=true next build",
     "start": "next start",
     "lint": "next lint",
     "setup-db": "tsx scripts/setup-database.ts",
     "fix-tables": "tsx scripts/fix-table-checks.ts",
-    "run-migrations": "tsx scripts/run-migrations.ts"
+    "run-migrations": "tsx scripts/run-migrations.ts",
+    "build:static": "cross-env NEXT_PUBLIC_STATIC_BUILD=true NEXT_PUBLIC_DISABLE_DATABASE_CHECKS=true next build"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.2",
