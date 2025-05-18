@@ -4,8 +4,6 @@ import type React from "react"
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -189,190 +187,182 @@ export default function EditProfilePage() {
 
   if (isLoading) {
     return (
-      <>
-        <ImprovedHeader showOptInForm={() => {}} />
-        <main className="container mx-auto px-4 py-8">
-          <Skeleton className="h-8 w-64 mb-6" />
-          <Skeleton className="h-[800px] w-full" />
-        </main>
-        <ImprovedFooter />
-      </>
+      <main className="container mx-auto px-4 py-8">
+        <Skeleton className="h-8 w-64 mb-6" />
+        <Skeleton className="h-[800px] w-full" />
+      </main>
     )
   }
 
   return (
-    <>
-      <ImprovedHeader showOptInForm={() => {}} />
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center mb-6">
-          <Button variant="ghost" onClick={() => router.push("/dashboard")} className="mr-2">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-          <h1 className="text-3xl font-bold text-[#0A3C1F]">Edit Profile</h1>
-        </div>
+    <main className="container mx-auto px-4 py-8">
+      <div className="flex items-center mb-6">
+        <Button variant="ghost" onClick={() => router.push("/dashboard")} className="mr-2">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
+        <h1 className="text-3xl font-bold text-[#0A3C1F]">Edit Profile</h1>
+      </div>
 
-        <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-          <Card>
-            <CardHeader>
-              <CardTitle>Personal Information</CardTitle>
-              <CardDescription>Update your personal details</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="first_name">First Name</Label>
-                  <Input
-                    id="first_name"
-                    name="first_name"
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="last_name">Last Name</Label>
-                  <Input id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} required />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
-                  <Input id="email" name="email" type="email" value={formData.email} disabled />
-                  <p className="text-xs text-gray-500">To change your email, please contact support</p>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Phone Number</Label>
-                  <Input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="(555) 555-5555"
-                  />
-                </div>
-              </div>
-
+      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle>Personal Information</CardTitle>
+            <CardDescription>Update your personal details</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="address">Address</Label>
+                <Label htmlFor="first_name">First Name</Label>
                 <Input
-                  id="address"
-                  name="address"
-                  value={formData.address}
+                  id="first_name"
+                  name="first_name"
+                  value={formData.first_name}
                   onChange={handleChange}
-                  placeholder="Street Address"
+                  required
                 />
               </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="city">City</Label>
-                  <Input id="city" name="city" value={formData.city} onChange={handleChange} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="state">State</Label>
-                  <Input id="state" name="state" value={formData.state} onChange={handleChange} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="zip">ZIP Code</Label>
-                  <Input id="zip" name="zip" value={formData.zip} onChange={handleChange} />
-                </div>
-              </div>
-
               <div className="space-y-2">
-                <Label htmlFor="bio">About You</Label>
-                <Textarea
-                  id="bio"
-                  name="bio"
-                  value={formData.bio}
+                <Label htmlFor="last_name">Last Name</Label>
+                <Input id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} required />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" value={formData.email} disabled />
+                <p className="text-xs text-gray-500">To change your email, please contact support</p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Tell us a bit about yourself..."
-                  rows={4}
+                  placeholder="(555) 555-5555"
                 />
               </div>
+            </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="military_experience">Military Experience</Label>
-                  <Select
-                    value={formData.military_experience}
-                    onValueChange={(value) => handleSelectChange("military_experience", value)}
-                  >
-                    <SelectTrigger id="military_experience">
-                      <SelectValue placeholder="Select experience" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="veteran">Veteran</SelectItem>
-                      <SelectItem value="active">Active Duty</SelectItem>
-                      <SelectItem value="reserve">Reserve</SelectItem>
-                      <SelectItem value="national_guard">National Guard</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="law_enforcement_experience">Law Enforcement Experience</Label>
-                  <Select
-                    value={formData.law_enforcement_experience}
-                    onValueChange={(value) => handleSelectChange("law_enforcement_experience", value)}
-                  >
-                    <SelectTrigger id="law_enforcement_experience">
-                      <SelectValue placeholder="Select experience" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">None</SelectItem>
-                      <SelectItem value="current">Current Officer</SelectItem>
-                      <SelectItem value="former">Former Officer</SelectItem>
-                      <SelectItem value="security">Security Experience</SelectItem>
-                      <SelectItem value="corrections">Corrections</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="education_level">Education Level</Label>
-                  <Select
-                    value={formData.education_level}
-                    onValueChange={(value) => handleSelectChange("education_level", value)}
-                  >
-                    <SelectTrigger id="education_level">
-                      <SelectValue placeholder="Select education" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="high_school">High School</SelectItem>
-                      <SelectItem value="some_college">Some College</SelectItem>
-                      <SelectItem value="associates">Associate's Degree</SelectItem>
-                      <SelectItem value="bachelors">Bachelor's Degree</SelectItem>
-                      <SelectItem value="masters">Master's Degree</SelectItem>
-                      <SelectItem value="doctorate">Doctorate</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            <div className="space-y-2">
+              <Label htmlFor="address">Address</Label>
+              <Input
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="Street Address"
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="city">City</Label>
+                <Input id="city" name="city" value={formData.city} onChange={handleChange} />
               </div>
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" type="button" onClick={() => router.push("/dashboard")}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? (
-                  <>
-                    <span className="animate-spin mr-2">⟳</span>
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
-        </form>
-      </main>
-      <ImprovedFooter />
-    </>
+              <div className="space-y-2">
+                <Label htmlFor="state">State</Label>
+                <Input id="state" name="state" value={formData.state} onChange={handleChange} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="zip">ZIP Code</Label>
+                <Input id="zip" name="zip" value={formData.zip} onChange={handleChange} />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="bio">About You</Label>
+              <Textarea
+                id="bio"
+                name="bio"
+                value={formData.bio}
+                onChange={handleChange}
+                placeholder="Tell us a bit about yourself..."
+                rows={4}
+              />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="military_experience">Military Experience</Label>
+                <Select
+                  value={formData.military_experience}
+                  onValueChange={(value) => handleSelectChange("military_experience", value)}
+                >
+                  <SelectTrigger id="military_experience">
+                    <SelectValue placeholder="Select experience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="veteran">Veteran</SelectItem>
+                    <SelectItem value="active">Active Duty</SelectItem>
+                    <SelectItem value="reserve">Reserve</SelectItem>
+                    <SelectItem value="national_guard">National Guard</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="law_enforcement_experience">Law Enforcement Experience</Label>
+                <Select
+                  value={formData.law_enforcement_experience}
+                  onValueChange={(value) => handleSelectChange("law_enforcement_experience", value)}
+                >
+                  <SelectTrigger id="law_enforcement_experience">
+                    <SelectValue placeholder="Select experience" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="current">Current Officer</SelectItem>
+                    <SelectItem value="former">Former Officer</SelectItem>
+                    <SelectItem value="security">Security Experience</SelectItem>
+                    <SelectItem value="corrections">Corrections</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="education_level">Education Level</Label>
+                <Select
+                  value={formData.education_level}
+                  onValueChange={(value) => handleSelectChange("education_level", value)}
+                >
+                  <SelectTrigger id="education_level">
+                    <SelectValue placeholder="Select education" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="high_school">High School</SelectItem>
+                    <SelectItem value="some_college">Some College</SelectItem>
+                    <SelectItem value="associates">Associate's Degree</SelectItem>
+                    <SelectItem value="bachelors">Bachelor's Degree</SelectItem>
+                    <SelectItem value="masters">Master's Degree</SelectItem>
+                    <SelectItem value="doctorate">Doctorate</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-between">
+            <Button variant="outline" type="button" onClick={() => router.push("/dashboard")}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSaving}>
+              {isSaving ? (
+                <>
+                  <span className="animate-spin mr-2">⟳</span>
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Changes
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+      </form>
+    </main>
   )
 }

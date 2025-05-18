@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -52,68 +50,64 @@ export default function VolunteerConfirmPage() {
   }, [token])
 
   return (
-    <>
-      <ImprovedHeader />
-      <main className="container mx-auto px-4 py-12">
-        <div className="max-w-md mx-auto">
-          <Card>
-            <CardHeader className="text-center">
-              <CardTitle className="text-2xl">Email Confirmation</CardTitle>
-              <CardDescription>Volunteer Recruiter Account</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {status === "loading" && (
-                <div className="flex flex-col items-center justify-center py-8">
-                  <Loader2 className="h-12 w-12 text-[#0A3C1F] animate-spin mb-4" />
-                  <p className="text-center text-gray-600">Confirming your email address...</p>
-                </div>
-              )}
-
-              {status === "success" && (
-                <Alert variant="default" className="bg-green-50 border-green-200">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                  <AlertTitle className="text-green-800">Email Confirmed</AlertTitle>
-                  <AlertDescription className="text-green-700">{message}</AlertDescription>
-                </Alert>
-              )}
-
-              {status === "error" && (
-                <Alert variant="destructive">
-                  <XCircle className="h-5 w-5" />
-                  <AlertTitle>Confirmation Failed</AlertTitle>
-                  <AlertDescription>{message}</AlertDescription>
-                </Alert>
-              )}
-
-              <div className="flex justify-center pt-4">
-                {status === "success" ? (
-                  <Button
-                    onClick={() => router.push("/volunteer-login")}
-                    className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
-                  >
-                    Log In to Your Account
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => router.push("/volunteer-register")}
-                    variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
-                  >
-                    Back to Registration
-                  </Button>
-                )}
+    <main className="container mx-auto px-4 py-12">
+      <div className="max-w-md mx-auto">
+        <Card>
+          <CardHeader className="text-center">
+            <CardTitle className="text-2xl">Email Confirmation</CardTitle>
+            <CardDescription>Volunteer Recruiter Account</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {status === "loading" && (
+              <div className="flex flex-col items-center justify-center py-8">
+                <Loader2 className="h-12 w-12 text-[#0A3C1F] animate-spin mb-4" />
+                <p className="text-center text-gray-600">Confirming your email address...</p>
               </div>
+            )}
 
-              {status === "success" && email && (
-                <p className="text-center text-sm text-gray-500 mt-4">
-                  You can now log in with your email address: <strong>{email}</strong>
-                </p>
+            {status === "success" && (
+              <Alert variant="default" className="bg-green-50 border-green-200">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+                <AlertTitle className="text-green-800">Email Confirmed</AlertTitle>
+                <AlertDescription className="text-green-700">{message}</AlertDescription>
+              </Alert>
+            )}
+
+            {status === "error" && (
+              <Alert variant="destructive">
+                <XCircle className="h-5 w-5" />
+                <AlertTitle>Confirmation Failed</AlertTitle>
+                <AlertDescription>{message}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className="flex justify-center pt-4">
+              {status === "success" ? (
+                <Button
+                  onClick={() => router.push("/volunteer-login")}
+                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                >
+                  Log In to Your Account
+                </Button>
+              ) : (
+                <Button
+                  onClick={() => router.push("/volunteer-register")}
+                  variant="outline"
+                  className="border-[#0A3C1F] text-[#0A3C1F]"
+                >
+                  Back to Registration
+                </Button>
               )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-      <ImprovedFooter />
-    </>
+            </div>
+
+            {status === "success" && email && (
+              <p className="text-center text-sm text-gray-500 mt-4">
+                You can now log in with your email address: <strong>{email}</strong>
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   )
 }

@@ -5,8 +5,6 @@ import { UserProfileCard } from "@/components/user-profile-card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
 import { UserProvider } from "@/context/user-context"
 import { SkipToContent } from "@/components/skip-to-content"
 
@@ -58,7 +56,6 @@ export function ProfilePageClient({ params }: ProfilePageClientProps) {
         </head>
 
         <SkipToContent />
-        <ImprovedHeader showOptInForm={() => {}} />
 
         <main id="main-content" className="flex-1 pt-40 pb-12 bg-[#F8F5EE] dark:bg-[#121212]">
           <div className="container mx-auto px-4">
@@ -74,8 +71,6 @@ export function ProfilePageClient({ params }: ProfilePageClientProps) {
             </div>
           </div>
         </main>
-
-        <ImprovedFooter />
       </div>
     </UserProvider>
   )

@@ -3,143 +3,108 @@
 import type React from "react"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle, Mail, ArrowLeft } from "lucide-react"
-import Link from "next/link"
+import { Label } from "@/components/ui/label"
+import { useToast } from "@/components/ui/use-toast"
+import { Mail, AlertCircle, CheckCircle2 } from "lucide-react"
+import { getSupabaseClient } from "@/lib/supabase-core"
 
 export default function ResendConfirmationPage() {
-  const router = useRouter()
   const [email, setEmail] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
-  const [message, setMessage] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSuccess, setIsSuccess] = useState(false)
+  const { toast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email) return
-
-    setIsSubmitting(true)
-    setStatus("idle")
-    setMessage("")
+    setIsLoading(true)
 
     try {
-      const response = await fetch("/api/resend-volunteer-confirmation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email }),
+      const supabase = getSupabaseClient()
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email,
       })
 
-      const data = await response.json()
+      if (error) throw error
 
-      if (data.success) {
-        setStatus("success")
-        setMessage(data.message || "Confirmation email has been resent. Please check your inbox.")
-      } else {
-        setStatus("error")
-        setMessage(data.message || "Failed to resend confirmation email.")
-      }
+      setIsSuccess(true)
+      toast({
+        title: "Confirmation email sent!",
+        description: "Please check your email for the confirmation link.",
+      })
     } catch (error) {
-      setStatus("error")
-      setMessage("An unexpected error occurred. Please try again later.")
+      console.error("Error resending confirmation:", error)
+      toast({
+        title: "Error",
+        description: "Failed to resend confirmation email. Please try again.",
+        variant: "destructive",
+      })
     } finally {
-      setIsSubmitting(false)
+      setIsLoading(false)
     }
   }
 
   return (
-    <>
-      <ImprovedHeader />
-      <main className="container mx-auto px-4 py-8 md:py-12">
-        <div className="max-w-md mx-auto">
-          <Link
-            href="/volunteer-login"
-            className="inline-flex items-center text-[#0A3C1F] hover:text-[#0A3C1F]/80 mb-6"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to login
-          </Link>
-
-          <Card>
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center">Resend Confirmation Email</CardTitle>
-              <CardDescription className="text-center">
-                Enter your email address to receive a new confirmation link
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {status === "success" && (
-                <Alert className="mb-6 bg-green-50 border-green-200">
-                  <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-green-700">{message}</AlertDescription>
-                </Alert>
-              )}
-
-              {status === "error" && (
-                <Alert variant="destructive" className="mb-6">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{message}</AlertDescription>
-                </Alert>
-              )}
-
+    <main className="container mx-auto px-4 py-8 md:py-12">
+      <div className="max-w-md mx-auto">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center">Resend Confirmation</CardTitle>
+            <CardDescription className="text-center">
+              Enter your email to receive a new confirmation link
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isSuccess ? (
+              <div className="text-center space-y-4">
+                <div className="flex justify-center">
+                  <CheckCircle2 className="h-12 w-12 text-green-500" />
+                </div>
+                <h3 className="text-lg font-semibold">Confirmation Email Sent!</h3>
+                <p className="text-gray-600">
+                  Please check your email for the confirmation link. If you don't see it, check your spam folder.
+                </p>
+              </div>
+            ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-medium">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10"
-                      required
-                    />
-                  </div>
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
-
-                <Button
-                  type="submit"
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
-                  disabled={isSubmitting || !email}
-                >
-                  {isSubmitting ? (
-                    <span className="flex items-center">
-                      <span className="animate-spin mr-2">⟳</span>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Mail className="mr-2 h-4 w-4 animate-spin" />
                       Sending...
-                    </span>
+                    </>
                   ) : (
-                    "Resend Confirmation Email"
+                    <>
+                      <Mail className="mr-2 h-4 w-4" />
+                      Resend Confirmation
+                    </>
                   )}
                 </Button>
               </form>
-
-              {status === "success" && (
-                <div className="mt-6 text-center">
-                  <Button
-                    variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
-                    onClick={() => router.push("/volunteer-login")}
-                  >
-                    Return to Login
-                  </Button>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      </main>
-      <ImprovedFooter />
-    </>
+            )}
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <div className="text-sm text-gray-500 flex items-center">
+              <AlertCircle className="h-4 w-4 mr-2" />
+              Check your spam folder if you don't see the email
+            </div>
+          </CardFooter>
+        </Card>
+      </div>
+    </main>
   )
 }

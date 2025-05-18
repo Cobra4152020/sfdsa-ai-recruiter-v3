@@ -1,102 +1,189 @@
 "use client"
 
-import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { useState, useEffect } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { UserProvider } from "@/context/user-context"
-import { useAuthModal } from "@/context/auth-modal-context"
+import { useToast } from "@/components/ui/use-toast"
+import { useUser } from "@/context/user-context"
+import { AchievementBadge } from "@/components/achievement-badge"
+import { BadgeProgress } from "@/components/badge-progress"
+import { BadgeRequirements } from "@/components/badge-requirements"
+import { BadgeRewards } from "@/components/badge-rewards"
+import { BadgeTimeline } from "@/components/badge-timeline"
+import { BadgeShare } from "@/components/badge-share"
+import { BadgeUnlockAnimation } from "@/components/badge-unlock-animation"
+import { Trophy, Share2, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 interface UserBadgeClientProps {
-  id: string
+  badgeId: string
 }
 
-export function UserBadgeClient({ id }: UserBadgeClientProps) {
-  const { openModal } = useAuthModal()
+export default function UserBadgeClient({ badgeId }: UserBadgeClientProps) {
+  const router = useRouter()
+  const { currentUser } = useUser()
+  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(true)
+  const [badge, setBadge] = useState<any>(null)
+  const [progress, setProgress] = useState(0)
+  const [isUnlocked, setIsUnlocked] = useState(false)
+  const [showUnlockAnimation, setShowUnlockAnimation] = useState(false)
 
-  const showOptInForm = (isApplying?: boolean) => {
-    if (isApplying) {
-      openModal("optin", "recruit")
-    } else {
-      openModal("signin", "recruit")
+  useEffect(() => {
+    const fetchBadge = async () => {
+      try {
+        // Simulate API call
+        await new Promise((resolve) => setTimeout(resolve, 1500))
+        setBadge({
+          id: badgeId,
+          name: "Community Champion",
+          description: "Awarded for outstanding contributions to the SFDSA community",
+          type: "achievement",
+          rarity: "legendary",
+          points: 1000,
+          requirements: [
+            "Complete 50 community interactions",
+            "Receive 10 positive feedback ratings",
+            "Participate in 5 community events",
+          ],
+          rewards: [
+            "1000 points",
+            "Special profile badge",
+            "Early access to new features",
+            "Recognition on leaderboard",
+          ],
+        })
+        setProgress(75)
+        setIsUnlocked(true)
+        setIsLoading(false)
+      } catch (error) {
+        console.error("Error fetching badge:", error)
+        toast({
+          title: "Error",
+          description: "Failed to load badge details. Please try again.",
+          variant: "destructive",
+        })
+      }
+    }
+
+    fetchBadge()
+  }, [badgeId, toast])
+
+  const handleShare = async () => {
+    try {
+      // Simulate sharing
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+      toast({
+        title: "Badge shared!",
+        description: "Your achievement has been shared with the community.",
+      })
+    } catch (error) {
+      toast({
+        title: "Error sharing badge",
+        description: "Failed to share badge. Please try again.",
+        variant: "destructive",
+      })
     }
   }
 
-  const decodedName = decodeURIComponent(id)
+  if (isLoading || !badge) {
+    return (
+      <main className="container mx-auto px-4 py-8">
+        <div className="max-w-4xl mx-auto">
+          <div className="animate-pulse">
+            <div className="h-8 w-64 bg-gray-200 rounded mb-4" />
+            <div className="h-96 bg-gray-200 rounded" />
+          </div>
+        </div>
+      </main>
+    )
+  }
 
   return (
-    <UserProvider>
-      <div className="min-h-screen flex flex-col">
-        <ImprovedHeader showOptInForm={showOptInForm} />
-        <main className="flex-1 pt-40 pb-12 bg-[#F8F5EE] dark:bg-[#121212]">
-          <div className="container mx-auto px-4">
-            <Link href="/awards">
-              <Button variant="ghost" className="mb-8">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Awards
-              </Button>
-            </Link>
+    <main className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center mb-6">
+          <Button variant="ghost" onClick={() => router.push("/badges")} className="mr-2">
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back to Badges
+          </Button>
+          <h1 className="text-3xl font-bold text-[#0A3C1F]">{badge.name}</h1>
+        </div>
 
-            <div className="max-w-3xl mx-auto text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">
-                {decodedName}'s Recruitment Badge
-              </h1>
-              <p className="text-lg text-[#0A3C1F]/70 dark:text-white/70">
-                {decodedName} is exploring a career with the San Francisco Sheriff's Office. Join them and discover
-                opportunities in law enforcement!
-              </p>
-            </div>
-
-            <div className="flex flex-col items-center justify-center">
-              {/* Replace with your RecruitmentBadge component or create a simplified version */}
-              <div className="relative rounded-full bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/80 p-1 w-48 h-48">
-                <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFD700]/60 opacity-50 blur-md"></div>
-                <div className="relative h-full w-full rounded-full bg-[#0A3C1F] flex flex-col items-center justify-center text-white p-4">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-1/3 h-1/3 text-[#FFD700] mb-2"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-                  </svg>
-                  <div className="text-center">
-                    <div className="font-bold text-[#FFD700]">SF DEPUTY SHERIFF</div>
-                    <div className="mt-1 font-medium text-sm">RECRUIT CANDIDATE</div>
-                  </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Badge Details</CardTitle>
+                <CardDescription>{badge.description}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col items-center mb-8">
+                  <AchievementBadge
+                    type={badge.type}
+                    rarity={badge.rarity}
+                    points={badge.points}
+                    earned={isUnlocked}
+                    size="xl"
+                  />
+                  <BadgeProgress progress={progress} />
                 </div>
-              </div>
 
-              <div className="mt-4 text-center">
-                <h3 className="font-bold text-lg text-[#0A3C1F] dark:text-[#FFD700]">{decodedName}</h3>
-                <p className="text-sm text-[#0A3C1F]/70 dark:text-white/70">Recruitment Candidate</p>
-              </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <BadgeRequirements requirements={badge.requirements} progress={progress} />
+                  <BadgeRewards rewards={badge.rewards} unlocked={isUnlocked} />
+                </div>
 
-              <div className="mt-12 max-w-xl mx-auto text-center">
-                <h2 className="text-2xl font-bold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">
-                  Join the San Francisco Sheriff's Office
-                </h2>
-                <p className="text-[#0A3C1F]/70 dark:text-white/70 mb-6">
-                  Follow {decodedName}'s lead and explore a career in law enforcement. Learn about the application
-                  process, requirements, and benefits of joining the San Francisco Sheriff's Office.
-                </p>
-
-                <Link href="/">
-                  <Button className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] dark:text-black font-bold px-8 py-3 rounded-xl text-lg shadow-lg">
-                    Learn More & Apply
-                  </Button>
-                </Link>
-              </div>
-            </div>
+                <div className="mt-8 flex justify-center gap-4">
+                  {isUnlocked ? (
+                    <>
+                      <Button onClick={handleShare} className="gap-2">
+                        <Share2 className="h-4 w-4" />
+                        Share Achievement
+                      </Button>
+                      <Button variant="outline" onClick={() => router.push("/badges")} className="gap-2">
+                        <Trophy className="h-4 w-4" />
+                        View All Badges
+                      </Button>
+                    </>
+                  ) : (
+                    <Button disabled className="gap-2">
+                      <Trophy className="h-4 w-4" />
+                      {progress}% Complete
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
           </div>
-        </main>
-        <ImprovedFooter />
+
+          <div className="space-y-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Activity</CardTitle>
+                <CardDescription>Latest progress towards this badge</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <BadgeTimeline badgeId={badgeId} />
+              </CardContent>
+            </Card>
+
+            <BadgeShare
+              badgeId={badgeId}
+              badgeName={badge.name}
+              isUnlocked={isUnlocked}
+              onShare={handleShare}
+            />
+          </div>
+        </div>
       </div>
-    </UserProvider>
+
+      {showUnlockAnimation && (
+        <BadgeUnlockAnimation
+          badge={badge}
+          onComplete={() => setShowUnlockAnimation(false)}
+        />
+      )}
+    </main>
   )
 } 

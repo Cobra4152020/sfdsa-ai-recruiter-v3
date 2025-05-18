@@ -1,161 +1,130 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect, useRef } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Send, User, Bot } from "lucide-react"
-import { TypingIndicator } from "@/components/typing-indicator"
-import { PageWrapper } from "@/components/page-wrapper"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { useToast } from "@/components/ui/use-toast"
+import { useUser } from "@/context/user-context"
+import { ChatMessage } from "@/components/chat-message"
+import { ChatInput } from "@/components/chat-input"
+import { ChatSuggestions } from "@/components/chat-suggestions"
+import { ChatTypingIndicator } from "@/components/chat-typing-indicator"
+import { ChatWelcomeMessage } from "@/components/chat-welcome-message"
+import { ChatError } from "@/components/chat-error"
+import { ChatRateLimit } from "@/components/chat-rate-limit"
+import { ChatUnavailable } from "@/components/chat-unavailable"
+import { ChatReconnecting } from "@/components/chat-reconnecting"
+import { useChatWebSocket } from "@/hooks/use-chat-websocket"
+import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom"
+import { useTypingIndicator } from "@/hooks/use-typing-indicator"
+import { useMessageHistory } from "@/hooks/use-message-history"
+import { useRateLimit } from "@/hooks/use-rate-limit"
+import { useErrorHandling } from "@/hooks/use-error-handling"
+import { useReconnection } from "@/hooks/use-reconnection"
 
-export default function ChatWithSgtKen() {
-  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([
-    {
-      role: "assistant",
-      content:
-        "Hi, I'm Sergeant Ken! How can I help you with your questions about becoming a San Francisco Deputy Sheriff?",
+export default function ChatWithSgtKenPage() {
+  const { currentUser } = useUser()
+  const { toast } = useToast()
+  const scrollAreaRef = useRef<HTMLDivElement>(null)
+  const [isConnected, setIsConnected] = useState(false)
+  const [isTyping, setIsTyping] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isReconnecting, setIsReconnecting] = useState(false)
+  const [isRateLimited, setIsRateLimited] = useState(false)
+
+  // Custom hooks for chat functionality
+  const { messages, addMessage, clearMessages } = useMessageHistory()
+  const { startTyping, stopTyping } = useTypingIndicator(setIsTyping)
+  const { checkRateLimit } = useRateLimit(setIsRateLimited)
+  const { handleError } = useErrorHandling(setError)
+  const { reconnect } = useReconnection(setIsReconnecting)
+
+  // WebSocket connection
+  const { sendMessage, closeConnection } = useChatWebSocket({
+    onMessage: (message) => {
+      addMessage(message)
+      stopTyping()
     },
-  ])
-  const [input, setInput] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const [isOptInFormOpen, setIsOptInFormOpen] = useState(false)
+    onError: handleError,
+    onOpen: () => setIsConnected(true),
+    onClose: () => setIsConnected(false),
+  })
 
-  const showOptInForm = (applying = false) => {
-    setIsOptInFormOpen(true)
-  }
+  // Scroll to bottom when new messages arrive
+  useScrollToBottom(scrollAreaRef, messages)
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }
-
+  // Cleanup on unmount
   useEffect(() => {
-    scrollToBottom()
-  }, [messages])
+    return () => {
+      closeConnection()
+    }
+  }, [closeConnection])
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!input.trim()) return
+  const handleSendMessage = async (content: string) => {
+    if (!isConnected) {
+      toast({
+        title: "Not connected",
+        description: "Please wait while we reconnect...",
+        variant: "destructive",
+      })
+      return
+    }
 
-    // Add user message
-    const userMessage = { role: "user", content: input }
-    setMessages((prev) => [...prev, userMessage])
-    setInput("")
-    setIsLoading(true)
+    if (!checkRateLimit()) {
+      return
+    }
 
     try {
-      // Call your chat API
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          messages: [...messages, userMessage],
-        }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Failed to get response")
-      }
-
-      const data = await response.json()
-      setMessages((prev) => [...prev, { role: "assistant", content: data.message }])
+      startTyping()
+      await sendMessage(content)
     } catch (error) {
-      console.error("Error:", error)
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Sorry, I'm having trouble connecting right now. Please try again later." },
-      ])
-    } finally {
-      setIsLoading(false)
+      handleError(error)
+      stopTyping()
     }
   }
 
   return (
-    <>
-      <ImprovedHeader showOptInForm={showOptInForm} />
-      <main className="container mx-auto px-4 py-12 min-h-[calc(100vh-300px)] flex flex-col items-center justify-center">
-        <div className="max-w-3xl w-full">
-          <h1 className="text-3xl font-bold text-center mb-8 text-[#0A3C1F]">Chat with Sergeant Ken</h1>
-          <p className="text-center mb-8 text-gray-600">
-            Ask Sergeant Ken any questions about becoming a San Francisco Deputy Sheriff.
-          </p>
-          <div className="flex justify-center">
-            <AskSgtKenButton variant="secondary" size="lg" />
-          </div>
-        </div>
-        <PageWrapper>
-          <div className="container max-w-4xl mx-auto py-8 px-4">
-            <Card className="w-full">
-              <CardHeader className="bg-[#0A3C1F] text-white">
-                <CardTitle className="text-xl flex items-center">
-                  <Bot className="mr-2 h-6 w-6" />
-                  Chat with Sergeant Ken
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 h-[60vh] overflow-y-auto">
+    <main className="container mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto">
+        <Card className="border-t-4 border-t-[#0A3C1F]">
+          <CardHeader>
+            <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+              Chat with Sgt. Ken
+            </CardTitle>
+            <CardDescription className="text-center">
+              Ask questions about becoming a San Francisco Deputy Sheriff
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[600px] flex flex-col">
+              <ScrollArea ref={scrollAreaRef} className="flex-1 pr-4">
                 <div className="space-y-4">
+                  <ChatWelcomeMessage />
                   {messages.map((message, index) => (
-                    <div key={index} className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}>
-                      <div
-                        className={`max-w-[80%] rounded-lg p-3 ${
-                          message.role === "user"
-                            ? "bg-[#0A3C1F] text-white"
-                            : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                        }`}
-                      >
-                        <div className="flex items-start mb-1">
-                          {message.role === "user" ? (
-                            <User className="h-5 w-5 mr-2 text-white" />
-                          ) : (
-                            <Bot className="h-5 w-5 mr-2 text-[#FFD700]" />
-                          )}
-                          <span className="font-semibold">{message.role === "user" ? "You" : "Sgt. Ken"}</span>
-                        </div>
-                        <div className="whitespace-pre-wrap">{message.content}</div>
-                      </div>
-                    </div>
+                    <ChatMessage key={index} message={message} />
                   ))}
-                  {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 dark:bg-gray-800">
-                        <div className="flex items-start mb-1">
-                          <Bot className="h-5 w-5 mr-2 text-[#FFD700]" />
-                          <span className="font-semibold">Sgt. Ken</span>
-                        </div>
-                        <TypingIndicator />
-                      </div>
-                    </div>
-                  )}
-                  <div ref={messagesEndRef} />
+                  {isTyping && <ChatTypingIndicator />}
                 </div>
-              </CardContent>
-              <CardFooter className="border-t p-4">
-                <form onSubmit={handleSubmit} className="flex w-full gap-2">
-                  <Input
-                    placeholder="Type your message..."
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    disabled={isLoading}
-                    className="flex-1"
-                  />
-                  <Button type="submit" disabled={isLoading || !input.trim()}>
-                    <Send className="h-4 w-4" />
-                    <span className="sr-only">Send message</span>
-                  </Button>
-                </form>
-              </CardFooter>
-            </Card>
-          </div>
-        </PageWrapper>
-      </main>
-      <ImprovedFooter />
-    </>
+              </ScrollArea>
+
+              <div className="mt-4 space-y-4">
+                {error && <ChatError error={error} onRetry={reconnect} />}
+                {isReconnecting && <ChatReconnecting />}
+                {isRateLimited && <ChatRateLimit />}
+                {!isConnected && !isReconnecting && <ChatUnavailable onRetry={reconnect} />}
+
+                <ChatSuggestions onSelect={handleSendMessage} />
+                <ChatInput
+                  onSendMessage={handleSendMessage}
+                  disabled={!isConnected || isRateLimited}
+                />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   )
 }

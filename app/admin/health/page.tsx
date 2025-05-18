@@ -1,6 +1,5 @@
 "use client"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { HealthCheck } from "@/components/health-check"
@@ -10,90 +9,89 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 
+const mockHealthData = {
+  database: {
+    status: "healthy",
+    latency: "45ms",
+    connections: 12,
+    uptime: "99.99%"
+  },
+  email: {
+    status: "healthy",
+    deliveryRate: "98.5%",
+    bounceRate: "1.5%",
+    queueSize: 0
+  },
+  auth: {
+    status: "healthy",
+    activeUsers: 156,
+    failedLogins: 2,
+    tokenExpiry: "24h"
+  },
+  storage: {
+    status: "healthy",
+    availability: "99.99%",
+    errorRate: "0.01%",
+    bandwidth: "45MB/s"
+  }
+}
+
 export default function HealthPage() {
   const router = useRouter()
 
   return (
-    <>
-      <ImprovedHeader showOptInForm={() => {}} />
-      <main className="container mx-auto px-4 py-8">
-        <div className="flex items-center mb-6">
-          <Button variant="ghost" onClick={() => router.push("/admin/dashboard")} className="mr-2">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Dashboard
-          </Button>
-          <h1 className="text-3xl font-bold text-[#0A3C1F]">System Health</h1>
-        </div>
+    <main className="container mx-auto px-4 py-8">
+      <div className="flex items-center mb-6">
+        <Button variant="ghost" onClick={() => router.push("/admin/dashboard")} className="mr-2">
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to Dashboard
+        </Button>
+        <h1 className="text-3xl font-bold text-[#0A3C1F]">System Health</h1>
+      </div>
 
-        <Tabs defaultValue="overview">
-          <TabsList className="mb-6">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="database">Database</TabsTrigger>
-            <TabsTrigger value="links">Links</TabsTrigger>
-          </TabsList>
+      <Tabs defaultValue="health">
+        <TabsList className="mb-6">
+          <TabsTrigger value="health">Health Check</TabsTrigger>
+          <TabsTrigger value="links">Link Checker</TabsTrigger>
+          <TabsTrigger value="database">Database Health</TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="overview">
-            <div className="grid grid-cols-1 gap-6">
-              <HealthCheck />
+        <TabsContent value="health">
+          <Card>
+            <CardHeader>
+              <CardTitle>Application Health</CardTitle>
+              <CardDescription>Check the overall health of the application</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <HealthCheck data={mockHealthData} />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Health Check Documentation</CardTitle>
-                  <CardDescription>Information about the system health checks</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <h3 className="font-medium mb-2">Overview</h3>
-                    <p className="text-gray-600">
-                      The health check system monitors the status of various components of the application. It checks
-                      the API, database connection, and environment variables to ensure everything is working correctly.
-                    </p>
-                  </div>
+        <TabsContent value="links">
+          <Card>
+            <CardHeader>
+              <CardTitle>Link Checker</CardTitle>
+              <CardDescription>Verify all links in the application are working</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <LinkChecker />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                  <div>
-                    <h3 className="font-medium mb-2">Components Checked</h3>
-                    <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                      <li>
-                        <strong>API</strong>: Checks if the API endpoints are responding correctly
-                      </li>
-                      <li>
-                        <strong>Database</strong>: Verifies the connection to the Supabase database
-                      </li>
-                      <li>
-                        <strong>Environment</strong>: Ensures all required environment variables are set
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="font-medium mb-2">Status Codes</h3>
-                    <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                      <li>
-                        <strong>OK</strong>: The component is functioning correctly
-                      </li>
-                      <li>
-                        <strong>ERROR</strong>: The component is not functioning correctly
-                      </li>
-                      <li>
-                        <strong>UNKNOWN</strong>: The status of the component could not be determined
-                      </li>
-                    </ul>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="database">
-            <SupabaseHealthCheck />
-          </TabsContent>
-
-          <TabsContent value="links">
-            <LinkChecker />
-          </TabsContent>
-        </Tabs>
-      </main>
-      <ImprovedFooter />
-    </>
+        <TabsContent value="database">
+          <Card>
+            <CardHeader>
+              <CardTitle>Database Health</CardTitle>
+              <CardDescription>Check Supabase connection and database health</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <SupabaseHealthCheck />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </main>
   )
 }
