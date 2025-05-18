@@ -1,9 +1,11 @@
-import { useMemo } from "react"
+import { useMemo, useState } from "react"
 import { motion } from "framer-motion"
-import { Badge } from "@/types/badge"
+import { BadgeWithProgress } from "@/types/badge"
 import { useEnhancedBadges } from "@/hooks/use-enhanced-badges"
 import { AchievementBadge } from "@/components/achievement-badge"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Share2 } from "lucide-react"
+import { BadgeShareDialog } from "@/components/badges/badge-share-dialog"
 
 interface BadgeGridProps {
   userId?: string
@@ -25,12 +27,13 @@ export function BadgeGrid({
   showAll = false,
 }: BadgeGridProps) {
   const { collections, isLoading, error } = useEnhancedBadges()
+  const [selectedBadge, setSelectedBadge] = useState<BadgeWithProgress | null>(null)
 
   const filteredBadges = useMemo(() => {
     if (!collections) return []
 
     // Flatten all badges from collections
-    let badges = collections.flatMap(c => c.badges)
+    let badges = collections.flatMap(c => c.badges) as BadgeWithProgress[]
 
     // Apply search filter
     if (searchQuery) {
@@ -58,9 +61,9 @@ export function BadgeGrid({
           case "earned":
             return badge.isUnlocked
           case "progress":
-            return !badge.isUnlocked && badge.progress > 0
+            return !badge.isUnlocked && (badge.progress || 0) > 0
           case "locked":
-            return !badge.isUnlocked && badge.progress === 0
+            return !badge.isUnlocked && (!badge.progress || badge.progress === 0)
           default:
             return true
         }
@@ -100,27 +103,51 @@ export function BadgeGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-      {filteredBadges.map((badge, index) => (
-        <motion.div
-          key={badge.id}
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: index * 0.1 }}
-          className="flex flex-col items-center text-center"
-        >
-          <AchievementBadge
-            type={badge.type}
-            rarity={badge.rarity}
-            points={badge.points}
-            earned={badge.isUnlocked}
-            progress={badge.progress}
-            size="lg"
-          />
-          <h3 className="mt-2 font-medium text-sm">{badge.name}</h3>
-          <p className="text-xs text-gray-500 mt-1">{badge.points} points</p>
-        </motion.div>
-      ))}
-    </div>
+    <>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+        {filteredBadges.map((badge, index) => (
+          <motion.div
+            key={badge.id}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: index * 0.1 }}
+            className="flex flex-col items-center text-center group relative"
+          >
+            <div className="relative">
+              <AchievementBadge
+                type={badge.type}
+                rarity={badge.rarity}
+                points={badge.points}
+                earned={badge.isUnlocked || false}
+                size="lg"
+              />
+              {badge.isUnlocked && (
+                <button
+                  onClick={() => setSelectedBadge(badge)}
+                  className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Share2 className="h-4 w-4 text-gray-600" />
+                </button>
+              )}
+            </div>
+            <h3 className="mt-2 font-medium text-sm">{badge.name}</h3>
+            <p className="text-xs text-gray-500 mt-1">{badge.points} points</p>
+            {badge.progress !== undefined && badge.progress > 0 && !badge.isUnlocked && (
+              <p className="text-xs text-blue-500 mt-1">
+                {Math.round(badge.progress * 100)}% complete
+              </p>
+            )}
+          </motion.div>
+        ))}
+      </div>
+
+      {selectedBadge && (
+        <BadgeShareDialog
+          badge={selectedBadge}
+          isOpen={true}
+          onClose={() => setSelectedBadge(null)}
+        />
+      )}
+    </>
   )
 } 

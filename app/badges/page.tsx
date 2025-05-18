@@ -3,12 +3,12 @@
 import { useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BadgeGrid } from "@/components/badge-grid"
-import { BadgeLeaderboard } from "@/components/badge-leaderboard"
-import { BadgeStats } from "@/components/badge-stats"
-import { BadgeTimeline } from "@/components/badge-timeline"
-import { BadgeFilter } from "@/components/badge-filter"
-import { BadgeSearch } from "@/components/badge-search"
+import { BadgeGrid } from "@/components/badges/badge-collection-grid"
+import { BadgeLeaderboard } from "@/components/badges/badge-leaderboard"
+import { BadgeStats } from "@/components/badges/badge-stats"
+import { BadgeTimeline } from "@/components/badges/badge-timeline"
+import { BadgeFilter } from "@/components/badges/badge-filter"
+import { BadgeSearch } from "@/components/badges/badge-search"
 import { useUser } from "@/context/user-context"
 
 export default function BadgesPage() {
