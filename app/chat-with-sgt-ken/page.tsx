@@ -7,15 +7,17 @@ import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useToast } from "@/components/ui/use-toast"
 import { useUser } from "@/context/user-context"
-import { ChatMessage } from "@/components/chat-message"
-import { ChatInput } from "@/components/chat-input"
-import { ChatSuggestions } from "@/components/chat-suggestions"
-import { ChatTypingIndicator } from "@/components/chat-typing-indicator"
-import { ChatWelcomeMessage } from "@/components/chat-welcome-message"
-import { ChatError } from "@/components/chat-error"
-import { ChatRateLimit } from "@/components/chat-rate-limit"
-import { ChatUnavailable } from "@/components/chat-unavailable"
-import { ChatReconnecting } from "@/components/chat-reconnecting"
+import {
+  ChatMessage,
+  ChatInput,
+  ChatSuggestions,
+  ChatTypingIndicator,
+  ChatWelcomeMessage,
+  ChatError,
+  ChatRateLimit,
+  ChatUnavailable,
+  ChatReconnecting
+} from "@/components/chat"
 import { useChatWebSocket } from "@/hooks/use-chat-websocket"
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom"
 import { useTypingIndicator } from "@/hooks/use-typing-indicator"
@@ -23,6 +25,12 @@ import { useMessageHistory } from "@/hooks/use-message-history"
 import { useRateLimit } from "@/hooks/use-rate-limit"
 import { useErrorHandling } from "@/hooks/use-error-handling"
 import { useReconnection } from "@/hooks/use-reconnection"
+
+interface Message {
+  content: string
+  role: "user" | "assistant"
+  timestamp: string
+}
 
 export default function ChatWithSgtKenPage() {
   const { currentUser } = useUser()
@@ -43,7 +51,7 @@ export default function ChatWithSgtKenPage() {
 
   // WebSocket connection
   const { sendMessage, closeConnection } = useChatWebSocket({
-    onMessage: (message) => {
+    onMessage: (message: Message) => {
       addMessage(message)
       stopTyping()
     },
@@ -102,7 +110,7 @@ export default function ChatWithSgtKenPage() {
               <ScrollArea ref={scrollAreaRef} className="flex-1 pr-4">
                 <div className="space-y-4">
                   <ChatWelcomeMessage />
-                  {messages.map((message, index) => (
+                  {messages.map((message: Message, index: number) => (
                     <ChatMessage key={index} message={message} />
                   ))}
                   {isTyping && <ChatTypingIndicator />}
