@@ -17,10 +17,10 @@ import {
   BadgeUnlockAnimation,
   BadgeErrorBoundary,
 } from "@/components/badges"
-import type { Badge } from "@/types/badge"
+import type { Badge, BadgeWithProgress } from "@/types/badge"
 
 interface BadgeClientProps {
-  badge: Badge
+  badge: BadgeWithProgress
 }
 
 export default function BadgeClient({ badge }: BadgeClientProps) {
@@ -68,33 +68,44 @@ export default function BadgeClient({ badge }: BadgeClientProps) {
                 <CardContent>
                   <div className="flex flex-col items-center mb-8">
                     <AchievementBadge
-                      type={badge.category}
-                      rarity="common"
-                      points={100}
-                      earned={false}
+                      type={badge.type}
+                      rarity={badge.rarity}
+                      points={badge.points}
+                      earned={badge.isUnlocked}
                       size="lg"
                     />
-                    <BadgeProgress progress={0} />
+                    <BadgeProgress
+                      badgeType={badge.type}
+                      badgeName={badge.name}
+                      progress={badge.progress}
+                      currentValue={badge.progress}
+                      maxValue={100}
+                    />
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <BadgeRequirements requirements={[
-                      "Complete related training",
-                      "Pass assessment",
-                      "Receive verification"
-                    ]} progress={0} />
-                    <BadgeRewards rewards={[
-                      "Recognition on profile",
-                      "Access to special resources",
-                      "Progress towards certification"
-                    ]} unlocked={false} />
+                    <BadgeRequirements requirements={badge.requirements} progress={badge.progress} />
+                    <BadgeRewards rewards={badge.rewards} unlocked={badge.isUnlocked} />
                   </div>
 
                   <div className="mt-8 flex justify-center gap-4">
-                    <Button disabled className="gap-2">
-                      <Trophy className="h-4 w-4" />
-                      0% Complete
-                    </Button>
+                    {badge.isUnlocked ? (
+                      <>
+                        <Button onClick={handleShare} className="gap-2">
+                          <Share2 className="h-4 w-4" />
+                          Share Achievement
+                        </Button>
+                        <Button variant="outline" onClick={() => router.push("/badges")} className="gap-2">
+                          <Trophy className="h-4 w-4" />
+                          View All Badges
+                        </Button>
+                      </>
+                    ) : (
+                      <Button disabled className="gap-2">
+                        <Trophy className="h-4 w-4" />
+                        {badge.progress}% Complete
+                      </Button>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -117,7 +128,7 @@ export default function BadgeClient({ badge }: BadgeClientProps) {
                 <BadgeShare
                   badgeId={badge.id}
                   badgeName={badge.name}
-                  isUnlocked={false}
+                  isUnlocked={badge.isUnlocked}
                   onShare={handleShare}
                 />
               </BadgeErrorBoundary>
@@ -136,4 +147,4 @@ export default function BadgeClient({ badge }: BadgeClientProps) {
       )}
     </main>
   )
-}
+} 

@@ -1,41 +1,25 @@
 import { supabase } from "./supabase-service"
 
-export type BadgeType =
-  | "written"
-  | "oral"
-  | "physical"
-  | "polygraph"
-  | "psychological"
-  | "full"
-  | "chat-participation"
-  | "first-response"
-  | "application-started"
-  | "application-completed"
-  | "frequent-user"
-  | "resource-downloader"
-  | "hard-charger"
-  | "connector"
-  | "deep-diver"
-  | "quick-learner"
-  | "persistent-explorer"
-  | "dedicated-applicant"
-  | "first-donation"
-  | "recurring-donor"
-  | "generous-donor"
-  | "donation-milestone-5"
-  | "donation-milestone-10"
-  | "donation-milestone-25"
-  | "donation-amount-250"
-  | "donation-amount-500"
-  | "donation-amount-1000"
+export type BadgeType = "achievement" | "skill" | "participation" | "special"
+export type BadgeRarity = "common" | "uncommon" | "rare" | "epic" | "legendary"
 
 export interface Badge {
   id: string
   name: string
   description: string
-  category: "application" | "participation" | "donation"
-  color: string
-  icon: string
+  type: BadgeType
+  rarity: BadgeRarity
+  points: number
+  requirements: string[]
+  rewards: string[]
+  imageUrl?: string
+  createdAt: string
+  updatedAt: string
+  tierEnabled?: boolean
+  maxTier?: number
+  parentBadgeId?: string
+  expirationDays?: number
+  verificationRequired?: boolean
 }
 
 // Get badge by ID
@@ -47,49 +31,127 @@ export async function getBadgeById(id: string): Promise<Badge | null> {
       id: "written",
       name: "Written Test",
       description: "Completed written test preparation",
-      category: "application",
-      color: "bg-blue-500",
-      icon: "/placeholder.svg?key=t6kke",
+      type: "achievement",
+      rarity: "common",
+      points: 100,
+      requirements: [
+        "Complete written test study guide",
+        "Pass practice test",
+        "Review feedback"
+      ],
+      rewards: [
+        "Access to advanced study materials",
+        "Test-taking tips",
+        "Practice test feedback"
+      ],
+      imageUrl: "/placeholder.svg?key=t6kke",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
     {
       id: "oral",
       name: "Oral Board",
       description: "Prepared for oral board interviews",
-      category: "application",
-      color: "bg-green-700",
-      icon: "/placeholder.svg?key=409vx",
+      type: "achievement",
+      rarity: "uncommon",
+      points: 150,
+      requirements: [
+        "Complete interview preparation guide",
+        "Practice common questions",
+        "Review feedback"
+      ],
+      rewards: [
+        "Mock interview access",
+        "Interview tips",
+        "Sample answers"
+      ],
+      imageUrl: "/placeholder.svg?key=409vx",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
     {
       id: "physical",
       name: "Physical Test",
       description: "Completed physical test preparation",
-      category: "application",
-      color: "bg-blue-700",
-      icon: "/placeholder.svg?key=j0utq",
+      type: "achievement",
+      rarity: "uncommon",
+      points: 150,
+      requirements: [
+        "Complete fitness assessment",
+        "Follow training program",
+        "Pass practice test"
+      ],
+      rewards: [
+        "Training program access",
+        "Fitness tips",
+        "Progress tracking"
+      ],
+      imageUrl: "/placeholder.svg?key=j0utq",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
     {
       id: "polygraph",
       name: "Polygraph",
       description: "Learned about the polygraph process",
-      category: "application",
-      color: "bg-teal-500",
-      icon: "/placeholder.svg?key=4jay9",
+      type: "achievement",
+      rarity: "rare",
+      points: 200,
+      requirements: [
+        "Review polygraph guide",
+        "Complete questionnaire",
+        "Understand process"
+      ],
+      rewards: [
+        "Detailed process guide",
+        "Preparation tips",
+        "Common questions"
+      ],
+      imageUrl: "/placeholder.svg?key=4jay9",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
     {
       id: "psychological",
       name: "Psychological",
       description: "Prepared for psychological evaluation",
-      category: "application",
-      color: "bg-purple-600",
-      icon: "/placeholder.svg?key=237g2",
+      type: "achievement",
+      rarity: "rare",
+      points: 200,
+      requirements: [
+        "Review evaluation guide",
+        "Complete self-assessment",
+        "Understand process"
+      ],
+      rewards: [
+        "Process overview",
+        "Preparation tips",
+        "Self-assessment tools"
+      ],
+      imageUrl: "/placeholder.svg?key=237g2",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
     {
       id: "full-process",
       name: "Full Process",
       description: "Completed all preparation areas",
-      category: "application",
-      color: "bg-[#0A3C1F]",
-      icon: "/placeholder.svg?key=n3str",
+      type: "achievement",
+      rarity: "legendary",
+      points: 500,
+      requirements: [
+        "Complete all test preparations",
+        "Pass all practice tests",
+        "Submit application"
+      ],
+      rewards: [
+        "Special recognition",
+        "Full access to resources",
+        "Application support"
+      ],
+      imageUrl: "/placeholder.svg?key=n3str",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
 
     // Participation badges
@@ -97,201 +159,49 @@ export async function getBadgeById(id: string): Promise<Badge | null> {
       id: "chat-participation",
       name: "Chat Participation",
       description: "Engaged with Sgt. Ken",
-      category: "participation",
-      color: "bg-blue-500",
-      icon: "/placeholder.svg?key=ixk83",
+      type: "participation",
+      rarity: "common",
+      points: 50,
+      requirements: [
+        "Start a conversation",
+        "Ask questions",
+        "Engage meaningfully"
+      ],
+      rewards: [
+        "Chat access",
+        "Quick responses",
+        "Personalized help"
+      ],
+      imageUrl: "/placeholder.svg?key=ixk83",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
     {
       id: "first-response",
       name: "First Response",
       description: "Received first response from Sgt. Ken",
-      category: "participation",
-      color: "bg-green-700",
-      icon: "/placeholder.svg?key=9dx3e",
-    },
-    {
-      id: "application-started",
-      name: "Application Started",
-      description: "Started the application process",
-      category: "participation",
-      color: "bg-blue-700",
-      icon: "/placeholder.svg?key=tgvvt",
-    },
-    {
-      id: "application-completed",
-      name: "Application Completed",
-      description: "Completed the application process",
-      category: "participation",
-      color: "bg-teal-500",
-      icon: "/placeholder.svg?key=c1035",
-    },
-    {
-      id: "frequent-user",
-      name: "Frequent User",
-      description: "Regularly engages with the recruitment platform",
-      category: "participation",
-      color: "bg-purple-600",
-      icon: "/placeholder.svg?key=d8kco",
-    },
-    {
-      id: "resource-downloader",
-      name: "Resource Downloader",
-      description: "Downloaded recruitment resources and materials",
-      category: "participation",
-      color: "bg-orange-500",
-      icon: "/placeholder.svg?key=lv4ao",
-    },
-    {
-      id: "hard-charger",
-      name: "Hard Charger",
-      description: "Consistently asks questions and has applied",
-      category: "participation",
-      color: "bg-orange-500",
-      icon: "/placeholder.svg?key=lv4ao",
-    },
-    {
-      id: "connector",
-      name: "Connector",
-      description: "Connects with other participants",
-      category: "participation",
-      color: "bg-cyan-500",
-      icon: "/placeholder.svg?key=lv4ao",
-    },
-    {
-      id: "deep-diver",
-      name: "Deep Diver",
-      description: "Explores topics in great detail",
-      category: "participation",
-      color: "bg-blue-500",
-      icon: "/placeholder.svg?key=lv4ao",
-    },
-    {
-      id: "quick-learner",
-      name: "Quick Learner",
-      description: "Rapidly progresses through recruitment information",
-      category: "participation",
-      color: "bg-purple-500",
-      icon: "/placeholder.svg?key=lv4ao",
-    },
-    {
-      id: "persistent-explorer",
-      name: "Persistent Explorer",
-      description: "Returns regularly to learn more",
-      category: "participation",
-      color: "bg-green-500",
-      icon: "/placeholder.svg?key=lv4ao",
-    },
-    {
-      id: "dedicated-applicant",
-      name: "Dedicated Applicant",
-      description: "Applied and continues to engage",
-      category: "participation",
-      color: "bg-red-500",
-      icon: "/placeholder.svg?key=lv4ao",
-    },
-
-    // Donation badges
-    {
-      id: "first-donation",
-      name: "First Donation",
-      description: "Made your first donation to support our mission",
-      category: "donation",
-      color: "bg-green-500",
-      icon: "/placeholder.svg?key=donation1",
-    },
-    {
-      id: "recurring-donor",
-      name: "Recurring Donor",
-      description: "Set up a recurring donation to provide ongoing support",
-      category: "donation",
-      color: "bg-blue-600",
-      icon: "/placeholder.svg?key=donation2",
-    },
-    {
-      id: "generous-donor",
-      name: "Generous Donor",
-      description: "Made a significant donation of $100 or more",
-      category: "donation",
-      color: "bg-purple-600",
-      icon: "/placeholder.svg?key=donation3",
-    },
-    {
-      id: "donation-milestone-5",
-      name: "5 Donations",
-      description: "Made 5 separate donations to support our cause",
-      category: "donation",
-      color: "bg-amber-500",
-      icon: "/placeholder.svg?key=donation4",
-    },
-    {
-      id: "donation-milestone-10",
-      name: "10 Donations",
-      description: "Made 10 separate donations to support our cause",
-      category: "donation",
-      color: "bg-amber-600",
-      icon: "/placeholder.svg?key=donation5",
-    },
-    {
-      id: "donation-milestone-25",
-      name: "25 Donations",
-      description: "Made 25 separate donations to support our cause",
-      category: "donation",
-      color: "bg-amber-700",
-      icon: "/placeholder.svg?key=donation6",
-    },
-    {
-      id: "donation-amount-250",
-      name: "Silver Supporter",
-      description: "Donated a total of $250 or more",
-      category: "donation",
-      color: "bg-gray-400",
-      icon: "/placeholder.svg?key=donation7",
-    },
-    {
-      id: "donation-amount-500",
-      name: "Gold Supporter",
-      description: "Donated a total of $500 or more",
-      category: "donation",
-      color: "bg-yellow-500",
-      icon: "/placeholder.svg?key=donation8",
-    },
-    {
-      id: "donation-amount-1000",
-      name: "Platinum Supporter",
-      description: "Donated a total of $1,000 or more",
-      category: "donation",
-      color: "bg-slate-300",
-      icon: "/placeholder.svg?key=donation9",
-    },
+      type: "participation",
+      rarity: "common",
+      points: 25,
+      requirements: [
+        "Ask first question",
+        "Receive response",
+        "Continue conversation"
+      ],
+      rewards: [
+        "Initial guidance",
+        "Resource access",
+        "Next steps"
+      ],
+      imageUrl: "/placeholder.svg?key=9dx3e",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
   ]
 
   // Find badge by ID
-  const badge = allBadges.find((badge) => badge.id === id)
-
-  // If not found in predefined badges, try to fetch from database
-  if (!badge) {
-    try {
-      const { data, error } = await supabase.from("badges").select("*").eq("id", id).single()
-
-      if (error || !data) {
-        return null
-      }
-
-      return {
-        id: data.id,
-        name: data.name || "Unknown Badge",
-        description: data.description || "No description available",
-        category: data.category || "participation",
-        color: data.color || "bg-gray-500",
-        icon: data.icon || "/generic-badge.png",
-      }
-    } catch (error) {
-      console.error("Error fetching badge:", error)
-      return null
-    }
-  }
-
-  return badge
+  const badge = allBadges.find((b) => b.id === id)
+  return badge || null
 }
 
 // Award badge to user
@@ -343,74 +253,15 @@ export async function assignBadgeToUser(userId: string, badgeId: string) {
 
 // Get all available badge IDs
 export async function getAllBadgeIds(): Promise<string[]> {
-  // Get all predefined badges
-  const allBadges: Badge[] = [
-    // Application badges
-    {
-      id: "written",
-      name: "Written Test",
-      description: "Completed written test preparation",
-      category: "application",
-      color: "bg-blue-500",
-      icon: "/placeholder.svg?key=t6kke",
-    },
-    {
-      id: "oral",
-      name: "Oral Board",
-      description: "Prepared for oral board interviews",
-      category: "application",
-      color: "bg-green-700",
-      icon: "/placeholder.svg?key=409vx",
-    },
-    {
-      id: "physical",
-      name: "Physical Test",
-      description: "Completed physical test preparation",
-      category: "application",
-      color: "bg-blue-700",
-      icon: "/placeholder.svg?key=j0utq",
-    },
-    {
-      id: "polygraph",
-      name: "Polygraph",
-      description: "Learned about the polygraph process",
-      category: "application",
-      color: "bg-teal-500",
-      icon: "/placeholder.svg?key=4jay9",
-    },
-    {
-      id: "psychological",
-      name: "Psychological",
-      description: "Prepared for psychological evaluation",
-      category: "application",
-      color: "bg-purple-600",
-      icon: "/placeholder.svg?key=237g2",
-    },
-    {
-      id: "full-process",
-      name: "Full Process",
-      description: "Completed all preparation areas",
-      category: "application",
-      color: "bg-[#0A3C1F]",
-      icon: "/placeholder.svg?key=n3str",
-    },
-  ]
-
-  // Get IDs from predefined badges
-  const predefinedIds = allBadges.map(badge => badge.id)
-
-  // Get IDs from database
-  try {
-    const { data, error } = await supabase.from("badges").select("id")
-    if (error) throw error
-
-    const dbIds = data.map(badge => badge.id)
-
-    // Combine and deduplicate IDs
-    return [...new Set([...predefinedIds, ...dbIds])]
-  } catch (error) {
-    console.error("Error fetching badge IDs from database:", error)
-    // Return just predefined IDs if database fetch fails
-    return predefinedIds
-  }
+  const allBadges = await Promise.resolve([
+    "written",
+    "oral",
+    "physical",
+    "polygraph",
+    "psychological",
+    "full-process",
+    "chat-participation",
+    "first-response"
+  ])
+  return allBadges
 }

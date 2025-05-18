@@ -1,30 +1,124 @@
-# sfdsa-ai-recruiter
+# SFDSA AI Recruiter
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+An AI-powered recruitment platform for the San Francisco Deputy Sheriff's Association, featuring an interactive chat interface and gamified badge system.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/sfdsas-projects/v0-sfdsa-ai-recruiter)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/ZM1Yh2VKe3I)
+## Features
 
-## Overview
+### Chat Interface
+- Real-time messaging with AI assistant (Sgt. Ken)
+- Rich message formatting with Markdown support
+- File and image attachments
+- Message status indicators
+- Typing indicators
+- Auto-scrolling chat
+- Rate limiting protection
+- Error handling and reconnection
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+### Badge System
+- Achievement tracking
+- Progress visualization
+- Requirement checklists
+- Reward system
+- Social sharing
+- Unlock animations
+- Timeline view
+- Leaderboard integration
 
-## Deployment
+## Tech Stack
 
-Your project is live at:
+- Next.js 13+ (App Router)
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- React Testing Library
+- Jest
 
-**[https://vercel.com/sfdsas-projects/v0-sfdsa-ai-recruiter](https://vercel.com/sfdsas-projects/v0-sfdsa-ai-recruiter)**
+## Documentation
 
-## Build your app
+- [API Documentation](API.md) - Detailed API endpoints and usage
+- [Component Documentation](#component-documentation) - UI component usage
+- [Contributing Guidelines](#contributing) - How to contribute to the project
 
-Continue building your app on:
+## Getting Started
 
-**[https://v0.dev/chat/projects/ZM1Yh2VKe3I](https://v0.dev/chat/projects/ZM1Yh2VKe3I)**
+1. Clone the repository:
+```bash
+git clone https://github.com/your-org/sfdsa-ai-recruiter.git
+cd sfdsa-ai-recruiter
+```
 
-## How It Works
+2. Install dependencies:
+```bash
+npm install
+```
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
+
+4. Run the development server:
+```bash
+npm run dev
+```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Testing
+
+Run the test suite:
+```bash
+npm test
+```
+
+Run tests with coverage:
+```bash
+npm test -- --coverage
+```
+
+## Component Documentation
+
+### Chat Components
+
+#### ChatMessage
+Displays individual chat messages with support for:
+- User/Assistant avatars
+- Markdown formatting
+- Image/file attachments
+- Message status
+- Timestamps
+
+#### ChatInput
+Message input component with:
+- Text input
+- File attachment
+- Send button
+- Character limit
+
+### Badge Components
+
+#### AchievementBadge
+Displays achievement badges with:
+- Multiple sizes (sm, md, lg, xl)
+- Rarity levels
+- Points display
+- Earned/Unearned states
+
+#### BadgeProgress
+Shows progress towards badge completion:
+- Progress bar
+- Current/Max value
+- Loading states
+- Error handling
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

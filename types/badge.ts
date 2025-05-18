@@ -1,8 +1,8 @@
-export type BadgeType = 'achievement' | 'skill' | 'participation' | 'special'
-export type BadgeRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
-export type BadgeLayoutType = 'grid' | 'list' | 'masonry' | 'carousel'
-export type BadgeDisplayStyle = 'standard' | '3d' | 'minimal' | 'detailed'
-export type BadgeRewardType = 'feature' | 'content' | 'physical' | 'points' | 'custom'
+export type BadgeType = "achievement" | "skill" | "participation" | "special"
+export type BadgeRarity = "common" | "uncommon" | "rare" | "epic" | "legendary"
+export type BadgeLayoutType = "grid" | "list" | "masonry" | "carousel"
+export type BadgeDisplayStyle = "standard" | "3d" | "minimal" | "detailed"
+export type BadgeRewardType = "feature" | "content" | "physical" | "points" | "custom"
 
 export interface Badge {
   id: string
@@ -38,7 +38,7 @@ export interface TimelineEvent {
   id: number
   date: string
   event: string
-  type: 'start' | 'progress' | 'milestone' | 'completion'
+  type: "start" | "progress" | "milestone" | "completion"
   badgeId: string
   userId: string
 }

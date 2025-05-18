@@ -6,7 +6,7 @@ import { useState } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 
-interface Message {
+export interface Message {
   content: string
   role: "user" | "assistant"
   timestamp: string
