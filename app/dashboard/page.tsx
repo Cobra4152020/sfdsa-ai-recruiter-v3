@@ -16,20 +16,24 @@ import { useUser } from "@/context/user-context"
 
 export default function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
-  const { currentUser } = useUser()
+  const { currentUser, isLoading: isUserLoading } = useUser()
   const router = useRouter()
   const { toast } = useToast()
 
   useEffect(() => {
-    // Simulate loading delay
-    const timer = setTimeout(() => {
+    if (!currentUser && !isUserLoading) {
+      router.push('/login')
+      return
+    }
+
+    // Only stop loading when we have user data
+    if (!isUserLoading) {
       setIsLoading(false)
-    }, 1000)
+    }
+  }, [currentUser, isUserLoading, router])
 
-    return () => clearTimeout(timer)
-  }, [])
-
-  if (isLoading) {
+  // Show loading state while checking user or loading data
+  if (isLoading || isUserLoading) {
     return (
       <main className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
@@ -49,6 +53,12 @@ export default function DashboardPage() {
         <Skeleton className="h-96" />
       </main>
     )
+  }
+
+  // If no user is found after loading, redirect to login
+  if (!currentUser) {
+    router.push('/login')
+    return null
   }
 
   return (
