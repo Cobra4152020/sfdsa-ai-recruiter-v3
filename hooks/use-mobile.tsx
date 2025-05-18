@@ -1,6 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useClientOnly } from "@/hooks/use-client-only"
+import { getWindowDimensions, isBrowser } from "@/lib/utils"
 
 /**
  * Hook to detect if the current viewport is mobile
@@ -8,15 +10,18 @@ import { useState, useEffect } from "react"
  * @returns boolean indicating if the current viewport is mobile
  */
 export function useMobile(breakpoint = 768) {
+  const { innerWidth } = useClientOnly(() => getWindowDimensions(), { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {
+    if (!isBrowser()) return
+
     // Function to check if window width is less than breakpoint
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < breakpoint)
+      setIsMobile(innerWidth < breakpoint)
     }
 
-    // Check on mount
+    // Check on mount and when innerWidth changes
     checkMobile()
 
     // Add event listener for window resize
@@ -24,7 +29,7 @@ export function useMobile(breakpoint = 768) {
 
     // Clean up event listener on unmount
     return () => window.removeEventListener("resize", checkMobile)
-  }, [breakpoint])
+  }, [breakpoint, innerWidth])
 
   return isMobile
 }

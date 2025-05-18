@@ -97,7 +97,7 @@ export function ImprovedFooter() {
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <Image
-                  src="/images/sfdsa-logo.png"
+                  src="/sfdsa-logo.png"
                   alt="San Francisco Deputy Sheriffs' Association"
                   width={120}
                   height={120}
@@ -112,7 +112,7 @@ export function ImprovedFooter() {
               </div>
               <div>
                 <Image
-                  src="/images/protecting-sf-logo.png"
+                  src="/protecting-sf-logo.png"
                   alt="Protecting San Francisco"
                   width={120}
                   height={120}

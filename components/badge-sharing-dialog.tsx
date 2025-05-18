@@ -8,8 +8,9 @@ import { AchievementBadge } from "./achievement-badge"
 import { RecruitmentBadge } from "./recruitment-badge"
 import { Copy, Check, Download } from "lucide-react"
 import { toast } from "@/components/ui/use-toast"
-// Fix QRCode import
 import { QRCodeSVG } from "qrcode.react"
+import { useClientOnly } from "@/hooks/use-client-only"
+import { getWindowOrigin, isBrowser } from "@/lib/utils"
 
 type BadgeType =
   | "written"
@@ -44,13 +45,13 @@ export function BadgeSharingDialog({ isOpen, onClose, badges, userName }: BadgeS
   const [copied, setCopied] = useState(false)
   const [shareUrl, setShareUrl] = useState("")
   const qrCodeRef = useRef<HTMLDivElement>(null)
+  const origin = useClientOnly(() => getWindowOrigin(), '')
 
   // Generate share URL when dialog opens
   const handleOpenChange = (open: boolean) => {
     if (open) {
       // Use user-badge route for sharing user badges
-      const url =
-        typeof window !== "undefined" ? `${window.location.origin}/user-badge/${encodeURIComponent(userName)}` : ""
+      const url = `${origin}/user-badge/${encodeURIComponent(userName)}`
       setShareUrl(url)
     }
 
@@ -59,23 +60,35 @@ export function BadgeSharingDialog({ isOpen, onClose, badges, userName }: BadgeS
     }
   }
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(shareUrl)
-    setCopied(true)
-    toast({
-      title: "Link copied!",
-      description: "Share this link with others to show your recruitment badges.",
-    })
+  const copyToClipboard = async () => {
+    if (!isBrowser()) return
+    
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      toast({
+        title: "Link copied!",
+        description: "Share this link with others to show your recruitment badges.",
+      })
 
-    setTimeout(() => setCopied(false), 2000)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      toast({
+        title: "Failed to copy",
+        description: "Please try copying the link manually.",
+        variant: "destructive"
+      })
+    }
   }
 
   // Handle social media sharing
   const shareOnFacebook = () => {
+    if (!isBrowser()) return
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank")
   }
 
   const shareOnTwitter = () => {
+    if (!isBrowser()) return
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(
         `Check out my recruitment badges for the San Francisco Sheriff's Office! #LawEnforcement #Careers`,
@@ -85,6 +98,7 @@ export function BadgeSharingDialog({ isOpen, onClose, badges, userName }: BadgeS
   }
 
   const shareOnLinkedIn = () => {
+    if (!isBrowser()) return
     window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, "_blank")
   }
 

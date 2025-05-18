@@ -17,6 +17,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { AchievementShareDialog } from "./achievement-share-dialog"
+import { useClientOnly } from "@/hooks/use-client-only"
+import { getWindowOrigin } from "@/lib/utils"
 
 interface BadgeDetailCardProps {
   badge: Badge
@@ -29,6 +31,8 @@ interface BadgeDetailCardProps {
 export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUser, onShare }: BadgeDetailCardProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  
+  const origin = useClientOnly(() => getWindowOrigin(), '')
 
   const handleShareClick = () => {
     if (earned) {
@@ -184,7 +188,7 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
             title: `${badge.name} Badge Earned`,
             description: `I earned the ${badge.name} badge in my journey to become a San Francisco Deputy Sheriff! ${badge.description}`,
             imageUrl: badge.icon,
-            shareUrl: `${typeof window !== "undefined" ? window.location.origin : ""}/badge/${badge.id}?ref=${currentUser?.id}`,
+            shareUrl: `${origin}/badge/${badge.id}?ref=${currentUser?.id}`,
             type: "badge",
             id: badge.id,
           }}

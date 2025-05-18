@@ -14,6 +14,9 @@ import { Eye, EyeOff, Mail, Lock, User, Facebook, Twitter, Apple } from "lucide-
 import { motion, AnimatePresence } from "framer-motion"
 import { useUser } from "@/context/user-context"
 import { v4 as uuidv4 } from "uuid"
+import { useRouter } from "next/navigation"
+import { useClientOnly } from "@/hooks/use-client-only"
+import { getWindowOrigin, isBrowser } from "@/lib/utils"
 
 interface UnifiedRegistrationPopupProps {
   isOpen: boolean
@@ -67,6 +70,8 @@ export function UnifiedRegistrationPopup({
 
   const { toast } = useToast()
   const { login } = useUser()
+  const router = useRouter()
+  const origin = useClientOnly(() => getWindowOrigin(), '')
 
   // Generate a unique tracking number for opt-in
   useEffect(() => {
@@ -90,7 +95,7 @@ export function UnifiedRegistrationPopup({
       if (resetPassword) {
         const { supabase } = await import("@/lib/supabase-client-singleton")
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/reset-password`,
+          redirectTo: `${origin}/reset-password`,
         })
 
         if (error) throw error
@@ -135,7 +140,7 @@ export function UnifiedRegistrationPopup({
 
           // Check if volunteer is active
           if (!userData?.is_active) {
-            window.location.href = "/volunteer-pending"
+            router.push("/volunteer-pending")
             return
           }
         } else if (userType === "admin") {
@@ -171,7 +176,7 @@ export function UnifiedRegistrationPopup({
         login({
           id: data.user.id,
           name: userData?.name || data.user.email?.split("@")[0] || "User",
-          email: data.user.email,
+          email: data.user.email || email || "unknown@example.com",
           participation_count: userData?.points || 0,
           has_applied: userData?.has_applied || false,
         })
@@ -183,13 +188,13 @@ export function UnifiedRegistrationPopup({
 
         // Redirect based on user type
         if (callbackUrl) {
-          window.location.href = callbackUrl
+          router.push(callbackUrl)
         } else if (userType === "volunteer") {
-          window.location.href = "/volunteer-dashboard"
+          router.push("/volunteer-dashboard")
         } else if (userType === "admin") {
-          window.location.href = "/admin/dashboard"
+          router.push("/admin/dashboard")
         } else {
-          window.location.href = "/dashboard"
+          router.push("/dashboard")
         }
       }
     } catch (error) {
@@ -209,116 +214,105 @@ export function UnifiedRegistrationPopup({
     setIsLoading(true)
 
     try {
-      // Validate inputs
-      if (!agreeToTerms) {
-        throw new Error("You must agree to the Terms of Service and Privacy Policy")
-      }
-
+      // Validate passwords match
       if (password !== confirmPassword) {
         throw new Error("Passwords do not match")
       }
 
-      if (password.length < 8) {
-        throw new Error("Password must be at least 8 characters long")
+      if (!email) {
+        throw new Error("Email is required")
       }
 
+      // Use the appropriate auth service based on user type
       const { supabase } = await import("@/lib/supabase-client-singleton")
-
-      if (userType === "volunteer") {
-        // Register volunteer recruiter
-        if (!firstName || !lastName) {
-          throw new Error("Please enter your first and last name")
-        }
-
-        // Use the API endpoint instead of direct Supabase calls
-        const response = await fetch("/api/auth/register-volunteer", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            email,
-            password,
-            firstName,
-            lastName,
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name: name || email.split("@")[0],
+            first_name: firstName,
+            last_name: lastName,
             phone,
+            zip_code: zipCode,
             organization,
             position,
             location,
-          }),
-        })
-
-        const data = await response.json()
-
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to create volunteer account")
-        }
-
-        toast({
-          title: "Sign up successful",
-          description: "Please check your email to verify your account. Your account requires approval.",
-        })
-
-        // Redirect to pending page
-        window.location.href = "/volunteer-pending"
-        return
-      } else {
-        // Register recruit user
-        if (!name.trim()) {
-          throw new Error("Please enter your name")
-        }
-
-        // Use the API endpoint instead of direct Supabase calls
-        const response = await fetch("/api/auth/register", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
+            referral_source: referralSource,
+            referral_code: referralCode,
+            user_type: userType,
           },
-          body: JSON.stringify({
-            name,
-            email,
-            password,
-          }),
-        })
+        },
+      })
 
-        const data = await response.json()
+      if (error) throw error
 
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to create account")
-        }
+      if (data.user) {
+        // Create user profile based on user type
+        if (userType === "volunteer") {
+          const { error: profileError } = await supabase.from("volunteer.recruiters").insert([
+            {
+              id: data.user.id,
+              name: name || email.split("@")[0],
+              email,
+              organization,
+              position,
+              location,
+              is_active: false, // Volunteers need to be approved
+            },
+          ])
 
-        // Get user ID from response if available
-        const userId = data.userId || data.id
+          if (profileError) {
+            console.error("Error creating volunteer profile:", profileError)
+            throw new Error("Failed to create user profile")
+          }
 
-        if (userId) {
+          // Redirect to pending page
+          router.push("/volunteer-pending")
+          return
+        } else {
+          // Default to recruit
+          const { error: profileError } = await supabase.from("recruit.users").insert([
+            {
+              id: data.user.id,
+              name: name || email.split("@")[0],
+              email,
+              first_name: firstName,
+              last_name: lastName,
+              phone,
+              zip_code: zipCode,
+              referral_source: referralSource,
+              referral_code: referralCode,
+              points: 0,
+              has_applied: false,
+            },
+          ])
+
+          if (profileError) {
+            console.error("Error creating recruit profile:", profileError)
+            throw new Error("Failed to create user profile")
+          }
+
           // Login the user in the context
           login({
-            id: userId,
-            name: name,
-            email: email,
-            participation_count: 50, // Initial points
+            id: data.user.id,
+            name: name || email.split("@")[0],
+            email: email || data.user.email || "",
+            participation_count: 0,
             has_applied: false,
           })
 
           toast({
             title: "Sign up successful",
-            description: "Your account has been created with 50 points!",
+            description: "Welcome to the SF Deputy Sheriff recruitment program!",
           })
 
           // Redirect to appropriate page
           if (callbackUrl) {
-            window.location.href = callbackUrl
+            router.push(callbackUrl)
           } else {
-            window.location.href = "/dashboard"
+            router.push("/dashboard")
           }
-        } else {
-          toast({
-            title: "Sign up successful",
-            description: "Please check your email to verify your account",
-          })
-
-          // Switch to sign in tab
-          setActiveTab("signin")
         }
       }
     } catch (error) {
@@ -338,47 +332,46 @@ export function UnifiedRegistrationPopup({
     setIsLoading(true)
 
     try {
-      // Validate inputs
-      if (!firstName.trim() || !lastName.trim() || !email.trim()) {
+      // Validate required fields
+      if (!firstName || !lastName || !email || !phone || !zipCode) {
         throw new Error("Please fill in all required fields")
       }
 
-      // Save to database
-      const { supabase } = await import("@/lib/supabase-service")
-      const { error } = await supabase.from("applicants").insert({
-        first_name: firstName,
-        last_name: lastName,
-        email,
-        phone,
-        zip_code: zipCode,
-        referral_source: referralSource,
-        referral_code: referralCode || null,
-        tracking_number: trackingNumber,
-        application_status: isApplying ? "started" : "interested",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+      // Create opt-in record
+      const { supabase } = await import("@/lib/supabase-client-singleton")
+      const { error } = await supabase.from("recruit.opt_ins").insert([
+        {
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          phone,
+          zip_code: zipCode,
+          referral_source: referralSource,
+          referral_code: referralCode,
+          tracking_number: trackingNumber,
+        },
+      ])
+
+      if (error) throw error
+
+      setIsSubmitted(true)
+      toast({
+        title: "Thank you for your interest!",
+        description: "We'll be in touch with more information about the application process.",
       })
 
-      if (error) {
-        console.error("Error submitting form:", error)
-        throw new Error("There was a problem submitting your information. Please try again.")
-      }
-
-      // Show success message
-      setIsSubmitted(true)
-
-      // Redirect after showing success message
+      // Redirect after a delay
       setTimeout(() => {
         if (isApplying) {
-          window.location.href = "https://careers.sf.gov/interest/public-safety/sheriff/"
+          router.push("https://careers.sf.gov/interest/public-safety/sheriff/")
         } else {
           onClose()
         }
-      }, 3000)
+      }, 2000)
     } catch (error) {
-      console.error("Error submitting form:", error)
+      console.error("Opt-in error:", error)
       toast({
-        title: "Submission Error",
+        title: "Submission failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       })
@@ -388,21 +381,19 @@ export function UnifiedRegistrationPopup({
   }
 
   const handleSocialAuth = async (provider: "google" | "facebook" | "twitter" | "linkedin" | "apple") => {
+    if (!isBrowser()) return
+    
     setSocialLoading(provider)
 
     try {
       const { supabase } = await import("@/lib/supabase-client-singleton")
 
       // Set appropriate redirect URL based on user type
-      let redirectTo = `${window.location.origin}/auth/callback`
+      let redirectTo = `${origin}/auth/callback`
       if (userType === "volunteer") {
-        redirectTo = `${window.location.origin}/auth/callback?userType=volunteer`
+        redirectTo = `${origin}/auth/callback?userType=volunteer`
       } else if (userType === "admin") {
-        redirectTo = `${window.location.origin}/auth/callback?userType=admin`
-      }
-
-      if (callbackUrl) {
-        redirectTo += `&callbackUrl=${encodeURIComponent(callbackUrl)}`
+        redirectTo = `${origin}/auth/callback?userType=admin`
       }
 
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -419,44 +410,32 @@ export function UnifiedRegistrationPopup({
       if (error) throw error
 
       if (data.url) {
-        window.location.href = data.url
+        router.push(data.url)
       }
     } catch (error) {
-      console.error(`${provider} auth error:`, error)
+      console.error("Social auth error:", error)
       toast({
         title: "Authentication failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       })
+    } finally {
       setSocialLoading(null)
     }
   }
 
   const handleMagicLinkAuth = async () => {
-    if (!email) {
-      toast({
-        title: "Email required",
-        description: "Please enter your email address",
-        variant: "destructive",
-      })
-      return
-    }
-
     setIsLoading(true)
 
     try {
       const { supabase } = await import("@/lib/supabase-client-singleton")
 
       // Set appropriate redirect URL based on user type
-      let redirectTo = `${window.location.origin}/dashboard`
+      let redirectTo = `${origin}/dashboard`
       if (userType === "volunteer") {
-        redirectTo = `${window.location.origin}/volunteer-dashboard`
+        redirectTo = `${origin}/volunteer-dashboard`
       } else if (userType === "admin") {
-        redirectTo = `${window.location.origin}/admin/dashboard`
-      }
-
-      if (callbackUrl) {
-        redirectTo = callbackUrl
+        redirectTo = `${origin}/admin/dashboard`
       }
 
       const { error } = await supabase.auth.signInWithOtp({
@@ -472,14 +451,16 @@ export function UnifiedRegistrationPopup({
         title: "Magic link sent",
         description: "Check your email for a link to sign in",
       })
+
+      setIsLoading(false)
+      onClose()
     } catch (error) {
       console.error("Magic link error:", error)
       toast({
-        title: "Error sending magic link",
+        title: "Failed to send magic link",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       })
-    } finally {
       setIsLoading(false)
     }
   }

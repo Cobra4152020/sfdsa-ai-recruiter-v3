@@ -9,6 +9,8 @@ interface User {
   name?: string
   avatarUrl?: string
   userType?: string
+  participation_count?: number
+  has_applied?: boolean
 }
 
 // Define the context type
@@ -17,6 +19,7 @@ interface UserContextType {
   isLoading: boolean
   error: string | null
   setCurrentUser: (user: User | null) => void
+  login: (user: User) => void
 }
 
 // Create the context with default values
@@ -25,6 +28,7 @@ const UserContext = createContext<UserContextType>({
   isLoading: true,
   error: null,
   setCurrentUser: () => {},
+  login: () => {},
 })
 
 // Hook to use the user context
@@ -38,6 +42,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+
+  const login = (user: User) => {
+    setCurrentUser(user)
+  }
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -99,6 +107,6 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [])
 
   return (
-    <UserContext.Provider value={{ currentUser, isLoading, error, setCurrentUser }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ currentUser, isLoading, error, setCurrentUser, login }}>{children}</UserContext.Provider>
   )
 }

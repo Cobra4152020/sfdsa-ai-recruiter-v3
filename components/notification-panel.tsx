@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react"
 import { X } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
+import { useRouter } from "next/navigation"
+import { useExternalNavigation } from "@/hooks/use-external-navigation"
 
 interface Notification {
   id: number
@@ -23,6 +25,8 @@ interface NotificationPanelProps {
 export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
+  const { navigateTo } = useExternalNavigation()
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -131,6 +135,13 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
     return !(notification.is_read || notification.read)
   }
 
+  const handleNotificationClick = async (notification: Notification) => {
+    await markAsRead(notification.id)
+    if (notification.action_url) {
+      navigateTo(notification.action_url)
+    }
+  }
+
   return (
     <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-md shadow-lg overflow-hidden z-50">
       <div className="flex justify-between items-center p-4 border-b">
@@ -161,12 +172,7 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
               >
                 <div
                   className="cursor-pointer"
-                  onClick={() => {
-                    markAsRead(notification.id)
-                    if (notification.action_url) {
-                      window.location.href = notification.action_url
-                    }
-                  }}
+                  onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="flex justify-between">
                     <h4 className="font-medium">{notification.title}</h4>

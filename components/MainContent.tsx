@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from "react"
 import { Send, Gamepad2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 type MessageType = {
   role: "assistant" | "user"
@@ -26,6 +27,7 @@ export default function MainContent({ messages, onSendMessage, isLoading, displa
   const [input, setInput] = useState("")
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const router = useRouter()
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
@@ -49,7 +51,7 @@ export default function MainContent({ messages, onSendMessage, isLoading, displa
     if (!isLoading) {
       // Special handling for trivia game link
       if (reply.toLowerCase().includes("trivia") || reply.toLowerCase().includes("play sf trivia")) {
-        window.location.href = "/trivia"
+        router.push("/trivia")
         return
       }
 

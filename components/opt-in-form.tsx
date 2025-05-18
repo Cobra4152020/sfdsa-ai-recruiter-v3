@@ -14,6 +14,9 @@ import { v4 as uuidv4 } from "uuid"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/lib/supabase-service"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useRouter } from "next/navigation"
+import { getWindowOrigin, isBrowser } from "@/lib/utils"
+import { useClientOnly } from "@/hooks/use-client-only"
 
 interface OptInFormProps {
   onClose: () => void
@@ -23,6 +26,8 @@ interface OptInFormProps {
 }
 
 export function OptInForm({ onClose, isApplying = false, isOpen = true, referralCode }: OptInFormProps) {
+  const router = useRouter()
+  const origin = useClientOnly(() => getWindowOrigin(), '')
   const [isDialogOpen, setIsDialogOpen] = useState(isOpen)
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
@@ -126,7 +131,7 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
 
       // Log success in analytics
       try {
-        await fetch("/api/analytics/page-view", {
+        await fetch(`${origin}/api/analytics/page-view`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -144,7 +149,10 @@ export function OptInForm({ onClose, isApplying = false, isOpen = true, referral
       // Redirect after showing success message
       setTimeout(() => {
         if (isApplying) {
-          window.location.href = "https://careers.sf.gov/interest/public-safety/sheriff/"
+          // For external URLs, use window.location.href
+          if (isBrowser()) {
+            window.location.href = "https://careers.sf.gov/interest/public-safety/sheriff/"
+          }
         } else {
           handleClose()
         }

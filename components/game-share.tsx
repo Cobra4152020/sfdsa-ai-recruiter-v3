@@ -15,6 +15,8 @@ import { useToast } from "@/components/ui/use-toast"
 import { addParticipationPoints } from "@/lib/points-service"
 import { useUser } from "@/context/user-context"
 import { useAuthModal } from "@/context/auth-modal-context"
+import { useClientOnly } from "@/hooks/use-client-only"
+import { getWindowOrigin, isBrowser } from "@/lib/utils"
 
 interface GameShareProps {
   score: number
@@ -29,12 +31,15 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
   const { toast } = useToast()
   const { currentUser } = useUser()
   const { openModal } = useAuthModal()
+  const origin = useClientOnly(() => getWindowOrigin(), '')
 
   const handleShare = async (platform: string) => {
     if (!currentUser) {
       openModal("signin", "recruit")
       return
     }
+
+    if (!isBrowser()) return
 
     setIsSharing(true)
 
@@ -57,7 +62,7 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
 
       // Create share text
       const shareText = `I scored ${score} points in ${gameName} on the SF Deputy Sheriff recruitment site! ${gameDescription}`
-      const shareUrl = `https://sfdeputysheriff.com/games/${gameName.toLowerCase()}`
+      const shareUrl = `${origin}/games/${gameName.toLowerCase()}`
 
       // Handle platform-specific sharing
       switch (platform) {

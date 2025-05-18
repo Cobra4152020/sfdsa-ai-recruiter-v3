@@ -26,9 +26,7 @@ const nextConfig = {
   // Enable experimental optimizations
   experimental: {
     optimizeCss: true,
-    optimizeImages: true,
     scrollRestoration: true,
-    serverActions: true,
     serverComponentsExternalPackages: ['sharp'],
     optimizePackageImports: [
       '@heroicons/react',

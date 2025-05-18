@@ -7,12 +7,14 @@ import { RecruiterAnalyticsDashboard } from "@/components/recruiter-analytics-da
 import { ReferralLinkGenerator } from "@/components/referral-link-generator"
 import { useToast } from "@/components/ui/use-toast"
 import { supabase } from "@/lib/supabase-client-singleton"
+import { useRouter } from "next/navigation"
 
 export default function VolunteerDashboardPage() {
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("dashboard")
   const [isLoading, setIsLoading] = useState(true)
   const [user, setUser] = useState<any>(null)
+  const router = useRouter()
 
   useEffect(() => {
     let isMounted = true
@@ -26,7 +28,7 @@ export default function VolunteerDashboardPage() {
 
         if (!session) {
           if (isMounted) {
-            window.location.href = "/volunteer-login"
+            router.push("/volunteer-login")
           }
           return
         }
@@ -41,7 +43,7 @@ export default function VolunteerDashboardPage() {
         if (error || !userRoles || userRoles.role !== "volunteer_recruiter") {
           console.error("Role verification failed:", error || "No volunteer role found")
           if (isMounted) {
-            window.location.href = "/volunteer-login"
+            router.push("/volunteer-login")
           }
           return
         }
@@ -55,7 +57,7 @@ export default function VolunteerDashboardPage() {
       } catch (error) {
         console.error("Auth check error:", error)
         if (isMounted) {
-          window.location.href = "/volunteer-login"
+          router.push("/volunteer-login")
         }
       }
     }
@@ -65,7 +67,7 @@ export default function VolunteerDashboardPage() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [router])
 
   if (isLoading) {
     return (

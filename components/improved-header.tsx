@@ -1,7 +1,7 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
-import type { ReactNode, JSX } from "react"
+import { useState, useEffect } from "react"
+import type { ReactNode } from "react"
 import Link from "next/link"
 import type { Route } from "next"
 import { 
@@ -10,8 +10,7 @@ import {
   Twitter, 
   Youtube, 
   Instagram, 
-  Linkedin, 
-  Moon,
+  Linkedin,
   Shield,
   BookOpen,
   Trophy,
@@ -20,7 +19,6 @@ import {
   User,
   Settings,
   HelpCircle,
-  LucideIcon,
   Menu,
   X
 } from "lucide-react"
@@ -32,6 +30,9 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/theme-provider"
 import { UserNav } from "@/components/user-nav"
 import { cn } from "@/lib/utils"
+import { useClientOnly } from "@/hooks/use-client-only"
+import { getWindowDimensions } from "@/lib/utils"
+import { DropdownNav } from "@/components/ui/dropdown-nav"
 
 interface ImprovedHeaderProps {
   showOptInForm?: (isApplying?: boolean) => void
@@ -43,73 +44,6 @@ interface NavItem {
   icon?: ReactNode
 }
 
-interface DropdownNavProps {
-  label: string
-  icon: ReactNode
-  items: NavItem[]
-}
-
-function DropdownNav({ label, icon, items }: DropdownNavProps): JSX.Element {
-  const [isOpen, setIsOpen] = useState(false)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-
-  const handleMouseEnter = () => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current)
-    }
-    setIsOpen(true)
-  }
-
-  const handleMouseLeave = () => {
-    timeoutRef.current = setTimeout(() => {
-      setIsOpen(false)
-    }, 150)
-  }
-
-  return (
-    <div 
-      className="relative group"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <button 
-        className="flex items-center text-white hover:text-[#FFD700] py-2 transition-all duration-200 group"
-      >
-        <span className="flex items-center transform group-hover:scale-105 transition-transform duration-200">
-          <span className="text-[#FFD700]">{icon}</span>
-          <span className="mx-1">{label}</span>
-          <ChevronDown className={`ml-1 h-4 w-4 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
-        </span>
-      </button>
-      
-      <div
-        className={`absolute left-0 mt-2 w-64 bg-[#0A3C1F] dark:bg-[#0A3C1F] rounded-lg shadow-lg overflow-hidden z-50 border border-[#FFD700]/20 ${
-          isOpen ? 'block' : 'hidden'
-        }`}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
-        {items.map((item) => (
-          <Link 
-            key={item.href} 
-            href={item.href} 
-            className="flex items-center px-4 py-3 text-sm text-white hover:text-[#FFD700] hover:bg-[#FFD700]/10 transition-all duration-150 group"
-          >
-            {item.icon && (
-              <span className="mr-2 transform group-hover:scale-110 transition-transform duration-200 text-[#FFD700]">
-                {item.icon}
-              </span>
-            )}
-            <span className="transform group-hover:translate-x-1 transition-transform duration-200">
-              {item.label}
-            </span>
-          </Link>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const { theme, setTheme } = useTheme()
@@ -117,13 +51,11 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
   const { openModal } = useAuthModal()
   const [scrolled, setScrolled] = useState(false)
 
+  const { scrollY } = useClientOnly(() => getWindowDimensions(), { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
+
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 10)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
+    setScrolled(scrollY > 10)
+  }, [scrollY])
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -154,37 +86,37 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       label: "Mission Briefing",
       icon: <BookOpen className="w-4 h-4" />,
       items: [
-        { label: "Overview", href: "/mission-briefing" as Route, icon: <Shield className="w-4 h-4" /> },
-        { label: "Daily Briefing", href: "/daily-briefing" as Route, icon: <BookOpen className="w-4 h-4" /> },
-        { label: "Requirements", href: "/mission-briefing/requirements" as Route, icon: <Shield className="w-4 h-4" /> },
-        { label: "Application Process", href: "/mission-briefing/process" as Route, icon: <Shield className="w-4 h-4" /> }
+        { label: "Overview", href: "/mission-briefing", icon: <Shield className="w-4 h-4" /> },
+        { label: "Daily Briefing", href: "/daily-briefing", icon: <BookOpen className="w-4 h-4" /> },
+        { label: "Requirements", href: "/requirements", icon: <Shield className="w-4 h-4" /> },
+        { label: "Application Process", href: "/application-process", icon: <Shield className="w-4 h-4" /> }
       ]
     },
     gamification: {
       label: "Achievements",
       icon: <Trophy className="w-4 h-4" />,
       items: [
-        { label: "Badges Gallery", href: "/badges" as Route, icon: <Shield className="w-4 h-4" /> },
-        { label: "NFT Awards", href: "/nft-awards" as Route, icon: <Trophy className="w-4 h-4" /> },
-        { label: "Leaderboard", href: "/gamification" as Route, icon: <Trophy className="w-4 h-4" /> }
+        { label: "Badges Gallery", href: "/badges", icon: <Shield className="w-4 h-4" /> },
+        { label: "NFT Awards", href: "/nft-awards", icon: <Trophy className="w-4 h-4" /> },
+        { label: "Leaderboard", href: "/gamification", icon: <Trophy className="w-4 h-4" /> }
       ]
     },
     games: {
       label: "Challenges",
       icon: <Gamepad2 className="w-4 h-4" />,
       items: [
-        { label: "Daily Trivia", href: "/trivia" as Route, icon: <Gamepad2 className="w-4 h-4" /> },
-        { label: "TikTok Challenges", href: "/tiktok-challenges" as Route, icon: <Gamepad2 className="w-4 h-4" /> },
-        { label: "Special Missions", href: "/games" as Route, icon: <Gamepad2 className="w-4 h-4" /> }
+        { label: "Daily Trivia", href: "/trivia", icon: <Gamepad2 className="w-4 h-4" /> },
+        { label: "TikTok Challenges", href: "/tiktok-challenges", icon: <Gamepad2 className="w-4 h-4" /> },
+        { label: "Special Missions", href: "/play-the-game", icon: <Gamepad2 className="w-4 h-4" /> }
       ]
     },
     support: {
       label: "Support",
       icon: <HelpCircle className="w-4 h-4" />,
       items: [
-        { label: "Chat with Sgt. Ken", href: "/chat-with-sgt-ken" as Route, icon: <MessageSquare className="w-4 h-4" /> },
-        { label: "Contact Support", href: "/contact" as Route, icon: <HelpCircle className="w-4 h-4" /> },
-        { label: "Accessibility", href: "/accessibility" as Route, icon: <HelpCircle className="w-4 h-4" /> }
+        { label: "Chat with Sgt. Ken", href: "/chat-with-sgt-ken", icon: <MessageSquare className="w-4 h-4" /> },
+        { label: "Contact Support", href: "/contact", icon: <HelpCircle className="w-4 h-4" /> },
+        { label: "Accessibility", href: "/accessibility", icon: <HelpCircle className="w-4 h-4" /> }
       ]
     }
   }
@@ -193,9 +125,9 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
     label: "Account",
     icon: <User className="w-4 h-4" />,
     items: [
-      { label: "Dashboard", href: "/dashboard" as Route, icon: <User className="w-4 h-4" /> },
-      { label: "Profile", href: "/profile" as Route, icon: <User className="w-4 h-4" /> },
-      { label: "Settings", href: "/profile/settings" as Route, icon: <Settings className="w-4 h-4" /> }
+      { label: "Dashboard", href: "/dashboard", icon: <User className="w-4 h-4" /> },
+      { label: "Profile", href: "/profile", icon: <User className="w-4 h-4" /> },
+      { label: "Settings", href: "/profile/settings", icon: <Settings className="w-4 h-4" /> }
     ]
   } : null
 
@@ -206,33 +138,29 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
     )}>
       {/* Top bar */}
       <div className="bg-[#0A3C1F] dark:bg-black text-white dark:text-[#FFD700] py-2">
-        <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <span className="text-sm">
-                Join the San Francisco Deputy Sheriff's Department
-              </span>
-            </div>
-            <div className="flex items-center space-x-3">
-              <div className="hidden md:flex items-center space-x-3">
-                <Link href="https://facebook.com" aria-label="Facebook" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                  <Facebook size={16} />
-                </Link>
-                <Link href="https://twitter.com" aria-label="Twitter" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                  <Twitter size={16} />
-                </Link>
-                <Link href="https://youtube.com" aria-label="YouTube" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                  <Youtube size={16} />
-                </Link>
-                <Link href="https://instagram.com" aria-label="Instagram" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                  <Instagram size={16} />
-                </Link>
-                <Link href="https://linkedin.com" aria-label="LinkedIn" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                  <Linkedin size={16} />
-                </Link>
-                <ThemeToggle />
-              </div>
-            </div>
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <div className="flex items-center space-x-4">
+            <span className="text-sm">
+              Join the San Francisco Deputy Sheriff's Department
+            </span>
+          </div>
+          <div className="hidden md:flex items-center space-x-3">
+            <Link href="https://www.facebook.com/SFDeputySheriff" aria-label="Facebook" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+              <Facebook size={16} />
+            </Link>
+            <Link href="https://twitter.com/SFDeputySheriff" aria-label="Twitter" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+              <Twitter size={16} />
+            </Link>
+            <Link href="https://www.youtube.com/@SFDeputySheriff" aria-label="YouTube" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+              <Youtube size={16} />
+            </Link>
+            <Link href="https://www.instagram.com/sfdeputysheriff" aria-label="Instagram" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+              <Instagram size={16} />
+            </Link>
+            <Link href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs-association" aria-label="LinkedIn" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+              <Linkedin size={16} />
+            </Link>
+            <ThemeToggle />
           </div>
         </div>
       </div>
@@ -250,29 +178,42 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
             </Link>
 
             {/* Desktop navigation */}
-            <div className="hidden md:flex items-center space-x-8">
-              <Link href="/about" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                About
-              </Link>
-              <Link href="/benefits" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                Benefits
-              </Link>
-              <Link href="/requirements" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                Requirements
-              </Link>
-              <Link href="/training" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                Training
-              </Link>
-              <Link href="/faq" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                FAQ
-              </Link>
-              <Link href="/contact" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
-                Contact
-              </Link>
+            <div className="hidden md:flex items-center space-x-6">
+              {Object.values(mainNavItems).map((item) => (
+                <DropdownNav
+                  key={item.label}
+                  label={item.label}
+                  icon={item.icon}
+                  items={item.items.map(navItem => ({
+                    label: (
+                      <div className="flex items-center">
+                        {navItem.icon && <span className="mr-2">{navItem.icon}</span>}
+                        <span>{navItem.label}</span>
+                      </div>
+                    ),
+                    href: navItem.href
+                  }))}
+                />
+              ))}
+              {userNavItems && (
+                <DropdownNav
+                  label={userNavItems.label}
+                  icon={userNavItems.icon}
+                  items={userNavItems.items.map(navItem => ({
+                    label: (
+                      <div className="flex items-center">
+                        {navItem.icon && <span className="mr-2">{navItem.icon}</span>}
+                        <span>{navItem.label}</span>
+                      </div>
+                    ),
+                    href: navItem.href
+                  }))}
+                />
+              )}
             </div>
 
             {/* Action buttons */}
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="hidden md:flex items-center space-x-2">
               {!currentUser ? (
                 <>
                   <Button
@@ -315,64 +256,43 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       >
         <div className="container mx-auto px-4 py-4">
           <div className="flex flex-col space-y-4">
-            <Link
-              href="/about"
-              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              About
-            </Link>
-            <Link
-              href="/benefits"
-              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Benefits
-            </Link>
-            <Link
-              href="/requirements"
-              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Requirements
-            </Link>
-            <Link
-              href="/training"
-              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Training
-            </Link>
-            <Link
-              href="/faq"
-              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              FAQ
-            </Link>
-            <Link
-              href="/contact"
-              className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Contact
-            </Link>
+            {Object.values(mainNavItems).map((section) => (
+              <div key={section.label} className="space-y-2">
+                <div className="flex items-center text-[#0A3C1F] dark:text-[#FFD700]">
+                  {section.icon}
+                  <span className="ml-2 font-medium">{section.label}</span>
+                </div>
+                <div className="ml-6 space-y-1">
+                  {section.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className="flex items-center text-sm text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.icon}
+                      <span className="ml-2">{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            ))}
 
             {/* Mobile social links */}
             <div className="flex items-center space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Link href="https://facebook.com" aria-label="Facebook" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+              <Link href="https://www.facebook.com/SFDeputySheriff" aria-label="Facebook" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
                 <Facebook size={20} />
               </Link>
-              <Link href="https://twitter.com" aria-label="Twitter" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+              <Link href="https://twitter.com/SFDeputySheriff" aria-label="Twitter" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
                 <Twitter size={20} />
               </Link>
-              <Link href="https://youtube.com" aria-label="YouTube" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+              <Link href="https://www.youtube.com/@SFDeputySheriff" aria-label="YouTube" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
                 <Youtube size={20} />
               </Link>
-              <Link href="https://instagram.com" aria-label="Instagram" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+              <Link href="https://www.instagram.com/sfdeputysheriff" aria-label="Instagram" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
                 <Instagram size={20} />
               </Link>
-              <Link href="https://linkedin.com" aria-label="LinkedIn" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
+              <Link href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs-association" aria-label="LinkedIn" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
                 <Linkedin size={20} />
               </Link>
             </div>

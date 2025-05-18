@@ -1,114 +1,41 @@
 "use client"
 
-import type React from "react"
-import { createContext, useContext, useEffect, useState } from "react"
+import * as React from "react"
+import { ThemeProvider as NextThemesProvider, useTheme as useNextTheme } from "next-themes"
 import { Moon, Sun } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { type VariantProps } from "class-variance-authority"
-import { buttonVariants } from "@/components/ui/button"
+import { useClientOnly } from "@/hooks/use-client-only"
+import { isBrowser } from "@/lib/utils"
 
-type Theme = "light" | "dark" | "system"
-
-type ThemeProviderProps = {
-  children: React.ReactNode
-  defaultTheme?: Theme
-  storageKey?: string
+export function ThemeProvider({ children, ...props }: { children: React.ReactNode } & Record<string, unknown>) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>
 }
 
-type ThemeProviderState = {
-  theme: Theme
-  setTheme: (theme: Theme) => void
-  toggleTheme: () => void
+interface ThemeToggleProps {
+  className?: string
 }
 
-const initialState: ThemeProviderState = {
-  theme: "system",
-  setTheme: () => null,
-  toggleTheme: () => null,
-}
+export function ThemeToggle({ className }: ThemeToggleProps) {
+  const [mounted, setMounted] = React.useState(false)
+  const { theme, setTheme } = useTheme()
 
-const ThemeProviderContext = createContext<ThemeProviderState>(initialState)
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
-export function ThemeProvider({
-  children,
-  defaultTheme = "system",
-  storageKey = "app-theme",
-  ...props
-}: ThemeProviderProps) {
-  const [theme, setTheme] = useState<Theme>(defaultTheme)
-
-  useEffect(() => {
-    const root = window.document.documentElement
-    root.classList.remove("light", "dark")
-
-    if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-      root.classList.add(systemTheme)
-    } else {
-      root.classList.add(theme)
-    }
-  }, [theme])
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
-    const handleChange = () => {
-      if (theme === "system") {
-        const root = window.document.documentElement
-        root.classList.remove("light", "dark")
-        root.classList.add(mediaQuery.matches ? "dark" : "light")
-      }
-    }
-
-    mediaQuery.addEventListener("change", handleChange)
-    return () => mediaQuery.removeEventListener("change", handleChange)
-  }, [theme])
-
-  const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      setTheme(theme)
-      // Save the theme preference
-      if (typeof window !== "undefined") {
-        localStorage.setItem(storageKey, theme)
-      }
-    },
-    toggleTheme: () => {
-      const newTheme = theme === "dark" ? "light" : "dark"
-      setTheme(newTheme)
-      if (typeof window !== "undefined") {
-        localStorage.setItem(storageKey, newTheme)
-      }
-    }
+  if (!mounted) {
+    return null
   }
 
   return (
-    <ThemeProviderContext.Provider {...props} value={value}>
-      {children}
-    </ThemeProviderContext.Provider>
-  )
-}
-
-export const useTheme = () => {
-  const context = useContext(ThemeProviderContext)
-
-  if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider")
-
-  return context
-}
-
-export function ThemeToggle() {
-  const { theme, toggleTheme } = useTheme()
-  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches)
-
-  return (
     <Button
-      onClick={toggleTheme}
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       variant="outline"
       size="icon"
-      className="rounded-full"
+      className={className}
       aria-label="Toggle theme"
     >
-      {isDark ? (
+      {theme === "dark" ? (
         <Sun className="h-4 w-4 text-yellow-400" />
       ) : (
         <Moon className="h-4 w-4" />
@@ -116,4 +43,47 @@ export function ThemeToggle() {
       <span className="sr-only">Toggle theme</span>
     </Button>
   )
+}
+
+export function useTheme() {
+  const { theme, setTheme } = useNextTheme()
+  const prefersDark = useClientOnly(() => {
+    if (!isBrowser()) return false
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+  }, false)
+
+  const isDark = theme === "dark" || (theme === "system" && prefersDark)
+
+  React.useEffect(() => {
+    if (!isBrowser()) return
+
+    const root = document.documentElement
+    const systemTheme = prefersDark ? "dark" : "light"
+    
+    if (theme === "system") {
+      root.classList.remove("light", "dark")
+      root.classList.add(systemTheme)
+    } else {
+      root.classList.remove("light", "dark")
+      root.classList.add(theme || "")
+    }
+
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (theme === "system") {
+        const newTheme = e.matches ? "dark" : "light"
+        root.classList.remove("light", "dark")
+        root.classList.add(newTheme)
+      }
+    }
+
+    mediaQuery.addEventListener("change", handleChange)
+    return () => mediaQuery.removeEventListener("change", handleChange)
+  }, [theme, prefersDark])
+
+  return {
+    theme,
+    setTheme,
+    isDark,
+  }
 }
