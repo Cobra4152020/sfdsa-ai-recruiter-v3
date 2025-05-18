@@ -7,11 +7,13 @@ import { useToast } from "@/components/ui/use-toast"
 import { useUser } from "@/context/user-context"
 import { AchievementBadge } from "@/components/achievement-badge"
 import { BadgeProgress } from "@/components/badge-progress"
-import { BadgeRequirements } from "@/components/badge-requirements"
-import { BadgeRewards } from "@/components/badge-rewards"
-import { BadgeTimeline } from "@/components/badge-timeline"
-import { BadgeShare } from "@/components/badge-share"
-import { BadgeUnlockAnimation } from "@/components/badge-unlock-animation"
+import {
+  BadgeRequirements,
+  BadgeRewards,
+  BadgeTimeline,
+  BadgeShare,
+  BadgeUnlockAnimation,
+} from "@/components/badges"
 import { Trophy, Share2, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
 

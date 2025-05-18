@@ -1,72 +1,79 @@
 "use client"
 
-import { Trophy, Star, Award, Medal } from "lucide-react"
-import type { BadgeType, BadgeRarity } from "@/types/badge"
+import { Trophy, Star, Medal } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface AchievementBadgeProps {
-  type: BadgeType
-  rarity: BadgeRarity
+  type: string
+  rarity: string
   points: number
   earned: boolean
-  size?: "sm" | "md" | "lg"
-  className?: string
+  size?: "sm" | "md" | "lg" | "xl"
 }
-
-const RARITY_COLORS = {
-  common: "bg-gray-100 text-gray-600",
-  uncommon: "bg-green-100 text-green-600",
-  rare: "bg-blue-100 text-blue-600",
-  epic: "bg-purple-100 text-purple-600",
-  legendary: "bg-yellow-100 text-yellow-600",
-} as const
-
-const TYPE_ICONS = {
-  achievement: Trophy,
-  skill: Star,
-  participation: Medal,
-  special: Award,
-} as const
-
-const SIZE_CLASSES = {
-  sm: "h-12 w-12 p-2",
-  md: "h-16 w-16 p-3",
-  lg: "h-20 w-20 p-4",
-} as const
 
 export function AchievementBadge({
   type,
   rarity,
   points,
   earned,
-  size = "md",
-  className,
+  size = "md"
 }: AchievementBadgeProps) {
-  const Icon = TYPE_ICONS[type]
-  const rarityColor = RARITY_COLORS[rarity]
-  const sizeClass = SIZE_CLASSES[size]
+  const getBadgeIcon = () => {
+    switch (type) {
+      case "achievement":
+        return <Trophy className="h-full w-full" />
+      case "milestone":
+        return <Medal className="h-full w-full" />
+      default:
+        return <Star className="h-full w-full" />
+    }
+  }
+
+  const getBadgeColor = () => {
+    switch (rarity) {
+      case "common":
+        return "bg-gray-100 text-gray-600"
+      case "rare":
+        return "bg-blue-100 text-blue-600"
+      case "epic":
+        return "bg-purple-100 text-purple-600"
+      case "legendary":
+        return "bg-yellow-100 text-yellow-600"
+      default:
+        return "bg-gray-100 text-gray-600"
+    }
+  }
+
+  const getSizeClasses = () => {
+    switch (size) {
+      case "sm":
+        return "w-12 h-12"
+      case "md":
+        return "w-16 h-16"
+      case "lg":
+        return "w-20 h-20"
+      case "xl":
+        return "w-24 h-24"
+      default:
+        return "w-16 h-16"
+    }
+  }
 
   return (
-    <div className="relative inline-block">
+    <div className="relative">
       <div
         className={cn(
-          "rounded-full flex items-center justify-center transition-all duration-200",
-          rarityColor,
-          sizeClass,
-          !earned && "opacity-50 grayscale",
-          className
+          "rounded-lg flex items-center justify-center p-3 transition-all",
+          getSizeClasses(),
+          getBadgeColor(),
+          !earned && "opacity-50 grayscale"
         )}
       >
-        <Icon className="w-full h-full" />
+        {getBadgeIcon()}
       </div>
-      {points > 0 && (
-        <div className={cn(
-          "absolute -bottom-2 -right-2 bg-white rounded-full px-2 py-0.5 text-xs font-bold border shadow-sm",
-          earned ? "text-green-600 border-green-200" : "text-gray-400 border-gray-200"
-        )}>
-          +{points}
-        </div>
-      )}
+      <div className="absolute -bottom-2 -right-2 bg-[#0A3C1F] text-white text-xs font-medium px-2 py-0.5 rounded-full">
+        {points} pts
+      </div>
     </div>
   )
 }

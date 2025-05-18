@@ -1,63 +1,88 @@
-import { useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { Trophy } from "lucide-react"
-import type { Badge } from "@/types/badge"
+import { Trophy, Star, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+
+interface Badge {
+  id: string
+  name: string
+  description: string
+  points: number
+}
 
 interface BadgeUnlockAnimationProps {
-  badge: Pick<Badge, 'name' | 'type' | 'points'>
+  badge: Badge
   onComplete: () => void
 }
 
 export function BadgeUnlockAnimation({ badge, onComplete }: BadgeUnlockAnimationProps) {
-  useEffect(() => {
-    const timer = setTimeout(onComplete, 3000)
-    return () => clearTimeout(timer)
-  }, [onComplete])
-
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
         <motion.div
-          initial={{ scale: 0, opacity: 0 }}
+          initial={{ scale: 0.5, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          exit={{ scale: 0, opacity: 0 }}
-          className="bg-white rounded-lg p-8 text-center space-y-4"
+          exit={{ scale: 0.5, opacity: 0 }}
+          className="relative bg-white rounded-xl p-8 max-w-md w-full mx-4 text-center"
         >
-          <motion.div
-            animate={{
-              rotate: [0, 360],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{ duration: 1, repeat: 1 }}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onComplete}
+            className="absolute top-2 right-2"
           >
-            <Trophy className="h-16 w-16 text-yellow-500 mx-auto" />
+            <X className="h-4 w-4" />
+          </Button>
+
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+            className="mb-6"
+          >
+            <div className="mx-auto w-24 h-24 bg-[#0A3C1F] rounded-full flex items-center justify-center mb-4">
+              <Trophy className="h-12 w-12 text-white" />
+            </div>
+            <h2 className="text-2xl font-bold text-[#0A3C1F] mb-2">
+              Badge Unlocked!
+            </h2>
+            <p className="text-gray-600 mb-4">{badge.name}</p>
+            <div className="flex items-center justify-center gap-2 text-yellow-500">
+              {[...Array(5)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.4 + i * 0.1 }}
+                >
+                  <Star className="h-6 w-6 fill-current" />
+                </motion.div>
+              ))}
+            </div>
           </motion.div>
-          
-          <motion.h2
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="text-2xl font-bold text-gray-900"
-          >
-            Badge Unlocked!
-          </motion.h2>
-          
-          <motion.p
-            initial={{ y: 20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.7 }}
-            className="text-gray-600"
-          >
-            Congratulations! You've earned the {badge.name} badge
-          </motion.p>
-          
+
           <motion.div
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.9 }}
-            className="text-lg font-semibold text-yellow-600"
+            transition={{ delay: 0.8 }}
           >
-            +{badge.points} points
+            <p className="text-gray-600 mb-4">{badge.description}</p>
+            <div className="text-lg font-semibold text-[#0A3C1F]">
+              +{badge.points} Points
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1 }}
+          >
+            <Button
+              onClick={onComplete}
+              className="mt-6"
+              variant="default"
+            >
+              Continue
+            </Button>
           </motion.div>
         </motion.div>
       </div>

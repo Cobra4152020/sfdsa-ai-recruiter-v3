@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Share2, Twitter, Facebook, Linkedin } from "lucide-react"
+import { Twitter, Facebook, Linkedin, Link as LinkIcon } from "lucide-react"
+import { useState } from "react"
 
 interface BadgeShareProps {
   badgeId: string
@@ -10,6 +11,28 @@ interface BadgeShareProps {
 }
 
 export function BadgeShare({ badgeId, badgeName, isUnlocked, onShare }: BadgeShareProps) {
+  const [copied, setCopied] = useState(false)
+  const shareUrl = `${window.location.origin}/badges/${badgeId}`
+
+  const shareText = `I just earned the ${badgeName} badge! Join me in becoming a San Francisco Deputy Sheriff. #LawEnforcement #JoinTheForce`
+
+  const socialShareUrls = {
+    twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
+    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
+  }
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+      onShare()
+    } catch (error) {
+      console.error("Failed to copy URL:", error)
+    }
+  }
+
   if (!isUnlocked) {
     return null
   }
@@ -18,25 +41,56 @@ export function BadgeShare({ badgeId, badgeName, isUnlocked, onShare }: BadgeSha
     <Card>
       <CardHeader>
         <CardTitle>Share Achievement</CardTitle>
-        <CardDescription>Share your achievement with your network</CardDescription>
+        <CardDescription>Share your success with others</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <Button onClick={onShare} className="w-full gap-2">
-            <Share2 className="h-4 w-4" />
-            Share Achievement
-          </Button>
-          
-          <div className="flex justify-center space-x-4">
-            <Button variant="outline" size="icon" onClick={() => window.open(`https://twitter.com/intent/tweet?text=I just earned the ${badgeName} badge!`, '_blank')}>
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                window.open(socialShareUrls.twitter, "_blank")
+                onShare()
+              }}
+            >
               <Twitter className="h-4 w-4" />
+              <span className="sr-only">Share on Twitter</span>
             </Button>
-            <Button variant="outline" size="icon" onClick={() => window.open(`https://www.facebook.com/sharer/sharer.php?u=${window.location.href}`, '_blank')}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                window.open(socialShareUrls.facebook, "_blank")
+                onShare()
+              }}
+            >
               <Facebook className="h-4 w-4" />
+              <span className="sr-only">Share on Facebook</span>
             </Button>
-            <Button variant="outline" size="icon" onClick={() => window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${window.location.href}`, '_blank')}>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => {
+                window.open(socialShareUrls.linkedin, "_blank")
+                onShare()
+              }}
+            >
               <Linkedin className="h-4 w-4" />
+              <span className="sr-only">Share on LinkedIn</span>
             </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={copyToClipboard}
+              className={copied ? "text-green-600" : ""}
+            >
+              <LinkIcon className="h-4 w-4" />
+              <span className="sr-only">Copy link</span>
+            </Button>
+          </div>
+          <div className="text-sm text-gray-500">
+            Share this achievement to inspire others to join the force!
           </div>
         </div>
       </CardContent>

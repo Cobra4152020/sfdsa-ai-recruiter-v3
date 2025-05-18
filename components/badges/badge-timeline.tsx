@@ -4,10 +4,13 @@ import { BadgeWithProgress, TimelineEvent } from '@/types/badge'
 import { useEnhancedBadges } from '@/hooks/use-enhanced-badges'
 import { format } from 'date-fns'
 import { Skeleton } from '@/components/ui/skeleton'
+import { Card, CardContent } from "@/components/ui/card"
+import { Circle, CheckCircle2, Star } from "lucide-react"
 
 interface BadgeTimelineProps {
   userId?: string
   limit?: number
+  badgeId: string
 }
 
 interface EnhancedTimelineEvent extends TimelineEvent {
@@ -16,7 +19,8 @@ interface EnhancedTimelineEvent extends TimelineEvent {
 
 export function BadgeTimeline({
   userId,
-  limit = 10
+  limit = 10,
+  badgeId
 }: BadgeTimelineProps) {
   const { collections, isLoading, error } = useEnhancedBadges()
   
@@ -50,6 +54,17 @@ export function BadgeTimeline({
       }))
   }, [collections, limit])
 
+  const getEventIcon = (type: TimelineEvent["type"]) => {
+    switch (type) {
+      case "progress":
+        return <Circle className="h-4 w-4 text-blue-500" />
+      case "unlock":
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />
+      case "share":
+        return <Star className="h-4 w-4 text-yellow-500" />
+    }
+  }
+
   if (error) {
     return (
       <div className="text-center text-red-500 py-8">
@@ -77,90 +92,23 @@ export function BadgeTimeline({
   }
 
   return (
-    <div className="space-y-8">
-      {events.map((event: EnhancedTimelineEvent, index: number) => (
-        <motion.div
-          key={event.id}
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className="relative pl-8 pb-8 last:pb-0"
-        >
-          {/* Timeline line */}
-          <div className="absolute left-[11px] top-2 bottom-0 w-0.5 bg-gray-200 last:hidden" />
-          
-          {/* Timeline dot */}
-          <div className={`absolute left-0 top-2 w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-            getEventStyles(event.type).dotClass
-          }`}>
-            {getEventStyles(event.type).icon}
-          </div>
-
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            {event.badge && (
-              <div className="flex-shrink-0 w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                {event.badge.imageUrl ? (
-                  <img
-                    src={event.badge.imageUrl}
-                    alt={event.badge.name}
-                    className="w-8 h-8"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-gray-200 rounded-full" />
-                )}
-              </div>
-            )}
-
-            <div className="flex-grow">
-              <p className="text-sm text-gray-500">
-                {format(new Date(event.date), 'MMM d, yyyy')}
-              </p>
-              <h3 className="font-medium mt-1">
-                {event.badge?.name || 'Unknown Badge'}
-              </h3>
-              <p className="text-sm text-gray-600 mt-1">{event.event}</p>
-            </div>
-
-            {event.badge && (
-              <div className="flex-shrink-0 text-right sm:ml-4">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                  {event.badge.points} points
-                </span>
-              </div>
+    <div className="space-y-4">
+      {events.map((event) => (
+        <div key={event.id} className="flex gap-3">
+          <div className="flex flex-col items-center">
+            <div className="h-8 flex items-center">{getEventIcon(event.type)}</div>
+            {event.id !== events[events.length - 1].id && (
+              <div className="w-px h-full bg-gray-200" />
             )}
           </div>
-        </motion.div>
+          <div>
+            <p className="text-sm text-gray-900">{event.event}</p>
+            <time className="text-xs text-gray-500">
+              {new Date(event.date).toLocaleDateString()}
+            </time>
+          </div>
+        </div>
       ))}
     </div>
   )
-}
-
-function getEventStyles(type: TimelineEvent['type']) {
-  switch (type) {
-    case 'start':
-      return {
-        dotClass: 'bg-blue-50 border-blue-500',
-        icon: '🎯'
-      }
-    case 'progress':
-      return {
-        dotClass: 'bg-yellow-50 border-yellow-500',
-        icon: '📈'
-      }
-    case 'milestone':
-      return {
-        dotClass: 'bg-purple-50 border-purple-500',
-        icon: '🏆'
-      }
-    case 'completion':
-      return {
-        dotClass: 'bg-green-50 border-green-500',
-        icon: '✨'
-      }
-    default:
-      return {
-        dotClass: 'bg-gray-50 border-gray-500',
-        icon: '•'
-      }
-  }
 } 

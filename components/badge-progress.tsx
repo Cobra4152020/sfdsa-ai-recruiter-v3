@@ -15,6 +15,7 @@ interface BadgeProgressProps {
   maxValue?: number
   fetchUrl?: string
   className?: string
+  progress: number
 }
 
 export function BadgeProgress({
@@ -25,6 +26,7 @@ export function BadgeProgress({
   maxValue = 10,
   fetchUrl,
   className,
+  progress,
 }: BadgeProgressProps) {
   const { currentUser } = useUser()
   const [currentValue, setCurrentValue] = useState(initialValue || 0)
