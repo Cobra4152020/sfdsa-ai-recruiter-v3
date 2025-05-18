@@ -3,13 +3,14 @@
 import type React from "react"
 import { useRef, useEffect, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface DropdownNavItem {
   label: React.ReactNode
   href: string
+  icon?: React.ReactNode
 }
 
 interface DropdownNavProps {
@@ -22,9 +23,10 @@ interface DropdownNavProps {
 
 export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onToggle }: DropdownNavProps) {
   const [isOpen, setIsOpen] = useState(false)
+  const [activeIndex, setActiveIndex] = useState(-1)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const router = useRouter()
+  const pathname = usePathname()
 
   // Handle controlled vs uncontrolled state
   useEffect(() => {
@@ -32,6 +34,12 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
       setIsOpen(controlledIsOpen)
     }
   }, [controlledIsOpen])
+
+  // Close dropdown when pathname changes
+  useEffect(() => {
+    setIsOpen(false)
+    setActiveIndex(-1)
+  }, [pathname])
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) {
@@ -43,6 +51,7 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
       setIsOpen(false)
+      setActiveIndex(-1)
     }, 150)
   }
 
@@ -51,6 +60,7 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
     const handleClickOutside = (event: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsOpen(false)
+        setActiveIndex(-1)
       }
     }
 
@@ -65,6 +75,7 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setIsOpen(false)
+        setActiveIndex(-1)
       }
     }
 
@@ -76,19 +87,45 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
 
   // Handle keyboard navigation
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" || event.key === " ") {
+    if (!isOpen && (event.key === "Enter" || event.key === " " || event.key === "ArrowDown")) {
       event.preventDefault()
-      setIsOpen(!isOpen)
+      setIsOpen(true)
+      setActiveIndex(0)
+      return
     }
-  }
 
-  const handleLinkClick = (href: string, event: React.MouseEvent) => {
-    event.preventDefault()
-    setIsOpen(false)
-    // Use setTimeout to ensure the dropdown closes before navigation
-    setTimeout(() => {
-      router.push(href)
-    }, 10)
+    if (isOpen) {
+      switch (event.key) {
+        case "ArrowDown":
+          event.preventDefault()
+          setActiveIndex(prev => (prev + 1) % items.length)
+          break
+        case "ArrowUp":
+          event.preventDefault()
+          setActiveIndex(prev => (prev - 1 + items.length) % items.length)
+          break
+        case "Enter":
+        case " ":
+          event.preventDefault()
+          if (activeIndex >= 0) {
+            const item = items[activeIndex]
+            window.location.href = item.href // Use direct navigation instead of Link component
+            setIsOpen(false)
+            setActiveIndex(-1)
+          }
+          break
+        case "Tab":
+          if (!event.shiftKey && activeIndex === items.length - 1) {
+            setIsOpen(false)
+            setActiveIndex(-1)
+          }
+          if (event.shiftKey && activeIndex === 0) {
+            setIsOpen(false)
+            setActiveIndex(-1)
+          }
+          break
+      }
+    }
   }
 
   return (
@@ -97,13 +134,18 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
       ref={dropdownRef}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
+      onKeyDown={handleKeyDown}
     >
       <button 
         className="flex items-center text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white py-2 transition-all duration-200 group"
         aria-expanded={isOpen}
         aria-haspopup="true"
-        onKeyDown={handleKeyDown}
-        onClick={() => setIsOpen(!isOpen)}
+        aria-controls={isOpen ? "dropdown-menu" : undefined}
+        onClick={(e) => {
+          e.preventDefault()
+          setIsOpen(!isOpen)
+          if (onToggle) onToggle()
+        }}
       >
         <span className="flex items-center transform group-hover:scale-105 transition-transform duration-200">
           {icon && <span className="text-[#FFD700] dark:text-[#FFD700] mr-1" aria-hidden="true">{icon}</span>}
@@ -120,27 +162,32 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
 
       {isOpen && (
         <div
-          className="absolute left-0 mt-2 w-64 bg-[#0A3C1F] dark:bg-[#0A3C1F] rounded-lg shadow-lg overflow-hidden z-50 border border-[#FFD700]/20 animate-in fade-in slide-in-from-top-5 duration-200"
+          id="dropdown-menu"
+          className="absolute left-0 mt-2 w-64 bg-[#0A3C1F] dark:bg-[#0A3C1F] rounded-lg shadow-lg overflow-hidden z-50 border border-[#FFD700]/20"
           role="menu"
           aria-orientation="vertical"
+          aria-labelledby="dropdown-button"
         >
-          <div className="py-1" role="menu" aria-orientation="vertical">
+          <div className="py-1" role="none">
             {items.map((item, index) => (
               <a
                 key={index}
                 href={item.href}
-                className="flex items-center px-4 py-3 text-sm text-white hover:text-[#FFD700] hover:bg-[#FFD700]/10 transition-all duration-150 group"
+                className={cn(
+                  "flex items-center w-full px-4 py-3 text-sm text-white hover:text-[#FFD700] hover:bg-[#FFD700]/10 transition-all duration-150 group text-left",
+                  activeIndex === index && "bg-[#FFD700]/5 text-[#FFD700]"
+                )}
                 role="menuitem"
-                onClick={(e) => handleLinkClick(item.href, e)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault()
-                    handleLinkClick(item.href, e as any)
-                  }
+                tabIndex={isOpen ? 0 : -1}
+                aria-current={activeIndex === index}
+                onClick={(e) => {
+                  e.preventDefault()
+                  window.location.href = item.href // Use direct navigation
+                  setIsOpen(false)
+                  setActiveIndex(-1)
                 }}
-                tabIndex={0}
-                style={{ transitionDelay: `${50 + index * 25}ms` }}
               >
+                {item.icon && <span className="mr-3 opacity-75 group-hover:opacity-100">{item.icon}</span>}
                 {item.label}
               </a>
             ))}

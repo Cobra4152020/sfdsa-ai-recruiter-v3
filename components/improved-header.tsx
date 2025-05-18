@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { ReactNode } from "react"
-import Link from "next/link"
-import type { Route } from "next"
+import { usePathname } from "next/navigation"
 import { 
   ChevronDown, 
   Facebook, 
@@ -40,7 +39,7 @@ interface ImprovedHeaderProps {
 
 interface NavItem {
   label: string
-  href: Route
+  href: string
   icon?: ReactNode
 }
 
@@ -50,12 +49,17 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
   const { currentUser } = useUser()
   const { openModal } = useAuthModal()
   const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
 
   const { scrollY } = useClientOnly(() => getWindowDimensions(), { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
 
   useEffect(() => {
     setScrolled(scrollY > 10)
   }, [scrollY])
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false)
+  }, [pathname])
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
@@ -145,21 +149,21 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
             </span>
           </div>
           <div className="hidden md:flex items-center space-x-3">
-            <Link href="https://www.facebook.com/SFDeputySheriff" aria-label="Facebook" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+            <a href="https://www.facebook.com/SFDeputySheriff" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
               <Facebook size={16} />
-            </Link>
-            <Link href="https://twitter.com/SFDeputySheriff" aria-label="Twitter" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+            </a>
+            <a href="https://twitter.com/SFDeputySheriff" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
               <Twitter size={16} />
-            </Link>
-            <Link href="https://www.youtube.com/@SFDeputySheriff" aria-label="YouTube" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+            </a>
+            <a href="https://www.youtube.com/@SFDeputySheriff" target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
               <Youtube size={16} />
-            </Link>
-            <Link href="https://www.instagram.com/sfdeputysheriff" aria-label="Instagram" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+            </a>
+            <a href="https://www.instagram.com/sfdeputysheriff" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
               <Instagram size={16} />
-            </Link>
-            <Link href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs-association" aria-label="LinkedIn" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
+            </a>
+            <a href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs-association" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
               <Linkedin size={16} />
-            </Link>
+            </a>
             <ThemeToggle />
           </div>
         </div>
@@ -172,10 +176,10 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       )}>
         <div className="container mx-auto px-4">
           <nav className="flex justify-between items-center">
-            <Link href="/" className="flex items-center space-x-2">
+            <a href="/" className="flex items-center space-x-2 group transition-transform duration-200 hover:scale-105">
               <ShieldLogo className="w-8 h-8" />
               <span className="text-xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">SFDSA</span>
-            </Link>
+            </a>
 
             {/* Desktop navigation */}
             <div className="hidden md:flex items-center space-x-6">
@@ -210,35 +214,29 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                   }))}
                 />
               )}
-            </div>
-
-            {/* Action buttons */}
-            <div className="hidden md:flex items-center space-x-2">
-              {!currentUser ? (
-                <>
+              {!currentUser && (
+                <div className="flex items-center space-x-4">
                   <Button
                     variant="ghost"
                     onClick={handleLogin}
-                    className="text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/10 dark:hover:bg-[#FFD700]/10"
+                    className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white"
                   >
-                    Sign In
+                    Login
                   </Button>
                   <Button
                     onClick={handleApplyNow}
-                    className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white dark:bg-[#FFD700] dark:hover:bg-[#FFD700]/90 dark:text-black"
+                    className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-black dark:hover:bg-[#FFD700]/90"
                   >
                     Apply Now
                   </Button>
-                </>
-              ) : (
-                <UserNav />
+                </div>
               )}
             </div>
 
             {/* Mobile menu button */}
             <button
               onClick={toggleMobileMenu}
-              className="md:hidden p-2 rounded-md text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/10 dark:hover:bg-[#FFD700]/10"
+              className="md:hidden text-[#0A3C1F] dark:text-[#FFD700]"
               aria-label="Toggle mobile menu"
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -248,68 +246,57 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       </div>
 
       {/* Mobile menu */}
-      <div
-        className={cn(
-          "md:hidden fixed inset-x-0 top-[calc(4rem+2.5rem)] bottom-0 z-50 bg-white dark:bg-[#121212] transition-transform duration-300 ease-in-out transform",
-          isMobileMenuOpen ? "translate-x-0" : "translate-x-full"
-        )}
-      >
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col space-y-4">
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-x-0 top-[calc(4rem+2.5rem)] bottom-0 bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-gray-800"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation menu"
+        >
+          <div className="container mx-auto px-4 py-4 h-full overflow-y-auto">
             {Object.values(mainNavItems).map((section) => (
-              <div key={section.label} className="space-y-2">
-                <div className="flex items-center text-[#0A3C1F] dark:text-[#FFD700]">
-                  {section.icon}
-                  <span className="ml-2 font-medium">{section.label}</span>
-                </div>
-                <div className="ml-6 space-y-1">
+              <div key={section.label} className="mb-6">
+                <h3 className="text-[#0A3C1F] dark:text-[#FFD700] font-semibold mb-3 flex items-center text-lg">
+                  {section.icon && <span className="mr-2">{section.icon}</span>}
+                  {section.label}
+                </h3>
+                <div className="space-y-3 pl-6">
                   {section.items.map((item) => (
-                    <Link
+                    <a
                       key={item.href}
                       href={item.href}
-                      className="flex items-center text-sm text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+                      className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] py-2 flex items-center text-base transition-all duration-200 hover:translate-x-1"
                       onClick={() => setIsMobileMenuOpen(false)}
+                      role="menuitem"
+                      tabIndex={isMobileMenuOpen ? 0 : -1}
                     >
-                      {item.icon}
-                      <span className="ml-2">{item.label}</span>
-                    </Link>
+                      {item.icon && <span className="mr-3 opacity-75">{item.icon}</span>}
+                      {item.label}
+                    </a>
                   ))}
                 </div>
               </div>
             ))}
-
-            {/* Mobile social links */}
-            <div className="flex items-center space-x-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <Link href="https://www.facebook.com/SFDeputySheriff" aria-label="Facebook" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
-                <Facebook size={20} />
-              </Link>
-              <Link href="https://twitter.com/SFDeputySheriff" aria-label="Twitter" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
-                <Twitter size={20} />
-              </Link>
-              <Link href="https://www.youtube.com/@SFDeputySheriff" aria-label="YouTube" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
-                <Youtube size={20} />
-              </Link>
-              <Link href="https://www.instagram.com/sfdeputysheriff" aria-label="Instagram" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
-                <Instagram size={20} />
-              </Link>
-              <Link href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs-association" aria-label="LinkedIn" className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white">
-                <Linkedin size={20} />
-              </Link>
-            </div>
-
-            {/* Mobile action buttons */}
             {!currentUser && (
-              <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="mt-8 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-6">
                 <Button
                   variant="ghost"
-                  onClick={handleLogin}
-                  className="text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/10 dark:hover:bg-[#FFD700]/10"
+                  onClick={() => {
+                    handleLogin()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="w-full text-[#0A3C1F] dark:text-[#FFD700] text-lg font-medium"
+                  tabIndex={isMobileMenuOpen ? 0 : -1}
                 >
-                  Sign In
+                  Login
                 </Button>
                 <Button
-                  onClick={handleApplyNow}
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white dark:bg-[#FFD700] dark:hover:bg-[#FFD700]/90 dark:text-black"
+                  onClick={() => {
+                    handleApplyNow()
+                    setIsMobileMenuOpen(false)
+                  }}
+                  className="w-full bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-black dark:hover:bg-[#FFD700]/90 text-lg font-medium"
+                  tabIndex={isMobileMenuOpen ? 0 : -1}
                 >
                   Apply Now
                 </Button>
@@ -317,7 +304,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
             )}
           </div>
         </div>
-      </div>
+      )}
     </header>
   )
 }
