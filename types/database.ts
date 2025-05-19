@@ -1,3 +1,17 @@
+import type {
+  Badge,
+  BadgeType,
+  BadgeRarity,
+  BadgeProgress,
+  BadgeCollection,
+  BadgeChallenge,
+  UserChallengeProgress,
+  BadgeShowcaseSettings,
+  UserBadgePreferences,
+  BadgeAnalytics,
+  BadgeShare
+} from './badge';
+
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[]
 
 export interface Database {
@@ -30,138 +44,163 @@ export interface Database {
         }
       }
       badges: {
+        Row: Omit<Badge, 'imageUrl'> & { image_url: string | null }
+        Insert: Omit<Badge, 'id' | 'createdAt' | 'updatedAt' | 'imageUrl'> & { 
+          id?: string
+          image_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<Badge, 'id' | 'createdAt' | 'updatedAt' | 'imageUrl'>> & {
+          id?: string
+          image_url?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      badge_progress: {
+        Row: Omit<BadgeProgress, 'badgeId' | 'userId'> & {
+          id: string
+          badge_id: string
+          user_id: string
+        }
+        Insert: Omit<BadgeProgress, 'badgeId' | 'userId' | 'createdAt' | 'updatedAt'> & {
+          id?: string
+          badge_id: string
+          user_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<BadgeProgress, 'badgeId' | 'userId' | 'createdAt' | 'updatedAt'>> & {
+          id?: string
+          badge_id?: string
+          user_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      badge_collections: {
+        Row: Omit<BadgeCollection, 'badges'>
+        Insert: Omit<BadgeCollection, 'id' | 'badges' | 'createdAt' | 'updatedAt'> & {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<BadgeCollection, 'id' | 'badges' | 'createdAt' | 'updatedAt'>> & {
+          id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      badge_collection_memberships: {
         Row: {
           id: string
-          name: string
-          description: string
-          image_url: string
-          criteria: string
-          points: number
+          collection_id: string
+          badge_id: string
+          position: number
           created_at: string
         }
         Insert: {
           id?: string
-          name: string
-          description: string
-          image_url: string
-          criteria: string
-          points: number
+          collection_id: string
+          badge_id: string
+          position?: number
           created_at?: string
         }
         Update: {
           id?: string
-          name?: string
-          description?: string
-          image_url?: string
-          criteria?: string
-          points?: number
+          collection_id?: string
+          badge_id?: string
+          position?: number
           created_at?: string
         }
       }
-      user_badges: {
-        Row: {
+      badge_challenges: {
+        Row: Omit<BadgeChallenge, 'badgeId'> & { badge_id: string | null }
+        Insert: Omit<BadgeChallenge, 'id' | 'badgeId' | 'createdAt' | 'updatedAt'> & {
+          id?: string
+          badge_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<BadgeChallenge, 'id' | 'badgeId' | 'createdAt' | 'updatedAt'>> & {
+          id?: string
+          badge_id?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      user_challenge_progress: {
+        Row: Omit<UserChallengeProgress, 'userId' | 'challengeId'> & {
           id: string
           user_id: string
-          badge_id: string
-          awarded_at: string
+          challenge_id: string
         }
-        Insert: {
+        Insert: Omit<UserChallengeProgress, 'userId' | 'challengeId' | 'createdAt' | 'updatedAt'> & {
           id?: string
           user_id: string
-          badge_id: string
-          awarded_at?: string
+          challenge_id: string
+          created_at?: string
+          updated_at?: string
         }
-        Update: {
+        Update: Partial<Omit<UserChallengeProgress, 'userId' | 'challengeId' | 'createdAt' | 'updatedAt'>> & {
           id?: string
+          user_id?: string
+          challenge_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      badge_showcase_settings: {
+        Row: Omit<BadgeShowcaseSettings, 'userId'> & { user_id: string }
+        Insert: Omit<BadgeShowcaseSettings, 'userId' | 'createdAt' | 'updatedAt'> & {
+          user_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<BadgeShowcaseSettings, 'userId' | 'createdAt' | 'updatedAt'>> & {
+          user_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      user_badge_preferences: {
+        Row: Omit<UserBadgePreferences, 'userId'> & { user_id: string }
+        Insert: Omit<UserBadgePreferences, 'userId' | 'createdAt' | 'updatedAt'> & {
+          user_id: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<UserBadgePreferences, 'userId' | 'createdAt' | 'updatedAt'>> & {
+          user_id?: string
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      badge_analytics: {
+        Row: Omit<BadgeAnalytics, 'badgeId'> & { badge_id: string }
+        Insert: Omit<BadgeAnalytics, 'badgeId' | 'updatedAt'> & {
+          badge_id: string
+          updated_at?: string
+        }
+        Update: Partial<Omit<BadgeAnalytics, 'badgeId' | 'updatedAt'>> & {
+          badge_id?: string
+          updated_at?: string
+        }
+      }
+      badge_shares: {
+        Row: Omit<BadgeShare, 'userId' | 'badgeId'> & {
+          user_id: string
+          badge_id: string
+        }
+        Insert: Omit<BadgeShare, 'userId' | 'badgeId' | 'createdAt'> & {
+          user_id: string
+          badge_id: string
+          created_at?: string
+        }
+        Update: Partial<Omit<BadgeShare, 'userId' | 'badgeId' | 'createdAt'>> & {
           user_id?: string
           badge_id?: string
-          awarded_at?: string
-        }
-      }
-      nft_awards: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
-          description: string
-          image_url: string
-          token_id: string
-          blockchain: string
-          contract_address: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          description: string
-          image_url: string
-          token_id: string
-          blockchain: string
-          contract_address: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          description?: string
-          image_url?: string
-          token_id?: string
-          blockchain?: string
-          contract_address?: string
-          created_at?: string
-        }
-      }
-      user_activities: {
-        Row: {
-          id: string
-          user_id: string
-          activity_type: string
-          description: string
-          points: number
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          activity_type: string
-          description: string
-          points: number
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          activity_type?: string
-          description?: string
-          points?: number
-          created_at?: string
-        }
-      }
-      applicants: {
-        Row: {
-          id: string
-          user_id: string
-          name: string
-          email: string
-          status: string
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          user_id: string
-          name: string
-          email: string
-          status: string
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          user_id?: string
-          name?: string
-          email?: string
-          status?: string
           created_at?: string
         }
       }
@@ -203,6 +242,9 @@ export interface Database {
           created_at: string
         }[]
       }
+    }
+    Enums: {
+      badge_type: BadgeType
     }
   }
 }

@@ -77,15 +77,22 @@ export function BadgeCollectionGrid({
 
   // Filter collections based on search query and filters
   const filteredCollections = collections
-    .filter(collection => collection && Array.isArray(collection.badges) && collection.badges.length > 0)
+    .filter(collection => {
+      // Ensure collection exists and has a valid badges array
+      return collection && 
+        typeof collection === 'object' && 
+        Array.isArray(collection.badges) &&
+        collection.badges.length > 0
+    })
     .map(collection => ({
       ...collection,
       badges: collection.badges.filter(badge => {
-        if (!badge) return false
+        // Ensure badge exists and has required properties
+        if (!badge || typeof badge !== 'object') return false
 
         const matchesSearch = !searchQuery || 
-          badge.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          badge.description?.toLowerCase().includes(searchQuery.toLowerCase())
+          (badge.name && badge.name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          (badge.description && badge.description.toLowerCase().includes(searchQuery.toLowerCase()))
 
         const matchesType = !filters?.type || filters.type === 'all' || badge.type === filters.type
         const matchesRarity = !filters?.rarity || filters.rarity === 'all' || badge.rarity === filters.rarity
@@ -94,11 +101,12 @@ export function BadgeCollectionGrid({
         const matchesStatus = !status || 
           (status === 'earned' && badgeWithProgress.earned) ||
           (status === 'progress' && !badgeWithProgress.earned && badgeWithProgress.progress > 0) ||
-          (status === 'locked' && !badgeWithProgress.earned && badgeWithProgress.progress === 0)
+          (status === 'locked' && !badgeWithProgress.earned && (!badgeWithProgress.progress || badgeWithProgress.progress === 0))
 
         return matchesSearch && matchesType && matchesRarity && matchesStatus
       })
-    })).filter(collection => collection.badges.length > 0)
+    }))
+    .filter(collection => collection.badges.length > 0)
 
   if (filteredCollections.length === 0) {
     return (
@@ -121,10 +129,10 @@ export function BadgeCollectionGrid({
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="text-2xl font-bold">
-                    {collection.name}
+                    {collection.name || 'Unnamed Collection'}
                   </CardTitle>
                   <CardDescription>
-                    {collection.description}
+                    {collection.description || 'No description available'}
                   </CardDescription>
                 </div>
                 <CollapsibleTrigger asChild>
@@ -145,11 +153,12 @@ export function BadgeCollectionGrid({
                   </span>
                 </div>
               )}
-              <div className="mt-2 flex items-center gap-4">
+              
+              <div className="mt-2 flex flex-wrap gap-2">
                 <div className="text-sm text-muted-foreground">
-                  {collection.badges.length} Badges
+                  {collection.badges.length} {collection.badges.length === 1 ? 'Badge' : 'Badges'}
                 </div>
-                {collection.progress !== undefined && (
+                {typeof collection.progress === 'number' && (
                   <div className="text-sm text-muted-foreground">
                     {Math.round(collection.progress * 100)}% Complete
                   </div>
@@ -170,7 +179,7 @@ export function BadgeCollectionGrid({
                   className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5"
                 >
                   {collection.badges.map((badge) => {
-                    if (!badge) return null
+                    if (!badge || typeof badge !== 'object') return null
                     const badgeWithProgress = badge as BadgeWithProgress
                     return (
                       <motion.div

@@ -17,7 +17,7 @@ import {
   BadgeUnlockAnimation,
   BadgeErrorBoundary,
 } from "@/components/badges"
-import type { Badge, BadgeWithProgress } from "@/types/badge"
+import type { Badge, BadgeWithProgress, TimelineEvent } from "@/types/badge"
 
 interface BadgeClientProps {
   badge: BadgeWithProgress
@@ -28,6 +28,31 @@ export function BadgeClient({ badge }: BadgeClientProps) {
   const { currentUser } = useUser()
   const { toast } = useToast()
   const [showUnlockAnimation, setShowUnlockAnimation] = useState(false)
+
+  // Mock timeline events for the badge
+  const mockTimelineEvents: TimelineEvent[] = [
+    {
+      id: "1",
+      type: "start",
+      badgeId: badge.id,
+      event: "Started working towards badge",
+      date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
+    },
+    {
+      id: "2",
+      type: "progress",
+      badgeId: badge.id,
+      event: "Made progress on requirements",
+      date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(), // 3 days ago
+    },
+    badge.earned && {
+      id: "3",
+      type: "completion",
+      badgeId: badge.id,
+      event: "Earned the badge",
+      date: new Date().toISOString(),
+    },
+  ].filter(Boolean) as TimelineEvent[]
 
   const handleShare = async () => {
     try {
@@ -113,7 +138,12 @@ export function BadgeClient({ badge }: BadgeClientProps) {
                     <CardDescription>Latest progress towards this badge</CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <BadgeTimeline userId={currentUser?.id} limit={10} />
+                    <BadgeTimeline 
+                      userId={currentUser?.id} 
+                      events={mockTimelineEvents}
+                      badges={[badge]}
+                      limit={10} 
+                    />
                   </CardContent>
                 </Card>
               </BadgeErrorBoundary>

@@ -1,136 +1,168 @@
-import { useState, useMemo } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeWithProgress, UserXP } from '@/types/badge'
-import { useEnhancedBadges } from '@/hooks/use-enhanced-badges'
-import { Skeleton } from '@/components/ui/skeleton'
+"use client"
+
+import { useState } from 'react'
+import { motion } from 'framer-motion'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Medal, Trophy, Star, Crown, Flame } from 'lucide-react'
 
 interface LeaderboardEntry {
   userId: string
   username: string
-  totalXp: number
-  badgesEarned: number
-  recentBadges: BadgeWithProgress[]
+  avatarUrl?: string
+  points: number
+  rank: number
+  badges: number
+  streak: number
 }
+
+// Mock data for the leaderboard
+const mockEntries: LeaderboardEntry[] = [
+  {
+    userId: '1',
+    username: 'Michael Chen',
+    avatarUrl: '/asian-male-officer-headshot.png',
+    points: 1250,
+    rank: 1,
+    badges: 8,
+    streak: 12
+  },
+  {
+    userId: '2',
+    username: 'Sarah Johnson',
+    avatarUrl: '/female-law-enforcement-headshot.png',
+    points: 1180,
+    rank: 2,
+    badges: 7,
+    streak: 8
+  },
+  {
+    userId: '3',
+    username: 'David Rodriguez',
+    avatarUrl: '/male-law-enforcement-headshot.png',
+    points: 1050,
+    rank: 3,
+    badges: 6,
+    streak: 5
+  },
+  {
+    userId: '4',
+    username: 'Jessica Williams',
+    avatarUrl: '/female-law-enforcement-headshot.png',
+    points: 980,
+    rank: 4,
+    badges: 5,
+    streak: 3
+  },
+  {
+    userId: '5',
+    username: 'Robert Kim',
+    avatarUrl: '/asian-male-officer-headshot.png',
+    points: 920,
+    rank: 5,
+    badges: 5,
+    streak: 4
+  }
+]
+
+type TimeRange = 'daily' | 'weekly' | 'monthly' | 'all-time'
 
 interface BadgeLeaderboardProps {
-  limit?: number
-  timeframe?: 'all' | 'month' | 'week' | 'day'
+  entries?: LeaderboardEntry[]
+  timeRange?: TimeRange
+  currentUserId?: string
 }
 
-export function BadgeLeaderboard({ 
-  limit = 10,
-  timeframe = 'all' 
+export function BadgeLeaderboard({
+  entries = mockEntries,
+  timeRange = 'weekly',
+  currentUserId
 }: BadgeLeaderboardProps) {
-  const [sortBy, setSortBy] = useState<'xp' | 'badges'>('xp')
-  const { collections, userXP, isLoading, error } = useEnhancedBadges()
+  const [selectedTab, setSelectedTab] = useState<TimeRange>(timeRange)
 
-  const leaderboardData = useMemo(() => {
-    if (!collections || !userXP) return []
-
-    const entries: LeaderboardEntry[] = Object.entries(userXP).map(([userId, xpData]: [string, UserXP]) => ({
-      userId,
-      username: userId, // TODO: Replace with actual username lookup
-      totalXp: xpData.totalXp,
-      badgesEarned: collections.reduce((count, collection) => 
-        count + collection.badges.filter(b => (b as BadgeWithProgress).isUnlocked).length, 0
-      ),
-      recentBadges: collections
-        .flatMap(c => c.badges)
-        .filter(b => (b as BadgeWithProgress).isUnlocked)
-        .slice(0, 3) as BadgeWithProgress[]
-    }))
-
-    return entries.sort((a, b) => 
-      sortBy === 'xp' 
-        ? b.totalXp - a.totalXp
-        : b.badgesEarned - a.badgesEarned
-    ).slice(0, limit)
-  }, [collections, userXP, sortBy, limit])
-
-  if (error) {
-    return (
-      <div className="text-center text-red-500 py-8">
-        Failed to load leaderboard data. Please try again.
-      </div>
-    )
+  const getRankIcon = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return <Trophy className="h-6 w-6 text-yellow-500" />
+      case 2:
+        return <Medal className="h-6 w-6 text-gray-400" />
+      case 3:
+        return <Medal className="h-6 w-6 text-amber-600" />
+      default:
+        return null
+    }
   }
 
-  if (isLoading) {
-    return (
-      <div className="space-y-4">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <Skeleton key={i} className="h-16 w-full rounded-lg" />
-        ))}
-      </div>
-    )
+  const getInitials = (username: string) => {
+    return username
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Leaderboard</h2>
-        <div className="flex gap-2">
-          <button
-            onClick={() => setSortBy('xp')}
-            className={`px-4 py-2 rounded-lg ${
-              sortBy === 'xp' 
-                ? 'bg-primary text-white' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            XP
-          </button>
-          <button
-            onClick={() => setSortBy('badges')}
-            className={`px-4 py-2 rounded-lg ${
-              sortBy === 'badges' 
-                ? 'bg-primary text-white' 
-                : 'bg-gray-100 hover:bg-gray-200'
-            }`}
-          >
-            Badges
-          </button>
-        </div>
-      </div>
+      <Tabs defaultValue={selectedTab}>
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="daily">Daily</TabsTrigger>
+          <TabsTrigger value="weekly">Weekly</TabsTrigger>
+          <TabsTrigger value="monthly">Monthly</TabsTrigger>
+          <TabsTrigger value="all-time">All Time</TabsTrigger>
+        </TabsList>
 
-      <AnimatePresence>
-        <div className="space-y-4">
-          {leaderboardData.map((entry, index) => (
-            <motion.div
-              key={entry.userId}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ delay: index * 0.1 }}
-              className="flex items-center gap-4 p-4 bg-white rounded-lg shadow-sm"
-            >
-              <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center font-bold text-lg">
-                {index + 1}
-              </div>
-              
-              <div className="flex-grow">
-                <h3 className="font-medium">{entry.username}</h3>
-                <div className="flex gap-2 text-sm text-gray-500">
-                  <span>{entry.totalXp} XP</span>
-                  <span>•</span>
-                  <span>{entry.badgesEarned} Badges</span>
-                </div>
-              </div>
-
-              <div className="flex gap-2">
-                {entry.recentBadges.map(badge => (
-                  <div 
-                    key={badge.id}
-                    className="w-8 h-8 rounded-full bg-gray-100"
-                    style={{ backgroundImage: `url(${badge.imageUrl})` }}
-                    title={badge.name}
-                  />
+        <TabsContent value={selectedTab}>
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Achievers</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {entries.map((entry, index) => (
+                  <motion.div
+                    key={entry.userId}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    className={`flex items-center justify-between p-4 rounded-lg ${
+                      entry.userId === currentUserId ? 'bg-[#F0F7F2] border border-[#0A3C1F]' : 'bg-gray-50'
+                    }`}
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="flex items-center justify-center w-8">
+                        {getRankIcon(entry.rank) || <span className="text-lg font-semibold">{entry.rank}</span>}
+                      </div>
+                      <Avatar>
+                        <AvatarImage src={entry.avatarUrl} />
+                        <AvatarFallback>{getInitials(entry.username)}</AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-medium">
+                          {entry.username}
+                          {entry.streak >= 7 && (
+                            <span className="ml-2 inline-flex items-center">
+                              <Flame className="h-4 w-4 text-orange-500" />
+                              <span className="text-sm text-orange-500 ml-1">{entry.streak}</span>
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {entry.badges} badges earned
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Star className="h-5 w-5 text-yellow-500" />
+                      <span className="font-semibold">{entry.points}</span>
+                    </div>
+                  </motion.div>
                 ))}
               </div>
-            </motion.div>
-          ))}
-        </div>
-      </AnimatePresence>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   )
 } 

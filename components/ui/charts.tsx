@@ -1,186 +1,136 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 import {
+  LineChart as RechartsLineChart,
   Line,
+  PieChart as RechartsPieChart,
+  Pie,
+  AreaChart as RechartsAreaChart,
+  BarChart as RechartsBarChart,
   Bar,
   Area,
-  ComposedChart,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
   Legend,
-} from "recharts"
+  ResponsiveContainer,
+  Cell
+} from 'recharts'
 
-type ChartProps = {
+const COLORS = [
+  '#0088FE',
+  '#00C49F',
+  '#FFBB28',
+  '#FF8042',
+  '#8884d8',
+  '#82ca9d',
+  '#ffc658',
+  '#ff7300'
+]
+
+interface ChartProps {
   data: any[]
-  xField: string
+  xField?: string
   yField?: string
-  series?: string[]
-  height?: number
-  tooltipFormat?: (value: number, name?: string) => string
 }
 
-// Generate a color for each series
-const getSeriesColor = (index: number, isDark: boolean = false): string => {
-  const colors = isDark ? [
-    "#FFD700", // Gold
-    "#60A5FA", // Light Blue
-    "#F59E0B", // Amber
-    "#EF4444", // Red
-    "#A78BFA", // Light Purple
-    "#34D399", // Light Emerald
-    "#F472B6", // Light Pink
-    "#38BDF8", // Light Sky
-  ] : [
-    "#0A3C1F", // Primary green
-    "#2563EB", // Blue
-    "#D97706", // Amber
-    "#DC2626", // Red
-    "#7C3AED", // Purple
-    "#059669", // Emerald
-    "#DB2777", // Pink
-    "#0369A1", // Sky
-  ]
-  return colors[index % colors.length]
-}
-
-export function LineChart({ data, xField, yField, series, height = 300, tooltipFormat }: ChartProps) {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return <div style={{ height }}></div>
-
-  // If no series provided but yField exists, create a single series
-  const chartSeries = series || (yField ? [yField] : [])
-
+export function LineChart({ 
+  data, 
+  xField = 'date', 
+  yField = 'value' 
+}: ChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={height}>
-      <ComposedChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey={xField}
-          tickFormatter={(value) => {
-            if (typeof value === "string" && value.includes("T")) {
-              // Format ISO date string
-              return value.split("T")[0]
-            }
-            return value
-          }}
-        />
-        <YAxis />
-        <Tooltip
-          formatter={(value, name) => [tooltipFormat ? tooltipFormat(Number(value), name as string) : value, name]}
-        />
-        <Legend />
-        {chartSeries.map((field, index) => (
-          <Line
-            key={field}
-            type="monotone"
-            dataKey={field}
-            name={formatSeriesName(field)}
-            stroke={getSeriesColor(index)}
-            strokeWidth={2}
-            dot={{ r: 3 }}
-          />
-        ))}
-      </ComposedChart>
-    </ResponsiveContainer>
-  )
-}
-
-export function BarChart({ data, xField, yField, series, height = 300, tooltipFormat }: ChartProps) {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return <div style={{ height }}></div>
-
-  // If no series provided but yField exists, create a single series
-  const chartSeries = series || (yField ? [yField] : [])
-
-  return (
-    <ResponsiveContainer width="100%" height={height}>
-      <ComposedChart data={data}>
+    <ResponsiveContainer width="100%" height={300}>
+      <RechartsLineChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
         <XAxis dataKey={xField} />
         <YAxis />
-        <Tooltip formatter={(value, name) => [tooltipFormat ? tooltipFormat(Number(value)) : value, name]} />
+        <Tooltip />
         <Legend />
-        {chartSeries.map((field, index) => (
-          <Bar key={field} dataKey={field} name={formatSeriesName(field)} fill={getSeriesColor(index)} />
-        ))}
-      </ComposedChart>
-    </ResponsiveContainer>
-  )
-}
-
-export function AreaChart({ data, xField, yField, series, height = 300, tooltipFormat }: ChartProps) {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return <div style={{ height }}></div>
-
-  // If no series provided but yField exists, create a single series
-  const chartSeries = series || (yField ? [yField] : [])
-
-  return (
-    <ResponsiveContainer width="100%" height={height}>
-      <ComposedChart data={data}>
-        <CartesianGrid strokeDasharray="3 3" />
-        <XAxis
-          dataKey={xField}
-          tickFormatter={(value) => {
-            if (typeof value === "string" && value.includes("T")) {
-              // Format ISO date string
-              return value.split("T")[0]
-            }
-            return value
-          }}
+        <Line
+          type="monotone"
+          dataKey={yField}
+          stroke="#8884d8"
+          activeDot={{ r: 8 }}
         />
-        <YAxis />
-        <Tooltip formatter={(value, name) => [tooltipFormat ? tooltipFormat(Number(value)) : value, name]} />
-        <Legend />
-        {chartSeries.map((field, index) => (
-          <Area
-            key={field}
-            type="monotone"
-            dataKey={field}
-            name={formatSeriesName(field)}
-            fill={getSeriesColor(index)}
-            stroke={getSeriesColor(index)}
-            fillOpacity={0.3}
-          />
-        ))}
-      </ComposedChart>
+      </RechartsLineChart>
     </ResponsiveContainer>
   )
 }
 
-// Helper function to format series names for display
-function formatSeriesName(name: string): string {
-  const nameMap: Record<string, string> = {
-    LCP: "Largest Contentful Paint",
-    FID: "First Input Delay",
-    CLS: "Cumulative Layout Shift",
-    FCP: "First Contentful Paint",
-    TTFB: "Time to First Byte",
-    INP: "Interaction to Next Paint",
-  }
+export function PieChart({ 
+  data 
+}: { 
+  data: { name: string; value: number }[] 
+}) {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <RechartsPieChart>
+        <Pie
+          data={data}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius={80}
+          label
+        >
+          {data.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend />
+      </RechartsPieChart>
+    </ResponsiveContainer>
+  )
+}
 
-  if (name.startsWith("resource-")) {
-    return `${name.replace("resource-", "")} Resources`
-  }
+export function AreaChart({ 
+  data, 
+  xField = 'date', 
+  yField = 'value' 
+}: ChartProps) {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <RechartsAreaChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xField} />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Area
+          type="monotone"
+          dataKey={yField}
+          stroke="#8884d8"
+          fill="#8884d8"
+          fillOpacity={0.3}
+        />
+      </RechartsAreaChart>
+    </ResponsiveContainer>
+  )
+}
 
-  return nameMap[name] || name
+export function BarChart({ 
+  data, 
+  xField = 'name', 
+  yField = 'value' 
+}: ChartProps) {
+  return (
+    <ResponsiveContainer width="100%" height={300}>
+      <RechartsBarChart data={data}>
+        <CartesianGrid strokeDasharray="3 3" />
+        <XAxis dataKey={xField} />
+        <YAxis />
+        <Tooltip />
+        <Legend />
+        <Bar
+          dataKey={yField}
+          fill="#8884d8"
+        />
+      </RechartsBarChart>
+    </ResponsiveContainer>
+  )
 }

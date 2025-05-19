@@ -11,65 +11,65 @@
     --sheriff-tan: #F8F5EE;
 
     /* Light mode */
-    --background: var(--sheriff-tan);
-    --foreground: var(--sheriff-green);
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
-    --card-foreground: var(--sheriff-green);
+    --card-foreground: 222.2 84% 4.9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: var(--sheriff-green);
+    --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: var(--sheriff-green);
-    --primary-foreground: var(--sheriff-gold);
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
 
-    --secondary: 0 0% 100%;
-    --secondary-foreground: var(--sheriff-green);
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: var(--sheriff-gold);
-    --accent-foreground: var(--sheriff-green);
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: var(--sheriff-green);
+    --ring: 221.2 83.2% 53.3%;
 
     --radius: 0.5rem;
   }
 
   .dark {
-    --background: var(--sheriff-black);
-    --foreground: var(--sheriff-gold);
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
 
-    --card: var(--sheriff-black);
-    --card-foreground: var(--sheriff-gold);
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: var(--sheriff-black);
-    --popover-foreground: var(--sheriff-gold);
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: var(--sheriff-gold);
-    --primary-foreground: var(--sheriff-black);
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
 
     --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: var(--sheriff-gold);
+    --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: var(--sheriff-gold);
-    --accent-foreground: var(--sheriff-black);
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: var(--sheriff-gold);
+    --ring: 224.3 76.3% 48%;
   }
 }
 

@@ -6,11 +6,17 @@ export type BadgeType =
   | "psychological"
   | "full"
   | "chat-participation"
+  | "first-response"
   | "application-started"
   | "application-completed"
-  | "first-response"
   | "frequent-user"
-  | "resource-downloader";
+  | "resource-downloader"
+  | "hard-charger"
+  | "connector"
+  | "deep-diver"
+  | "quick-learner"
+  | "persistent-explorer"
+  | "dedicated-applicant";
 
 export type BadgeCategory = "achievement" | "process" | "participation";
 
@@ -18,9 +24,9 @@ export type BadgeStatus = "earned" | "progress" | "locked";
 
 export type BadgeRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
-export type BadgeLayoutType = "grid" | "list" | "masonry" | "carousel"
-export type BadgeDisplayStyle = "standard" | "3d" | "minimal" | "detailed"
-export type BadgeRewardType = "feature" | "content" | "physical" | "points" | "custom"
+export type BadgeLayoutType = "grid" | "list" | "timeline" | "masonry" | "carousel";
+export type BadgeDisplayStyle = "standard" | "compact" | "detailed" | "3d" | "minimal";
+export type BadgeRewardType = "feature" | "content" | "physical" | "points" | "custom";
 
 export interface Badge {
   id: string;
@@ -32,120 +38,152 @@ export interface Badge {
   requirements: string[];
   rewards: string[];
   imageUrl?: string;
+  tierEnabled?: boolean;
+  maxTier?: number;
+  parentBadgeId?: string;
+  expirationDate?: string;
   createdAt: string;
   updatedAt: string;
-  tierEnabled?: boolean
-  maxTier?: number
-  parentBadgeId?: string
-  expirationDays?: number
-  verificationRequired?: boolean
 }
 
 export interface BadgeProgress {
   badgeId: string;
+  userId: string;
   progress: number;
-  earned: boolean;
-  lastUpdated: string;
+  isUnlocked: boolean;
+  unlockedAt?: string;
+  actionsCompleted: any[];
+  lastActionAt: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
+export type TimelineEventType = 'start' | 'progress' | 'milestone' | 'completion' | 'unlock' | 'share';
+
 export interface TimelineEvent {
-  id: number
-  date: string
-  event: string
-  type: "start" | "progress" | "milestone" | "completion" | "unlock" | "share"
-  badgeId: string
-  userId: string
+  id: string;
+  type: TimelineEventType;
+  badgeId: string;
+  event: string;
+  date: string;
+  userId?: string;
 }
 
 export interface BadgeWithProgress extends Badge {
   progress: number;
-  earned: boolean;
-  status: BadgeStatus;
-  lastUpdated: string;
+  earned?: boolean;
+  currentTier?: number;
+  xpEarned?: number;
+  isUnlocked?: boolean;
+  progressDetails: BadgeProgress;
+  streakCount?: number;
+  lastActivity?: string;
+  nextMilestone?: {
+    value: number;
+    reward: BadgeReward;
+  };
 }
 
 export interface BadgeCollection {
-  id: string
-  name: string
-  description?: string
-  theme?: string
-  specialReward?: string
-  badges: Badge[]
-  progress?: number
-  isComplete?: boolean
+  id: string;
+  name: string;
+  description: string;
+  theme?: string;
+  specialReward?: string;
+  badges: Badge[];
+  progress?: number;
+  isComplete?: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BadgeTier {
-  id: string
-  badgeId: string
-  tierLevel: number
-  name: string
-  requirements: string[]
-  xpRequired: number
-  createdAt: string
+  id: string;
+  badgeId: string;
+  level: number;
+  requirements: string[];
+  rewards: string[];
+  imageUrl?: string;
+  name: string;
+  xpRequired: number;
+  createdAt: string;
 }
 
 export interface UserXP {
-  userId: string
-  totalXp: number
-  currentLevel: number
-  lastDailyChallenge?: string
-  streakCount: number
+  userId: string;
+  totalXp: number;
+  currentLevel: number;
+  streakCount: number;
+  lastDailyChallenge?: string;
 }
 
 export interface BadgeChallenge {
-  id: string
-  name: string
-  description?: string
-  badgeId: string
-  startDate?: string
-  endDate?: string
-  xpReward: number
-  requirements: Record<string, any>
-  isActive: boolean
+  id: string;
+  title: string;
+  description: string;
+  badgeId: string;
+  requirements: string[];
+  rewards: string[];
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  xpReward: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserChallengeProgress {
-  userId: string
-  challengeId: string
-  progress: Record<string, any>
-  completedAt?: string
+  userId: string;
+  challengeId: string;
+  progress: Record<string, any>;
+  isComplete: boolean;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BadgeShowcaseSettings {
-  userId: string
-  layoutType: BadgeLayoutType
-  featuredBadges: string[]
-  showcaseTheme: string
-  isPublic: boolean
+  userId: string;
+  layoutType: BadgeLayoutType;
+  featuredBadges: string[];
+  showcaseTheme: string;
+  isPublic: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BadgeAnalytics {
-  badgeId: string
-  totalEarned: number
-  completionRate: number
-  averageTimeToEarn: string
-  popularityScore: number
+  badgeId: string;
+  totalEarned: number;
+  averageTimeToEarn: number;
+  completionRate: number;
+  popularityScore: number;
+  updatedAt: string;
 }
 
 export interface BadgeReward {
-  id: string
-  badgeId: string
-  rewardType: BadgeRewardType
-  rewardData: Record<string, any>
-  requiredTier: number
-  isActive: boolean
+  id: string;
+  badgeId: string;
+  type: string;
+  value: any;
+  description: string;
+  rewardType: BadgeRewardType;
+  rewardData: Record<string, any>;
+  requiredTier: number;
+  isActive: boolean;
 }
 
 export interface UserBadgePreferences {
-  userId: string
-  displayStyle: BadgeDisplayStyle
+  userId: string;
+  displayStyle: BadgeDisplayStyle;
   notificationSettings: {
-    email: boolean
-    push: boolean
-  }
-  pinnedBadges: string[]
-  customGoals?: Record<string, any>
+    email: boolean;
+    push: boolean;
+  };
+  pinnedBadges: string[];
+  customGoals: Record<string, any> | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface BadgeFilters {
@@ -168,4 +206,13 @@ export interface BadgeAwardResult {
   alreadyEarned?: boolean;
   badge?: BadgeWithProgress;
   message?: string;
+}
+
+export interface BadgeShare {
+  id: string;
+  userId: string;
+  badgeId: string;
+  platform: string;
+  shareUrl?: string;
+  createdAt: string;
 } 

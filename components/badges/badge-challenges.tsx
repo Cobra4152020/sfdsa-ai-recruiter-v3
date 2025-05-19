@@ -1,149 +1,133 @@
-import { useState } from 'react'
+"use client"
+
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { Clock, Trophy, ChevronDown, ChevronUp } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import type { BadgeChallenge, Badge } from '@/types/badge'
-import { AchievementBadge } from '@/components/achievement-badge'
-import { Button } from '@/components/ui/button'
+import { BadgeChallenge, UserChallengeProgress, BadgeWithProgress } from '@/types/badge'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+import { Button } from '@/components/ui/button'
+import { Trophy, Calendar, Flame, Share2 } from 'lucide-react'
 
 interface BadgeChallengesProps {
-  challenges: BadgeChallenge[]
-  onChallengeProgress?: (challengeId: string, progress: Record<string, any>) => void
-  className?: string
+  activeChallenges: BadgeChallenge[]
+  userProgress: UserChallengeProgress[]
+  streakCount: number
+  onShare?: (challenge: BadgeChallenge) => void
 }
 
 export function BadgeChallenges({
-  challenges,
-  onChallengeProgress,
-  className,
+  activeChallenges,
+  userProgress,
+  streakCount,
+  onShare
 }: BadgeChallengesProps) {
-  const [expandedChallenges, setExpandedChallenges] = useState<Set<string>>(new Set())
+  const [timeLeft, setTimeLeft] = useState<string>('')
 
-  const toggleChallenge = (challengeId: string) => {
-    const newExpanded = new Set(expandedChallenges)
-    if (newExpanded.has(challengeId)) {
-      newExpanded.delete(challengeId)
-    } else {
-      newExpanded.add(challengeId)
+  // Calculate time left until daily reset
+  useEffect(() => {
+    const updateTimeLeft = () => {
+      const now = new Date()
+      const tomorrow = new Date(now)
+      tomorrow.setHours(24, 0, 0, 0)
+      const diff = tomorrow.getTime() - now.getTime()
+      
+      const hours = Math.floor(diff / (1000 * 60 * 60))
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+      setTimeLeft(`${hours}h ${minutes}m`)
     }
-    setExpandedChallenges(newExpanded)
-  }
 
-  const getTimeRemaining = (endDate: string) => {
-    const end = new Date(endDate).getTime()
-    const now = new Date().getTime()
-    const distance = end - now
-
-    const days = Math.floor(distance / (1000 * 60 * 60 * 24))
-    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-
-    return { days, hours }
-  }
+    updateTimeLeft()
+    const interval = setInterval(updateTimeLeft, 60000)
+    return () => clearInterval(interval)
+  }, [])
 
   return (
-    <div className={cn('grid gap-6', className)}>
-      {challenges.map((challenge) => {
-        const timeRemaining = challenge.endDate ? getTimeRemaining(challenge.endDate) : null
+    <div className="space-y-6">
+      {/* Streak Counter */}
+      <Card className="bg-gradient-to-r from-orange-500 to-red-500 text-white">
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Flame className="h-8 w-8" />
+              <div>
+                <h3 className="text-xl font-bold">Daily Streak</h3>
+                <p className="text-sm opacity-90">Keep it going!</p>
+              </div>
+            </div>
+            <div className="text-3xl font-bold">{streakCount} days</div>
+          </div>
+        </CardContent>
+      </Card>
 
-        return (
-          <Collapsible
-            key={challenge.id}
-            open={expandedChallenges.has(challenge.id)}
-            onOpenChange={() => toggleChallenge(challenge.id)}
-          >
-            <Card>
-              <CardHeader className="relative">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-2xl font-bold">
-                      {challenge.name}
-                    </CardTitle>
-                    <CardDescription>
-                      {challenge.description}
-                    </CardDescription>
+      {/* Daily Reset Timer */}
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Calendar className="h-6 w-6 text-blue-500" />
+              <div>
+                <h3 className="font-medium">Daily Reset In</h3>
+                <p className="text-sm text-gray-500">New challenges coming soon</p>
+              </div>
+            </div>
+            <div className="text-xl font-semibold text-blue-500">{timeLeft}</div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Active Challenges */}
+      <div className="grid gap-4">
+        {activeChallenges.map(challenge => {
+          const progress = userProgress.find(p => p.challengeId === challenge.id)
+          const progressValue = progress ? calculateProgress(progress.progress) : 0
+
+          return (
+            <motion.div
+              key={challenge.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+            >
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>{challenge.name}</CardTitle>
+                    {progressValue === 100 && (
+                      <Trophy className="h-5 w-5 text-yellow-500" />
+                    )}
                   </div>
-                  <CollapsibleTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      {expandedChallenges.has(challenge.id) ? (
-                        <ChevronUp className="h-4 w-4" />
-                      ) : (
-                        <ChevronDown className="h-4 w-4" />
-                      )}
-                    </Button>
-                  </CollapsibleTrigger>
-                </div>
-                {timeRemaining && (
-                  <div className="absolute top-4 right-16 flex items-center gap-2 text-yellow-500">
-                    <Clock className="h-4 w-4" />
-                    <span className="text-sm font-medium">
-                      {timeRemaining.days}d {timeRemaining.hours}h remaining
-                    </span>
-                  </div>
-                )}
-                <div className="mt-2 flex items-center gap-4">
-                  <div className="text-sm text-muted-foreground">
-                    {challenge.xpReward} XP Reward
-                  </div>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                    <Trophy className="h-4 w-4" />
-                    <span>Special Challenge</span>
-                  </div>
-                </div>
-              </CardHeader>
-              <CollapsibleContent>
+                </CardHeader>
                 <CardContent>
-                  <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="space-y-6"
-                  >
-                    <div>
-                      <h4 className="font-medium mb-2">Requirements</h4>
-                      <ul className="list-disc list-inside space-y-2">
-                        {Object.entries(challenge.requirements).map(([key, value]) => (
-                          <li key={key} className="text-sm text-muted-foreground">
-                            {value as string}
-                          </li>
-                        ))}
-                      </ul>
+                  <p className="text-sm text-gray-500 mb-4">{challenge.description}</p>
+                  <div className="space-y-4">
+                    <Progress value={progressValue} />
+                    <div className="flex items-center justify-between text-sm">
+                      <span>{progressValue}% Complete</span>
+                      <span className="text-blue-500">{challenge.xpReward} XP</span>
                     </div>
-
-                    <div>
-                      <h4 className="font-medium mb-2">Progress</h4>
-                      <Progress value={0} className="h-2" />
-                      <p className="text-sm text-muted-foreground mt-1">
-                        Start completing requirements to make progress
-                      </p>
-                    </div>
-
-                    <div className="flex justify-end">
+                    {progressValue === 100 && onShare && (
                       <Button
-                        onClick={() => onChallengeProgress?.(challenge.id, { started: true })}
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => onShare(challenge)}
                       >
-                        Accept Challenge
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share Achievement
                       </Button>
-                    </div>
-                  </motion.div>
+                    )}
+                  </div>
                 </CardContent>
-              </CollapsibleContent>
-            </Card>
-          </Collapsible>
-        )
-      })}
+              </Card>
+            </motion.div>
+          )
+        })}
+      </div>
     </div>
   )
+}
+
+function calculateProgress(progress: Record<string, any>): number {
+  const total = Object.keys(progress).length
+  const completed = Object.values(progress).filter(Boolean).length
+  return Math.round((completed / total) * 100)
 } 
