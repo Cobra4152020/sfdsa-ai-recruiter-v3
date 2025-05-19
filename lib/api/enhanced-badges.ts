@@ -40,6 +40,7 @@ export async function getBadgeCollections(): Promise<BadgeCollection[]> {
     .order("created_at", { ascending: false })
 
   if (error) throw new EnhancedBadgeError("Failed to fetch badge collections")
+  if (!data) return []
 
   return data.map((collection: any) => ({
     id: collection.id,
@@ -47,7 +48,17 @@ export async function getBadgeCollections(): Promise<BadgeCollection[]> {
     description: collection.description,
     theme: collection.theme,
     specialReward: collection.special_reward,
-    badges: collection.badges.map((b: any) => b.badge),
+    badges: Array.isArray(collection.badges) 
+      ? collection.badges
+          .filter((b: any) => b && b.badge)
+          .map((b: any) => ({
+            ...b.badge,
+            earned: false,
+            progress: 0,
+            status: 'locked',
+            lastUpdated: new Date().toISOString()
+          }))
+      : [],
     progress: 0, // Calculate based on user progress
     isComplete: false, // Calculate based on user progress
   }))
@@ -143,6 +154,45 @@ export async function getUserXP(userId: string): Promise<UserXP> {
     currentLevel: Number(data.current_level),
     lastDailyChallenge: data.last_daily_challenge as string | undefined,
     streakCount: Number(data.streak_count),
+  }
+}
+
+export async function updateUserXP(userId: string, xpChange: number): Promise<UserXP> {
+  const supabase = getSupabaseClient()
+  if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
+
+  const { data: currentXP, error: fetchError } = await supabase
+    .from("user_xp")
+    .select("*")
+    .eq("user_id", userId)
+    .single()
+
+  if (fetchError) throw new EnhancedBadgeError("Failed to fetch current XP")
+
+  const newTotalXP = (currentXP?.total_xp || 0) + xpChange
+  const newLevel = Math.floor(newTotalXP / 1000) + 1 // Simple level calculation
+
+  const { data, error } = await supabase
+    .from("user_xp")
+    .upsert({
+      user_id: userId,
+      total_xp: newTotalXP,
+      current_level: newLevel,
+      last_daily_challenge: currentXP?.last_daily_challenge,
+      streak_count: currentXP?.streak_count || 0
+    })
+    .select()
+    .single()
+
+  if (error) throw new EnhancedBadgeError("Failed to update user XP")
+  if (!data) throw new EnhancedBadgeError("No data returned from XP update")
+
+  return {
+    userId: data.user_id,
+    totalXp: Number(data.total_xp),
+    currentLevel: Number(data.current_level),
+    lastDailyChallenge: data.last_daily_challenge,
+    streakCount: Number(data.streak_count)
   }
 }
 
@@ -290,45 +340,34 @@ export async function getBadgeShowcaseSettings(userId: string): Promise<BadgeSho
   }
 }
 
-export async function updateBadgeShowcase(
-  userId: string,
-  settings: Omit<BadgeShowcaseSettings, 'userId'>
+export async function updateShowcaseSettings(
+  userId: string, 
+  settings: Partial<Omit<BadgeShowcaseSettings, 'userId'>>
 ): Promise<BadgeShowcaseSettings> {
-  try {
-    const supabase = getSupabaseClient()
-    if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
+  const supabase = getSupabaseClient()
+  if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
-    const { data, error } = await supabase
-      .from("badge_showcase_settings")
-      .upsert({
-        user_id: userId,
-        ...settings,
-        updated_at: new Date().toISOString()
-      })
-      .select()
-      .single()
+  const { data, error } = await supabase
+    .from("badge_showcase_settings")
+    .upsert({
+      user_id: userId,
+      layout_type: settings.layoutType,
+      featured_badges: settings.featuredBadges,
+      showcase_theme: settings.showcaseTheme,
+      is_public: settings.isPublic
+    })
+    .select()
+    .single()
 
-    if (error) throw new EnhancedBadgeError("Failed to update showcase settings", error.code)
-    if (!data) throw new EnhancedBadgeError("No data returned from showcase update")
-    
-    const typedData = data as {
-      user_id: string
-      layout_type: BadgeLayoutType
-      featured_badges: string[]
-      showcase_theme: string
-      is_public: boolean
-    }
+  if (error) throw new EnhancedBadgeError("Failed to update showcase settings")
+  if (!data) throw new EnhancedBadgeError("No data returned from settings update")
 
-    return {
-      userId: typedData.user_id,
-      layoutType: typedData.layout_type,
-      featuredBadges: typedData.featured_badges,
-      showcaseTheme: typedData.showcase_theme,
-      isPublic: typedData.is_public
-    }
-  } catch (error) {
-    if (error instanceof EnhancedBadgeError) throw error
-    throw new EnhancedBadgeError("Failed to update badge showcase")
+  return {
+    userId: data.user_id,
+    layoutType: data.layout_type,
+    featuredBadges: data.featured_badges,
+    showcaseTheme: data.showcase_theme,
+    isPublic: data.is_public
   }
 }
 

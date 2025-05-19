@@ -3,6 +3,7 @@ import { getBadgeById, getAllBadgeIds } from "@/lib/badge-utils"
 import { BadgeClient } from "./badge-client"
 import { AuthModalProvider } from "@/context/auth-modal-context"
 import { notFound } from "next/navigation"
+import type { BadgeWithProgress } from "@/types/badge"
 
 interface BadgePageProps {
   params: {
@@ -28,7 +29,7 @@ export async function generateMetadata({ params }: BadgePageProps): Promise<Meta
       description: badge.description,
       images: [
         {
-          url: badge.icon || "/generic-badge.png",
+          url: badge.imageUrl || "/generic-badge.png",
           width: 1200,
           height: 1200,
           alt: badge.name,
@@ -39,7 +40,7 @@ export async function generateMetadata({ params }: BadgePageProps): Promise<Meta
       card: "summary_large_image",
       title: `${badge.name} - SF Deputy Sheriff Badge`,
       description: badge.description,
-      images: [badge.icon || "/generic-badge.png"],
+      images: [badge.imageUrl || "/generic-badge.png"],
     },
   }
 }
@@ -58,9 +59,18 @@ export default async function BadgePage({ params }: BadgePageProps) {
     notFound()
   }
 
+  // Convert Badge to BadgeWithProgress
+  const badgeWithProgress: BadgeWithProgress = {
+    ...badge,
+    progress: 0,
+    isUnlocked: false,
+    currentTier: 1,
+    xpEarned: 0,
+  }
+
   return (
     <AuthModalProvider>
-      <BadgeClient badgeId={params.id} />
+      <BadgeClient badge={badgeWithProgress} />
     </AuthModalProvider>
   )
 }

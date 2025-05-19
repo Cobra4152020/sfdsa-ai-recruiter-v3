@@ -1,7 +1,9 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Twitter, Facebook, Linkedin, Link as LinkIcon } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 
 interface BadgeShareProps {
   badgeId: string
@@ -12,7 +14,11 @@ interface BadgeShareProps {
 
 export function BadgeShare({ badgeId, badgeName, isUnlocked, onShare }: BadgeShareProps) {
   const [copied, setCopied] = useState(false)
-  const shareUrl = `${window.location.origin}/badges/${badgeId}`
+  const [shareUrl, setShareUrl] = useState("")
+
+  useEffect(() => {
+    setShareUrl(`${window.location.origin}/badges/${badgeId}`)
+  }, [badgeId])
 
   const shareText = `I just earned the ${badgeName} badge! Join me in becoming a San Francisco Deputy Sheriff. #LawEnforcement #JoinTheForce`
 

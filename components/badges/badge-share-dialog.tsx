@@ -1,3 +1,5 @@
+"use client"
+
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { BadgeWithProgress } from '@/types/badge'
@@ -36,9 +38,15 @@ export function BadgeShareDialog({
 }: BadgeShareDialogProps) {
   const [copied, setCopied] = useState(false)
   const [shareRewardShown, setShareRewardShown] = useState(false)
-  const { updateUserXP } = useEnhancedBadges()
+  const [shareUrl, setShareUrl] = useState("")
+  const { addXP } = useEnhancedBadges()
   
-  const shareUrl = `${window.location.origin}/badges/${badge.id}`
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setShareUrl(`${window.location.origin}/badges/${badge.id}`)
+    }
+  }, [badge.id])
+
   const randomPhraseIndex = Math.floor(Math.random() * RECRUITMENT_PHRASES.length)
   const randomMessageIndex = Math.floor(Math.random() * PERSUASIVE_MESSAGES.length)
 
@@ -58,13 +66,15 @@ export function BadgeShareDialog({
   }, [copied])
 
   const handleShare = async (platform: 'twitter' | 'facebook' | 'linkedin') => {
+    if (typeof window === 'undefined') return
+
     // Open share dialog
     window.open(socialShareUrls[platform], '_blank', 'width=600,height=400')
     
     // Award points if not already awarded
     if (!shareRewardShown) {
       try {
-        await updateUserXP(SHARE_REWARD_POINTS, 'share')
+        await addXP(SHARE_REWARD_POINTS)
         setShareRewardShown(true)
       } catch (err) {
         console.error('Failed to award share points:', err)
@@ -79,7 +89,7 @@ export function BadgeShareDialog({
       
       // Award points for copying if not already awarded
       if (!shareRewardShown) {
-        await updateUserXP(SHARE_REWARD_POINTS, 'share')
+        await addXP(SHARE_REWARD_POINTS)
         setShareRewardShown(true)
       }
     } catch (err) {

@@ -1,3 +1,5 @@
+"use client"
+
 import { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import { BadgeWithProgress, BadgeType } from '@/types/badge'
@@ -23,16 +25,26 @@ export function BadgeStats({
   const { collections, userXP, isLoading, error } = useEnhancedBadges()
 
   const stats = useMemo(() => {
-    if (!collections) return []
+    if (!collections || collections.length === 0) return []
 
-    const allBadges = collections.flatMap(c => c.badges) as BadgeWithProgress[]
-    const earnedBadges = allBadges.filter(b => b.isUnlocked)
-    const totalPoints = earnedBadges.reduce((sum, b) => sum + b.points, 0)
+    // Ensure all collections have a badges array
+    const validCollections = collections.filter(c => Array.isArray(c.badges))
+    if (validCollections.length === 0) return []
+
+    const allBadges = validCollections.flatMap(c => c.badges).filter(Boolean) as BadgeWithProgress[]
+    if (allBadges.length === 0) return []
+
+    const earnedBadges = allBadges.filter(b => b.earned)
+    const totalPoints = earnedBadges.reduce((sum, b) => sum + (b.points || 0), 0)
     
     const badgesByType = allBadges.reduce((acc, badge) => {
-      acc[badge.type] = (acc[badge.type] || 0) + 1
+      if (badge.type) {
+        acc[badge.type] = (acc[badge.type] || 0) + 1
+      }
       return acc
     }, {} as Record<BadgeType, number>)
+
+    const mostCommonType = Object.entries(badgesByType).sort((a, b) => b[1] - a[1])[0]
 
     const cards: StatCard[] = [
       {
@@ -43,7 +55,9 @@ export function BadgeStats({
       {
         title: 'Badges Earned',
         value: earnedBadges.length,
-        description: `${Math.round((earnedBadges.length / allBadges.length) * 100)}% completion rate`,
+        description: allBadges.length > 0 
+          ? `${Math.round((earnedBadges.length / allBadges.length) * 100)}% completion rate`
+          : 'No badges available',
         trend: 5 // Example trend, should be calculated from analytics
       },
       {
@@ -51,13 +65,16 @@ export function BadgeStats({
         value: totalPoints,
         description: 'Points from earned badges',
         trend: 12 // Example trend
-      },
-      {
-        title: 'Most Common Type',
-        value: Object.entries(badgesByType).sort((a, b) => b[1] - a[1])[0][0],
-        description: `${Math.max(...Object.values(badgesByType))} badges of this type`
       }
     ]
+
+    if (mostCommonType) {
+      cards.push({
+        title: 'Most Common Type',
+        value: mostCommonType[0],
+        description: `${mostCommonType[1]} badges of this type`
+      })
+    }
 
     if (showPersonal && userXP) {
       cards.push(
@@ -91,6 +108,14 @@ export function BadgeStats({
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-32 rounded-lg" />
         ))}
+      </div>
+    )
+  }
+
+  if (stats.length === 0) {
+    return (
+      <div className="text-center text-gray-500 py-8">
+        No badge statistics available. Check back later!
       </div>
     )
   }

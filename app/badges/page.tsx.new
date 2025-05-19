@@ -7,7 +7,7 @@ import { BadgeCollectionGrid } from "@/components/badges/badge-collection-grid"
 import { BadgeLeaderboard } from "@/components/badges/badge-leaderboard"
 import { BadgeStats } from "@/components/badges/badge-stats"
 import { BadgeTimeline } from "@/components/badges/badge-timeline"
-import { BadgeFilter, type BadgeFilters } from "@/components/badges/badge-filter"
+import { BadgeFilter, BadgeFilters } from "@/components/badges/badge-filter"
 import { BadgeSearch } from "@/components/badges/badge-search"
 import { useUser } from "@/context/user-context"
 
@@ -21,14 +21,6 @@ export default function BadgesPage() {
     status: 'all',
     sortBy: 'newest'
   })
-
-  const handleSearch = (query: string) => {
-    setSearchQuery(query)
-  }
-
-  const handleFilterChange = (newFilters: BadgeFilters) => {
-    setFilters(newFilters)
-  }
 
   return (
     <main className="container mx-auto px-4 py-8">
@@ -123,11 +115,11 @@ export default function BadgesPage() {
               <CardDescription>Latest badge achievements</CardDescription>
             </CardHeader>
             <CardContent>
-              <BadgeTimeline badgeId={currentUser?.id || ''} />
+              <BadgeTimeline userId={currentUser?.id} limit={10} />
             </CardContent>
           </Card>
         </div>
       </div>
     </main>
   )
-}
+} 

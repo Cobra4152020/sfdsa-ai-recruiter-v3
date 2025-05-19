@@ -1,3 +1,5 @@
+"use client"
+
 import { useMemo, useState } from "react"
 import { motion } from "framer-motion"
 import { BadgeWithProgress } from "@/types/badge"
@@ -27,20 +29,27 @@ export function BadgeGrid({
   showAll = false,
 }: BadgeGridProps) {
   const { collections, isLoading, error } = useEnhancedBadges()
-  const [selectedBadge, setSelectedBadge] = useState<BadgeWithProgress | null>(null)
+    const [selectedBadge, setSelectedBadge] = useState<BadgeWithProgress | null>(null)  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
 
   const filteredBadges = useMemo(() => {
-    if (!collections) return []
+    if (!collections || !Array.isArray(collections)) return []
 
-    // Flatten all badges from collections
-    let badges = collections.flatMap(c => c.badges) as BadgeWithProgress[]
+    // Flatten all badges from collections and ensure they exist
+    let badges = collections
+      .filter(c => c && Array.isArray(c.badges))
+      .flatMap(c => c.badges)
+      .filter((badge): badge is BadgeWithProgress => 
+        !!badge && 
+        typeof badge === 'object' && 
+        typeof badge.name === 'string'
+      )
 
     // Apply search filter
     if (searchQuery) {
       const query = searchQuery.toLowerCase()
       badges = badges.filter(badge => 
         badge.name.toLowerCase().includes(query) ||
-        badge.description.toLowerCase().includes(query)
+        (badge.description || '').toLowerCase().includes(query)
       )
     }
 
@@ -59,11 +68,11 @@ export function BadgeGrid({
       badges = badges.filter(badge => {
         switch (status) {
           case "earned":
-            return badge.isUnlocked
+            return badge.earned
           case "progress":
-            return !badge.isUnlocked && (badge.progress || 0) > 0
+            return !badge.earned && (badge.progress || 0) > 0
           case "locked":
-            return !badge.isUnlocked && (!badge.progress || badge.progress === 0)
+            return !badge.earned && (!badge.progress || badge.progress === 0)
           default:
             return true
         }
@@ -83,71 +92,64 @@ export function BadgeGrid({
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-        {Array.from({ length: 10 }).map((_, i) => (
-          <div key={i} className="space-y-2">
-            <Skeleton className="h-24 w-24 rounded-lg" />
-            <Skeleton className="h-4 w-20" />
-          </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} className="h-48 rounded-lg" />
         ))}
       </div>
     )
   }
 
-  if (filteredBadges.length === 0) {
-    return (
-      <div className="text-center text-gray-500 py-8">
-        No badges found matching your criteria.
-      </div>
-    )
+  const handleBadgeClick = (badge: BadgeWithProgress) => {
+    setSelectedBadge(badge)
+    setIsShareDialogOpen(true)
   }
 
   return (
     <>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-        {filteredBadges.map((badge, index) => (
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {filteredBadges.map((badge) => (
           <motion.div
             key={badge.id}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: index * 0.1 }}
-            className="flex flex-col items-center text-center group relative"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-lg p-4 shadow-sm relative"
           >
-            <div className="relative">
+            <div className="flex justify-center">
               <AchievementBadge
                 type={badge.type}
-                rarity={badge.rarity}
-                points={badge.points}
-                earned={badge.isUnlocked || false}
+                earned={badge.earned || false}
                 size="lg"
               />
-              {badge.isUnlocked && (
+              {badge.earned && (
                 <button
-                  onClick={() => setSelectedBadge(badge)}
-                  className="absolute -top-2 -right-2 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={() => handleBadgeClick(badge)}
+                  className="absolute top-2 right-2 p-2 text-gray-500 hover:text-gray-700 transition-colors"
                 >
-                  <Share2 className="h-4 w-4 text-gray-600" />
+                  <Share2 className="w-4 h-4" />
                 </button>
               )}
             </div>
-            <h3 className="mt-2 font-medium text-sm">{badge.name}</h3>
-            <p className="text-xs text-gray-500 mt-1">{badge.points} points</p>
-            {badge.progress !== undefined && badge.progress > 0 && !badge.isUnlocked && (
-              <p className="text-xs text-blue-500 mt-1">
-                {Math.round(badge.progress * 100)}% complete
-              </p>
-            )}
+            <div className="text-center">
+              <h3 className="mt-2 font-medium text-sm">{badge.name}</h3>
+              <p className="text-xs text-gray-500 mt-1">{badge.points} points</p>
+              {badge.progress !== undefined && badge.progress > 0 && !badge.earned && (
+                <p className="text-xs text-blue-500 mt-1">
+                  {Math.round(badge.progress * 100)}% complete
+                </p>
+              )}
+            </div>
           </motion.div>
         ))}
       </div>
-
-      {selectedBadge && (
-        <BadgeShareDialog
-          badge={selectedBadge}
-          isOpen={true}
-          onClose={() => setSelectedBadge(null)}
-        />
-      )}
+      <BadgeShareDialog
+        badge={selectedBadge}
+        isOpen={isShareDialogOpen}
+        onClose={() => {
+          setIsShareDialogOpen(false)
+          setSelectedBadge(null)
+        }}
+      />
     </>
   )
 } 

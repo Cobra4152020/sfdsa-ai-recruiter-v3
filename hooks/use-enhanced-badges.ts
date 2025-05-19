@@ -73,7 +73,38 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}) {
           getUserBadgePreferences(currentUser.id),
         ])
 
-        setCollections(collectionsData)
+        // Validate collections data
+        if (!Array.isArray(collectionsData)) {
+          console.warn('Invalid collections data format, initializing empty array')
+          setCollections([])
+          return
+        }
+
+        // Ensure each collection has required properties and initialize with defaults if needed
+        const validCollections = collectionsData
+          .filter(collection => collection && typeof collection === 'object')
+          .map(collection => ({
+            id: collection.id || '',
+            name: collection.name || 'Untitled Collection',
+            description: collection.description || '',
+            theme: collection.theme || 'default',
+            specialReward: collection.special_reward || null,
+            badges: Array.isArray(collection.badges) 
+              ? collection.badges
+                  .filter((b: any) => b && b.badge && typeof b.badge === 'object')
+                  .map((b: any) => ({
+                    ...b.badge,
+                    earned: false,
+                    progress: 0,
+                    status: 'locked',
+                    lastUpdated: new Date().toISOString()
+                  }))
+              : [],
+            progress: 0,
+            isComplete: false,
+          }))
+
+        setCollections(validCollections)
         setUserXP(xpData)
         setActiveChallenges(challengesData)
         setShowcaseSettings(showcaseData)
