@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase/index"
 
 export function useUserProfile(userId: string, enabled = true) {
   const [profile, setProfile] = useState<any>(null)
@@ -35,6 +34,7 @@ export function useUserProfile(userId: string, enabled = true) {
           console.error("API error:", apiError)
 
           // Fallback to Supabase direct query
+          const { supabase } = require("@/lib/supabase/index")
           try {
             const { data: userData, error: userError } = await supabase
               .from("users")

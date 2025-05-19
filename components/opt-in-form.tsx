@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import { X } from "lucide-react"
-import { getClientSideSupabase } from "@/lib/supabase"
 
 interface OptInFormProps {
   onClose: () => void
@@ -21,16 +20,20 @@ export function OptInForm({ onClose, isApplying = false, isOpen = false, referra
   const [lastName, setLastName] = useState("")
   const [phone, setPhone] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
-
-  const supabase = getClientSideSupabase()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError(null)
+    setSuccess(false)
 
     try {
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const supabase = getClientSideSupabase()
       // Create application record
       const { data, error } = await supabase
         .from("applications")

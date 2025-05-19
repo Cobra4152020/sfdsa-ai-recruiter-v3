@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
-import { PointsGate } from "@/components/points-gate"
-import DiscountedHousingContent from "./content"
+import DiscountedHousingClient from "./discounted-housing-client"
 
 export const metadata: Metadata = {
   title: "Discounted Housing | SF Deputy Sheriff Recruitment",
@@ -11,14 +10,5 @@ export const metadata: Metadata = {
 }
 
 export default function DiscountedHousingPage() {
-  return (
-    <PointsGate
-      requiredPoints={300}
-      pageName="Discounted Housing Programs"
-      pageDescription="Learn about special housing programs and discounts available to San Francisco Deputy Sheriffs."
-      imageUrl="/san-francisco-apartments.png"
-    >
-      <DiscountedHousingContent />
-    </PointsGate>
-  )
+  return <DiscountedHousingClient />
 }

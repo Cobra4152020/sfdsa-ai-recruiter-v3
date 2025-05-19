@@ -17,7 +17,6 @@ import { v4 as uuidv4 } from "uuid"
 import { useRouter } from "next/navigation"
 import { useClientOnly } from "@/hooks/use-client-only"
 import { getWindowOrigin, isBrowser } from "@/lib/utils"
-import { getClientSideSupabase } from "@/lib/supabase"
 
 interface UnifiedRegistrationPopupProps {
   isOpen: boolean
@@ -74,8 +73,6 @@ export function UnifiedRegistrationPopup({
   const router = useRouter()
   const origin = useClientOnly(() => getWindowOrigin(), '')
 
-  const supabase = getClientSideSupabase()
-
   // Generate a unique tracking number for opt-in
   useEffect(() => {
     if (activeTab === "optin") {
@@ -93,6 +90,10 @@ export function UnifiedRegistrationPopup({
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+
+    // Dynamically require supabase client on the client only
+    const { getClientSideSupabase } = require("@/lib/supabase")
+    const supabase = getClientSideSupabase()
 
     try {
       if (resetPassword) {
@@ -214,6 +215,10 @@ export function UnifiedRegistrationPopup({
     e.preventDefault()
     setIsLoading(true)
 
+    // Dynamically require supabase client on the client only
+    const { getClientSideSupabase } = require("@/lib/supabase")
+    const supabase = getClientSideSupabase()
+
     try {
       // Validate passwords match
       if (password !== confirmPassword) {
@@ -331,6 +336,10 @@ export function UnifiedRegistrationPopup({
     e.preventDefault()
     setIsLoading(true)
 
+    // Dynamically require supabase client on the client only
+    const { getClientSideSupabase } = require("@/lib/supabase")
+    const supabase = getClientSideSupabase()
+
     try {
       // Validate required fields
       if (!firstName || !lastName || !email || !phone || !zipCode) {
@@ -384,6 +393,10 @@ export function UnifiedRegistrationPopup({
     
     setSocialLoading(provider)
 
+    // Dynamically require supabase client on the client only
+    const { getClientSideSupabase } = require("@/lib/supabase")
+    const supabase = getClientSideSupabase()
+
     try {
       // Set appropriate redirect URL based on user type
       let redirectTo = `${origin}/auth/callback`
@@ -423,6 +436,10 @@ export function UnifiedRegistrationPopup({
 
   const handleMagicLinkAuth = async () => {
     setIsLoading(true)
+
+    // Dynamically require supabase client on the client only
+    const { getClientSideSupabase } = require("@/lib/supabase")
+    const supabase = getClientSideSupabase()
 
     try {
       const { error } = await supabase.auth.signInWithOtp({

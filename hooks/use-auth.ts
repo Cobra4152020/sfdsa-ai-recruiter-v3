@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { useUser } from "@/context/user-context"
 import { useRegistration } from "@/context/registration-context"
 import { useRouter } from "next/navigation"
-import { getClientSideSupabase } from "@/lib/supabase"
 
 export function useAuth(
   options: {
@@ -18,11 +17,13 @@ export function useAuth(
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
 
-  const supabase = getClientSideSupabase()
-
   useEffect(() => {
     // Short circuit if auth is still loading
     if (typeof window === "undefined") return
+
+    // Dynamically require supabase client on the client only
+    const { getClientSideSupabase } = require("@/lib/supabase")
+    const supabase = getClientSideSupabase()
 
     // Initialization logic
     const init = async () => {
@@ -83,6 +84,9 @@ export function useAuth(
 
   const signOut = async () => {
     try {
+      // Dynamically require supabase client on the client only
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const supabase = getClientSideSupabase()
       await supabase.auth.signOut()
       router.push("/")
     } catch (error) {

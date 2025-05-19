@@ -32,7 +32,6 @@ import type {
   BadgeLayoutType,
   BadgeDisplayStyle,
 } from '@/types/badge'
-import { supabase } from '@/lib/supabase/index'
 
 interface BadgeCollectionMembership {
   badge: Badge | null
@@ -231,16 +230,7 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load badge collections with error handling
-      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
-      const { data: collectionsData, error: collectionsError } = await supabase
-        .from('badge_collections')
-        .select(`
-          *,
-          badges:badge_collection_memberships(
-            badge:badges(*)
-          )
-        `)
-        .order('created_at', { ascending: false })
+      const { data: collectionsData, error: collectionsError } = await getBadgeCollections()
 
       if (collectionsError) {
         console.error('Error loading collections:', collectionsError)
@@ -261,12 +251,7 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load user XP
-      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
-      const { data: xpData, error: xpError } = await supabase
-        .from('user_xp')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .single()
+      const { data: xpData, error: xpError } = await getUserXP(currentUser.id)
 
       if (!xpError) {
         setUserXP(xpData || {
@@ -278,25 +263,14 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load active challenges
-      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
-      const now = new Date().toISOString()
-      const { data: challengesData, error: challengesError } = await supabase
-        .from('badge_challenges')
-        .select('*')
-        .eq('is_active', true)
-        .gte('end_date', now)
+      const { data: challengesData, error: challengesError } = await getActiveChallenges()
 
       if (!challengesError && challengesData) {
         setActiveChallenges(challengesData)
       }
 
       // Load showcase settings
-      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
-      const { data: showcaseData, error: showcaseError } = await supabase
-        .from('badge_showcase_settings')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .single()
+      const { data: showcaseData, error: showcaseError } = await getBadgeShowcaseSettings(currentUser.id)
 
       if (!showcaseError && showcaseData) {
         setShowcaseSettings(showcaseData)
@@ -314,12 +288,7 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load preferences
-      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
-      const { data: preferencesData, error: preferencesError } = await supabase
-        .from('user_badge_preferences')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .single()
+      const { data: preferencesData, error: preferencesError } = await getUserBadgePreferences(currentUser.id)
 
       if (!preferencesError && preferencesData) {
         setPreferences(preferencesData)

@@ -9,7 +9,6 @@ import { OptInForm } from "@/components/opt-in-form"
 import { UserProvider } from "@/context/user-context"
 import { AuthModalProvider } from "@/context/auth-modal-context"
 import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
-import { getClientSideSupabase } from '@/lib/supabase/index'
 
 interface PageWrapperProps {
   children: React.ReactNode

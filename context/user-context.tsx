@@ -2,7 +2,6 @@
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
 import { useRouter } from "next/navigation"
-import { getClientSideSupabase } from "@/lib/supabase"
 
 // Define the user type
 interface User {
@@ -54,6 +53,8 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [supabase, setSupabase] = useState<any>(null)
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Dynamically require getClientSideSupabase only on the client
+      const { getClientSideSupabase } = require("@/lib/supabase")
       setSupabase(getClientSideSupabase())
     }
   }, [])

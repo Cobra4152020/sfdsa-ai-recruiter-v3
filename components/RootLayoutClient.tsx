@@ -9,7 +9,6 @@ import PerformanceMonitor from "@/components/performance-monitor"
 import { ErrorMonitor } from "@/components/error-monitor"
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
 import MainLayoutClient from "@/components/MainLayoutClient"
-import { getClientSideSupabase } from '@/lib/supabase/index'
 
 export default function RootLayoutClient({
   children,

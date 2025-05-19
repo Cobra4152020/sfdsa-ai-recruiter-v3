@@ -113,9 +113,6 @@ importers:
       '@supabase/supabase-js':
         specifier: ^2.39.8
         version: 2.49.4
-      '@types/next':
-        specifier: ^9.0.0
-        version: 9.0.0(@babel/core@7.27.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       canvas:
         specifier: ^2.11.2
         version: 2.11.2
@@ -252,6 +249,9 @@ importers:
       '@types/jest':
         specifier: ^29.5.14
         version: 29.5.14
+      '@types/next':
+        specifier: ^9.0.0
+        version: 9.0.0(@babel/core@7.27.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@types/node':
         specifier: ^20.17.48
         version: 20.17.48
