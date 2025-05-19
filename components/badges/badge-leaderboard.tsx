@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -79,7 +79,25 @@ export function BadgeLeaderboard({
   timeRange = 'weekly',
   currentUserId
 }: BadgeLeaderboardProps) {
-  const [selectedTab, setSelectedTab] = useState<TimeRange>(timeRange)
+  const [selectedTimeRange, setSelectedTimeRange] = useState<TimeRange>(timeRange)
+  const [displayedEntries, setDisplayedEntries] = useState<LeaderboardEntry[]>(entries)
+
+  const handleTimeRangeChange = (value: string) => {
+    if (value === 'daily' || value === 'weekly' || value === 'monthly' || value === 'all-time') {
+      setSelectedTimeRange(value)
+    }
+  }
+
+  useEffect(() => {
+    // Update displayed entries when props change
+    setDisplayedEntries(entries)
+  }, [entries])
+
+  useEffect(() => {
+    // Handle time range changes
+    // In a real app, this would fetch new data based on the time range
+    setDisplayedEntries(entries)
+  }, [selectedTimeRange, entries])
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
@@ -102,9 +120,20 @@ export function BadgeLeaderboard({
       .toUpperCase()
   }
 
+  if (!displayedEntries?.length) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-gray-500">No leaderboard data available</p>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
-      <Tabs defaultValue={selectedTab}>
+      <Tabs 
+        defaultValue={selectedTimeRange}
+        onValueChange={handleTimeRangeChange}
+      >
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="daily">Daily</TabsTrigger>
           <TabsTrigger value="weekly">Weekly</TabsTrigger>
@@ -112,55 +141,48 @@ export function BadgeLeaderboard({
           <TabsTrigger value="all-time">All Time</TabsTrigger>
         </TabsList>
 
-        <TabsContent value={selectedTab}>
-          <Card>
-            <CardHeader>
-              <CardTitle>Top Achievers</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {entries.map((entry, index) => (
-                  <motion.div
-                    key={entry.userId}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className={`flex items-center justify-between p-4 rounded-lg ${
-                      entry.userId === currentUserId ? 'bg-[#F0F7F2] border border-[#0A3C1F]' : 'bg-gray-50'
-                    }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center justify-center w-8">
-                        {getRankIcon(entry.rank) || <span className="text-lg font-semibold">{entry.rank}</span>}
-                      </div>
-                      <Avatar>
-                        <AvatarImage src={entry.avatarUrl} />
-                        <AvatarFallback>{getInitials(entry.username)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">
-                          {entry.username}
-                          {entry.streak >= 7 && (
-                            <span className="ml-2 inline-flex items-center">
-                              <Flame className="h-4 w-4 text-orange-500" />
-                              <span className="text-sm text-orange-500 ml-1">{entry.streak}</span>
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {entry.badges} badges earned
-                        </div>
-                      </div>
+        <TabsContent value={selectedTimeRange}>
+          <div className="space-y-4">
+            {displayedEntries.map((entry, index) => (
+              <motion.div
+                key={entry.userId}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className={`flex items-center justify-between p-4 rounded-lg ${
+                  entry.userId === currentUserId ? 'bg-[#F0F7F2] border border-[#0A3C1F]' : 'bg-gray-50'
+                }`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center justify-center w-8">
+                    {getRankIcon(entry.rank) || <span className="text-lg font-semibold">{entry.rank}</span>}
+                  </div>
+                  <Avatar>
+                    <AvatarImage src={entry.avatarUrl} />
+                    <AvatarFallback>{getInitials(entry.username)}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <div className="font-medium">
+                      {entry.username}
+                      {entry.streak >= 7 && (
+                        <span className="ml-2 inline-flex items-center">
+                          <Flame className="h-4 w-4 text-orange-500" />
+                          <span className="text-sm text-orange-500 ml-1">{entry.streak}</span>
+                        </span>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Star className="h-5 w-5 text-yellow-500" />
-                      <span className="font-semibold">{entry.points}</span>
+                    <div className="text-sm text-gray-500">
+                      {entry.badges} badges earned
                     </div>
-                  </motion.div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Star className="h-5 w-5 text-yellow-500" />
+                  <span className="font-semibold">{entry.points}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
         </TabsContent>
       </Tabs>
     </div>

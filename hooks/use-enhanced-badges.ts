@@ -224,6 +224,12 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       setIsLoading(true)
       setError(null)
 
+      // Only attempt to load data if we have a currentUser
+      if (!currentUser?.id) {
+        console.log('No current user, using default collections')
+        return
+      }
+
       // Load badge collections with error handling
       const { data: collectionsData, error: collectionsError } = await supabase
         .from('badge_collections')
@@ -237,105 +243,98 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
 
       if (collectionsError) {
         console.error('Error loading collections:', collectionsError)
-        // Keep using DEFAULT_COLLECTIONS that were set in useState
-      } else if (!Array.isArray(collectionsData) || collectionsData.length === 0) {
-        console.warn('No collections found, using default collections')
-        // Keep using DEFAULT_COLLECTIONS that were set in useState
-      } else {
+        // Keep using DEFAULT_COLLECTIONS
+      } else if (collectionsData && Array.isArray(collectionsData) && collectionsData.length > 0) {
         try {
-          // Transform the data to match the expected format
           const transformedCollections = collectionsData.map(collection => ({
             ...collection,
             badges: (collection.badges
               ?.map((membership: { badge: Badge | null }) => membership.badge)
               .filter((badge: Badge | null): badge is Badge => badge !== null) || [])
           }))
-          
-          // Only update collections if we have valid data
-          if (Array.isArray(transformedCollections) && transformedCollections.length > 0) {
-            setCollections(transformedCollections)
-          }
+          setCollections(transformedCollections)
         } catch (transformError) {
           console.error('Error transforming collections:', transformError)
-          // Keep using DEFAULT_COLLECTIONS that were set in useState
+          // Keep using DEFAULT_COLLECTIONS
         }
       }
 
-      // Load user XP if userId is provided
-      if (currentUser?.id) {
-        const { data: xpData, error: xpError } = await supabase
-          .from('user_xp')
-          .select('*')
-          .eq('user_id', currentUser.id)
-          .single()
+      // Load user XP
+      const { data: xpData, error: xpError } = await supabase
+        .from('user_xp')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .single()
 
-        if (xpError && xpError.code !== 'PGRST116') { // Ignore "not found" errors
-          console.error('Error loading user XP:', xpError)
-        } else {
-          setUserXP(xpData || {
-            userId: currentUser.id,
-            totalXp: 0,
-            currentLevel: 1,
-            streakCount: 0
-          })
-        }
+      if (!xpError) {
+        setUserXP(xpData || {
+          userId: currentUser.id,
+          totalXp: 0,
+          currentLevel: 1,
+          streakCount: 0
+        })
+      }
 
-        // Load active challenges
+      // Load active challenges
+      const now = new Date().toISOString()
+      const { data: challengesData, error: challengesError } = await supabase
+        .from('badge_challenges')
+        .select('*')
+        .eq('is_active', true)
+        .gte('end_date', now)
+
+      if (!challengesError && challengesData) {
+        setActiveChallenges(challengesData)
+      }
+
+      // Load showcase settings
+      const { data: showcaseData, error: showcaseError } = await supabase
+        .from('badge_showcase_settings')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .single()
+
+      if (!showcaseError && showcaseData) {
+        setShowcaseSettings(showcaseData)
+      } else {
         const now = new Date().toISOString()
-        const { data: challengesData, error: challengesError } = await supabase
-          .from('badge_challenges')
-          .select('*')
-          .eq('is_active', true)
-          .gte('end_date', now)
-
-        if (challengesError) {
-          console.error('Error loading challenges:', challengesError)
-          setActiveChallenges([])
-        } else {
-          setActiveChallenges(challengesData || [])
-        }
-
-        // Load showcase settings
-        const { data: showcaseData, error: showcaseError } = await supabase
-          .from('badge_showcase_settings')
-          .select('*')
-          .eq('user_id', currentUser.id)
-          .single()
-
-        if (showcaseError && showcaseError.code !== 'PGRST116') {
-          console.error('Error loading showcase settings:', showcaseError)
-        } else {
-          setShowcaseSettings(showcaseData || {
-            userId: currentUser.id,
-            layoutType: 'grid',
-            featuredBadges: [],
-            showcaseTheme: 'default',
-            isPublic: true
-          })
-        }
-
-        // Load preferences
-        const { data: preferencesData, error: preferencesError } = await supabase
-          .from('user_badge_preferences')
-          .select('*')
-          .eq('user_id', currentUser.id)
-          .single()
-
-        if (preferencesError && preferencesError.code !== 'PGRST116') {
-          console.error('Error loading preferences:', preferencesError)
-        } else {
-          setPreferences(preferencesData || {
-            userId: currentUser.id,
-            displayStyle: 'standard',
-            notificationSettings: { email: true, push: true },
-            pinnedBadges: [],
-            customGoals: null
-          })
-        }
+        setShowcaseSettings({
+          userId: currentUser.id,
+          layoutType: 'grid',
+          featuredBadges: [],
+          showcaseTheme: 'default',
+          isPublic: true,
+          createdAt: now,
+          updatedAt: now
+        })
       }
+
+      // Load preferences
+      const { data: preferencesData, error: preferencesError } = await supabase
+        .from('user_badge_preferences')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .single()
+
+      if (!preferencesError && preferencesData) {
+        setPreferences(preferencesData)
+      } else {
+        const now = new Date().toISOString()
+        setPreferences({
+          userId: currentUser.id,
+          displayStyle: 'standard',
+          notificationSettings: { email: true, push: true },
+          pinnedBadges: [],
+          customGoals: null,
+          createdAt: now,
+          updatedAt: now
+        })
+      }
+
     } catch (err) {
       console.error('Error in useEnhancedBadges:', err)
       setError(err instanceof Error ? err : new Error('Unknown error occurred'))
+      // Don't rethrow - we want to handle errors gracefully and show fallback UI
     } finally {
       setIsLoading(false)
     }
@@ -448,10 +447,6 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
     }
   }, [currentUser?.id, toast])
 
-  const refetch = async () => {
-    await loadData()
-  }
-
   return {
     collections,
     userXP,
@@ -460,6 +455,6 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
     preferences,
     isLoading,
     error,
-    refetch
+    refetch: loadData
   }
 } 
