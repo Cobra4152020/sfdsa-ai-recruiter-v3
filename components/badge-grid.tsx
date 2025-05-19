@@ -29,7 +29,8 @@ export function BadgeGrid({
   showAll = false,
 }: BadgeGridProps) {
   const { collections, isLoading, error } = useEnhancedBadges()
-    const [selectedBadge, setSelectedBadge] = useState<BadgeWithProgress | null>(null)  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const [selectedBadge, setSelectedBadge] = useState<BadgeWithProgress | null>(null)
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
 
   const filteredBadges = useMemo(() => {
     if (!collections || !Array.isArray(collections)) return []

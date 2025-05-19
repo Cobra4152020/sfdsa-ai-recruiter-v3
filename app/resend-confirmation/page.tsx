@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
 import { Mail, AlertCircle, CheckCircle2 } from "lucide-react"
-import { getSupabaseClient } from "@/lib/supabase-core"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export default function ResendConfirmationPage() {
   const [email, setEmail] = useState("")
@@ -22,7 +22,7 @@ export default function ResendConfirmationPage() {
     setIsLoading(true)
 
     try {
-      const supabase = getSupabaseClient()
+      const supabase = getClientSideSupabase()
       const { error } = await supabase.auth.resend({
         type: "signup",
         email,

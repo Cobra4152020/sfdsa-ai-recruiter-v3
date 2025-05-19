@@ -1,9 +1,8 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-client"
+import { getServiceSupabase } from '@/app/lib/supabase/server'
 import { sendEmail } from "@/lib/email/send-email"
 import { donationReceiptTemplate } from "@/lib/email/templates/donation-receipt"
 
@@ -16,7 +15,7 @@ export async function POST(request: Request) {
     }
 
     // Get donation details from database
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
     const { data: donation } = await supabase.from("donations").select("*").eq("payment_id", donationId).single()
 
     // Send receipt email

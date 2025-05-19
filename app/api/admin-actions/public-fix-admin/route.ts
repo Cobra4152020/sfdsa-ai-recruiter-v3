@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function publicFixAdminProfile(userId: string, adminEmail: string, securityCode: string) {
   try {
@@ -13,7 +13,8 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
     }
 
     // Check if user exists in auth
-    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(userId)
+    const supabase = getServiceSupabase()
+    const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId)
 
     if (userError || !userData.user) {
       return {
@@ -31,22 +32,22 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
     }
 
     // Check if admin schema exists, create if not
-    const { error: schemaCheckError } = await supabaseAdmin.rpc("check_if_schema_exists", { schema_name: "admin" })
+    const { error: schemaCheckError } = await supabase.rpc("check_if_schema_exists", { schema_name: "admin" })
 
     if (schemaCheckError) {
       // Create admin schema
-      await supabaseAdmin.sql`CREATE SCHEMA IF NOT EXISTS admin;`
+      await supabase.sql`CREATE SCHEMA IF NOT EXISTS admin;`
     }
 
     // Check if admin.users table exists, create if not
-    const { error: tableCheckError } = await supabaseAdmin.rpc("check_if_table_exists", {
+    const { error: tableCheckError } = await supabase.rpc("check_if_table_exists", {
       schema_name: "admin",
       table_name: "users",
     })
 
     if (tableCheckError) {
       // Create admin.users table
-      await supabaseAdmin.sql`
+      await supabase.sql`
         CREATE TABLE IF NOT EXISTS admin.users (
           id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
           email TEXT NOT NULL,
@@ -59,7 +60,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
     }
 
     // Check if user has entry in user_types
-    const { data: userTypeData, error: userTypeError } = await supabaseAdmin
+    const { data: userTypeData, error: userTypeError } = await supabase
       .from("user_types")
       .select("*")
       .eq("user_id", userId)
@@ -74,7 +75,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
 
     // Create or update user_types entry
     if (!userTypeData) {
-      const { error: insertError } = await supabaseAdmin.from("user_types").insert({
+      const { error: insertError } = await supabase.from("user_types").insert({
         user_id: userId,
         user_type: "admin",
         email: adminEmail,
@@ -87,7 +88,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
         }
       }
     } else if (userTypeData.user_type !== "admin") {
-      const { error: updateError } = await supabaseAdmin
+      const { error: updateError } = await supabase
         .from("user_types")
         .update({ user_type: "admin" })
         .eq("user_id", userId)
@@ -101,7 +102,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
     }
 
     // Check if user has entry in admin.users
-    const { data: adminUserData, error: adminUserError } = await supabaseAdmin
+    const { data: adminUserData, error: adminUserError } = await supabase
       .from("admin.users")
       .select("*")
       .eq("id", userId)
@@ -116,7 +117,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
 
     // Create or update admin.users entry
     if (!adminUserData) {
-      const { error: insertError } = await supabaseAdmin.from("admin.users").insert({
+      const { error: insertError } = await supabase.from("admin.users").insert({
         id: userId,
         email: adminEmail,
         name: userData.user.user_metadata?.name || adminEmail.split("@")[0],
@@ -125,7 +126,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
       if (insertError) {
         // Try with regular insert if RLS is causing problems
         try {
-          await supabaseAdmin.sql`
+          await supabase.sql`
             INSERT INTO admin.users (id, email, name) 
             VALUES (${userId}, ${adminEmail}, ${userData.user.user_metadata?.name || adminEmail.split("@")[0]})
             ON CONFLICT (id) DO UPDATE SET
@@ -142,7 +143,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
     }
 
     // Check if user has admin role in user_roles
-    const { data: userRoleData, error: userRoleError } = await supabaseAdmin
+    const { data: userRoleData, error: userRoleError } = await supabase
       .from("user_roles")
       .select("*")
       .eq("user_id", userId)
@@ -158,7 +159,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
 
     // Create admin role if not exists
     if (!userRoleData) {
-      const { error: insertError } = await supabaseAdmin.from("user_roles").insert({
+      const { error: insertError } = await supabase.from("user_roles").insert({
         user_id: userId,
         role: "admin",
         assigned_at: new Date().toISOString(),
@@ -174,7 +175,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
     }
 
     // Ensure RLS policies are set up correctly
-    await supabaseAdmin.sql`
+    await supabase.sql`
       -- Enable RLS on admin.users
       ALTER TABLE admin.users ENABLE ROW LEVEL SECURITY;
 
@@ -228,7 +229,7 @@ export const revalidate = 3600; // Revalidate every hour;
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const result = await publicFixAdmin(body);
+    const result = await publicFixAdminProfile(body.userId, body.adminEmail, body.securityCode);
     return NextResponse.json(result);
   } catch (error) {
     console.error(`Error in publicFixAdmin:`, error);

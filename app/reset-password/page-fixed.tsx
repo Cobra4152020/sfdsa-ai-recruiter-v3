@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { supabase } from "@/lib/supabase-client-singleton"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { Lock, AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react"
 
 export default function ResetPasswordPage() {
@@ -27,6 +27,8 @@ export default function ResetPasswordPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
+
+  const supabase = getClientSideSupabase()
 
   // Extract token from URL if present
   useEffect(() => {

@@ -112,7 +112,7 @@ function logToConsole(entry: LogEntry) {
 async function logToDatabase(entry: LogEntry) {
   try {
     // Import dynamically to avoid circular dependencies
-    const { getServiceSupabase } = await import("@/lib/supabase-clients")
+    const { getServiceSupabase } = await import("@/app/lib/supabase/server")
     const supabase = getServiceSupabase()
 
     // Store log in the database

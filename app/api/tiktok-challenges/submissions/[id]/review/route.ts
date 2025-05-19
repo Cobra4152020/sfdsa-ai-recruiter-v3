@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { TikTokChallengeService } from "@/lib/tiktok-challenge-service"
-import { verifyAdminAccess } from "@/lib/user-management-service"
+import { verifyAdminAccess } from "@/lib/user-management-service-server"
 import { generateTikTokSubmissionStaticParams } from "@/lib/static-params"
 
 // GET method is static for pre-rendering

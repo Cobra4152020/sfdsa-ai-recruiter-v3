@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle, XCircle } from "lucide-react"
-import { supabase } from "@/lib/supabase-client-singleton"
+import { supabase } from "@/lib/supabase"
 
 export default function AdminDiagnosticPage() {
   const [email, setEmail] = useState("")

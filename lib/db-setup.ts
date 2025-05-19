@@ -1,8 +1,8 @@
-import { createClient } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function setupChatDatabase() {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Check if add_participation_points function exists
     const { data: functionExists, error: functionCheckError } = await supabase.rpc("function_exists", {

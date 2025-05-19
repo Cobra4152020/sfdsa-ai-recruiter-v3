@@ -3,6 +3,7 @@
 import type React from "react"
 import { useRef, useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { usePathname } from "next/navigation"
 import { ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -27,6 +28,7 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
   const dropdownRef = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const pathname = usePathname()
+  const router = useRouter()
 
   // Handle controlled vs uncontrolled state
   useEffect(() => {
@@ -109,7 +111,7 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
           event.preventDefault()
           if (activeIndex >= 0) {
             const item = items[activeIndex]
-            window.location.href = item.href // Use direct navigation instead of Link component
+            router.push(item.href)
             setIsOpen(false)
             setActiveIndex(-1)
           }
@@ -141,8 +143,7 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-controls={isOpen ? "dropdown-menu" : undefined}
-        onClick={(e) => {
-          e.preventDefault()
+        onClick={() => {
           setIsOpen(!isOpen)
           if (onToggle) onToggle()
         }}
@@ -170,7 +171,7 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
         >
           <div className="py-1" role="none">
             {items.map((item, index) => (
-              <a
+              <Link
                 key={index}
                 href={item.href}
                 className={cn(
@@ -180,16 +181,14 @@ export function DropdownNav({ label, items, icon, isOpen: controlledIsOpen, onTo
                 role="menuitem"
                 tabIndex={isOpen ? 0 : -1}
                 aria-current={activeIndex === index}
-                onClick={(e) => {
-                  e.preventDefault()
-                  window.location.href = item.href // Use direct navigation
+                onClick={() => {
                   setIsOpen(false)
                   setActiveIndex(-1)
                 }}
               >
                 {item.icon && <span className="mr-3 opacity-75 group-hover:opacity-100">{item.icon}</span>}
                 {item.label}
-              </a>
+              </Link>
             ))}
           </div>
         </div>

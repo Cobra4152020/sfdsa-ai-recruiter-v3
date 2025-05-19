@@ -2,7 +2,7 @@ export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 interface DonationSummary {
   totalDonations: number;

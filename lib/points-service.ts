@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function addParticipationPoints(
   userId: string,
@@ -7,7 +7,7 @@ export async function addParticipationPoints(
   description?: string,
 ) {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // First try to use the RPC function
     try {

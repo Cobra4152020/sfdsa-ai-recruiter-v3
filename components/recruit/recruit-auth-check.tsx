@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase-client-singleton"
+import { supabase } from "@/lib/supabase"
 
 export function RecruitAuthCheck({ children }: { children: React.ReactNode }) {
   const [isRecruit, setIsRecruit] = useState<boolean | null>(null)

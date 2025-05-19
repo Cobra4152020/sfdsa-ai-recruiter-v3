@@ -4,7 +4,7 @@
  * This service audits the login functionality across different user roles
  * and identifies any security vulnerabilities, inefficiencies, or usability issues.
  */
-import { createClient } from "@/lib/supabase-clients"
+import { getServiceSupabase } from '@/lib/supabase/server'
 
 export type UserRole = "recruit" | "volunteer" | "admin"
 export type AuditCategory = "security" | "usability" | "performance" | "integration"
@@ -109,102 +109,8 @@ export class LoginAuditService {
   private addFinding(finding: Omit<AuditFinding, "id" | "timestamp">) {
     this.findings.push({
       ...finding,
-      id: `AUDIT-${this.findingId++}`,
+      id: `finding-${this.findingId++}`,
       timestamp: new Date().toISOString(),
     })
   }
-
-  async getFindings(category?: AuditCategory, severity?: AuditSeverity, role?: UserRole): Promise<AuditFinding[]> {
-    let filteredFindings = this.findings
-
-    if (category) {
-      filteredFindings = filteredFindings.filter((f) => f.category === category)
-    }
-
-    if (severity) {
-      filteredFindings = filteredFindings.filter((f) => f.severity === severity)
-    }
-
-    if (role) {
-      filteredFindings = filteredFindings.filter((f) => f.affectedRoles.includes(role))
-    }
-
-    return filteredFindings
-  }
-
-  async logAuditEvent(userId: string, eventType: string, details: any) {
-    try {
-      const client = createClient()
-      await client.from("login_audit_logs").insert({
-        user_id: userId,
-        event_type: eventType,
-        details,
-        created_at: new Date().toISOString(),
-      })
-    } catch (error) {
-      console.error("Failed to log audit event:", error)
-    }
-  }
-
-  async getRecentAuditEvents(limit = 100) {
-    try {
-      const client = createClient()
-      const { data, error } = await client
-        .from("login_audit_logs")
-        .select("*")
-        .order("created_at", { ascending: false })
-        .limit(limit)
-
-      if (error) {
-        throw error
-      }
-
-      return data
-    } catch (error) {
-      console.error("Failed to get recent audit events:", error)
-      return []
-    }
-  }
-
-  async runAudit() {
-    // Test admin access control
-    await this.testAdminAccessControl()
-
-    // Test social login flows
-    await this.testSocialLoginFlows()
-
-    // Test point allocation
-    await this.testPointAllocation()
-
-    // Test login performance
-    await this.measureLoginPerformance()
-
-    return this.findings
-  }
-
-  private async testAdminAccessControl() {
-    // Implementation would test if admin routes are properly protected
-    console.log("Testing admin access control...")
-    // Actual implementation would make requests to admin routes and check responses
-  }
-
-  private async testSocialLoginFlows() {
-    // Implementation would test social login functionality
-    console.log("Testing social login flows...")
-    // Actual implementation would test social login integrations
-  }
-
-  private async testPointAllocation() {
-    // Implementation would verify if points are correctly allocated on signup
-    console.log("Testing point allocation...")
-    // Actual implementation would create test users and verify point allocation
-  }
-
-  private async measureLoginPerformance() {
-    // Implementation would measure login performance
-    console.log("Measuring login performance...")
-    // Actual implementation would time login requests
-  }
 }
-
-export const loginAuditService = new LoginAuditService()

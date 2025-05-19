@@ -1,9 +1,8 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 interface TriviaAnswer {
   questionNumber: number
@@ -27,7 +26,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
     }
 
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Insert the attempt and get its ID
     const { data: attemptData, error: attemptError } = await supabase

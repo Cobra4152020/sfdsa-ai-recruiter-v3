@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { toast } from "@/components/ui/use-toast"
-import { supabase } from "@/lib/supabase-client"
+import { getClientSideSupabase } from '@/lib/supabase/index'
 import { useUser } from "@/context/user-context"
 import { Award, Heart } from "lucide-react"
 
@@ -14,7 +14,7 @@ export function NotificationToastListener() {
     if (!currentUser?.id || isSubscribed) return
 
     // Subscribe to new notifications for this user
-    const channel = supabase
+    const channel = getClientSideSupabase()
       .channel(`notifications:${currentUser.id}`)
       .on(
         "postgres_changes",
@@ -31,12 +31,6 @@ export function NotificationToastListener() {
           toast({
             title: notification.title,
             description: notification.message,
-            icon:
-              notification.type === "badge" ? (
-                <Award className="h-4 w-4 text-blue-500" />
-              ) : (
-                <Heart className="h-4 w-4 text-red-500" />
-              ),
             duration: 5000,
           })
         },
@@ -46,7 +40,7 @@ export function NotificationToastListener() {
     setIsSubscribed(true)
 
     return () => {
-      supabase.removeChannel(channel)
+      getClientSideSupabase().removeChannel(channel)
       setIsSubscribed(false)
     }
   }, [currentUser, isSubscribed])

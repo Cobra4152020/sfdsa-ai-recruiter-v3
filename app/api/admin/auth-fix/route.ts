@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-server"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { diagnoseUserAuth } from "@/lib/auth-diagnostic"
 
 export async function POST(request: Request) {
@@ -16,7 +16,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
     const diagnostic = await diagnoseUserAuth(email)
     const fixes: string[] = []
 

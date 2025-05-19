@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { TikTokChallengeService } from "@/lib/tiktok-challenge-service"
-import { verifyAdminAccess } from "@/lib/user-management-service"
+import { verifyAdminAccess } from '@/lib/user-management-service-server'
 
 export const dynamic = 'force-static'
 

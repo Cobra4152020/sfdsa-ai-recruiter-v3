@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase-service"
+import { getServiceSupabase } from '@/app/lib/supabase/server'
 
 interface StatusEmailParams {
   email: string
@@ -16,7 +16,7 @@ export async function sendApplicantStatusEmail({
   trackingNumber,
 }: StatusEmailParams) {
   try {
-    // Call the API route to send the email
+    // Call the API route to send the email and log it
     const response = await fetch("/api/send-application-status", {
       method: "POST",
       headers: {
@@ -35,16 +35,6 @@ export async function sendApplicantStatusEmail({
       const errorData = await response.json()
       throw new Error(errorData.message || "Failed to send email")
     }
-
-    // Log the email send in the database
-    await supabase.from("email_logs").insert({
-      email_type: "application_status",
-      recipient_email: email,
-      recipient_name: `${firstName} ${lastName}`,
-      status,
-      tracking_number: trackingNumber,
-      sent_at: new Date().toISOString(),
-    })
 
     return true
   } catch (error) {

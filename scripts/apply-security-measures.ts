@@ -1,10 +1,10 @@
-import { createClient } from '@/lib/supabase-clients';
+import { getServiceSupabase } from '@/lib/supabase/server';
 import { promises as fs } from 'fs';
 import path from 'path';
 
 async function applySecurityMeasures() {
   try {
-    const supabase = createClient();
+    const supabase = getServiceSupabase();
 
     console.log('Applying security measures...');
 

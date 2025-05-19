@@ -1,12 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { NFTAwardCard } from "@/components/nft-award-card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { PageWrapper } from "@/components/page-wrapper"
-import { UserProvider } from "@/context/user-context"
 import type { NFTAward } from "@/lib/nft-utils"
 
 interface NFTAwardPageClientProps {
@@ -15,6 +14,19 @@ interface NFTAwardPageClientProps {
 
 export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
   const [showOptInForm, setShowOptInForm] = useState(false)
+  const [UserProvider, setUserProvider] = useState<any>(null)
+
+  useEffect(() => {
+    const loadClientModules = async () => {
+      const { UserProvider } = await import("@/context/user-context")
+      setUserProvider(() => UserProvider)
+    }
+    loadClientModules()
+  }, [])
+
+  if (!UserProvider) {
+    return null
+  }
 
   if (!award) {
     return (

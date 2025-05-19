@@ -1,4 +1,4 @@
-import { getSupabaseClient } from "@/lib/supabase-core"
+import { getClientSideSupabase } from "@/lib/supabase"
 import type { Badge, BadgeProgress, TimelineEvent, BadgeWithProgress, BadgeType, BadgeRarity } from "@/types/badge"
 
 export class BadgeError extends Error {
@@ -45,7 +45,7 @@ interface BadgeEventRow {
 
 export async function getBadge(badgeId: string): Promise<BadgeWithProgress> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new BadgeError("Database client not initialized")
     
     // Get badge details
@@ -72,6 +72,31 @@ export async function getBadge(badgeId: string): Promise<BadgeWithProgress> {
     const badgeRow = badge as unknown as BadgeRow
     const progressRow = progress as unknown as BadgeProgressRow | null
 
+    // Compose a default progressDetails if missing
+    const progressDetails: BadgeProgress = progressRow
+      ? {
+          badgeId: progressRow.badge_id,
+          userId: progressRow.user_id,
+          progress: progressRow.progress,
+          isUnlocked: progressRow.is_unlocked,
+          unlockedAt: progressRow.unlocked_at,
+          actionsCompleted: [],
+          lastActionAt: progressRow.last_updated,
+          createdAt: badgeRow.created_at,
+          updatedAt: badgeRow.updated_at,
+        }
+      : {
+          badgeId: badgeRow.id,
+          userId: "",
+          progress: 0,
+          isUnlocked: false,
+          unlockedAt: undefined,
+          actionsCompleted: [],
+          lastActionAt: badgeRow.updated_at,
+          createdAt: badgeRow.created_at,
+          updatedAt: badgeRow.updated_at,
+        }
+
     return {
       id: badgeRow.id,
       name: badgeRow.name,
@@ -86,7 +111,7 @@ export async function getBadge(badgeId: string): Promise<BadgeWithProgress> {
       updatedAt: badgeRow.updated_at,
       progress: progressRow?.progress ?? 0,
       isUnlocked: progressRow?.is_unlocked ?? false,
-      unlockedAt: progressRow?.unlocked_at
+      progressDetails,
     }
   } catch (error) {
     if (error instanceof BadgeError) throw error
@@ -96,7 +121,7 @@ export async function getBadge(badgeId: string): Promise<BadgeWithProgress> {
 
 export async function getBadgeTimeline(badgeId: string): Promise<TimelineEvent[]> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new BadgeError("Database client not initialized")
     
     const { data, error } = await supabase
@@ -109,7 +134,7 @@ export async function getBadgeTimeline(badgeId: string): Promise<TimelineEvent[]
     if (error) throw new BadgeError("Failed to fetch badge timeline", error.code)
     
     return (data as unknown as BadgeEventRow[]).map(event => ({
-      id: event.id,
+      id: String(event.id),
       date: event.date,
       event: event.event,
       type: event.type,
@@ -124,7 +149,7 @@ export async function getBadgeTimeline(badgeId: string): Promise<TimelineEvent[]
 
 export async function shareBadge(badgeId: string): Promise<void> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new BadgeError("Database client not initialized")
     
     const { error } = await supabase
@@ -140,7 +165,7 @@ export async function shareBadge(badgeId: string): Promise<void> {
 
 export async function getAllBadges(): Promise<BadgeWithProgress[]> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new BadgeError("Database client not initialized")
     
     // Get all badges
@@ -162,6 +187,29 @@ export async function getAllBadges(): Promise<BadgeWithProgress[]> {
     // Combine badges with their progress
     return (badges as unknown as BadgeRow[]).map(badge => {
       const badgeProgress = progress?.find(p => p.badge_id === badge.id) as unknown as BadgeProgressRow | undefined
+      const progressDetails: BadgeProgress = badgeProgress
+        ? {
+            badgeId: badgeProgress.badge_id,
+            userId: badgeProgress.user_id,
+            progress: badgeProgress.progress,
+            isUnlocked: badgeProgress.is_unlocked,
+            unlockedAt: badgeProgress.unlocked_at,
+            actionsCompleted: [],
+            lastActionAt: badgeProgress.last_updated,
+            createdAt: badge.created_at,
+            updatedAt: badge.updated_at,
+          }
+        : {
+            badgeId: badge.id,
+            userId: "",
+            progress: 0,
+            isUnlocked: false,
+            unlockedAt: undefined,
+            actionsCompleted: [],
+            lastActionAt: badge.updated_at,
+            createdAt: badge.created_at,
+            updatedAt: badge.updated_at,
+          }
       return {
         id: badge.id,
         name: badge.name,
@@ -176,7 +224,7 @@ export async function getAllBadges(): Promise<BadgeWithProgress[]> {
         updatedAt: badge.updated_at,
         progress: badgeProgress?.progress ?? 0,
         isUnlocked: badgeProgress?.is_unlocked ?? false,
-        unlockedAt: badgeProgress?.unlocked_at
+        progressDetails,
       }
     })
   } catch (error) {

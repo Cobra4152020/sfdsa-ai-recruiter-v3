@@ -21,15 +21,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
-import {
-  type UserWithRole,
-  deleteUser,
-  approveVolunteerRecruiter,
-  rejectVolunteerRecruiter,
-} from "@/lib/user-management-service"
+import type { UserWithRole } from "@/lib/user-management-service"
 import { formatDistanceToNow } from "date-fns"
 import { MoreHorizontal, Edit, Trash, CheckCircle, XCircle, UserCog, Shield, User } from "lucide-react"
 import { Users } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
 
 interface UserTableProps {
   users: UserWithRole[]
@@ -43,93 +39,116 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<UserWithRole | null>(null)
   const [isDeleting, setIsDeleting] = useState(false)
+  const [isLoading, setIsLoading] = useState<string | null>(null)
 
   const handleEdit = (user: UserWithRole) => {
     router.push(`/admin/users/${user.id}`)
   }
 
-  const handleDelete = async () => {
-    if (!userToDelete) return
-
-    setIsDeleting(true)
+  const handleDelete = async (userId: string) => {
     try {
-      const result = await deleteUser(userToDelete.id)
-      if (result.success) {
-        toast({
-          title: "User deleted",
-          description: "The user has been successfully deleted.",
-        })
-        onRefresh()
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to delete user.",
-          variant: "destructive",
-        })
+      setIsLoading(userId)
+      const response = await fetch('/api/user-management', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'delete',
+          userId,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user')
       }
+
+      toast({
+        title: "Success",
+        description: "User has been deleted successfully.",
+      })
+      onRefresh()
     } catch (error) {
       console.error("Error deleting user:", error)
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description: "Failed to delete user. Please try again.",
         variant: "destructive",
       })
     } finally {
-      setIsDeleting(false)
+      setIsLoading(null)
       setDeleteDialogOpen(false)
       setUserToDelete(null)
     }
   }
 
-  const handleApprove = async (user: UserWithRole) => {
+  const handleApprove = async (userId: string) => {
     try {
-      const result = await approveVolunteerRecruiter(user.id)
-      if (result.success) {
-        toast({
-          title: "Volunteer approved",
-          description: "The volunteer recruiter has been approved.",
-        })
-        onRefresh()
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to approve volunteer.",
-          variant: "destructive",
-        })
+      setIsLoading(userId)
+      const response = await fetch('/api/user-management', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'approve',
+          userId,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to approve volunteer')
       }
+
+      toast({
+        title: "Success",
+        description: "Volunteer has been approved successfully.",
+      })
+      onRefresh()
     } catch (error) {
       console.error("Error approving volunteer:", error)
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description: "Failed to approve volunteer. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsLoading(null)
     }
   }
 
-  const handleReject = async (user: UserWithRole) => {
+  const handleReject = async (userId: string) => {
     try {
-      const result = await rejectVolunteerRecruiter(user.id)
-      if (result.success) {
-        toast({
-          title: "Volunteer rejected",
-          description: "The volunteer recruiter has been rejected.",
-        })
-        onRefresh()
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to reject volunteer.",
-          variant: "destructive",
-        })
+      setIsLoading(userId)
+      const response = await fetch('/api/user-management', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'reject',
+          userId,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to reject volunteer')
       }
+
+      toast({
+        title: "Success",
+        description: "Volunteer has been rejected successfully.",
+      })
+      onRefresh()
     } catch (error) {
       console.error("Error rejecting volunteer:", error)
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description: "Failed to reject volunteer. Please try again.",
         variant: "destructive",
       })
+    } finally {
+      setIsLoading(null)
     }
   }
 
@@ -145,36 +164,14 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
   }
 
   const getStatusBadge = (user: UserWithRole) => {
-    const status = user.status || "active"
-
-    switch (status) {
-      case "active":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-            Active
-          </span>
-        )
-      case "pending":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-            Pending
-          </span>
-        )
-      case "inactive":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-            Inactive
-          </span>
-        )
-      case "rejected":
-        return (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-            Rejected
-          </span>
-        )
-      default:
-        return null
+    if (user.user_type === "volunteer") {
+      const volunteerUser = user as any
+      if (volunteerUser.is_verified) {
+        return <Badge className="bg-green-100 text-green-800">Verified</Badge>
+      }
+      return <Badge className="bg-yellow-100 text-yellow-800">Pending</Badge>
     }
+    return null
   }
 
   if (loading) {
@@ -250,13 +247,13 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
                         Edit
                       </DropdownMenuItem>
 
-                      {user.user_type === "volunteer" && user.status === "pending" && (
+                      {user.user_type === "volunteer" && !(user as any).is_verified && (
                         <>
-                          <DropdownMenuItem onClick={() => handleApprove(user)}>
+                          <DropdownMenuItem onClick={() => handleApprove(user.id)}>
                             <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
                             Approve
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleReject(user)}>
+                          <DropdownMenuItem onClick={() => handleReject(user.id)}>
                             <XCircle className="h-4 w-4 mr-2 text-red-500" />
                             Reject
                           </DropdownMenuItem>
@@ -295,7 +292,7 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
             <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            <Button variant="destructive" onClick={() => handleDelete(userToDelete?.id || "")} disabled={isDeleting}>
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>
           </DialogFooter>

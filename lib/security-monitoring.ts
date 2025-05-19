@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase-clients';
+import { getServiceSupabase } from '@/lib/supabase/server';
 import { RealtimeChannel } from '@supabase/supabase-js';
 
 export interface SecurityEvent {
@@ -23,7 +23,7 @@ export interface SecurityAlert {
 }
 
 export class SecurityMonitoringService {
-  private supabase = createClient();
+  private supabase = getServiceSupabase();
   private realtimeChannel?: RealtimeChannel;
   private alertHandlers: ((alert: SecurityAlert) => void)[] = [];
 

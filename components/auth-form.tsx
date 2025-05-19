@@ -11,7 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { useUser } from "@/context/user-context"
-import { supabase } from "@/lib/supabase-client"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { Eye, EyeOff, Mail, Lock, User, Github, Twitter } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
@@ -31,6 +31,7 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
   const [resetPassword, setResetPassword] = useState(false)
   const { toast } = useToast()
   const { login } = useUser()
+  const supabase = getClientSideSupabase()
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()

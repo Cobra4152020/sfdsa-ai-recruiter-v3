@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 // This implementation avoids using the problematic web-push library
 export interface PushNotificationPayload {

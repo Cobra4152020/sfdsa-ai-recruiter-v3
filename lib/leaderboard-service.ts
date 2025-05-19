@@ -1,6 +1,6 @@
 import type { LeaderboardFilters, LeaderboardUser, LeaderboardResponse } from "../types/leaderboard"
 import { DEFAULT_FILTERS } from "../constants"
-import { getServiceSupabase } from "./supabase"
+import { getServiceSupabase } from '@/app/lib/supabase/server'
 import { getMockLeaderboardData } from "./mock"
 
 /**

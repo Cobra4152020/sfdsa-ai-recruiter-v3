@@ -6,8 +6,10 @@ import { VolunteerRecruiterDashboard } from "@/components/volunteer-recruiter-da
 import { RecruiterAnalyticsDashboard } from "@/components/recruiter-analytics-dashboard"
 import { ReferralLinkGenerator } from "@/components/referral-link-generator"
 import { useToast } from "@/components/ui/use-toast"
-import { supabase } from "@/lib/supabase-client-singleton"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
+
+const supabase = getClientSideSupabase()
 
 export default function VolunteerDashboardPage() {
   const { toast } = useToast()

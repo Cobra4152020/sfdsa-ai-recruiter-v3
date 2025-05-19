@@ -1,4 +1,3 @@
-import { supabaseAdmin } from "./supabase-service"
 import { format, subDays, startOfMonth, endOfMonth, eachMonthOfInterval } from "date-fns"
 import { mockAnalyticsData } from './mock-analytics-data';
 
@@ -67,8 +66,9 @@ export async function getUserGrowthData(period: Period): Promise<UserGrowthData[
   if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
     return mockAnalyticsData.growth[period];
   }
-  // Add your actual data fetching logic here
-  return mockAnalyticsData.growth[period];
+  const response = await fetch(`/api/analytics?type=growth&period=${period}`);
+  if (!response.ok) throw new Error('Failed to fetch growth data');
+  return response.json();
 }
 
 /**
@@ -78,8 +78,9 @@ export async function getUserEngagementData(period: Period): Promise<UserEngagem
   if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
     return mockAnalyticsData.engagement[period];
   }
-  // Add your actual data fetching logic here
-  return mockAnalyticsData.engagement[period];
+  const response = await fetch(`/api/analytics?type=engagement&period=${period}`);
+  if (!response.ok) throw new Error('Failed to fetch engagement data');
+  return response.json();
 }
 
 /**
@@ -89,8 +90,9 @@ export async function getConversionData(period: Period): Promise<ConversionData[
   if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
     return mockAnalyticsData.conversion;
   }
-  // Add your actual data fetching logic here
-  return mockAnalyticsData.conversion;
+  const response = await fetch(`/api/analytics?type=conversion&period=${period}`);
+  if (!response.ok) throw new Error('Failed to fetch conversion data');
+  return response.json();
 }
 
 /**
@@ -100,8 +102,9 @@ export async function getGeographicData(): Promise<GeographicData[]> {
   if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
     return mockAnalyticsData.geographic;
   }
-  // Add your actual data fetching logic here
-  return mockAnalyticsData.geographic;
+  const response = await fetch('/api/analytics?type=geographic');
+  if (!response.ok) throw new Error('Failed to fetch geographic data');
+  return response.json();
 }
 
 /**
@@ -111,8 +114,9 @@ export async function getRetentionData(weeks: number): Promise<RetentionData[]> 
   if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
     return mockAnalyticsData.retention.slice(0, weeks);
   }
-  // Add your actual data fetching logic here
-  return mockAnalyticsData.retention.slice(0, weeks);
+  const response = await fetch(`/api/analytics?type=retention&weeks=${weeks}`);
+  if (!response.ok) throw new Error('Failed to fetch retention data');
+  return response.json();
 }
 
 /**
@@ -122,8 +126,9 @@ export async function getBadgeDistributionData(): Promise<BadgeDistributionData[
   if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
     return mockAnalyticsData.badges;
   }
-  // Add your actual data fetching logic here
-  return mockAnalyticsData.badges;
+  const response = await fetch('/api/analytics?type=badges');
+  if (!response.ok) throw new Error('Failed to fetch badge data');
+  return response.json();
 }
 
 /**
@@ -133,31 +138,18 @@ export async function getUserActivitySummary(period: Period): Promise<UserActivi
   if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
     return mockAnalyticsData.activity[period];
   }
-  // Add your actual data fetching logic here
-  return mockAnalyticsData.activity[period];
+  const response = await fetch(`/api/analytics?type=activity&period=${period}`);
+  if (!response.ok) throw new Error('Failed to fetch activity data');
+  return response.json();
 }
 
 /**
  * Generate monthly report data
  */
 export async function generateMonthlyReport(month: Date = new Date()): Promise<any> {
-  const firstDay = startOfMonth(month)
-  const lastDay = endOfMonth(month)
-
-  try {
-    // Query for monthly report data
-    const { data, error } = await supabaseAdmin.rpc("generate_monthly_report", {
-      start_date: firstDay.toISOString(),
-      end_date: lastDay.toISOString(),
-    })
-
-    if (error) throw error
-
-    return data || {}
-  } catch (error) {
-    console.error("Error generating monthly report:", error)
-    throw error
-  }
+  const response = await fetch(`/api/analytics?type=monthly-report&month=${month.toISOString()}`);
+  if (!response.ok) throw new Error('Failed to generate monthly report');
+  return response.json();
 }
 
 /**

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-server"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { API_CACHE_HEADERS } from "@/lib/cache-utils"
 
 export const dynamic = "force-static"
@@ -20,7 +20,7 @@ interface PermissionsCheck {
 export async function GET() {
   const startTime = Date.now()
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
     const connectionTime = Date.now() - startTime
 
     // Test database connection with a simple query

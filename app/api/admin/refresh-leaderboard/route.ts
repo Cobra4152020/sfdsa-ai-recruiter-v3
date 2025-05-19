@@ -1,9 +1,8 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { API_CACHE_HEADERS } from "@/lib/cache-utils"
 
 export async function POST() {

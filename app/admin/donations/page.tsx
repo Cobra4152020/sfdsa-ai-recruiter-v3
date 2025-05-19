@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { DateRangePicker } from "@/components/ui/date-range-picker"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { createClient } from "@/lib/supabase-server"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 interface DonationStats {
   total_amount: number
@@ -45,7 +45,7 @@ export default function DonationsAdminPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const supabase = createClient()
+        const supabase = getClientSideSupabase()
 
         // Get recent donations
         const { data: donations, error } = await supabase

@@ -1,15 +1,14 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
 import { recordAttendance } from "@/lib/daily-briefing-service"
-import { createClient } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function POST(request: Request) {
   try {
     // Get the user ID from the session
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
     const {
       data: { session },
     } = await supabase.auth.getSession()

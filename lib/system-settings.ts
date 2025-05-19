@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "./supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 /**
  * Get a system setting from the database

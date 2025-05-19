@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase-client"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export function AdminAuthCheck({ children }: { children: React.ReactNode }) {
   const [isAdmin, setIsAdmin] = useState<boolean | null>(null)
@@ -14,6 +14,7 @@ export function AdminAuthCheck({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function checkAdminStatus() {
       try {
+        const supabase = getClientSideSupabase()
         const {
           data: { session },
         } = await supabase.auth.getSession()

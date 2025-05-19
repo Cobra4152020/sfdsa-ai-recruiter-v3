@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { addParticipationPoints } from "@/lib/points-service"
 
 export interface DailyBriefing {
@@ -40,7 +40,7 @@ export interface BriefingStats {
  */
 export async function getTodaysBriefing(): Promise<DailyBriefing | null> {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split("T")[0]
@@ -79,7 +79,7 @@ export async function getTodaysBriefing(): Promise<DailyBriefing | null> {
  */
 export async function recordAttendance(userId: string, briefingId: string): Promise<boolean> {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Check if user has already attended this briefing
     const { data: existingAttendance, error: checkError } = await supabase
@@ -131,7 +131,7 @@ export async function recordAttendance(userId: string, briefingId: string): Prom
  */
 export async function recordShare(userId: string, briefingId: string, platform: string): Promise<boolean> {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Check if user has already shared this briefing on this platform
     const { data: existingShare, error: checkError } = await supabase
@@ -195,7 +195,7 @@ export async function recordShare(userId: string, briefingId: string, platform: 
  */
 export async function getBriefingStats(briefingId: string, userId?: string): Promise<BriefingStats> {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Get total attendees
     const { count: totalAttendees, error: attendeesError } = await supabase
@@ -284,7 +284,7 @@ export function calculateCycleDay(date: Date): number {
  */
 export async function updateBriefingCycle(): Promise<boolean> {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
     const today = new Date()
     const cycleDay = calculateCycleDay(today)
 

@@ -1,10 +1,9 @@
-import type React from "react"
-import { RecruitAuthCheck } from "@/components/recruit/recruit-auth-check"
+import type { ReactNode } from "react";
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
-  return <RecruitAuthCheck>{children}</RecruitAuthCheck>
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
 }

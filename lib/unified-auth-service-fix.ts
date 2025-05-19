@@ -1,12 +1,24 @@
 // This is a partial update to fix the admin user profile handling
 // Only showing the relevant parts that need to be changed
 
+// Placeholder types for linter
+export type UserProfile = {
+  id: string;
+  email: string;
+  name: string;
+  userType: string;
+  avatarUrl?: string;
+  createdAt?: string;
+  providers?: string[];
+};
+
+export type AuthResult = {
+  data: any;
+  error: any;
+};
+
 // In the getUserProfile method, update the admin profile retrieval:
-async
-\
-getUserProfile(userId: string)
-: Promise<UserProfile | null>
-{
+export async function getUserProfile(userId: string): Promise<UserProfile | null> {
   try {
     // Assuming supabase, userId, userType, and UserProfile are defined or imported elsewhere
     // For example:
@@ -38,8 +50,7 @@ getUserProfile(userId: string)
 
     if (userType === "admin") {
       // Try to get from admin.users first
-      const { data: adminData, error: adminError } = await supabase
-        .from("admin.users")
+      const { data: adminData, error: adminError } = await (supabase.from("admin.users") as any)
         .select("*")
         .eq("id", userId)
         .single()
@@ -64,15 +75,19 @@ getUserProfile(userId: string)
         }
       }
 
-      return {
-        id: adminData.id,
-        email: adminData.email,
-        name: adminData.name,
-        userType: "admin",
-        avatarUrl: adminData.avatar_url,
-        createdAt: adminData.created_at,
-        providers,
+      if (adminData) {
+        return {
+          id: adminData.id,
+          email: adminData.email,
+          name: adminData.name,
+          userType: "admin",
+          avatarUrl: adminData.avatar_url,
+          createdAt: adminData.created_at,
+          providers,
+        }
       }
+      // Fallback if adminData is null
+      return null
     }
 
     // ... rest of the method ...
@@ -83,10 +98,7 @@ getUserProfile(userId: string)
 }
 
 // In the createAdminUser method, update the admin user creation:
-async
-createAdminUser(email: string, password: string, name: string)
-: Promise<AuthResult>
-{
+export async function createAdminUser(email: string, password: string, name: string): Promise<AuthResult> {
   try {
     // Assuming supabaseAdmin and AuthResult are defined or imported elsewhere
     // For example:

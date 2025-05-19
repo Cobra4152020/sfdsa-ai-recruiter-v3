@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase-client"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 // Check if the browser supports notifications
 export function isNotificationSupported() {
@@ -36,6 +36,8 @@ export async function saveNotificationPreferences(userId: string, enabled: boole
   if (!userId) return false
 
   try {
+    const supabase = getClientSideSupabase()
+    if (!supabase) throw new Error('Supabase client not available')
     const { error } = await supabase.from("user_notification_settings").upsert(
       {
         user_id: userId,
@@ -60,6 +62,8 @@ export async function getNotificationPreferences(userId: string) {
   if (!userId) return { push_notifications: false }
 
   try {
+    const supabase = getClientSideSupabase()
+    if (!supabase) throw new Error('Supabase client not available')
     const { data, error } = await supabase
       .from("user_notification_settings")
       .select("push_notifications")
@@ -127,4 +131,11 @@ export async function disableNotifications(userId: string): Promise<boolean> {
     console.error("Error disabling notifications:", error)
     return false
   }
+}
+
+// Example usage in a function:
+export async function sendPushNotification(userId: string, message: string) {
+  const supabase = getClientSideSupabase()
+  if (!supabase) throw new Error('Supabase client not available')
+  // ... use supabase as before ...
 }

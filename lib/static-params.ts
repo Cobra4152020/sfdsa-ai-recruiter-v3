@@ -1,4 +1,4 @@
-import { createClient } from "./supabase-server"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 interface User {
   id: string
@@ -20,7 +20,7 @@ interface Donation {
  * Generates static parameters for user-related routes
  */
 export async function generateUserStaticParams() {
-  const supabase = createClient()
+  const supabase = getServiceSupabase()
   const { data: users } = await supabase.from("users").select("id")
   
   return (users as User[] | null)?.map((user) => ({
@@ -32,7 +32,7 @@ export async function generateUserStaticParams() {
  * Generates static parameters for TikTok challenge routes
  */
 export async function generateTikTokChallengeStaticParams() {
-  const supabase = createClient()
+  const supabase = getServiceSupabase()
   const { data: challenges } = await supabase.from("tiktok_challenges").select("id")
   
   return (challenges as TikTokChallenge[] | null)?.map((challenge) => ({
@@ -44,7 +44,7 @@ export async function generateTikTokChallengeStaticParams() {
  * Generates static parameters for TikTok challenge submission routes
  */
 export async function generateTikTokSubmissionStaticParams() {
-  const supabase = createClient()
+  const supabase = getServiceSupabase()
   const { data: submissions } = await supabase.from("tiktok_challenge_submissions").select("id")
   
   return (submissions as TikTokSubmission[] | null)?.map((submission) => ({
@@ -56,7 +56,7 @@ export async function generateTikTokSubmissionStaticParams() {
  * Generates static parameters for donation routes
  */
 export async function generateDonationStaticParams() {
-  const supabase = createClient()
+  const supabase = getServiceSupabase()
   const { data: donations } = await supabase.from("donations").select("id")
   
   return (donations as Donation[] | null)?.map((donation) => ({

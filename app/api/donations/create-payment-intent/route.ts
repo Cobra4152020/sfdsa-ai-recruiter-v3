@@ -1,10 +1,9 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
-import { createClient } from "@/lib/supabase-client"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2023-10-16",
@@ -30,7 +29,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Amount must be at least $1" }, { status: 400 })
     }
 
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Convert amount to cents for Stripe
     const amountInCents = Math.round(amount * 100)

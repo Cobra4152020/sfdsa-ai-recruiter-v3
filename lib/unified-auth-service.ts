@@ -1,5 +1,5 @@
-import { supabase } from "@/lib/supabase-client-singleton"
-import { supabaseAdmin } from "@/lib/supabase-service"
+import { supabase } from "@/lib/supabase"
+import { getServiceSupabase } from '@/app/lib/supabase/server'
 import { constructUrl } from "@/lib/url-utils"
 import type { Provider } from "@supabase/supabase-js"
 
@@ -231,7 +231,7 @@ export const authService = {
       const avatarUrl = user_metadata?.avatar_url || user_metadata?.picture
 
       // Create user in recruit.users table
-      const { error: insertError } = await supabaseAdmin.from("recruit.users").insert({
+      const { error: insertError } = await getServiceSupabase.from("recruit.users").insert({
         id,
         email,
         name,
@@ -246,7 +246,7 @@ export const authService = {
       }
 
       // Set user type
-      const { error: typeError } = await supabaseAdmin.from("user_types").insert({
+      const { error: typeError } = await getServiceSupabase.from("user_types").insert({
         user_id: id,
         user_type: "recruit",
         email,
@@ -258,7 +258,7 @@ export const authService = {
       }
 
       // Create social provider entry
-      const { error: providerError } = await supabaseAdmin.from("user_social_providers").insert({
+      const { error: providerError } = await getServiceSupabase.from("user_social_providers").insert({
         user_id: id,
         provider,
         provider_id: user_metadata?.sub || user_metadata?.id || id,
@@ -336,7 +336,7 @@ export const authService = {
   async unlinkSocialProvider(userId: string, provider: SocialProvider): Promise<AuthResult> {
     try {
       // Check if user has password auth before unlinking
-      const { data: userAuth } = await supabaseAdmin.auth.admin.getUserById(userId)
+      const { data: userAuth } = await getServiceSupabase.auth.admin.getUserById(userId)
 
       if (!userAuth.user?.email) {
         return {
@@ -405,7 +405,7 @@ export const authService = {
     try {
       // This is a simplified check - in a real implementation,
       // you would need to use the Supabase admin API to check if the user has a password
-      const { data } = await supabaseAdmin.auth.admin.getUserById(userId)
+      const { data } = await getServiceSupabase.auth.admin.getUserById(userId)
 
       // Check if the user has identities with password
       const hasPassword = data.user?.identities?.some(
@@ -444,7 +444,7 @@ export const authService = {
   async signInWithMagicLink(email: string, redirectUrl?: string): Promise<AuthResult> {
     try {
       // Check if user exists and get user type
-      const { data: userData } = await supabaseAdmin
+      const { data: userData } = await getServiceSupabase
         .from("user_types")
         .select("user_id, user_type")
         .eq("email", email)
@@ -496,7 +496,7 @@ export const authService = {
   async registerRecruit(email: string, password: string, name: string): Promise<AuthResult> {
     try {
       // Check if email already exists
-      const { data: existingUser } = await supabaseAdmin
+      const { data: existingUser } = await getServiceSupabase
         .from("user_types")
         .select("user_id, user_type")
         .eq("email", email)
@@ -536,7 +536,7 @@ export const authService = {
       }
 
       // Use the admin client to insert into recruit.users table (bypassing RLS)
-      const { error: insertError } = await supabaseAdmin.from("recruit.users").insert({
+      const { error: insertError } = await getServiceSupabase.from("recruit.users").insert({
         id: data.user.id,
         email: data.user.email,
         name: name || data.user.email?.split("@")[0] || "User",
@@ -553,7 +553,7 @@ export const authService = {
       }
 
       // Set user type using admin client
-      const { error: typeError } = await supabaseAdmin.from("user_types").insert({
+      const { error: typeError } = await getServiceSupabase.from("user_types").insert({
         user_id: data.user.id,
         user_type: "recruit",
         email: data.user.email,
@@ -597,7 +597,7 @@ export const authService = {
   ): Promise<AuthResult> {
     try {
       // Check if email already exists
-      const { data: existingUser } = await supabaseAdmin
+      const { data: existingUser } = await getServiceSupabase
         .from("user_types")
         .select("user_id, user_type")
         .eq("email", email)
@@ -642,7 +642,7 @@ export const authService = {
       }
 
       // Use the admin client to insert into volunteer.recruiters table (bypassing RLS)
-      const { error: insertError } = await supabaseAdmin.from("volunteer.recruiters").insert({
+      const { error: insertError } = await getServiceSupabase.from("volunteer.recruiters").insert({
         id: data.user.id,
         email: data.user.email,
         first_name: firstName,
@@ -664,7 +664,7 @@ export const authService = {
       }
 
       // Set user type using admin client
-      const { error: typeError } = await supabaseAdmin.from("user_types").insert({
+      const { error: typeError } = await getServiceSupabase.from("user_types").insert({
         user_id: data.user.id,
         user_type: "volunteer",
         email: data.user.email,
@@ -1101,7 +1101,7 @@ export const authService = {
       }
 
       // Create user in Supabase Auth
-      const { data, error } = await supabaseAdmin.auth.admin.createUser({
+      const { data, error } = await getServiceSupabase.auth.admin.createUser({
         email,
         password,
         email_confirm: true,
@@ -1124,7 +1124,7 @@ export const authService = {
       }
 
       // Create admin user in database
-      const { error: insertError } = await supabaseAdmin.from("admin.users").insert({
+      const { error: insertError } = await getServiceSupabase.from("admin.users").insert({
         id: data.user.id,
         email: data.user.email,
         name,
@@ -1140,7 +1140,7 @@ export const authService = {
       }
 
       // Set user type
-      const { error: typeError } = await supabaseAdmin.from("user_types").insert({
+      const { error: typeError } = await getServiceSupabase.from("user_types").insert({
         user_id: data.user.id,
         user_type: "admin",
         email: data.user.email,

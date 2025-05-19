@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { useUser } from "@/context/user-context"
 import { useRegistration } from "@/context/registration-context"
 import { useRouter } from "next/navigation"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export function useAuth(
   options: {
@@ -17,6 +18,8 @@ export function useAuth(
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
 
+  const supabase = getClientSideSupabase()
+
   useEffect(() => {
     // Short circuit if auth is still loading
     if (typeof window === "undefined") return
@@ -24,7 +27,6 @@ export function useAuth(
     // Initialization logic
     const init = async () => {
       try {
-        const { supabase } = await import("@/lib/supabase-client-singleton")
         const { data } = await supabase.auth.getSession()
 
         // If no session and redirect not set to "ifFound", redirect to login
@@ -81,7 +83,6 @@ export function useAuth(
 
   const signOut = async () => {
     try {
-      const { supabase } = await import("@/lib/supabase-client-singleton")
       await supabase.auth.signOut()
       router.push("/")
     } catch (error) {

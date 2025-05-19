@@ -1,6 +1,5 @@
-import { createClient } from "@/lib/supabase-clients"
-import { supabase } from "@/lib/supabase-client-singleton"
-import { supabaseAdmin } from "@/lib/supabase-service"
+import { supabase } from "@/lib/supabase/index"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { constructUrl } from "@/lib/url-utils"
 import { addParticipationPoints } from "@/lib/points-service"
 import type { Provider } from "@supabase/supabase-js"
@@ -406,7 +405,7 @@ export class EnhancedAuthService {
       const avatarUrl = user_metadata?.avatar_url || user_metadata?.picture
 
       // Create user in recruit.users table
-      const { error: insertError } = await supabaseAdmin.from("recruit.users").insert({
+      const { error: insertError } = await getServiceSupabase().from("recruit.users").insert({
         id,
         email,
         name,
@@ -421,7 +420,7 @@ export class EnhancedAuthService {
       }
 
       // Set user type
-      const { error: typeError } = await supabaseAdmin.from("user_types").insert({
+      const { error: typeError } = await getServiceSupabase().from("user_types").insert({
         user_id: id,
         user_type: "recruit",
         email,
@@ -433,7 +432,7 @@ export class EnhancedAuthService {
       }
 
       // Create social provider entry
-      const { error: providerError } = await supabaseAdmin.from("user_social_providers").insert({
+      const { error: providerError } = await getServiceSupabase().from("user_social_providers").insert({
         user_id: id,
         provider,
         provider_id: user_metadata?.sub || user_metadata?.id || id,
@@ -461,7 +460,7 @@ export class EnhancedAuthService {
     try {
       // Check if email already exists
       const checkStart = performance.now()
-      const { data: existingUser } = await supabaseAdmin
+      const { data: existingUser } = await getServiceSupabase()
         .from("user_types")
         .select("user_id, user_type")
         .eq("email", email)
@@ -510,7 +509,7 @@ export class EnhancedAuthService {
 
       // Use the admin client to insert into recruit.users table (bypassing RLS)
       const insertStart = performance.now()
-      const { error: insertError } = await supabaseAdmin.from("recruit.users").insert({
+      const { error: insertError } = await getServiceSupabase().from("recruit.users").insert({
         id: data.user.id,
         email: data.user.email,
         name: name || data.user.email?.split("@")[0] || "User",
@@ -529,7 +528,7 @@ export class EnhancedAuthService {
 
       // Set user type using admin client
       const typeStart = performance.now()
-      const { error: typeError } = await supabaseAdmin.from("user_types").insert({
+      const { error: typeError } = await getServiceSupabase().from("user_types").insert({
         user_id: data.user.id,
         user_type: "recruit",
         email: data.user.email,
@@ -542,7 +541,7 @@ export class EnhancedAuthService {
 
       // Log the initial points
       try {
-        await supabaseAdmin.from("user_point_logs").insert([
+        await getServiceSupabase().from("user_point_logs").insert([
           {
             user_id: data.user.id,
             points: 50,
@@ -806,11 +805,10 @@ export class EnhancedAuthService {
       const now = new Date().toISOString()
 
       if (userRole === "recruit") {
-        await supabaseAdmin
-          .from("recruit.users")
+        await getServiceSupabase().from("recruit.users")
           .update({
             last_login_at: now,
-            login_count: supabaseAdmin.rpc("increment", {
+            login_count: getServiceSupabase().rpc("increment", {
               row_id: userId,
               table: "recruit.users",
               column: "login_count",
@@ -819,11 +817,10 @@ export class EnhancedAuthService {
           })
           .eq("id", userId)
       } else if (userRole === "volunteer") {
-        await supabaseAdmin
-          .from("volunteer.recruiters")
+        await getServiceSupabase().from("volunteer.recruiters")
           .update({
             last_login_at: now,
-            login_count: supabaseAdmin.rpc("increment", {
+            login_count: getServiceSupabase().rpc("increment", {
               row_id: userId,
               table: "volunteer.recruiters",
               column: "login_count",
@@ -832,11 +829,10 @@ export class EnhancedAuthService {
           })
           .eq("id", userId)
       } else if (userRole === "admin") {
-        await supabaseAdmin
-          .from("admin.users")
+        await getServiceSupabase().from("admin.users")
           .update({
             last_login_at: now,
-            login_count: supabaseAdmin.rpc("increment", {
+            login_count: getServiceSupabase().rpc("increment", {
               row_id: userId,
               table: "admin.users",
               column: "login_count",

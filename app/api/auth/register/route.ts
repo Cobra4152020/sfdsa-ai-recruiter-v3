@@ -1,9 +1,8 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function POST(request: Request) {
   try {
@@ -15,9 +14,8 @@ export async function POST(request: Request) {
     }
 
     // Check if user already exists
-    const { data: existingUser } = await supabaseAdmin
-      .from("user_types")
-      .select("user_id, user_type")
+    const supabase = getServiceSupabase()
+    const { data: existingUser } = await supabase.from("user_types").select("user_id, user_type")
       .eq("email", email)
       .maybeSingle()
 
@@ -29,7 +27,7 @@ export async function POST(request: Request) {
     }
 
     // Create the user in Auth
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    const { data, error } = await supabase.auth.admin.createUser({
       email,
       password,
       email_confirm: true,
@@ -48,7 +46,7 @@ export async function POST(request: Request) {
     }
 
     // Create the user profile in the database
-    const { error: insertError } = await supabaseAdmin.from("recruit.users").insert({
+    const { error: insertError } = await supabase.from("recruit.users").insert({
       id: data.user.id,
       email: data.user.email,
       name: name,
@@ -63,7 +61,7 @@ export async function POST(request: Request) {
     }
 
     // Set user type
-    const { error: typeError } = await supabaseAdmin.from("user_types").insert({
+    const { error: typeError } = await supabase.from("user_types").insert({
       user_id: data.user.id,
       user_type: "recruit",
       email: data.user.email,
@@ -76,7 +74,7 @@ export async function POST(request: Request) {
 
     // Log the initial points
     try {
-      await supabaseAdmin.from("user_point_logs").insert([
+      await supabase.from("user_point_logs").insert([
         {
           user_id: data.user.id,
           points: 50,

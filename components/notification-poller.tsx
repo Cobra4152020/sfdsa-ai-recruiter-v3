@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef } from "react"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 interface NotificationPollerProps {
   userId: string
@@ -16,8 +17,8 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
     // Function to check for new notifications
     const checkNotifications = async () => {
       try {
-        // Import dynamically to avoid issues during SSR
-        const { supabase } = await import("@/lib/supabase-client-singleton")
+        // Get the Supabase client
+        const supabase = getClientSideSupabase()
 
         // Get pending notifications from the queue
         const { data: notifications, error } = await supabase

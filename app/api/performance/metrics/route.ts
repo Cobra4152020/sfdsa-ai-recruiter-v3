@@ -1,9 +1,8 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function GET(request: Request) {
   try {
@@ -14,7 +13,7 @@ export async function GET(request: Request) {
     const page = searchParams.get("page") || "all"
 
     // Build the query
-    let query = supabase
+    let query = getServiceSupabase
       .from("performance_metrics")
       .select("*")
       .gte("timestamp", startDate)
@@ -77,7 +76,7 @@ function getDefaultStartDate(): string {
 
 // Get aggregated metrics (average, p75, p95) by type
 async function getAggregatedMetrics(startDate: string, endDate: string) {
-  const { data, error } = await supabase.rpc("get_aggregated_metrics", {
+  const { data, error } = await getServiceSupabase.rpc("get_aggregated_metrics", {
     start_date: startDate,
     end_date: endDate,
   })
@@ -86,7 +85,7 @@ async function getAggregatedMetrics(startDate: string, endDate: string) {
     console.error("Error fetching aggregated metrics:", error)
 
     // Fallback to manual aggregation if the RPC fails
-    const { data: metricsData, error: metricsError } = await supabase
+    const { data: metricsData, error: metricsError } = await getServiceSupabase
       .from("performance_metrics")
       .select("metric_name, metric_value")
       .gte("timestamp", startDate)
@@ -140,7 +139,7 @@ async function getTimeSeriesData(startDate: string, endDate: string, metricType:
   }
 
   // Query for time series data
-  let query = supabase
+  let query = getServiceSupabase
     .from("performance_metrics")
     .select("metric_name, metric_value, timestamp")
     .gte("timestamp", startDate)
@@ -193,7 +192,7 @@ async function getTimeSeriesData(startDate: string, endDate: string, metricType:
 
 // Get performance data by page
 async function getPagePerformance(startDate: string, endDate: string) {
-  const { data, error } = await supabase
+  const { data, error } = await getServiceSupabase
     .from("performance_metrics")
     .select("path, metric_name, metric_value")
     .gte("timestamp", startDate)
@@ -243,7 +242,7 @@ async function getPagePerformance(startDate: string, endDate: string) {
 // Get available pages and metric types for filtering
 async function getFilterOptions() {
   // Get unique pages
-  const { data: pageData, error: pageError } = await supabase
+  const { data: pageData, error: pageError } = await getServiceSupabase
     .from("performance_metrics")
     .select("path")
     .not("path", "is", null)
@@ -254,7 +253,7 @@ async function getFilterOptions() {
   }
 
   // Get unique metric types
-  const { data: metricData, error: metricError } = await supabase
+  const { data: metricData, error: metricError } = await getServiceSupabase
     .from("performance_metrics")
     .select("metric_name")
     .order("metric_name")

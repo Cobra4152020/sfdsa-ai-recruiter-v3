@@ -1,9 +1,8 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { supabase } from "@/lib/supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import type { PerformanceMetric } from "@/lib/performance-monitoring"
 
 export async function POST(request: Request) {
@@ -17,7 +16,7 @@ export async function POST(request: Request) {
     }
 
     // Insert the metric into the database
-    const { error } = await supabase.from("performance_metrics").insert({
+    const { error } = await getServiceSupabase.from("performance_metrics").insert({
       metric_name: metric.name,
       metric_value: metric.value,
       rating: metric.rating,

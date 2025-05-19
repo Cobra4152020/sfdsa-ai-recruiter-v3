@@ -2,7 +2,7 @@ export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { sendEmail } from "@/lib/email/send-email"
 import { getSystemSetting } from "@/lib/system-settings"
 

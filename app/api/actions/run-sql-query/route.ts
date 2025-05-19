@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-service"
+import { getServiceSupabase } from '@/app/lib/supabase/server'
 import { revalidatePath } from "next/cache"
 
 export const dynamic = 'force-static';
@@ -12,37 +12,25 @@ export async function generateStaticParams() {
 
 export async function POST(request: Request) {
   try {
-    const { query, revalidatePaths = [] } = await request.json()
-    const supabase = getServiceSupabase()
+    const { query } = await request.json()
+    const supabaseAdmin = getServiceSupabase()
 
-    // Execute the SQL query using the exec_sql RPC function
-    const { data, error } = await supabase.rpc("exec_sql", { sql_query: query })
+    if (!query) {
+      return NextResponse.json({ error: "No query provided" }, { status: 400 })
+    }
+
+    const { data, error } = await supabaseAdmin.rpc("exec_sql", { sql: query })
 
     if (error) {
-      console.error("Error executing SQL query:", error)
-      return NextResponse.json({
-        success: false,
-        error: error.message,
-        query,
-      }, { status: 500 })
+      return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
     // Revalidate any paths that might be affected by this query
-    if (revalidatePaths.length > 0) {
-      revalidatePaths.forEach((path) => revalidatePath(path))
-    }
+    revalidatePath("/")
 
-    return NextResponse.json({
-      success: true,
-      data,
-      query,
-    })
-  } catch (error) {
-    console.error("Unexpected error executing SQL query:", error)
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
-      query,
-    }, { status: 500 })
+    return NextResponse.json({ data })
+  } catch (error: any) {
+    console.error("Error executing SQL query:", error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
   }
 } 

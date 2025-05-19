@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { authService } from "@/lib/unified-auth-service"
+import { authService } from "@/lib/unified-auth-service-client"
 import { useToast } from "@/components/ui/use-toast"
 import type { Provider } from "@supabase/supabase-js"
 

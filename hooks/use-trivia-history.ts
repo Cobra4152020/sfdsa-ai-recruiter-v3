@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { useUser } from "@/context/user-context"
-import { supabase } from "@/lib/supabase-client"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export interface TriviaGameHistory {
   gameId: string
@@ -29,6 +29,7 @@ export function useTriviaHistory() {
         setIsLoading(true)
         setError(null)
 
+        const supabase = getClientSideSupabase()
         const { data, error } = await supabase
           .from("trivia_game_results")
           .select("*")

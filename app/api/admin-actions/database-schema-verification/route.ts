@@ -116,7 +116,7 @@ export async function fixSpecificIssues(issueIndices: number[]) {
  */
 export async function runCustomFix(sql: string) {
   try {
-    const { getServiceSupabase } = await import("@/lib/supabase-service")
+    const { getServiceSupabase } = await import("@/app/lib/supabase/server")
     const supabase = getServiceSupabase()
 
     const { error } = await supabase.rpc("exec_sql", { sql_query: sql })
@@ -148,7 +148,7 @@ export const revalidate = 3600; // Revalidate every hour;
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const result = await databaseSchemaVerification(body);
+    const result = await verifySchema(body);
     return NextResponse.json(result);
   } catch (error) {
     console.error(`Error in databaseSchemaVerification:`, error);

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Bell } from "lucide-react"
 import { NotificationPanel } from "./notification-panel"
 import { useClickOutside } from "@/hooks/use-click-outside"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 interface NotificationBellProps {
   userId: string
@@ -20,8 +21,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 
     const fetchUnreadCount = async () => {
       try {
-        // Import dynamically to avoid issues during SSR
-        const { supabase } = await import("@/lib/supabase-client-singleton")
+        const supabase = getClientSideSupabase()
 
         // Try with is_read first (this appears to be the correct column name)
         const { data: isReadData, error: isReadError } = await supabase

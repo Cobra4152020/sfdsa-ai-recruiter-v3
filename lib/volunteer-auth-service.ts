@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase-client"
+import { getServiceSupabase } from '@/lib/supabase/server'
 
 export interface VolunteerLoginResult {
   success: boolean
@@ -14,7 +14,7 @@ export const volunteerAuthService = {
   async login(email: string, password: string): Promise<VolunteerLoginResult> {
     try {
       // Sign in with Supabase
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { data, error: signInError } = await getServiceSupabase().auth.signInWithPassword({
         email,
         password,
       })
@@ -35,7 +35,7 @@ export const volunteerAuthService = {
       }
 
       // Check if user has volunteer_recruiter role
-      const { data: userRoles, error: roleError } = await supabase
+      const { data: userRoles, error: roleError } = await getServiceSupabase()
         .from("user_roles")
         .select("role")
         .eq("user_id", data.user.id)
@@ -69,7 +69,7 @@ export const volunteerAuthService = {
    */
   async sendMagicLink(email: string, redirectUrl: string): Promise<VolunteerLoginResult> {
     try {
-      const { error } = await supabase.auth.signInWithOtp({
+      const { error } = await getServiceSupabase().auth.signInWithOtp({
         email,
         options: {
           emailRedirectTo: redirectUrl,
@@ -103,7 +103,7 @@ export const volunteerAuthService = {
    */
   async isVolunteerRecruiter(userId: string): Promise<boolean> {
     try {
-      const { data, error } = await supabase
+      const { data, error } = await getServiceSupabase()
         .from("user_roles")
         .select("role")
         .eq("user_id", userId)

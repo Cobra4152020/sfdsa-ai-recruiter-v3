@@ -1,6 +1,7 @@
 "use client"
 
 import { useUser } from "@/context/user-context"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -14,8 +15,13 @@ import { User, Settings, LogOut } from "lucide-react"
 
 export function UserNav() {
   const { currentUser, signOut } = useUser()
+  const router = useRouter()
 
   if (!currentUser) return null
+
+  const handleNavigation = (href: string) => {
+    router.push(href)
+  }
 
   return (
     <DropdownMenu>
@@ -36,11 +42,11 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleNavigation("/profile")}>
           <User className="mr-2 h-4 w-4" />
           <span>Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onClick={() => handleNavigation("/profile/settings")}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>

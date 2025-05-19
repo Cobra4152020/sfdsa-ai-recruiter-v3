@@ -5,7 +5,6 @@ import { UserProfileCard } from "@/components/user-profile-card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
-import { UserProvider } from "@/context/user-context"
 import { SkipToContent } from "@/components/skip-to-content"
 
 interface ProfilePageClientProps {
@@ -18,6 +17,15 @@ export function ProfilePageClient({ params }: ProfilePageClientProps) {
   const userId = params.id
   const [userName, setUserName] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [UserProvider, setUserProvider] = useState<any>(null)
+
+  useEffect(() => {
+    const loadClientModules = async () => {
+      const { UserProvider } = await import("@/context/user-context")
+      setUserProvider(() => UserProvider)
+    }
+    loadClientModules()
+  }, [])
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -43,6 +51,10 @@ export function ProfilePageClient({ params }: ProfilePageClientProps) {
   const description = userName
     ? `Check out ${userName}'s profile on the San Francisco Sheriff's Office recruitment platform.`
     : "View this user's profile on the San Francisco Sheriff's Office recruitment platform."
+
+  if (!UserProvider) {
+    return null
+  }
 
   return (
     <UserProvider>

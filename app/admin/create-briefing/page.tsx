@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState } from "react"
-import { getClientSideSupabase } from "@/lib/supabase-client-safe"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"

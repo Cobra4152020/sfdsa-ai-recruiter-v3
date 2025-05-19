@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 /**
  * Ensures the applicants table exists in the database

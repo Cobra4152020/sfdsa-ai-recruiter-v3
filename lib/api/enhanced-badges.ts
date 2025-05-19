@@ -1,4 +1,4 @@
-import { getSupabaseClient } from "@/lib/supabase-core"
+import { getClientSideSupabase } from "@/lib/supabase"
 import type {
   Badge,
   BadgeCollection,
@@ -26,7 +26,7 @@ export class EnhancedBadgeError extends Error {
 
 // Badge Collections
 export async function getBadgeCollections(): Promise<BadgeCollection[]> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -66,7 +66,7 @@ export async function getBadgeCollections(): Promise<BadgeCollection[]> {
 
 export async function createBadgeCollection(collection: Omit<BadgeCollection, 'id' | 'badges'>): Promise<BadgeCollection> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
     const { data, error } = await supabase
@@ -92,7 +92,7 @@ export async function createBadgeCollection(collection: Omit<BadgeCollection, 'i
 
 export async function addBadgeToCollection(collectionId: string, badgeId: string, position?: number): Promise<void> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
     const { error } = await supabase
@@ -112,7 +112,7 @@ export async function addBadgeToCollection(collectionId: string, badgeId: string
 
 // Badge Tiers
 export async function getBadgeTiers(badgeId: string): Promise<BadgeTier[]> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -136,7 +136,7 @@ export async function getBadgeTiers(badgeId: string): Promise<BadgeTier[]> {
 
 // User XP
 export async function getUserXP(userId: string): Promise<UserXP> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -158,7 +158,7 @@ export async function getUserXP(userId: string): Promise<UserXP> {
 }
 
 export async function updateUserXP(userId: string, xpChange: number): Promise<UserXP> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data: currentXP, error: fetchError } = await supabase
@@ -198,7 +198,7 @@ export async function updateUserXP(userId: string, xpChange: number): Promise<Us
 
 // Badge Challenges
 export async function getActiveChallenges(): Promise<BadgeChallenge[]> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -225,7 +225,7 @@ export async function getActiveChallenges(): Promise<BadgeChallenge[]> {
 
 export async function createBadgeChallenge(challenge: Omit<BadgeChallenge, 'id'>): Promise<BadgeChallenge> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
     const { data, error } = await supabase
@@ -271,7 +271,7 @@ export async function getUserChallengeProgress(
   userId: string,
   challengeId: string
 ): Promise<UserChallengeProgress> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -298,7 +298,7 @@ export async function updateChallengeProgress(
   progress: Record<string, any>
 ): Promise<void> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
     const { error } = await supabase
@@ -319,7 +319,7 @@ export async function updateChallengeProgress(
 
 // Badge Showcase
 export async function getBadgeShowcaseSettings(userId: string): Promise<BadgeShowcaseSettings> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -344,7 +344,7 @@ export async function updateShowcaseSettings(
   userId: string, 
   settings: Partial<Omit<BadgeShowcaseSettings, 'userId'>>
 ): Promise<BadgeShowcaseSettings> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -373,7 +373,7 @@ export async function updateShowcaseSettings(
 
 // Badge Analytics
 export async function getBadgeAnalytics(badgeId: string): Promise<BadgeAnalytics> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -396,7 +396,7 @@ export async function getBadgeAnalytics(badgeId: string): Promise<BadgeAnalytics
 
 // Badge Rewards
 export async function getBadgeRewards(badgeId: string): Promise<BadgeReward[]> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -419,7 +419,7 @@ export async function getBadgeRewards(badgeId: string): Promise<BadgeReward[]> {
 
 export async function createBadgeReward(reward: Omit<BadgeReward, 'id'>): Promise<BadgeReward> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
     const { data, error } = await supabase
@@ -456,7 +456,7 @@ export async function createBadgeReward(reward: Omit<BadgeReward, 'id'>): Promis
 
 // User Preferences
 export async function getUserBadgePreferences(userId: string): Promise<UserBadgePreferences> {
-  const supabase = getSupabaseClient()
+  const supabase = getClientSideSupabase()
   if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
   const { data, error } = await supabase
@@ -485,7 +485,7 @@ export async function updateBadgePreferences(
   preferences: Partial<Omit<UserBadgePreferences, 'userId'>>
 ): Promise<UserBadgePreferences> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
     const { data, error } = await supabase
@@ -532,7 +532,7 @@ function isProgressComplete(progress: Record<string, any>): boolean {
 // Extended Badge Operations
 export async function getBadgeWithTiers(badgeId: string): Promise<BadgeWithProgress & { tiers: BadgeTier[] }> {
   try {
-    const supabase = getSupabaseClient()
+    const supabase = getClientSideSupabase()
     if (!supabase) throw new EnhancedBadgeError("Database client not initialized")
 
     // Get badge with progress

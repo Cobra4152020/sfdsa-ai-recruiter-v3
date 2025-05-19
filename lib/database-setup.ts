@@ -1,7 +1,20 @@
-import { getServiceSupabase } from "./supabase-service"
-import { withRetry } from "./supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import fs from "fs"
 import { setupApplicantsTable } from "./database-setup-applicants"
+
+// Minimal withRetry utility for retrying async operations
+async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 500): Promise<T> {
+  let lastError;
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      if (i < retries - 1) await new Promise(res => setTimeout(res, delay));
+    }
+  }
+  throw lastError;
+}
 
 /**
  * Creates a function to check if columns exist in a table

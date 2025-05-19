@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase-service"
+import { supabase } from "@/lib/supabase/index"
 
 export function useUserProfile(userId: string, enabled = true) {
   const [profile, setProfile] = useState<any>(null)

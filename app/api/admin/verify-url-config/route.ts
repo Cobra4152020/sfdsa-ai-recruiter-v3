@@ -1,15 +1,14 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { NextResponse } from "next/server"
 import { getBaseUrl } from "@/lib/url-utils"
-import { createClient } from "@/lib/supabase-server"
 import { authConfig } from "@/lib/supabase-auth-config"
 
 export async function GET() {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Get Supabase settings
     const { data: settings, error } = await supabase

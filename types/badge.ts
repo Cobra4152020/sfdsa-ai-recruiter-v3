@@ -56,6 +56,8 @@ export interface BadgeProgress {
   lastActionAt: string;
   createdAt: string;
   updatedAt: string;
+  history?: any[];
+  lastUpdated?: string;
 }
 
 export type TimelineEventType = 'start' | 'progress' | 'milestone' | 'completion' | 'unlock' | 'share';

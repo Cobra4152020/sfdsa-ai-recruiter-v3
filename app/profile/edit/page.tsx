@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
@@ -12,9 +11,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
-import { getSupabaseClient } from "@/lib/supabase-core"
 import { ArrowLeft, Save } from "lucide-react"
-import { useUser } from "@/context/user-context"
 
 export default function EditProfilePage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -36,11 +33,24 @@ export default function EditProfilePage() {
 
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = getSupabaseClient()
-  const { currentUser, setCurrentUser } = useUser()
+  const [supabase, setSupabase] = useState(null)
+  const [currentUser, setCurrentUser] = useState(null)
+
+  useEffect(() => {
+    const loadClientModules = async () => {
+      const { getClientSideSupabase } = await import("@/lib/supabase")
+      const { useUser } = await import("@/context/user-context")
+      const supabaseInstance = getClientSideSupabase()
+      const { currentUser, setCurrentUser } = useUser()
+      setSupabase(supabaseInstance)
+      setCurrentUser(currentUser)
+    }
+    loadClientModules()
+  }, [])
 
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) return
       try {
         const {
           data: { session },
@@ -201,17 +211,15 @@ export default function EditProfilePage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-3xl font-bold text-[#0A3C1F]">Edit Profile</h1>
       </div>
-
-      <form onSubmit={handleSubmit} className="max-w-4xl mx-auto">
-        <Card>
-          <CardHeader>
-            <CardTitle>Personal Information</CardTitle>
-            <CardDescription>Update your personal details</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Edit Profile</CardTitle>
+          <CardDescription>Update your personal information and preferences.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="first_name">First Name</Label>
                 <Input
@@ -224,41 +232,28 @@ export default function EditProfilePage() {
               </div>
               <div className="space-y-2">
                 <Label htmlFor="last_name">Last Name</Label>
-                <Input id="last_name" name="last_name" value={formData.last_name} onChange={handleChange} required />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" value={formData.email} disabled />
-                <p className="text-xs text-gray-500">To change your email, please contact support</p>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="phone">Phone Number</Label>
                 <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  value={formData.phone}
+                  id="last_name"
+                  name="last_name"
+                  value={formData.last_name}
                   onChange={handleChange}
-                  placeholder="(555) 555-5555"
+                  required
                 />
               </div>
             </div>
-
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input id="email" name="email" value={formData.email} onChange={handleChange} required disabled />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="phone">Phone</Label>
+              <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-                placeholder="Street Address"
-              />
+              <Input id="address" name="address" value={formData.address} onChange={handleChange} />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="city">City</Label>
                 <Input id="city" name="city" value={formData.city} onChange={handleChange} />
@@ -272,35 +267,32 @@ export default function EditProfilePage() {
                 <Input id="zip" name="zip" value={formData.zip} onChange={handleChange} />
               </div>
             </div>
-
             <div className="space-y-2">
-              <Label htmlFor="bio">About You</Label>
+              <Label htmlFor="bio">Bio</Label>
               <Textarea
                 id="bio"
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
-                placeholder="Tell us a bit about yourself..."
                 rows={4}
+                placeholder="Tell us about yourself..."
               />
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="military_experience">Military Experience</Label>
                 <Select
                   value={formData.military_experience}
                   onValueChange={(value) => handleSelectChange("military_experience", value)}
                 >
-                  <SelectTrigger id="military_experience">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select experience" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="veteran">Veteran</SelectItem>
                     <SelectItem value="active">Active Duty</SelectItem>
-                    <SelectItem value="reserve">Reserve</SelectItem>
-                    <SelectItem value="national_guard">National Guard</SelectItem>
+                    <SelectItem value="veteran">Veteran</SelectItem>
+                    <SelectItem value="reserve">Reserve/National Guard</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -310,15 +302,14 @@ export default function EditProfilePage() {
                   value={formData.law_enforcement_experience}
                   onValueChange={(value) => handleSelectChange("law_enforcement_experience", value)}
                 >
-                  <SelectTrigger id="law_enforcement_experience">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select experience" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="current">Current Officer</SelectItem>
-                    <SelectItem value="former">Former Officer</SelectItem>
-                    <SelectItem value="security">Security Experience</SelectItem>
-                    <SelectItem value="corrections">Corrections</SelectItem>
+                    <SelectItem value="sworn">Sworn Officer</SelectItem>
+                    <SelectItem value="civilian">Civilian</SelectItem>
+                    <SelectItem value="intern">Intern/Volunteer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -328,12 +319,11 @@ export default function EditProfilePage() {
                   value={formData.education_level}
                   onValueChange={(value) => handleSelectChange("education_level", value)}
                 >
-                  <SelectTrigger id="education_level">
+                  <SelectTrigger>
                     <SelectValue placeholder="Select education" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="high_school">High School</SelectItem>
-                    <SelectItem value="some_college">Some College</SelectItem>
                     <SelectItem value="associates">Associate's Degree</SelectItem>
                     <SelectItem value="bachelors">Bachelor's Degree</SelectItem>
                     <SelectItem value="masters">Master's Degree</SelectItem>
@@ -342,27 +332,18 @@ export default function EditProfilePage() {
                 </Select>
               </div>
             </div>
-          </CardContent>
-          <CardFooter className="flex justify-between">
-            <Button variant="outline" type="button" onClick={() => router.push("/dashboard")}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isSaving}>
-              {isSaving ? (
-                <>
-                  <span className="animate-spin mr-2">⟳</span>
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Changes
-                </>
-              )}
-            </Button>
-          </CardFooter>
-        </Card>
-      </form>
+            <CardFooter className="flex justify-end space-x-4">
+              <Button variant="outline" onClick={() => router.push("/dashboard")}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save Changes"}
+                <Save className="h-4 w-4 ml-2" />
+              </Button>
+            </CardFooter>
+          </form>
+        </CardContent>
+      </Card>
     </main>
   )
 }

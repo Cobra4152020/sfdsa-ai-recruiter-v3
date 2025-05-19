@@ -9,6 +9,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle } from "lucide-react"
 import { fixAdminProfile } from "@/lib/actions/fix-admin-profile"
 import Link from "next/link"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export default function FixAdminProfilePage() {
   const [email, setEmail] = useState("")
@@ -17,6 +18,8 @@ export default function FixAdminProfilePage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+
+  const supabase = getClientSideSupabase()
 
   const handleFix = async () => {
     if (!email || !recoveryCode) {
@@ -112,7 +115,6 @@ export default function FixAdminProfilePage() {
             variant="outline"
             size="sm"
             onClick={async () => {
-              const { supabase } = await import("@/lib/supabase-client-singleton")
               await supabase.auth.signOut()
               window.location.href = "/login"
             }}

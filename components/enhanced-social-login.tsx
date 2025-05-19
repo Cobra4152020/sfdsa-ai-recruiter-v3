@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { enhancedAuthService } from "@/lib/enhanced-auth-service"
+import { enhancedAuthService } from "@/lib/enhanced-auth-service-client"
 import { useToast } from "@/components/ui/use-toast"
 import { Spinner } from "@/components/ui/spinner"
 import type { Provider } from "@supabase/supabase-js"

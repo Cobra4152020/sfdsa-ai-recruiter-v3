@@ -3,6 +3,7 @@
 import { createContext, useContext, useState, type ReactNode } from "react"
 import { UnifiedRegistrationPopup } from "@/components/unified-registration-popup"
 import { useUser } from "@/context/user-context"
+import { getClientSideSupabase } from '@/lib/supabase/index'
 
 interface RegistrationContextType {
   openRegistrationPopup: (options?: {
@@ -40,15 +41,15 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
       return false
     }
 
-    setRequiredPoints(options.points)
-    setActionName(options.action)
-    setReferralCode(options.referral)
-    setIsApplying(!!options.applying)
-    setUserType(options.userType || "recruit")
-    setCallbackUrl(options.callbackUrl)
-    setInitialTab(options.initialTab || "signin")
-    setTitle(options.title)
-    setDescription(options.description)
+    setRequiredPoints(options?.points)
+    setActionName(options?.action)
+    setReferralCode(options?.referral)
+    setIsApplying(!!options?.applying)
+    setUserType(options?.userType || "recruit")
+    setCallbackUrl(options?.callbackUrl)
+    setInitialTab(options?.initialTab || "signin")
+    setTitle(options?.title)
+    setDescription(options?.description)
     setIsOpen(true)
     return true
   }

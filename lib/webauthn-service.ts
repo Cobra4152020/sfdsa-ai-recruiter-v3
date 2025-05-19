@@ -15,14 +15,14 @@ import type {
   AuthenticatorDevice,
   RegistrationResponseJSON,
 } from '@simplewebauthn/typescript-types';
-import { createClient } from '@/lib/supabase-clients';
+import { getServiceSupabase } from '@/lib/supabase/server';
 
 const rpName = 'SFDSA Recruiter';
 const rpID = process.env.NEXT_PUBLIC_DOMAIN || 'localhost';
 const origin = process.env.NEXT_PUBLIC_ORIGIN || `https://${rpID}`;
 
 export class WebAuthnService {
-  private supabase = createClient();
+  private supabase = getServiceSupabase();
 
   // Get authenticator devices for a user
   async getUserDevices(userId: string): Promise<AuthenticatorDevice[]> {

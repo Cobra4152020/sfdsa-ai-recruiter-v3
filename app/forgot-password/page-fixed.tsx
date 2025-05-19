@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/components/ui/use-toast"
-import { supabase } from "@/lib/supabase-client-singleton"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { Mail, AlertCircle, CheckCircle2 } from "lucide-react"
 import Link from "next/link"
 
@@ -21,6 +21,8 @@ export default function ForgotPasswordPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const { toast } = useToast()
+
+  const supabase = getClientSideSupabase()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

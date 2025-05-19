@@ -1,9 +1,8 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function GET(request: Request) {
   try {
@@ -11,7 +10,7 @@ export async function GET(request: Request) {
     const startDate = searchParams.get("startDate") || new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
     const endDate = searchParams.get("endDate") || new Date().toISOString()
 
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     const { data, error } = await supabase.rpc("get_donation_point_distribution", {
       p_start_date: startDate,
@@ -24,11 +23,9 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({
-      distribution: data.map((item) => ({
-        pointRange: item.point_range,
-        donationCount: Number.parseInt(item.donation_count),
-        totalPoints: Number.parseInt(item.total_points),
-        avgAmount: Number.parseFloat(item.avg_amount),
+      distribution: (data as Array<{ label: string; value: number }>).map((item) => ({
+        label: item.label,
+        value: item.value,
       })),
     })
   } catch (error) {

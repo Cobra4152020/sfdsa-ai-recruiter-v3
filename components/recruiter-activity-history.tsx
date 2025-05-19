@@ -166,4 +166,68 @@ export function RecruiterActivityHistory() {
   }, [currentUser?.id])
 
   // Apply filters when activities, searchTerm, or activityFilter change
-  use
+  useEffect(() => {
+    let filtered = activities
+    if (activityFilter !== "all") {
+      filtered = filtered.filter((a) => a.activityType === activityFilter)
+    }
+    if (searchTerm) {
+      filtered = filtered.filter((a) =>
+        a.description.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+    setFilteredActivities(filtered)
+    setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1)
+    setCurrentPage(1)
+  }, [activities, searchTerm, activityFilter])
+
+  // Paginate filtered activities
+  const paginatedActivities = filteredActivities.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  )
+
+  if (isLoading) return <div>Loading activity history...</div>
+  if (error) return <div>Error: {error}</div>
+
+  return (
+    <div>
+      <h2>Recruiter Activity History</h2>
+      <div>Total Points: {totalPoints}</div>
+      <input
+        type="text"
+        placeholder="Search activities..."
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <select
+        value={activityFilter}
+        onChange={(e) => setActivityFilter(e.target.value)}
+      >
+        <option value="all">All Activities</option>
+        {Object.keys(activityIcons).map((type) => (
+          <option key={type} value={type}>
+            {type.replace(/_/g, " ")}
+          </option>
+        ))}
+      </select>
+      <ul>
+        {paginatedActivities.map((activity) => (
+          <li key={activity.id}>
+            <span>{activityIcons[activity.activityType] || ""}</span> {activity.description} ({activity.points} pts)
+            <span style={{ marginLeft: 8, color: '#888' }}>{new Date(activity.createdAt).toLocaleString()}</span>
+          </li>
+        ))}
+      </ul>
+      <div>
+        Page {currentPage} of {totalPages}
+        <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+          Previous
+        </button>
+        <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+          Next
+        </button>
+      </div>
+    </div>
+  )
+}

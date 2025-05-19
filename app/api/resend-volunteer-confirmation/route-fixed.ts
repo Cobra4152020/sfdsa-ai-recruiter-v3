@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { sendVolunteerConfirmationEmail } from "@/lib/email/volunteer-emails"
 import { constructUrl } from "@/lib/url-utils"
 import { diagnoseUserAuth } from "@/lib/auth-diagnostic"

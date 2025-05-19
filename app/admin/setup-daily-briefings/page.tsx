@@ -6,7 +6,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { CheckCircle, AlertCircle, Loader2 } from "lucide-react"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { setupDailyBriefingsTable, addSampleBriefing } from "@/lib/daily-briefing-setup"
 
 export default function SetupDailyBriefingsPage() {
   const [isLoading, setIsLoading] = useState(false)
@@ -19,7 +18,8 @@ export default function SetupDailyBriefingsPage() {
     setResult(null)
 
     try {
-      const result = await setupDailyBriefingsTable()
+      const res = await fetch("/api/admin/daily-briefings/setup", { method: "POST" })
+      const result = await res.json()
       setResult(result)
     } catch (error) {
       console.error("Error setting up daily briefings table:", error)
@@ -34,7 +34,8 @@ export default function SetupDailyBriefingsPage() {
     setBriefingResult(null)
 
     try {
-      const result = await addSampleBriefing()
+      const res = await fetch("/api/admin/daily-briefings/add-sample", { method: "POST" })
+      const result = await res.json()
       setBriefingResult(result)
     } catch (error) {
       console.error("Error adding sample briefing:", error)

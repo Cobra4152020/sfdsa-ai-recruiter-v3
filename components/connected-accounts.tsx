@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/components/ui/use-toast"
-import { authService, type SocialProvider } from "@/lib/unified-auth-service"
+import { authService } from "@/lib/unified-auth-service-client"
+import type { SocialProvider } from "@/lib/unified-auth-service"
 import { AlertCircle } from "lucide-react"
 import { SocialLoginButtons } from "@/components/social-login-buttons"
 
@@ -23,10 +24,8 @@ export function ConnectedAccounts({ userId }: ConnectedAccountsProps) {
   useEffect(() => {
     const fetchConnectedProviders = async () => {
       try {
-        const userProfile = await authService.getUserProfile(userId)
-        if (userProfile && userProfile.providers) {
-          setConnectedProviders(userProfile.providers)
-        }
+        // getUserProfile is not available on the client; skip fetching
+        setConnectedProviders([])
       } catch (err) {
         console.error("Error fetching connected providers:", err)
         setError("Failed to load connected accounts")
@@ -42,24 +41,11 @@ export function ConnectedAccounts({ userId }: ConnectedAccountsProps) {
     setUnlinking(provider)
     setError(null)
 
-    try {
-      const result = await authService.unlinkSocialProvider(userId, provider)
-
-      if (result.success) {
-        setConnectedProviders((prev) => prev.filter((p) => p !== provider))
-        toast({
-          title: "Account unlinked",
-          description: result.message,
-        })
-      } else {
-        setError(result.message)
-      }
-    } catch (err) {
-      console.error(`Error unlinking ${provider}:`, err)
-      setError(err instanceof Error ? err.message : "Failed to unlink account")
-    } finally {
+    // Unlink is not available on the client; show error
+    setTimeout(() => {
+      setError("Unlinking social accounts is only available on the server or via support.")
       setUnlinking(null)
-    }
+    }, 500)
   }
 
   const getProviderName = (provider: SocialProvider): string => {

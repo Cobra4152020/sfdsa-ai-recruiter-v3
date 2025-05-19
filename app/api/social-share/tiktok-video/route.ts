@@ -1,10 +1,9 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { type NextRequest, NextResponse } from "next/server"
 import { trackEngagement } from "@/lib/analytics"
-import { supabaseAdmin } from "@/lib/supabase-admin"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 // Flag to track if video generation is available
 let videoSupport = false
@@ -42,7 +41,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Record the share in the database
-    await supabaseAdmin.from("social_shares").insert({
+    await getServiceSupabase.from("social_shares").insert({
       user_id: userId,
       platform: "tiktok",
       content_type: achievementType,

@@ -1,16 +1,14 @@
 import { NextResponse } from "next/server"
-import { supabaseAdmin } from "@/lib/supabase-service"
+import { getServiceSupabase } from '@/app/lib/supabase/server'
 
 export async function fixAdminProfile(userId: string) {
   try {
+    const supabaseAdmin = getServiceSupabase()
     // 1. Check if user exists in auth
     const { data: authUser, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId)
 
     if (authError || !authUser.user) {
-      return {
-        success: false,
-        message: `Auth user not found: ${authError?.message || "Unknown error"}`,
-      }
+      return { success: false, error: "User not found in auth" }
     }
 
     // 2. Check user_types table
@@ -18,13 +16,10 @@ export async function fixAdminProfile(userId: string) {
       .from("user_types")
       .select("user_type")
       .eq("user_id", userId)
-      .maybeSingle()
+      .single()
 
-    if (userTypeError) {
-      return {
-        success: false,
-        message: `Error checking user type: ${userTypeError.message}`,
-      }
+    if (userTypeError && userTypeError.code !== "PGRST116") {
+      return { success: false, error: `Error checking user type: ${userTypeError.message}` }
     }
 
     // 3. Insert or update user_types if needed
@@ -32,14 +27,11 @@ export async function fixAdminProfile(userId: string) {
       const { error: insertTypeError } = await supabaseAdmin.from("user_types").insert({
         user_id: userId,
         user_type: "admin",
-        email: authUser.user.email,
+        created_at: new Date().toISOString(),
       })
 
       if (insertTypeError) {
-        return {
-          success: false,
-          message: `Failed to insert user type: ${insertTypeError.message}`,
-        }
+        return { success: false, error: `Error inserting user type: ${insertTypeError.message}` }
       }
     } else if (userType.user_type !== "admin") {
       const { error: updateTypeError } = await supabaseAdmin
@@ -48,10 +40,7 @@ export async function fixAdminProfile(userId: string) {
         .eq("user_id", userId)
 
       if (updateTypeError) {
-        return {
-          success: false,
-          message: `Failed to update user type: ${updateTypeError.message}`,
-        }
+        return { success: false, error: `Error updating user type: ${updateTypeError.message}` }
       }
     }
 
@@ -81,9 +70,8 @@ export async function fixAdminProfile(userId: string) {
             id UUID PRIMARY KEY REFERENCES auth.users(id),
             email TEXT NOT NULL,
             name TEXT,
-            avatar_url TEXT,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-            updated_at TIMESTAMP WITH TIME ZONE
+            created_at TIMESTAMPTZ DEFAULT NOW(),
+            updated_at TIMESTAMPTZ DEFAULT NOW()
           );
         `,
       })
@@ -94,13 +82,10 @@ export async function fixAdminProfile(userId: string) {
       .from("admin.users")
       .select("id")
       .eq("id", userId)
-      .maybeSingle()
+      .single()
 
     if (adminUserError && adminUserError.code !== "PGRST116") {
-      return {
-        success: false,
-        message: `Error checking admin user: ${adminUserError.message}`,
-      }
+      return { success: false, error: `Error checking admin user: ${adminUserError.message}` }
     }
 
     // 7. Insert user into admin.users if not exists
@@ -108,14 +93,13 @@ export async function fixAdminProfile(userId: string) {
       const { error: insertError } = await supabaseAdmin.from("admin.users").insert({
         id: userId,
         email: authUser.user.email || "",
-        name: authUser.user.user_metadata?.name || authUser.user.email?.split("@")[0] || "Admin User",
+        name: authUser.user.user_metadata?.name || "",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       })
 
       if (insertError) {
-        return {
-          success: false,
-          message: `Failed to insert admin user: ${insertError.message}`,
-        }
+        return { success: false, error: `Error inserting admin user: ${insertError.message}` }
       }
     }
 
@@ -124,13 +108,10 @@ export async function fixAdminProfile(userId: string) {
       .from("user_roles")
       .select("role")
       .eq("user_id", userId)
-      .maybeSingle()
+      .single()
 
     if (userRoleError && userRoleError.code !== "PGRST116") {
-      return {
-        success: false,
-        message: `Error checking user role: ${userRoleError.message}`,
-      }
+      return { success: false, error: `Error checking user role: ${userRoleError.message}` }
     }
 
     // 9. Insert or update user_roles if needed
@@ -138,13 +119,11 @@ export async function fixAdminProfile(userId: string) {
       const { error: insertRoleError } = await supabaseAdmin.from("user_roles").insert({
         user_id: userId,
         role: "admin",
+        created_at: new Date().toISOString(),
       })
 
       if (insertRoleError) {
-        return {
-          success: false,
-          message: `Failed to insert user role: ${insertRoleError.message}`,
-        }
+        return { success: false, error: `Error inserting user role: ${insertRoleError.message}` }
       }
     } else if (userRole.role !== "admin") {
       const { error: updateRoleError } = await supabaseAdmin
@@ -153,24 +132,14 @@ export async function fixAdminProfile(userId: string) {
         .eq("user_id", userId)
 
       if (updateRoleError) {
-        return {
-          success: false,
-          message: `Failed to update user role: ${updateRoleError.message}`,
-        }
+        return { success: false, error: `Error updating user role: ${updateRoleError.message}` }
       }
     }
 
-        
-    return {
-      success: true,
-      message: "Admin profile fixed successfully!",
-    }
-  } catch (error) {
+    return { success: true }
+  } catch (error: any) {
     console.error("Error fixing admin profile:", error)
-    return {
-      success: false,
-      message: error instanceof Error ? error.message : "An unexpected error occurred",
-    }
+    return { success: false, error: error.message }
   }
 }
 

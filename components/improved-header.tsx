@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { ReactNode } from "react"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { 
   ChevronDown, 
   Facebook, 
@@ -31,7 +31,7 @@ import { UserNav } from "@/components/user-nav"
 import { cn } from "@/lib/utils"
 import { useClientOnly } from "@/hooks/use-client-only"
 import { getWindowDimensions } from "@/lib/utils"
-import { DropdownNav } from "@/components/ui/dropdown-nav"
+import Link from "next/link"
 
 interface ImprovedHeaderProps {
   showOptInForm?: (isApplying?: boolean) => void
@@ -43,13 +43,21 @@ interface NavItem {
   icon?: ReactNode
 }
 
+interface NavSection {
+  label: string
+  icon?: ReactNode
+  items: NavItem[]
+}
+
 export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
   const { theme, setTheme } = useTheme()
   const { currentUser } = useUser()
   const { openModal } = useAuthModal()
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
+  const router = useRouter()
 
   const { scrollY } = useClientOnly(() => getWindowDimensions(), { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
 
@@ -59,10 +67,21 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
 
   useEffect(() => {
     setIsMobileMenuOpen(false)
+    setActiveDropdown(null)
   }, [pathname])
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen)
+  }
+
+  const toggleDropdown = (label: string) => {
+    setActiveDropdown(activeDropdown === label ? null : label)
+  }
+
+  const handleNavigation = (href: string) => {
+    router.push(href)
+    setIsMobileMenuOpen(false)
+    setActiveDropdown(null)
   }
 
   const toggleTheme = () => {
@@ -85,7 +104,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
     }
   }
 
-  const mainNavItems = {
+  const mainNavItems: Record<string, NavSection> = {
     mission: {
       label: "Mission Briefing",
       icon: <BookOpen className="w-4 h-4" />,
@@ -176,50 +195,50 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       )}>
         <div className="container mx-auto px-4">
           <nav className="flex justify-between items-center">
-            <a href="/" className="flex items-center space-x-2 group transition-transform duration-200 hover:scale-105">
+            <Link 
+              href="/" 
+              className="flex items-center space-x-2 group transition-transform duration-200 hover:scale-105"
+            >
               <ShieldLogo className="w-8 h-8" />
               <span className="text-xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">SFDSA</span>
-            </a>
+            </Link>
 
             {/* Desktop navigation */}
             <div className="hidden md:flex items-center space-x-6">
-              {Object.values(mainNavItems).map((item) => (
-                <DropdownNav
-                  key={item.label}
-                  label={item.label}
-                  icon={item.icon}
-                  items={item.items.map(navItem => ({
-                    label: (
-                      <div className="flex items-center">
-                        {navItem.icon && <span className="mr-2">{navItem.icon}</span>}
-                        <span>{navItem.label}</span>
-                      </div>
-                    ),
-                    href: navItem.href
-                  }))}
-                />
+              {Object.entries(mainNavItems).map(([key, section]) => (
+                <div 
+                  key={key} 
+                  className="relative group"
+                >
+                  <button
+                    className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] transition-colors duration-200 group"
+                  >
+                    {section.icon && <span className="mr-1">{section.icon}</span>}
+                    <span>{section.label}</span>
+                    <ChevronDown className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" />
+                  </button>
+                  <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute top-full left-0 mt-2 w-48 bg-white dark:bg-[#121212] rounded-md shadow-lg py-2 z-[100] transition-all duration-200">
+                    {section.items.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="flex items-center w-full px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] transition-colors duration-200"
+                      >
+                        {item.icon && <span className="mr-2">{item.icon}</span>}
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
               ))}
-              {userNavItems && (
-                <DropdownNav
-                  label={userNavItems.label}
-                  icon={userNavItems.icon}
-                  items={userNavItems.items.map(navItem => ({
-                    label: (
-                      <div className="flex items-center">
-                        {navItem.icon && <span className="mr-2">{navItem.icon}</span>}
-                        <span>{navItem.label}</span>
-                      </div>
-                    ),
-                    href: navItem.href
-                  }))}
-                />
-              )}
-              {!currentUser && (
+              {currentUser ? (
+                <UserNav />
+              ) : (
                 <div className="flex items-center space-x-4">
                   <Button
                     variant="ghost"
                     onClick={handleLogin}
-                    className="text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white"
+                    className="text-[#0A3C1F] dark:text-[#FFD700]"
                   >
                     Login
                   </Button>
@@ -234,13 +253,21 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
             </div>
 
             {/* Mobile menu button */}
-            <button
-              onClick={toggleMobileMenu}
-              className="md:hidden text-[#0A3C1F] dark:text-[#FFD700]"
-              aria-label="Toggle mobile menu"
-            >
-              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
+            <div className="md:hidden flex items-center space-x-4">
+              <ThemeToggle />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMobileMenu}
+                className="text-[#0A3C1F] dark:text-[#FFD700]"
+              >
+                {isMobileMenuOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
+              </Button>
+            </div>
           </nav>
         </div>
       </div>
@@ -262,17 +289,14 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                 </h3>
                 <div className="space-y-3 pl-6">
                   {section.items.map((item) => (
-                    <a
+                    <button
                       key={item.href}
-                      href={item.href}
-                      className="block w-full text-left text-gray-600 dark:text-gray-300 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] py-2 flex items-center text-base transition-all duration-200 hover:translate-x-1"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                      role="menuitem"
-                      tabIndex={isMobileMenuOpen ? 0 : -1}
+                      onClick={() => handleNavigation(item.href)}
+                      className="w-full text-left text-gray-600 dark:text-gray-300 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] py-2 flex items-center text-base transition-all duration-200 hover:translate-x-1"
                     >
                       {item.icon && <span className="mr-3 opacity-75">{item.icon}</span>}
                       {item.label}
-                    </a>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -286,7 +310,6 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                     setIsMobileMenuOpen(false)
                   }}
                   className="w-full text-[#0A3C1F] dark:text-[#FFD700] text-lg font-medium"
-                  tabIndex={isMobileMenuOpen ? 0 : -1}
                 >
                   Login
                 </Button>
@@ -296,7 +319,6 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                     setIsMobileMenuOpen(false)
                   }}
                   className="w-full bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-black dark:hover:bg-[#FFD700]/90 text-lg font-medium"
-                  tabIndex={isMobileMenuOpen ? 0 : -1}
                 >
                   Apply Now
                 </Button>

@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase-client-singleton"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -10,8 +9,19 @@ export function AuthDebug() {
   const [userRoles, setUserRoles] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [supabase, setSupabase] = useState<any>(null)
+
+  useEffect(() => {
+    const loadClientModules = async () => {
+      const { getClientSideSupabase } = await import("@/lib/supabase")
+      const supabaseInstance = getClientSideSupabase()
+      setSupabase(supabaseInstance)
+    }
+    loadClientModules()
+  }, [])
 
   async function checkSession() {
+    if (!supabase) return
     try {
       setLoading(true)
       setError(null)
@@ -47,8 +57,10 @@ export function AuthDebug() {
   }
 
   useEffect(() => {
-    checkSession()
-  }, [])
+    if (supabase) {
+      checkSession()
+    }
+  }, [supabase])
 
   return (
     <Card className="w-full">

@@ -7,7 +7,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { useToast } from "@/components/ui/use-toast"
 import { Shield, ArrowRight, Loader2 } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner"
-import { supabase } from "@/lib/supabase-client-singleton" // Use the singleton
+import { getClientSideSupabase } from "@/lib/supabase"
+
+const supabase = getClientSideSupabase()
 
 export function AdminDirectLogin() {
   const [isLoading, setIsLoading] = useState(false)

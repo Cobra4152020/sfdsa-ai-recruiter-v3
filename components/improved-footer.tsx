@@ -1,26 +1,20 @@
 "use client"
 
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 import Image from "next/image"
 import { Facebook, Twitter, Youtube, Instagram, Linkedin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ShieldLogo } from "@/components/shield-logo"
 
 export function ImprovedFooter() {
-  const router = useRouter()
-
-  const handleNavigation = (href: string) => {
-    router.push(href)
-  }
-
   return (
     <footer className="bg-[#0A3C1F] text-white" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-4 py-12">
         {/* Brand Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
           <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8">
-            <button 
-              onClick={() => handleNavigation("/")} 
+            <Link 
+              href="/"
               className="flex items-center group transition-transform duration-200 hover:scale-105"
               aria-label="Go to homepage"
             >
@@ -31,7 +25,7 @@ export function ImprovedFooter() {
                 <div className="font-bold">SF Deputy Sheriff</div>
                 <div className="text-[#FFD700] text-sm">AI Recruitment</div>
               </div>
-            </button>
+            </Link>
             <p className="text-sm text-white/80 max-w-md">
               Serving the City and County of San Francisco with honor, integrity, and commitment to public safety.
             </p>
@@ -71,14 +65,14 @@ export function ImprovedFooter() {
                 { href: "/gi-bill", label: "G.I. Bill" },
                 { href: "/discounted-housing", label: "Discounted Housing" }
               ].map(({ href, label }) => (
-                <button
+                <Link
                   key={href}
-                  onClick={() => handleNavigation(href)}
+                  href={href}
                   className="text-left text-white/80 hover:text-[#FFD700] transition-all duration-200 hover:translate-x-1 focus:outline-none focus:text-[#FFD700]"
                   aria-label={`Navigate to ${label}`}
                 >
                   {label}
-                </button>
+                </Link>
               ))}
             </div>
           </div>
@@ -93,14 +87,14 @@ export function ImprovedFooter() {
                 { href: "/volunteer-recruiter", label: "Volunteer Recruiter" },
                 { href: "/contact", label: "Contact Support" }
               ].map(({ href, label }) => (
-                <button
+                <Link
                   key={href}
-                  onClick={() => handleNavigation(href)}
+                  href={href}
                   className="text-left text-white/80 hover:text-[#FFD700] transition-all duration-200 hover:translate-x-1 focus:outline-none focus:text-[#FFD700]"
                   aria-label={`Navigate to ${label}`}
                 >
                   {label}
-                </button>
+                </Link>
               ))}
             </div>
           </div>
@@ -147,15 +141,15 @@ export function ImprovedFooter() {
                     Email: info@sfdeputysheriff.com
                   </a>
                 </p>
-                <button 
-                  onClick={() => handleNavigation("/donate")} 
+                <Link 
+                  href="/donate"
                   className="block mt-4 w-full transform transition-transform duration-200 hover:scale-105"
                   aria-label="Support our mission - Make a donation"
                 >
                   <Button className="w-full bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 font-semibold">
                     Support Our Mission
                   </Button>
-                </button>
+                </Link>
               </div>
             </div>
           </div>

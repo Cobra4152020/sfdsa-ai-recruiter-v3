@@ -1,5 +1,3 @@
-import { createClient } from "@/lib/supabase-clients"
-import { getServiceSupabase } from "@/lib/supabase-service"
 import { checkAndAwardNFTs } from "@/lib/nft-utils"
 import { awardBadgeToUser } from "@/lib/badge-utils"
 
@@ -38,53 +36,10 @@ export interface DonationPointsAward {
 }
 
 /**
- * Award points for a donation
+ * Award points for a donation (server-only)
  */
-export async function awardDonationPoints(
-  userId: string,
-  donationId: string,
-  amount: number,
-  isRecurring = false,
-): Promise<{ success: boolean; points?: number; message?: string }> {
-  try {
-    const supabase = getServiceSupabase()
-
-    // Call the calculate_donation_points function
-    const { data, error } = await supabase.rpc("calculate_donation_points", {
-      p_donation_id: donationId,
-      p_user_id: userId,
-      p_amount: amount,
-      p_is_recurring: isRecurring,
-    })
-
-    if (error) {
-      console.error("Error awarding donation points:", error)
-      return { success: false, message: error.message }
-    }
-
-    const pointsAwarded = data as number
-
-    // Check for donation-related badges
-    await checkDonationBadges(userId, amount, isRecurring)
-
-    // Check for NFT awards based on total points
-    const { data: userData, error: userError } = await supabase
-      .from("users")
-      .select("donation_points, participation_count")
-      .eq("id", userId)
-      .single()
-
-    if (!userError && userData) {
-      // Add donation points to participation points for NFT eligibility
-      const totalPoints = (userData.participation_count || 0) + (userData.donation_points || 0)
-      await checkAndAwardNFTs(userId, totalPoints)
-    }
-
-    return { success: true, points: pointsAwarded }
-  } catch (error) {
-    console.error("Exception in awardDonationPoints:", error)
-    return { success: false, message: error instanceof Error ? error.message : "Unknown error" }
-  }
+export async function awardDonationPoints() {
+  throw new Error('awardDonationPoints is server-only. Use from lib/donation-points-service-server.ts');
 }
 
 /**
@@ -92,9 +47,7 @@ export async function awardDonationPoints(
  */
 async function checkDonationBadges(userId: string, amount: number, isRecurring: boolean) {
   try {
-    const supabase = getServiceSupabase()
-
-    // Get user's donation history
+    // 'This function requires server-only logic and must be implemented in lib/donation-points-service-server.ts.'
     const { data: donationHistory, error } = await supabase
       .from("donation_points")
       .select("donation_id, points, is_recurring")
@@ -159,200 +112,36 @@ async function checkDonationBadges(userId: string, amount: number, isRecurring: 
 }
 
 /**
- * Get donation point rules
+ * Get donation point rules (server-only)
  */
-export async function getDonationPointRules(): Promise<{
-  success: boolean
-  rules?: DonationPointRule[]
-  message?: string
-}> {
-  try {
-    const supabase = createClient()
-
-    const { data, error } = await supabase
-      .from("donation_point_rules")
-      .select("*")
-      .order("min_amount", { ascending: true })
-
-    if (error) {
-      console.error("Error fetching donation point rules:", error)
-      return { success: false, message: error.message }
-    }
-
-    const rules = data.map((rule) => ({
-      id: rule.id,
-      name: rule.name,
-      description: rule.description,
-      minAmount: rule.min_amount,
-      maxAmount: rule.max_amount,
-      pointsPerDollar: rule.points_per_dollar,
-      recurringMultiplier: rule.recurring_multiplier,
-      isActive: rule.is_active,
-      campaignId: rule.campaign_id,
-      createdAt: rule.created_at,
-      updatedAt: rule.updated_at,
-    }))
-
-    return { success: true, rules }
-  } catch (error) {
-    console.error("Exception in getDonationPointRules:", error)
-    return { success: false, message: error instanceof Error ? error.message : "Unknown error" }
-  }
+export async function getDonationPointRules() {
+  throw new Error('getDonationPointRules is server-only. Use from lib/donation-points-service-server.ts');
 }
 
 /**
- * Update a donation point rule
+ * Update a donation point rule (server-only)
  */
-export async function updateDonationPointRule(
-  ruleId: number,
-  rule: Partial<DonationPointRule>,
-): Promise<{ success: boolean; message?: string }> {
-  try {
-    const supabase = getServiceSupabase()
-
-    const { error } = await supabase
-      .from("donation_point_rules")
-      .update({
-        name: rule.name,
-        description: rule.description,
-        min_amount: rule.minAmount,
-        max_amount: rule.maxAmount,
-        points_per_dollar: rule.pointsPerDollar,
-        recurring_multiplier: rule.recurringMultiplier,
-        is_active: rule.isActive,
-        campaign_id: rule.campaignId,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", ruleId)
-
-    if (error) {
-      console.error("Error updating donation point rule:", error)
-      return { success: false, message: error.message }
-    }
-
-    return { success: true }
-  } catch (error) {
-    console.error("Exception in updateDonationPointRule:", error)
-    return { success: false, message: error instanceof Error ? error.message : "Unknown error" }
-  }
+export async function updateDonationPointRule() {
+  throw new Error('updateDonationPointRule is server-only. Use from lib/donation-points-service-server.ts');
 }
 
 /**
- * Get active donation campaigns
+ * Get active donation campaigns (server-only)
  */
-export async function getActiveDonationCampaigns(): Promise<{
-  success: boolean
-  campaigns?: DonationCampaign[]
-  message?: string
-}> {
-  try {
-    const supabase = createClient()
-
-    const { data, error } = await supabase
-      .from("donation_campaigns")
-      .select("*")
-      .eq("is_active", true)
-      .gte("start_date", new Date().toISOString())
-      .or(`end_date.is.null,end_date.gte.${new Date().toISOString()}`)
-      .order("start_date", { ascending: false })
-
-    if (error) {
-      console.error("Error fetching active donation campaigns:", error)
-      return { success: false, message: error.message }
-    }
-
-    const campaigns = data.map((campaign) => ({
-      id: campaign.id,
-      name: campaign.name,
-      description: campaign.description,
-      startDate: campaign.start_date,
-      endDate: campaign.end_date,
-      pointMultiplier: campaign.point_multiplier,
-      isActive: campaign.is_active,
-      createdAt: campaign.created_at,
-      updatedAt: campaign.updated_at,
-    }))
-
-    return { success: true, campaigns }
-  } catch (error) {
-    console.error("Exception in getActiveDonationCampaigns:", error)
-    return { success: false, message: error instanceof Error ? error.message : "Unknown error" }
-  }
+export async function getActiveDonationCampaigns() {
+  throw new Error('getActiveDonationCampaigns is server-only. Use from lib/donation-points-service-server.ts');
 }
 
 /**
- * Get user's donation points
+ * Get user donation points (server-only)
  */
-export async function getUserDonationPoints(userId: string): Promise<{
-  success: boolean
-  points?: number
-  donationCount?: number
-  message?: string
-}> {
-  try {
-    const supabase = createClient()
-
-    const { data, error } = await supabase.from("users").select("donation_points").eq("id", userId).single()
-
-    if (error) {
-      console.error("Error fetching user donation points:", error)
-      return { success: false, message: error.message }
-    }
-
-    // Get donation count
-    const { count, error: countError } = await supabase
-      .from("donation_points")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", userId)
-
-    if (countError) {
-      console.error("Error fetching donation count:", countError)
-    }
-
-    return {
-      success: true,
-      points: data.donation_points || 0,
-      donationCount: count || 0,
-    }
-  } catch (error) {
-    console.error("Exception in getUserDonationPoints:", error)
-    return { success: false, message: error instanceof Error ? error.message : "Unknown error" }
-  }
+export async function getUserDonationPoints() {
+  throw new Error('getUserDonationPoints is server-only. Use from lib/donation-points-service-server.ts');
 }
 
 /**
- * Get donation leaderboard
+ * Get donation leaderboard (server-only)
  */
-export async function getDonationLeaderboard(
-  limit = 10,
-  offset = 0,
-): Promise<{
-  success: boolean
-  leaderboard?: any[]
-  total?: number
-  message?: string
-}> {
-  try {
-    const supabase = createClient()
-
-    const { data, error, count } = await supabase
-      .from("donation_leaderboard")
-      .select("*", { count: "exact" })
-      .order("donation_points", { ascending: false })
-      .range(offset, offset + limit - 1)
-
-    if (error) {
-      console.error("Error fetching donation leaderboard:", error)
-      return { success: false, message: error.message }
-    }
-
-    return {
-      success: true,
-      leaderboard: data,
-      total: count || 0,
-    }
-  } catch (error) {
-    console.error("Exception in getDonationLeaderboard:", error)
-    return { success: false, message: error instanceof Error ? error.message : "Unknown error" }
-  }
+export async function getDonationLeaderboard() {
+  throw new Error('getDonationLeaderboard is server-only. Use from lib/donation-points-service-server.ts');
 }

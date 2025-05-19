@@ -1,12 +1,11 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
 import Stripe from "stripe"
-import { createClient } from "@/lib/supabase-client"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { headers } from "next/headers"
-import { awardDonationPoints } from "@/lib/donation-points-service"
+import { awardDonationPoints } from "@/lib/donation-points-service-server"
 import { createNotification } from "@/lib/notification-service"
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -28,7 +27,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Webhook Error: ${(err as Error).message}` }, { status: 400 })
   }
 
-  const supabase = createClient()
+  const supabase = getServiceSupabase()
 
   // Handle the event
   switch (event.type) {

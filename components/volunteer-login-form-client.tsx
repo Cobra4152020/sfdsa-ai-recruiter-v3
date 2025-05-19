@@ -12,7 +12,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/components/ui/use-toast"
 import { Mail, Lock, Eye, EyeOff, AlertCircle, InfoIcon } from "lucide-react"
-import { authService } from "@/lib/unified-auth-service"
+import { authService } from "@/lib/unified-auth-service-client"
 
 export function VolunteerLoginFormClient() {
   const router = useRouter()

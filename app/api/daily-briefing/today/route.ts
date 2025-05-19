@@ -2,7 +2,7 @@ export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-clients"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { getBriefingStats, updateBriefingCycle, calculateCycleDay } from "@/lib/daily-briefing-service"
 
 // Fallback briefing data
@@ -43,7 +43,7 @@ const fallbackBriefing = {
 
 export async function GET(request: Request) {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Get today's date in YYYY-MM-DD format
     const today = new Date()

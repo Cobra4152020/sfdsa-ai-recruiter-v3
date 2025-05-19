@@ -5,11 +5,12 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SetupAdminUserButton } from "@/components/admin/setup-admin-user-button"
-import { supabase } from "@/lib/supabase-client-singleton"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 
 export default function AdminSetupPage() {
+  const supabase = getClientSideSupabase()
   const [userId, setUserId] = useState("")
   const [email, setEmail] = useState("")
   const [name, setName] = useState("")
@@ -92,7 +93,7 @@ export default function AdminSetupPage() {
             </Alert>
           </CardContent>
           <CardFooter>
-            <SetupAdminUserButton userId={userId} email={email} name={name} />
+            <SetupAdminUserButton />
           </CardFooter>
         </Card>
       )}

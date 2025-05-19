@@ -1,12 +1,21 @@
 "use client"
 
-import { useEffect } from "react"
-import { useRegistration } from "@/context/registration-context"
+import { useEffect, useState } from "react"
 
 export default function VolunteerRegisterPage() {
-  const { openRegistrationPopup } = useRegistration()
+  const [openRegistrationPopup, setOpenRegistrationPopup] = useState<any>(null)
 
   useEffect(() => {
+    const loadClientModules = async () => {
+      const { useRegistration } = await import("@/context/registration-context")
+      const { openRegistrationPopup } = useRegistration()
+      setOpenRegistrationPopup(() => openRegistrationPopup)
+    }
+    loadClientModules()
+  }, [])
+
+  useEffect(() => {
+    if (!openRegistrationPopup) return
     // Open the registration popup automatically with volunteer settings
     openRegistrationPopup({
       userType: "volunteer",
@@ -24,7 +33,7 @@ export default function VolunteerRegisterPage() {
           The registration form should appear automatically. If it doesn't, please click the button below.
         </p>
         <button
-          onClick={() => openRegistrationPopup({ userType: "volunteer", initialTab: "signup" })}
+          onClick={() => openRegistrationPopup && openRegistrationPopup({ userType: "volunteer", initialTab: "signup" })}
           className="bg-[#0A3C1F] text-white py-2 px-4 rounded hover:bg-[#0A3C1F]/90"
         >
           Open Registration Form

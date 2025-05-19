@@ -10,7 +10,7 @@ import {
   deleteAllNotifications,
   type Notification,
 } from "@/lib/notification-service"
-import { supabase } from "@/lib/supabase-client"
+import { getClientSideSupabase } from '@/lib/supabase/index'
 
 export function useNotifications(userId?: string | null) {
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -53,7 +53,7 @@ export function useNotifications(userId?: string | null) {
     if (!userId || isSubscribed) return
 
     // Subscribe to changes in the notifications table for this user
-    const channel = supabase
+    const channel = getClientSideSupabase()
       .channel(`notifications:${userId}`)
       .on(
         "postgres_changes",
@@ -73,7 +73,7 @@ export function useNotifications(userId?: string | null) {
     setIsSubscribed(true)
 
     return () => {
-      supabase.removeChannel(channel)
+      getClientSideSupabase().removeChannel(channel)
       setIsSubscribed(false)
     }
   }, [userId, isSubscribed, fetchNotifications])

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { createClient } from "@/lib/supabase-clients"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export function AuthTestClient() {
   const [sessionData, setSessionData] = useState<any>(null)
@@ -19,7 +19,7 @@ export function AuthTestClient() {
       setLoading(true)
       setError(null)
 
-      const supabase = createClient()
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.getSession()
 
       if (error) throw error
@@ -40,7 +40,7 @@ export function AuthTestClient() {
   async function handleSignOut() {
     try {
       setLoading(true)
-      const supabase = createClient()
+      const supabase = getClientSideSupabase()
       const { error } = await supabase.auth.signOut()
       if (error) throw error
       setSessionData(null)

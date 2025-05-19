@@ -32,7 +32,7 @@ import type {
   BadgeLayoutType,
   BadgeDisplayStyle,
 } from '@/types/badge'
-import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase/index'
 
 interface BadgeCollectionMembership {
   badge: Badge | null
@@ -231,6 +231,7 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load badge collections with error handling
+      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
       const { data: collectionsData, error: collectionsError } = await supabase
         .from('badge_collections')
         .select(`
@@ -260,6 +261,7 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load user XP
+      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
       const { data: xpData, error: xpError } = await supabase
         .from('user_xp')
         .select('*')
@@ -276,6 +278,7 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load active challenges
+      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
       const now = new Date().toISOString()
       const { data: challengesData, error: challengesError } = await supabase
         .from('badge_challenges')
@@ -288,6 +291,7 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load showcase settings
+      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
       const { data: showcaseData, error: showcaseError } = await supabase
         .from('badge_showcase_settings')
         .select('*')
@@ -310,6 +314,7 @@ export function useEnhancedBadges(options: UseEnhancedBadgesOptions = {}): UseEn
       }
 
       // Load preferences
+      if (!supabase) throw new Error('Supabase client is not available on the server. This hook must be used on the client.')
       const { data: preferencesData, error: preferencesError } = await supabase
         .from('user_badge_preferences')
         .select('*')

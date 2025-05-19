@@ -1,6 +1,8 @@
 "use client"
 
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react"
+import { useRouter } from "next/navigation"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 // Define the user type
 interface User {
@@ -18,8 +20,10 @@ interface UserContextType {
   currentUser: User | null
   isLoading: boolean
   error: string | null
+  isLoggedIn: boolean
   setCurrentUser: (user: User | null) => void
   login: (user: User) => void
+  signOut: () => Promise<void>
 }
 
 // Create the context with default values
@@ -27,8 +31,10 @@ const UserContext = createContext<UserContextType>({
   currentUser: null,
   isLoading: true,
   error: null,
+  isLoggedIn: false,
   setCurrentUser: () => {},
   login: () => {},
+  signOut: async () => {},
 })
 
 // Hook to use the user context
@@ -42,16 +48,39 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
+
+  // Only initialize supabase on the client
+  const [supabase, setSupabase] = useState<any>(null)
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setSupabase(getClientSideSupabase())
+    }
+  }, [])
 
   const login = (user: User) => {
     setCurrentUser(user)
   }
 
+  const signOut = async () => {
+    if (!supabase) return
+    try {
+      await supabase.auth.signOut()
+      setCurrentUser(null)
+      router.push("/")
+    } catch (error) {
+      console.error("Error signing out:", error)
+    }
+  }
+
   useEffect(() => {
+    if (!supabase) return
+    let mounted = true
+
     const fetchUser = async () => {
       try {
-        // Import dynamically to avoid issues during SSR
-        const { supabase } = await import("@/lib/supabase-client-singleton")
+        setIsLoading(true)
+        setError(null)
 
         const {
           data: { session },
@@ -60,14 +89,18 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
         if (sessionError) {
           console.warn("Error fetching session:", sessionError)
-          setError("Failed to authenticate")
-          setIsLoading(false)
+          if (mounted) {
+            setError("Failed to authenticate")
+            setIsLoading(false)
+          }
           return
         }
 
         if (!session) {
-          setCurrentUser(null)
-          setIsLoading(false)
+          if (mounted) {
+            setCurrentUser(null)
+            setIsLoading(false)
+          }
           return
         }
 
@@ -80,33 +113,46 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
         if (userTypeError) {
           console.warn("Error fetching user type:", userTypeError)
-          setError("Failed to load user profile")
-          setIsLoading(false)
+          if (mounted) {
+            setError("Failed to load user profile")
+            setIsLoading(false)
+          }
           return
         }
 
         const userType = userTypeData?.user_type || "recruit"
 
-        // Set user data
-        setCurrentUser({
-          id: session.user.id,
-          email: session.user.email || "",
-          name: session.user.user_metadata?.name || session.user.email?.split("@")[0] || "User",
-          avatarUrl: session.user.user_metadata?.avatar_url,
-          userType,
-        })
+        if (mounted) {
+          // Set user data
+          setCurrentUser({
+            id: session.user.id,
+            email: session.user.email || "",
+            name: session.user.user_metadata?.name || session.user.email?.split("@")[0] || "User",
+            avatarUrl: session.user.user_metadata?.avatar_url,
+            userType,
+          })
+          setIsLoading(false)
+        }
       } catch (error) {
         console.warn("Error in user context:", error)
-        setError("An unexpected error occurred")
-      } finally {
-        setIsLoading(false)
+        if (mounted) {
+          setError("An unexpected error occurred")
+          setIsLoading(false)
+        }
       }
     }
 
     fetchUser()
-  }, [])
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      mounted = false
+    }
+  }, [supabase])
 
   return (
-    <UserContext.Provider value={{ currentUser, isLoading, error, setCurrentUser, login }}>{children}</UserContext.Provider>
+    <UserContext.Provider value={{ currentUser, isLoading, error, isLoggedIn: !!currentUser, setCurrentUser, login, signOut }}>
+      {children}
+    </UserContext.Provider>
   )
 }

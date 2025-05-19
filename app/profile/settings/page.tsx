@@ -10,9 +10,7 @@ import { Switch } from "@/components/ui/switch"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
-import { getSupabaseClient } from "@/lib/supabase-core"
 import { ArrowLeft, Shield, Bell, User, Key } from "lucide-react"
-import { useUser } from "@/context/user-context"
 
 export default function SettingsPage() {
   const [isLoading, setIsLoading] = useState(true)
@@ -27,11 +25,24 @@ export default function SettingsPage() {
 
   const router = useRouter()
   const { toast } = useToast()
-  const supabase = getSupabaseClient()
-  const { currentUser } = useUser()
+  const [supabase, setSupabase] = useState(null)
+  const [currentUser, setCurrentUser] = useState(null)
+
+  useEffect(() => {
+    const loadClientModules = async () => {
+      const { getClientSideSupabase } = await import("@/lib/supabase")
+      const { useUser } = await import("@/context/user-context")
+      const supabaseInstance = getClientSideSupabase()
+      const { currentUser, setCurrentUser } = useUser()
+      setSupabase(supabaseInstance)
+      setCurrentUser(currentUser)
+    }
+    loadClientModules()
+  }, [])
 
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) return
       try {
         const {
           data: { session },
@@ -200,9 +211,7 @@ export default function SettingsPage() {
                 </div>
                 <Switch
                   checked={notificationSettings.emailNotifications}
-                  onCheckedChange={(checked) =>
-                    setNotificationSettings({ ...notificationSettings, emailNotifications: checked })
-                  }
+                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, emailNotifications: checked })}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -212,9 +221,7 @@ export default function SettingsPage() {
                 </div>
                 <Switch
                   checked={notificationSettings.applicationUpdates}
-                  onCheckedChange={(checked) =>
-                    setNotificationSettings({ ...notificationSettings, applicationUpdates: checked })
-                  }
+                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, applicationUpdates: checked })}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -224,21 +231,17 @@ export default function SettingsPage() {
                 </div>
                 <Switch
                   checked={notificationSettings.newBadges}
-                  onCheckedChange={(checked) =>
-                    setNotificationSettings({ ...notificationSettings, newBadges: checked })
-                  }
+                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, newBadges: checked })}
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium">Leaderboard Updates</h3>
-                  <p className="text-sm text-gray-500">Get notified about leaderboard changes</p>
+                  <p className="text-sm text-gray-500">Get notified about your ranking changes</p>
                 </div>
                 <Switch
                   checked={notificationSettings.leaderboardUpdates}
-                  onCheckedChange={(checked) =>
-                    setNotificationSettings({ ...notificationSettings, leaderboardUpdates: checked })
-                  }
+                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, leaderboardUpdates: checked })}
                 />
               </div>
               <div className="flex items-center justify-between">
@@ -248,9 +251,7 @@ export default function SettingsPage() {
                 </div>
                 <Switch
                   checked={notificationSettings.marketingEmails}
-                  onCheckedChange={(checked) =>
-                    setNotificationSettings({ ...notificationSettings, marketingEmails: checked })
-                  }
+                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, marketingEmails: checked })}
                 />
               </div>
             </CardContent>
@@ -268,23 +269,13 @@ export default function SettingsPage() {
               <CardTitle>Security Settings</CardTitle>
               <CardDescription>Manage your account security</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium flex items-center">
-                  <Key className="h-4 w-4 mr-2" />
-                  Password
-                </h3>
-                <p className="text-sm text-gray-500">Last changed: Never</p>
+                <h3 className="font-medium">Change Password</h3>
+                <p className="text-sm text-gray-500">Update your password to keep your account secure</p>
                 <Button variant="outline" onClick={() => router.push("/reset-password")}>
                   Change Password
                 </Button>
-              </div>
-
-              <div className="pt-4 border-t">
-                <h3 className="font-medium mb-2">Account Activity</h3>
-                <p className="text-sm text-gray-500">
-                  Last login: {new Date().toLocaleDateString()} at {new Date().toLocaleTimeString()}
-                </p>
               </div>
             </CardContent>
           </Card>

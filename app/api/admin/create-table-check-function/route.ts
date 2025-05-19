@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-server"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function POST() {
   try {
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Create the check_table_exists function
     const { error } = await supabase.rpc("exec_sql", {

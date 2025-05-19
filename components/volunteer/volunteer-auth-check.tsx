@@ -4,7 +4,7 @@ import type React from "react"
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { supabase } from "@/lib/supabase-client-singleton"
+import { supabase } from "@/lib/supabase"
 
 export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) {
   const [isVolunteer, setIsVolunteer] = useState<boolean | null>(null)

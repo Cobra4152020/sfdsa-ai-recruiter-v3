@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "./supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export type TableInfo = {
   table_name: string

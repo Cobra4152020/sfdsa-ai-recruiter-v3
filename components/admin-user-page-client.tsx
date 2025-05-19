@@ -19,19 +19,16 @@ import {
 } from "@/components/ui/dialog"
 import { useToast } from "@/components/ui/use-toast"
 import { UserActivity } from "@/components/admin/user-activity"
-import {
-  getUserById,
-  updateUser,
-  deleteUser,
-  changeUserRole,
-  type UserWithRole,
-  type UserRole,
-  type RecruitUser,
-  type VolunteerUser,
-  type AdminUser,
+import type {
+  UserWithRole,
+  UserRole,
+  RecruitUser,
+  VolunteerUser,
+  AdminUser,
 } from "@/lib/user-management-service"
 import { ArrowLeft, Save, Trash, RefreshCw, Shield, UserCog, User } from "lucide-react"
 import Link from "next/link"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 type FormData = {
   recruit: Partial<RecruitUser>;
@@ -63,9 +60,17 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
   const fetchUser = async () => {
     try {
       setIsLoading(true)
-      const userData = await getUserById(params.id)
-      setUser(userData)
+      const supabase = getClientSideSupabase()
+      const { data: userData, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', params.id)
+        .single()
+
+      if (error) throw error
+
       if (userData) {
+        setUser(userData)
         switch (userData.user_type) {
           case "recruit": {
             const recruitUser = userData as RecruitUser
@@ -118,24 +123,21 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
 
   const handleSave = async () => {
     if (!user) return
-
     setIsLoading(true)
     try {
-      const result = await updateUser(user.id, formData)
+      const supabase = getClientSideSupabase()
+      const { error } = await supabase
+        .from('users')
+        .update(formData)
+        .eq('id', user.id)
 
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: "The user has been successfully updated.",
-        })
-        fetchUser() // Reload user data
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to update user",
-          variant: "destructive",
-        })
-      }
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: "The user has been successfully updated.",
+      })
+      fetchUser()
     } catch (error) {
       console.error("Error updating user:", error)
       toast({
@@ -150,24 +152,21 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
 
   const handleDelete = async () => {
     if (!user) return
-
     setIsDeleting(true)
     try {
-      const result = await deleteUser(user.id)
+      const supabase = getClientSideSupabase()
+      const { error } = await supabase
+        .from('users')
+        .delete()
+        .eq('id', user.id)
 
-      if (result.success) {
-        toast({
-          title: "Success",
-          description: "The user has been successfully deleted.",
-        })
-        router.push("/admin/users")
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to delete user",
-          variant: "destructive",
-        })
-      }
+      if (error) throw error
+
+      toast({
+        title: "Success",
+        description: "The user has been successfully deleted.",
+      })
+      router.push("/admin/users")
     } catch (error) {
       console.error("Error deleting user:", error)
       toast({
@@ -183,24 +182,21 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
 
   const handleChangeRole = async () => {
     if (!user) return
-
     setIsLoading(true)
     try {
-      const result = await changeUserRole(user.id, selectedRole)
+      const supabase = getClientSideSupabase()
+      const { error } = await supabase
+        .from('users')
+        .update({ user_type: selectedRole })
+        .eq('id', user.id)
 
-      if (result.success) {
-        toast({
-          title: "Role changed",
-          description: `The user's role has been changed to ${selectedRole}.`,
-        })
-        fetchUser() // Reload user data
-      } else {
-        toast({
-          title: "Error",
-          description: result.error || "Failed to change user role",
-          variant: "destructive",
-        })
-      }
+      if (error) throw error
+
+      toast({
+        title: "Role changed",
+        description: `The user's role has been changed to ${selectedRole}.`,
+      })
+      fetchUser()
     } catch (error) {
       console.error("Error changing user role:", error)
       toast({

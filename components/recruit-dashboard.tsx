@@ -32,10 +32,11 @@ interface RecruitDashboardProps {
 }
 
 export function RecruitDashboard({ className }: RecruitDashboardProps) {
-  const { currentUser } = useUser()
+  const { currentUser, isLoading: isUserLoading } = useUser()
   const { toast } = useToast()
   const [activeTab, setActiveTab] = useState("overview")
   const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [dashboardData, setDashboardData] = useState<any>(null)
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
   const [documentTitle, setDocumentTitle] = useState("")
@@ -51,7 +52,18 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
 
   useEffect(() => {
     const fetchDashboardData = async () => {
+      // Don't fetch if user is not loaded yet
+      if (isUserLoading) return
+      
+      // Don't fetch if no user is logged in
+      if (!currentUser) {
+        setIsLoading(false)
+        return
+      }
+
       setIsLoading(true)
+      setError(null)
+      
       try {
         // In a real implementation, this would be an API call
         // For now, we'll use mock data
@@ -270,13 +282,14 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
         setTriviaStats(mockTriviaStats)
       } catch (error) {
         console.error("Error fetching dashboard data:", error)
+        setError("An error occurred while fetching dashboard data. Please try again later.")
       } finally {
         setIsLoading(false)
       }
     }
 
     fetchDashboardData()
-  }, [])
+  }, [currentUser, isUserLoading])
 
   const handleScheduleAppointment = () => {
     if (!selectedDate) {
@@ -333,11 +346,38 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
     setMessageText("")
   }
 
-  if (isLoading) {
+  // Show error state if there's an error
+  if (error) {
+    return (
+      <div className={className}>
+        <div className="flex flex-col items-center justify-center h-64">
+          <p className="text-red-500 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Retry</Button>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading state while user is loading or data is loading
+  if (isUserLoading || isLoading) {
     return (
       <div className={className}>
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show message if no user is logged in
+  if (!currentUser) {
+    return (
+      <div className={className}>
+        <div className="flex flex-col items-center justify-center h-64">
+          <p className="text-gray-500 mb-4">Please log in to view your dashboard</p>
+          <Button asChild>
+            <Link href="/login">Log In</Link>
+          </Button>
         </div>
       </div>
     )

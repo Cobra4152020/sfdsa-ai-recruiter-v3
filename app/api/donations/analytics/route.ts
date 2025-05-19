@@ -1,16 +1,15 @@
-
 export const dynamic = 'force-static';
 export const revalidate = 3600; // Revalidate every hour;
 
 import { NextResponse } from "next/server"
-import { createClient } from "@/lib/supabase-client"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const period = searchParams.get("period") || "month"
 
-    const supabase = createClient()
+    const supabase = getServiceSupabase()
 
     // Get total donations
     const { data: totalData, error: totalError } = await supabase
@@ -20,7 +19,7 @@ export async function GET(request: Request) {
 
     if (totalError) throw totalError
 
-    const totalAmount = totalData.reduce((sum, donation) => sum + Number.parseFloat(donation.amount), 0)
+    const totalAmount = totalData.reduce((sum: number, donation: { amount: string }) => sum + Number.parseFloat(donation.amount), 0)
     const totalCount = totalData.length
 
     // Get donations by period
@@ -70,7 +69,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       totalAmount,
       totalCount,
-      periodAmount: periodData.reduce((sum, donation) => sum + Number.parseFloat(donation.amount), 0),
+      periodAmount: periodData.reduce((sum: number, donation: { amount: string }) => sum + Number.parseFloat(donation.amount), 0),
       periodCount: periodData.length,
       recurringCount,
       chartData,
@@ -81,12 +80,12 @@ export async function GET(request: Request) {
   }
 }
 
-function formatChartData(donations: any[], period: string) {
+function formatChartData(donations: { created_at: string, amount: string }[], period: string) {
   if (donations.length === 0) return []
 
   const groupedData: Record<string, number> = {}
 
-  donations.forEach((donation) => {
+  donations.forEach((donation: { created_at: string, amount: string }) => {
     const date = new Date(donation.created_at)
     let key
 

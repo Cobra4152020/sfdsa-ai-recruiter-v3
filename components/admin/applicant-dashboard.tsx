@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { supabase } from "@/lib/supabase-service"
+import { getClientSideSupabase } from '@/lib/supabase/index'
 import { ApplicantTable } from "./applicant-table"
 import { ApplicantFilters } from "./applicant-filters"
 import { ApplicantStats } from "./applicant-stats"
@@ -55,6 +55,7 @@ export function ApplicantDashboard() {
   async function fetchApplicants() {
     setIsLoading(true)
     try {
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.from("applicants").select("*").order("created_at", { ascending: false })
 
       if (error) throw error
@@ -109,6 +110,7 @@ export function ApplicantDashboard() {
 
   async function updateApplicantStatus(id: string, status: string) {
     try {
+      const supabase = getClientSideSupabase()
       const { error } = await supabase
         .from("applicants")
         .update({ application_status: status, updated_at: new Date().toISOString() })

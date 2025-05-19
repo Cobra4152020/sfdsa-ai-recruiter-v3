@@ -1,4 +1,4 @@
-import { supabase } from "./supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import type { Badge, BadgeType, BadgeRarity } from "@/types/badge"
 
 // Define all available badges as a constant

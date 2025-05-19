@@ -17,6 +17,7 @@ import { v4 as uuidv4 } from "uuid"
 import { useRouter } from "next/navigation"
 import { useClientOnly } from "@/hooks/use-client-only"
 import { getWindowOrigin, isBrowser } from "@/lib/utils"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 interface UnifiedRegistrationPopupProps {
   isOpen: boolean
@@ -73,6 +74,8 @@ export function UnifiedRegistrationPopup({
   const router = useRouter()
   const origin = useClientOnly(() => getWindowOrigin(), '')
 
+  const supabase = getClientSideSupabase()
+
   // Generate a unique tracking number for opt-in
   useEffect(() => {
     if (activeTab === "optin") {
@@ -93,7 +96,6 @@ export function UnifiedRegistrationPopup({
 
     try {
       if (resetPassword) {
-        const { supabase } = await import("@/lib/supabase-client-singleton")
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${origin}/reset-password`,
         })
@@ -111,7 +113,6 @@ export function UnifiedRegistrationPopup({
       }
 
       // Use the appropriate auth service based on user type
-      const { supabase } = await import("@/lib/supabase-client-singleton")
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -224,7 +225,6 @@ export function UnifiedRegistrationPopup({
       }
 
       // Use the appropriate auth service based on user type
-      const { supabase } = await import("@/lib/supabase-client-singleton")
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -338,7 +338,6 @@ export function UnifiedRegistrationPopup({
       }
 
       // Create opt-in record
-      const { supabase } = await import("@/lib/supabase-client-singleton")
       const { error } = await supabase.from("recruit.opt_ins").insert([
         {
           first_name: firstName,
@@ -386,8 +385,6 @@ export function UnifiedRegistrationPopup({
     setSocialLoading(provider)
 
     try {
-      const { supabase } = await import("@/lib/supabase-client-singleton")
-
       // Set appropriate redirect URL based on user type
       let redirectTo = `${origin}/auth/callback`
       if (userType === "volunteer") {
@@ -428,20 +425,10 @@ export function UnifiedRegistrationPopup({
     setIsLoading(true)
 
     try {
-      const { supabase } = await import("@/lib/supabase-client-singleton")
-
-      // Set appropriate redirect URL based on user type
-      let redirectTo = `${origin}/dashboard`
-      if (userType === "volunteer") {
-        redirectTo = `${origin}/volunteer-dashboard`
-      } else if (userType === "admin") {
-        redirectTo = `${origin}/admin/dashboard`
-      }
-
       const { error } = await supabase.auth.signInWithOtp({
         email,
         options: {
-          emailRedirectTo: redirectTo,
+          emailRedirectTo: `${origin}/dashboard`,
         },
       })
 

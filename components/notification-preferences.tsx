@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { PushNotificationPermission } from "@/components/push-notification-permission"
-import { supabase } from "@/lib/supabase-client"
+import { getClientSideSupabase } from '@/lib/supabase/index'
 
 interface NotificationPreferencesProps {
   userId?: string | null
@@ -43,7 +43,7 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
       }
 
       try {
-        const { data, error } = await supabase
+        const { data, error } = await getClientSideSupabase()
           .from("user_notification_settings")
           .select("*")
           .eq("user_id", userId)
@@ -84,16 +84,18 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
     setSaving(true)
 
     try {
-      const { error } = await supabase.from("user_notification_settings").upsert(
-        {
-          user_id: userId,
-          ...settings,
-          updated_at: new Date().toISOString(),
-        },
-        {
-          onConflict: "user_id",
-        },
-      )
+      const { error } = await getClientSideSupabase()
+        .from("user_notification_settings")
+        .upsert(
+          {
+            user_id: userId,
+            ...settings,
+            updated_at: new Date().toISOString(),
+          },
+          {
+            onConflict: "user_id",
+          },
+        )
 
       if (error) throw error
 
@@ -158,7 +160,7 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
             />
           </div>
           <div className="pt-2">
-            <PushNotificationPermission userId={userId} variant="outline" />
+            <PushNotificationPermission userId={userId} />
           </div>
         </div>
 

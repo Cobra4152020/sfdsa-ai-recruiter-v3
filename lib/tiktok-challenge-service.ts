@@ -1,5 +1,4 @@
-import { createClient } from "@/lib/supabase-client"
-import { getServiceSupabase } from "@/lib/supabase-service"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { awardBadgeToUser } from "@/lib/badge-utils"
 import { createNotification } from "@/lib/notification-service"
 import { v4 as uuidv4 } from "uuid"
@@ -60,7 +59,7 @@ export const TikTokChallengeService = {
    */
   async getActiveChallenges(): Promise<TikTokChallenge[]> {
     try {
-      const supabase = createClient()
+      const supabase = getServiceSupabase()
       const { data, error } = await supabase
         .from("active_tiktok_challenges")
         .select("*")
@@ -83,7 +82,7 @@ export const TikTokChallengeService = {
    */
   async getChallengesForUser(userId: string): Promise<ChallengeWithCompletionStatus[]> {
     try {
-      const supabase = createClient()
+      const supabase = getServiceSupabase()
       const { data, error } = await supabase.rpc("get_challenges_with_completion", { p_user_id: userId })
 
       if (error) {
@@ -91,7 +90,7 @@ export const TikTokChallengeService = {
         return []
       }
 
-      return data.map((challenge) => ({
+      return data.map((challenge: any) => ({
         id: challenge.id,
         title: challenge.title,
         description: challenge.description,
@@ -119,7 +118,7 @@ export const TikTokChallengeService = {
    */
   async getChallengeById(id: number): Promise<TikTokChallenge | null> {
     try {
-      const supabase = createClient()
+      const supabase = getServiceSupabase()
       const { data, error } = await supabase.from("tiktok_challenges").select("*").eq("id", id).single()
 
       if (error) {
@@ -231,7 +230,7 @@ export const TikTokChallengeService = {
     metadata?: Record<string, any>,
   ): Promise<TikTokChallengeSubmission | null> {
     try {
-      const supabase = createClient()
+      const supabase = getServiceSupabase()
 
       // Check if challenge exists and is active
       const { data: challenge, error: challengeError } = await supabase
@@ -333,7 +332,7 @@ export const TikTokChallengeService = {
    */
   async getSubmissionById(id: number): Promise<TikTokChallengeSubmission | null> {
     try {
-      const supabase = createClient()
+      const supabase = getServiceSupabase()
       const { data, error } = await supabase
         .from("tiktok_challenge_submissions")
         .select("*, tiktok_challenges(*)")
@@ -357,7 +356,7 @@ export const TikTokChallengeService = {
    */
   async getSubmissionsForChallenge(challengeId: number): Promise<TikTokChallengeSubmission[]> {
     try {
-      const supabase = createClient()
+      const supabase = getServiceSupabase()
       const { data, error } = await supabase
         .from("tiktok_challenge_submissions")
         .select("*")
@@ -381,7 +380,7 @@ export const TikTokChallengeService = {
    */
   async getUserSubmissions(userId: string): Promise<TikTokChallengeSubmission[]> {
     try {
-      const supabase = createClient()
+      const supabase = getServiceSupabase()
       const { data, error } = await supabase
         .from("tiktok_challenge_submissions")
         .select("*, tiktok_challenges(*)")
@@ -465,7 +464,7 @@ export const TikTokChallengeService = {
    */
   async getLeaderboard(limit = 10): Promise<any[]> {
     try {
-      const supabase = createClient()
+      const supabase = getServiceSupabase()
       const { data, error } = await supabase.from("tiktok_challenge_leaderboard").select("*").limit(limit)
 
       if (error) {
@@ -527,14 +526,14 @@ export const TikTokChallengeService = {
   /**
    * Notify user about their submission
    */
-  async notifyUserAboutSubmission(userId: string, challenge: any): Promise<void> {
+  async notifyUserAboutSubmission(userId: string, challenge: TikTokChallenge): Promise<void> {
     try {
       await createNotification({
         user_id: userId,
-        type: "challenge",
+        type: "system",
         title: "TikTok Challenge Submitted",
         message: `Your submission for "${challenge.title}" is being reviewed. We'll notify you when it's approved.`,
-        image_url: challenge.thumbnail_url || "/notification-icon.png",
+        image_url: challenge.thumbnailUrl || "/notification-icon.png",
         action_url: "/tiktok-challenges",
         metadata: {
           challengeId: challenge.id,
@@ -551,7 +550,7 @@ export const TikTokChallengeService = {
    */
   async notifyUserAboutReview(
     userId: string,
-    challenge: any,
+    challenge: TikTokChallenge,
     status: "approved" | "rejected",
     feedback?: string,
   ): Promise<void> {
@@ -561,19 +560,19 @@ export const TikTokChallengeService = {
           user_id: userId,
           type: "achievement",
           title: "TikTok Challenge Approved!",
-          message: `Your submission for "${challenge.title}" has been approved! You earned ${challenge.points_reward} points.`,
-          image_url: challenge.thumbnail_url || "/achievement-icon.png",
+          message: `Your submission for "${challenge.title}" has been approved! You earned ${challenge.pointsReward} points.`,
+          image_url: challenge.thumbnailUrl || "/achievement-icon.png",
           action_url: "/tiktok-challenges",
           metadata: {
             challengeId: challenge.id,
             challengeTitle: challenge.title,
-            pointsEarned: challenge.points_reward,
+            pointsEarned: challenge.pointsReward,
           },
         })
       } else {
         await createNotification({
           user_id: userId,
-          type: "alert",
+          type: "system",
           title: "TikTok Challenge Needs Revision",
           message: `Your submission for "${challenge.title}" was not approved. ${feedback || "Please review and try again."}`,
           image_url: "/notification-icon.png",
@@ -594,14 +593,14 @@ export const TikTokChallengeService = {
    * Notify admins about new submission
    */
   async notifyAdminsAboutSubmission(
-    submission: any,
-    challenge: any,
+    submission: TikTokChallengeSubmission,
+    challenge: TikTokChallenge,
     action: "submitted" | "resubmitted",
   ): Promise<void> {
     try {
       // In a real implementation, this would notify actual admins
       // For demo purposes, we'll just log it
-      console.log(`New TikTok challenge ${action} - Challenge: "${challenge.title}", User: ${submission.user_id}`)
+      console.log(`New TikTok challenge ${action} - Challenge: "${challenge.title}", User: ${submission.userId}`)
     } catch (error) {
       console.error("Error in notifyAdminsAboutSubmission:", error)
     }

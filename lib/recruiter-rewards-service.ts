@@ -1,7 +1,8 @@
-import { createClient } from "@/lib/supabase-clients"
-import { getServiceSupabase } from "@/lib/supabase-service"
+import { supabase } from "@/lib/supabase/index"
+import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { createNotification } from "@/lib/notification-service"
 import { awardBadgeToUser } from "@/lib/badge-utils"
+import type { NotificationType } from '@/lib/notification-service'
 
 // Activity types for recruiters
 export enum RecruiterActivityType {
@@ -94,8 +95,9 @@ export async function awardRecruiterPoints(
       return { success: false, message: "Recruiter ID is required" }
     }
 
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+
     const points = ACTIVITY_POINTS[activityType] || 0
-    const supabase = getServiceSupabase()
 
     // Insert the activity and points
     const { data, error } = await supabase
@@ -122,7 +124,7 @@ export async function awardRecruiterPoints(
     if (points > 100) {
       await createNotification({
         user_id: recruiterId,
-        type: "points",
+        type: "points" as NotificationType,
         title: `You earned ${points} recruiter points!`,
         message: description,
         image_url: "/notification-icon.png",
@@ -165,7 +167,7 @@ export async function getRecruiterPoints(recruiterId: string): Promise<{
   message?: string
 }> {
   try {
-    const supabase = createClient()
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
 
     const { data, error } = await supabase.from("recruiter_activities").select("points").eq("recruiter_id", recruiterId)
 
@@ -188,7 +190,7 @@ export async function getRecruiterPoints(recruiterId: string): Promise<{
  */
 export async function getRecruiterActivityCount(recruiterId: string): Promise<number> {
   try {
-    const supabase = createClient()
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
 
     const { count, error } = await supabase
       .from("recruiter_activities")
@@ -216,7 +218,7 @@ export async function getAvailableRewards(): Promise<{
   message?: string
 }> {
   try {
-    const supabase = createClient()
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
 
     const { data, error } = await supabase
       .from("recruiter_rewards")
@@ -257,7 +259,8 @@ export async function redeemReward(request: RewardRedemptionRequest): Promise<{
 }> {
   try {
     const { recruiterId, rewardId, notes } = request
-    const supabase = getServiceSupabase()
+
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
 
     // Get the reward details
     const { data: rewardData, error: rewardError } = await supabase
@@ -336,7 +339,7 @@ export async function redeemReward(request: RewardRedemptionRequest): Promise<{
       .eq("id", rewardId)
 
     // Record the redemption activity
-    await awardRecruiterPoints(recruiterId, "reward_redemption", `Redeemed reward: ${rewardData.name}`, undefined, {
+    await awardRecruiterPoints(recruiterId, RecruiterActivityType.REWARD_REDEMPTION, `Redeemed reward: ${rewardData.name}`, undefined, {
       reward_id: rewardId,
       points_spent: rewardData.points_required,
     })
@@ -344,7 +347,7 @@ export async function redeemReward(request: RewardRedemptionRequest): Promise<{
     // Create notification for the recruiter
     await createNotification({
       user_id: recruiterId,
-      type: "reward",
+      type: "reward" as NotificationType,
       title: "Reward Redeemed!",
       message: `You've successfully redeemed: ${rewardData.name}. We'll process your reward soon.`,
       image_url: rewardData.image_url || "/notification-icon.png",
@@ -358,7 +361,7 @@ export async function redeemReward(request: RewardRedemptionRequest): Promise<{
     // Create notification for admin - would be better to use a configurable admin list
     await createNotification({
       user_id: "admin", // This should be replaced with an actual admin user ID
-      type: "admin_alert",
+      type: "admin_alert" as NotificationType,
       title: "New Reward Redemption",
       message: `A recruiter has redeemed: ${rewardData.name}. Please review and process.`,
       image_url: "/notification-icon.png",
@@ -386,7 +389,7 @@ export async function getRecruiterStats(recruiterId: string): Promise<{
   message?: string
 }> {
   try {
-    const supabase = createClient()
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
 
     // Get stats from the leaderboard view
     const { data: leaderboardData, error: leaderboardError } = await supabase
@@ -460,7 +463,7 @@ export async function getRecruiterTiers(): Promise<{
   message?: string
 }> {
   try {
-    const supabase = createClient()
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
 
     const { data, error } = await supabase
       .from("recruiter_tiers")
@@ -495,7 +498,7 @@ export async function getRecruiterTiers(): Promise<{
  */
 async function checkAndUpdateRecruiterTier(recruiterId: string): Promise<void> {
   try {
-    const supabase = getServiceSupabase()
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
 
     // Get recruiter's total points
     const { data: pointsData, error: pointsError } = await supabase
@@ -548,7 +551,7 @@ async function checkAndUpdateRecruiterTier(recruiterId: string): Promise<void> {
     // If this is a new tier or the first tier
     if (!lastTierAchievement || lastTierAchievement !== currentTier.id) {
       // Record the tier achievement activity
-      await awardRecruiterPoints(recruiterId, "tier_achievement", `Achieved ${currentTier.name} tier`, undefined, {
+      await awardRecruiterPoints(recruiterId, RecruiterActivityType.TIER_ACHIEVEMENT, `Achieved ${currentTier.name} tier`, undefined, {
         tier_id: currentTier.id,
         tier_name: currentTier.name,
       })
@@ -556,7 +559,7 @@ async function checkAndUpdateRecruiterTier(recruiterId: string): Promise<void> {
       // Create a notification
       await createNotification({
         user_id: recruiterId,
-        type: "achievement",
+        type: "achievement" as NotificationType,
         title: "New Recruiter Tier Achieved!",
         message: `Congratulations! You've reached the ${currentTier.name} tier.`,
         image_url: currentTier.image_url || "/achievement-icon.png",
@@ -591,7 +594,7 @@ export async function getRecruiterLeaderboard(
   message?: string
 }> {
   try {
-    const supabase = createClient()
+    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
 
     const { data, error, count } = await supabase
       .from("recruiter_leaderboard")
