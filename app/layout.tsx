@@ -44,7 +44,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
+      <head>
+        <title>SFDSA AI Recruiter</title>
+        <meta name="description" content="San Francisco Deputy Sheriffs' Association AI Recruiter" />
+        <meta name="generator" content="v0.dev" />
+        {/* All Tailwind CDN and fallback links removed. Only local CSS is used. */}
+      </head>
       <body className={inter.className}>
         <RootLayoutClient>{children}</RootLayoutClient>
       </body>
