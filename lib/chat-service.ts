@@ -1,4 +1,4 @@
-import { createClient } from "@supabase/supabase-js"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { v4 as uuidv4 } from "uuid"
 
 // Types for chat interactions
@@ -18,17 +18,7 @@ export interface ChatInteraction {
 
 export async function logChatInteraction(interaction: ChatInteraction) {
   try {
-    // Directly check and use environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.warn("Supabase environment variables are missing, skipping chat interaction logging")
-      return null
-    }
-
-    // Create Supabase client directly with the environment variables
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = getClientSideSupabase()
 
     // Ensure we have a session ID for tracking conversation flow
     if (!interaction.session_id) {
@@ -51,17 +41,7 @@ export async function logChatInteraction(interaction: ChatInteraction) {
 
 export async function getUserChatHistory(userId: string, limit = 10) {
   try {
-    // Directly check and use environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.warn("Supabase environment variables are missing, skipping chat history fetch")
-      return []
-    }
-
-    // Create Supabase client directly with the environment variables
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = getClientSideSupabase()
 
     const { data, error } = await supabase
       .from("chat_interactions")
@@ -84,17 +64,7 @@ export async function getUserChatHistory(userId: string, limit = 10) {
 
 export async function addChatFeedback(interactionId: number, rating: number) {
   try {
-    // Directly check and use environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.warn("Supabase environment variables are missing, skipping chat feedback")
-      return false
-    }
-
-    // Create Supabase client directly with the environment variables
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = getClientSideSupabase()
 
     const { data, error } = await supabase
       .from("chat_interactions")
@@ -117,17 +87,7 @@ export async function addChatFeedback(interactionId: number, rating: number) {
 
 export async function getPopularChatTopics(limit = 5) {
   try {
-    // Directly check and use environment variables
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-    if (!supabaseUrl || !supabaseKey) {
-      console.warn("Supabase environment variables are missing, skipping popular topics fetch")
-      return []
-    }
-
-    // Create Supabase client directly with the environment variables
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    const supabase = getClientSideSupabase()
 
     const { data, error } = await supabase
       .from("chat_interactions")

@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase/index"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export interface AuthResult {
   success: boolean
@@ -13,7 +13,7 @@ export const authService = {
    * Sign in with email and password
    */
   async signInWithPassword(email: string, password: string): Promise<AuthResult> {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+    const supabase = getClientSideSupabase()
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -65,7 +65,7 @@ export const authService = {
    * Get current session with user type
    */
   async getSessionWithUserType() {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+    const supabase = getClientSideSupabase()
 
     try {
       const {
@@ -97,7 +97,7 @@ export const authService = {
    * Check if user is a recruit
    */
   async isRecruit(userId: string): Promise<boolean> {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+    const supabase = getClientSideSupabase()
 
     try {
       const { data } = await supabase.from("user_types").select("user_type").eq("user_id", userId).single()
@@ -113,7 +113,7 @@ export const authService = {
    * Check if user is a volunteer recruiter
    */
   async isVolunteerRecruiter(userId: string): Promise<boolean> {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+    const supabase = getClientSideSupabase()
 
     try {
       const { data } = await supabase.from("user_types").select("user_type").eq("user_id", userId).single()
@@ -129,7 +129,7 @@ export const authService = {
    * Send a magic link for passwordless login
    */
   async sendMagicLink(email: string, redirectUrl: string): Promise<AuthResult> {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+    const supabase = getClientSideSupabase()
 
     try {
       const { error } = await supabase.auth.signInWithOtp({

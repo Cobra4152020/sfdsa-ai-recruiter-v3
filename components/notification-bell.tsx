@@ -4,7 +4,6 @@ import { useState, useEffect } from "react"
 import { Bell } from "lucide-react"
 import { NotificationPanel } from "./notification-panel"
 import { useClickOutside } from "@/hooks/use-click-outside"
-import { getClientSideSupabase } from "@/lib/supabase"
 
 interface NotificationBellProps {
   userId: string
@@ -21,6 +20,7 @@ export function NotificationBell({ userId }: NotificationBellProps) {
 
     const fetchUnreadCount = async () => {
       try {
+        const { getClientSideSupabase } = require("@/lib/supabase")
         const supabase = getClientSideSupabase()
 
         // Try with is_read first (this appears to be the correct column name)

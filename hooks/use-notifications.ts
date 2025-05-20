@@ -10,7 +10,6 @@ import {
   deleteAllNotifications,
   type Notification,
 } from "@/lib/notification-service"
-import { getClientSideSupabase } from '@/lib/supabase/index'
 
 export function useNotifications(userId?: string | null) {
   const [notifications, setNotifications] = useState<Notification[]>([])
@@ -53,6 +52,7 @@ export function useNotifications(userId?: string | null) {
     if (!userId || isSubscribed) return
 
     // Subscribe to changes in the notifications table for this user
+    const { getClientSideSupabase } = require("@/lib/supabase")
     const channel = getClientSideSupabase()
       .channel(`notifications:${userId}`)
       .on(

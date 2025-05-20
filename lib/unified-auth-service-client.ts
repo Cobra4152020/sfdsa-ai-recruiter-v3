@@ -1,16 +1,11 @@
-import { supabase } from "@/lib/supabase/index"
 import type { Provider } from "@supabase/supabase-js"
 import type { AuthResult, UserProfile, SocialProvider } from "./unified-auth-service"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export const authService = {
   async signInWithSocialProvider(provider: Provider): Promise<AuthResult> {
-    if (!supabase) {
-      return {
-        success: false,
-        message: "Supabase client is not initialized.",
-      }
-    }
     try {
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.signInWithOAuth({ provider })
       if (error) {
         return {
@@ -33,13 +28,8 @@ export const authService = {
     }
   },
   async signOut(): Promise<AuthResult> {
-    if (!supabase) {
-      return {
-        success: false,
-        message: "Supabase client is not initialized.",
-      }
-    }
     try {
+      const supabase = getClientSideSupabase()
       const { error } = await supabase.auth.signOut()
       if (error) {
         return {
@@ -62,10 +52,8 @@ export const authService = {
     }
   },
   async getSession() {
-    if (!supabase) {
-      return null
-    }
     try {
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.getSession()
       if (error) {
         return null

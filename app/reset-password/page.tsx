@@ -10,7 +10,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/components/ui/use-toast"
-import { getClientSideSupabase } from "@/lib/supabase"
 import { Lock, AlertCircle, CheckCircle2 } from "lucide-react"
 
 export default function ResetPasswordPage() {
@@ -23,7 +22,6 @@ export default function ResetPasswordPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { toast } = useToast()
-  const supabase = getClientSideSupabase()
 
   useEffect(() => {
     // Check if we have the necessary parameters from the reset email
@@ -58,6 +56,9 @@ export default function ResetPasswordPage() {
     setSuccess(false)
 
     try {
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const supabase = getClientSideSupabase()
+
       const { error } = await supabase.auth.updateUser({
         password,
       })

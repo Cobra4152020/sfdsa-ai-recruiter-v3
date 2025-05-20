@@ -1,16 +1,11 @@
-import { supabase } from "@/lib/supabase/index"
 import type { Provider } from "@supabase/supabase-js"
 import type { AuthResult } from "./auth-service"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export const authService = {
   async signInWithSocialProvider(provider: Provider): Promise<AuthResult> {
-    if (!supabase) {
-      return {
-        success: false,
-        message: "Supabase client is not initialized.",
-      }
-    }
     try {
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.signInWithOAuth({ provider })
       if (error) {
         return {
@@ -42,15 +37,11 @@ export const authService = {
     throw new Error("registerRecruit is only available on the server.")
   },
   async signOut() {
-    if (!supabase) {
-      throw new Error("Supabase client is not initialized.")
-    }
+    const supabase = getClientSideSupabase()
     return supabase.auth.signOut()
   },
   async getSession() {
-    if (!supabase) {
-      throw new Error("Supabase client is not initialized.")
-    }
+    const supabase = getClientSideSupabase()
     return supabase.auth.getSession()
   },
   getRedirectUrlForUserRole() {

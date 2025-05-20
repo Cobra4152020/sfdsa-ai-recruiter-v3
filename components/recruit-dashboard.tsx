@@ -42,10 +42,16 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
   const [documentTitle, setDocumentTitle] = useState("")
   const [documentFile, setDocumentFile] = useState<File | null>(null)
   const [messageText, setMessageText] = useState("")
-  const [triviaStats, setTriviaStats] = useState({
+  const [triviaStats, setTriviaStats] = useState<{
+    gamesPlayed: number;
+    averageScore: number;
+    bestScore: string;
+    totalPointsEarned: number;
+    badgesEarned: { name: string; date: string; description: string }[];
+  }>({
     gamesPlayed: 0,
     averageScore: 0,
-    bestScore: 0,
+    bestScore: "0/0",
     totalPointsEarned: 0,
     badgesEarned: [],
   })

@@ -1,4 +1,3 @@
-import { getClientSideSupabase } from "@/lib/supabase"
 import type { Badge, BadgeProgress, TimelineEvent, BadgeWithProgress, BadgeType, BadgeRarity } from "@/types/badge"
 
 export class BadgeError extends Error {
@@ -45,6 +44,7 @@ interface BadgeEventRow {
 
 export async function getBadge(badgeId: string): Promise<BadgeWithProgress> {
   try {
+    const { getClientSideSupabase } = require("@/lib/supabase")
     const supabase = getClientSideSupabase()
     if (!supabase) throw new BadgeError("Database client not initialized")
     
@@ -121,6 +121,7 @@ export async function getBadge(badgeId: string): Promise<BadgeWithProgress> {
 
 export async function getBadgeTimeline(badgeId: string): Promise<TimelineEvent[]> {
   try {
+    const { getClientSideSupabase } = require("@/lib/supabase")
     const supabase = getClientSideSupabase()
     if (!supabase) throw new BadgeError("Database client not initialized")
     
@@ -149,6 +150,7 @@ export async function getBadgeTimeline(badgeId: string): Promise<TimelineEvent[]
 
 export async function shareBadge(badgeId: string): Promise<void> {
   try {
+    const { getClientSideSupabase } = require("@/lib/supabase")
     const supabase = getClientSideSupabase()
     if (!supabase) throw new BadgeError("Database client not initialized")
     
@@ -165,6 +167,7 @@ export async function shareBadge(badgeId: string): Promise<void> {
 
 export async function getAllBadges(): Promise<BadgeWithProgress[]> {
   try {
+    const { getClientSideSupabase } = require("@/lib/supabase")
     const supabase = getClientSideSupabase()
     if (!supabase) throw new BadgeError("Database client not initialized")
     

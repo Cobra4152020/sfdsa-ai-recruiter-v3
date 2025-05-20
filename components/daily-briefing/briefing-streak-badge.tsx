@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Flame } from "lucide-react"
 import { useUser } from "@/context/user-context"
-import { createClient } from "@/lib/supabase-clients"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export function BriefingStreakBadge() {
   const [streak, setStreak] = useState(0)
@@ -19,7 +19,7 @@ export function BriefingStreakBadge() {
       }
 
       try {
-        const supabase = createClient()
+        const supabase = getClientSideSupabase()
 
         // This is a placeholder - you would need to implement the actual streak calculation
         // in your database, possibly via a function like get_user_briefing_streak

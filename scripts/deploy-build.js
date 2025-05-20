@@ -46,13 +46,6 @@ async function buildProject() {
       fs.mkdirSync(publicCssDir, { recursive: true });
     }
     
-    // Download Tailwind CSS
-    log('Downloading Tailwind CSS...');
-    const tailwindUrl = 'https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css';
-    const tailwindPath = path.join(publicCssDir, 'tailwind.min.css');
-    await downloadFile(tailwindUrl, tailwindPath);
-    log('Tailwind CSS downloaded to public/css/tailwind.min.css');
-    
     // Set environment variables to skip problematic checks
     process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS = 'true';
     process.env.NEXT_PUBLIC_STATIC_BUILD = 'true';

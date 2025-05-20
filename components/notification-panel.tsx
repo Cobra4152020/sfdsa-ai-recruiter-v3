@@ -5,7 +5,6 @@ import { X } from "lucide-react"
 import { formatDistanceToNow } from "date-fns"
 import { useRouter } from "next/navigation"
 import { useExternalNavigation } from "@/hooks/use-external-navigation"
-import { getClientSideSupabase } from "@/lib/supabase"
 
 interface Notification {
   id: number
@@ -28,7 +27,6 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
   const { navigateTo } = useExternalNavigation()
-  const supabase = getClientSideSupabase()
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -38,6 +36,8 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
       }
 
       try {
+        const { getClientSideSupabase } = require("@/lib/supabase")
+        const supabase = getClientSideSupabase()
         const query = supabase
           .from("notifications")
           .select("*")
@@ -67,6 +67,8 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
   const markAsRead = async (notificationId: number) => {
     try {
       // Try to update is_read column first
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const supabase = getClientSideSupabase()
       const result = await supabase.from("notifications").update({ is_read: true }).eq("id", notificationId)
 
       if (result.error) {
@@ -91,6 +93,8 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
   const markAllAsRead = async () => {
     try {
       // Try to update is_read column first
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const supabase = getClientSideSupabase()
       const result = await supabase
         .from("notifications")
         .update({ is_read: true })

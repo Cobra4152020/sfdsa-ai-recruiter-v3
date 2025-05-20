@@ -11,35 +11,30 @@ import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
 import { ApplicationProgressGamification } from "@/components/application-progress-gamification"
 import { PointsIntroduction } from "@/components/points-introduction"
 import { RegistrationProvider } from "@/context/registration-context"
+import { useUser } from "@/context/user-context"
+import { useRegistration } from "@/context/registration-context"
+import type { User } from "@/context/user-context"
 
 export default function HomeClient() {
-  const [currentUser, setCurrentUser] = useState(null)
-  const [openRegistrationPopup, setOpenRegistrationPopup] = useState<any>(null)
+  const { currentUser } = useUser()
+  const { openRegistrationPopup } = useRegistration()
+  const [showOptInForm, setShowOptInForm] = useState<((applying?: boolean) => void) | null>(null)
 
   useEffect(() => {
-    const loadClientModules = async () => {
-      const { useUser } = await import("@/context/user-context")
-      const { useRegistration } = await import("@/context/registration-context")
-      const { currentUser } = useUser()
-      const { openRegistrationPopup } = useRegistration()
-      setCurrentUser(currentUser)
-      setOpenRegistrationPopup(() => openRegistrationPopup)
+    if (openRegistrationPopup) {
+      setShowOptInForm(() => (applying = false) => {
+        openRegistrationPopup({
+          applying,
+          initialTab: applying ? "optin" : "signin",
+        })
+      })
     }
-    loadClientModules()
-  }, [])
-
-  const showOptInForm = (applying = false) => {
-    if (!openRegistrationPopup) return
-    openRegistrationPopup({
-      applying,
-      initialTab: applying ? "optin" : "signin",
-    })
-  }
+  }, [openRegistrationPopup])
 
   return (
     <RegistrationProvider>
       <main className="flex-1 w-full">
-        <HeroSection onGetStarted={() => showOptInForm(true)} showOptInForm={showOptInForm} />
+        <HeroSection onGetStarted={() => showOptInForm?.(true)} showOptInForm={showOptInForm || (() => {})} />
         <TopRecruitsScroll />
         {currentUser && (
           <section className="w-full py-12 bg-[#0A3C1F] dark:bg-[#121212]">
@@ -66,7 +61,7 @@ export default function HomeClient() {
         <section id="faq" className="w-full scroll-mt-20">
           <FAQSection />
         </section>
-        <CTASection showOptInForm={showOptInForm} />
+        <CTASection showOptInForm={showOptInForm || (() => {})} />
       </main>
       {process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true" ? <DebugUser /> : null}
       <AskSgtKenButton position="fixed" variant="secondary" />

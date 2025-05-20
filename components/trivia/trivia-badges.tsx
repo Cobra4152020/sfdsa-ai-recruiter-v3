@@ -6,7 +6,6 @@ import { Award, Share2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { useUser } from "@/context/user-context"
-import { getClientSideSupabase } from "@/lib/supabase"
 
 interface TriviaBadge {
   id: string
@@ -69,6 +68,7 @@ export function TriviaBadges({ gameId, gameName, badgeTypes }: TriviaBadgesProps
 
   const fetchUserBadges = async () => {
     try {
+      const { getClientSideSupabase } = require("@/lib/supabase")
       const supabase = getClientSideSupabase()
 
       // Get user's earned badges

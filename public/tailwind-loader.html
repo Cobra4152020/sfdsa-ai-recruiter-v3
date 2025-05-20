@@ -2,7 +2,6 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css" rel="stylesheet">
   <style>
     :root {
       --background: 0 0% 100%;
@@ -50,31 +49,5 @@
   </style>
 </head>
 <body>
-  <script>
-    // This script injects Tailwind CSS into the parent document
-    try {
-      const parentDoc = window.parent.document;
-      
-      // Check if Tailwind CSS is already loaded
-      if (!parentDoc.querySelector('link[href*="tailwindcss"]')) {
-        const link = parentDoc.createElement('link');
-        link.rel = 'stylesheet';
-        link.href = 'https://cdn.jsdelivr.net/npm/tailwindcss@3.4.17/dist/tailwind.min.css';
-        parentDoc.head.appendChild(link);
-        console.log('Tailwind CSS injected by iframe');
-      }
-      
-      // Inject CSS variables if not present
-      if (!parentDoc.querySelector('style[data-shadcn-vars]')) {
-        const style = parentDoc.createElement('style');
-        style.setAttribute('data-shadcn-vars', 'true');
-        style.textContent = document.querySelector('style').textContent;
-        parentDoc.head.appendChild(style);
-        console.log('CSS variables injected by iframe');
-      }
-    } catch (e) {
-      console.error('Failed to inject styles from iframe:', e);
-    }
-  </script>
 </body>
 </html> 

@@ -11,7 +11,6 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { useToast } from "@/components/ui/use-toast"
 import { Mail, Lock, Eye, EyeOff, AlertCircle, InfoIcon } from "lucide-react"
-import { getClientSideSupabase } from "@/lib/supabase/index"
 import { SocialLoginButtons } from "@/components/social-login-buttons"
 
 interface UnifiedLoginFormProps {
@@ -42,6 +41,7 @@ export function UnifiedLoginForm({
     setError(null)
 
     try {
+      const { getClientSideSupabase } = require("@/lib/supabase")
       const supabase = getClientSideSupabase()
       const { data, error: signInError } = await supabase.auth.signInWithPassword({
         email,
@@ -125,6 +125,7 @@ export function UnifiedLoginForm({
     setError(null)
 
     try {
+      const { getClientSideSupabase } = require("@/lib/supabase")
       const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.signInWithOtp({
         email,

@@ -6,10 +6,7 @@ import { VolunteerRecruiterDashboard } from "@/components/volunteer-recruiter-da
 import { RecruiterAnalyticsDashboard } from "@/components/recruiter-analytics-dashboard"
 import { ReferralLinkGenerator } from "@/components/referral-link-generator"
 import { useToast } from "@/components/ui/use-toast"
-import { getClientSideSupabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
-
-const supabase = getClientSideSupabase()
 
 export default function VolunteerDashboardPage() {
   const { toast } = useToast()
@@ -20,6 +17,9 @@ export default function VolunteerDashboardPage() {
 
   useEffect(() => {
     let isMounted = true
+    // Import and call getClientSideSupabase only on the client
+    const { getClientSideSupabase } = require("@/lib/supabase")
+    const supabase = getClientSideSupabase()
 
     async function checkAuth() {
       try {

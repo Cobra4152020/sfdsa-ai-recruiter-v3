@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase/index"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { createNotification } from "@/lib/notification-service"
 import { awardBadgeToUser } from "@/lib/badge-utils"
@@ -95,8 +95,7 @@ export async function awardRecruiterPoints(
       return { success: false, message: "Recruiter ID is required" }
     }
 
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
-
+    const supabase = getClientSideSupabase()
     const points = ACTIVITY_POINTS[activityType] || 0
 
     // Insert the activity and points
@@ -167,8 +166,7 @@ export async function getRecruiterPoints(recruiterId: string): Promise<{
   message?: string
 }> {
   try {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
-
+    const supabase = getClientSideSupabase()
     const { data, error } = await supabase.from("recruiter_activities").select("points").eq("recruiter_id", recruiterId)
 
     if (error) {
@@ -190,8 +188,7 @@ export async function getRecruiterPoints(recruiterId: string): Promise<{
  */
 export async function getRecruiterActivityCount(recruiterId: string): Promise<number> {
   try {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
-
+    const supabase = getClientSideSupabase()
     const { count, error } = await supabase
       .from("recruiter_activities")
       .select("*", { count: "exact", head: true })
@@ -218,8 +215,7 @@ export async function getAvailableRewards(): Promise<{
   message?: string
 }> {
   try {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
-
+    const supabase = getClientSideSupabase()
     const { data, error } = await supabase
       .from("recruiter_rewards")
       .select("*")
@@ -260,7 +256,7 @@ export async function redeemReward(request: RewardRedemptionRequest): Promise<{
   try {
     const { recruiterId, rewardId, notes } = request
 
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+    const supabase = getClientSideSupabase()
 
     // Get the reward details
     const { data: rewardData, error: rewardError } = await supabase
@@ -389,7 +385,7 @@ export async function getRecruiterStats(recruiterId: string): Promise<{
   message?: string
 }> {
   try {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+    const supabase = getClientSideSupabase()
 
     // Get stats from the leaderboard view
     const { data: leaderboardData, error: leaderboardError } = await supabase
@@ -463,8 +459,7 @@ export async function getRecruiterTiers(): Promise<{
   message?: string
 }> {
   try {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
-
+    const supabase = getClientSideSupabase()
     const { data, error } = await supabase
       .from("recruiter_tiers")
       .select("*")
@@ -498,7 +493,7 @@ export async function getRecruiterTiers(): Promise<{
  */
 async function checkAndUpdateRecruiterTier(recruiterId: string): Promise<void> {
   try {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
+    const supabase = getClientSideSupabase()
 
     // Get recruiter's total points
     const { data: pointsData, error: pointsError } = await supabase
@@ -594,8 +589,7 @@ export async function getRecruiterLeaderboard(
   message?: string
 }> {
   try {
-    if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
-
+    const supabase = getClientSideSupabase()
     const { data, error, count } = await supabase
       .from("recruiter_leaderboard")
       .select("*", { count: "exact" })

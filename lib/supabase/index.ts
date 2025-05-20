@@ -25,8 +25,3 @@ export function getClientSideSupabase() {
 
   return clientInstance
 }
-
-// Default export for more consistent imports
-export const supabase = typeof window !== 'undefined' 
-  ? getClientSideSupabase()
-  : null // Server-side code should use getServerSideSupabase() explicitly

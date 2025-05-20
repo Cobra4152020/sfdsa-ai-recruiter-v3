@@ -1,14 +1,14 @@
 import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { supabase } from "@/lib/supabase/index"
+import { getClientSideSupabase } from "@/lib/supabase"
 import type { AuthResult } from "@/lib/auth-service"
 
 /**
  * Register a new recruit user (server-only)
  */
 export async function registerRecruit(email: string, password: string, name: string): Promise<AuthResult> {
-  if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
-
   try {
+    const supabase = getClientSideSupabase()
+
     // Create user in Supabase Auth
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -91,9 +91,9 @@ export async function registerVolunteerRecruiter(
   position: string,
   location: string,
 ): Promise<AuthResult> {
-  if (!supabase) throw new Error('Supabase client is not available on the server. This must be used on the client.');
-
   try {
+    const supabase = getClientSideSupabase()
+
     // Create user in Supabase Auth
     const { data, error } = await supabase.auth.signUp({
       email,

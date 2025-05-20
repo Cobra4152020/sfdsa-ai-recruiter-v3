@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Shield, AlertCircle } from "lucide-react"
-import { createClient } from "@/lib/supabase-clients"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export function AdminLoginForm() {
   const [email, setEmail] = useState("")
@@ -23,7 +23,7 @@ export function AdminLoginForm() {
     setError(null)
 
     try {
-      const supabase = createClient()
+      const supabase = getClientSideSupabase()
 
       // Sign in with email and password
       const { data, error: signInError } = await supabase.auth.signInWithPassword({

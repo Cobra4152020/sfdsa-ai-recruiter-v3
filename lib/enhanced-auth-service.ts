@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase/index"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { getServiceSupabase } from "@/app/lib/supabase/server"
 import { constructUrl } from "@/lib/url-utils"
 import { addParticipationPoints } from "@/lib/points-service"
@@ -74,6 +74,8 @@ export class EnhancedAuthService {
     let userFetchTime = 0
 
     try {
+      const supabase = getClientSideSupabase()
+
       // Record login attempt for analytics
       await this.recordLoginAttempt({
         email,
@@ -224,6 +226,7 @@ export class EnhancedAuthService {
     const startTime = performance.now()
 
     try {
+      const supabase = getClientSideSupabase()
       await this.recordLoginAttempt({
         method: `social/${provider}`,
         userAgent: this.getUserAgent(),
@@ -293,6 +296,7 @@ export class EnhancedAuthService {
     let databaseTime = 0
 
     try {
+      const supabase = getClientSideSupabase()
       // Exchange code for session
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
@@ -475,7 +479,7 @@ export class EnhancedAuthService {
       }
 
       // Create user in Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await getClientSideSupabase().auth.signUp({
         email,
         password,
         options: {
@@ -601,6 +605,7 @@ export class EnhancedAuthService {
    */
   async signOut(): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
       // Get current user before signing out
       const { data: userData } = await supabase.auth.getUser()
 
@@ -645,6 +650,7 @@ export class EnhancedAuthService {
    */
   async getSession() {
     try {
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.getSession()
 
       if (error) {
@@ -680,6 +686,7 @@ export class EnhancedAuthService {
    */
   async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
+      const supabase = getClientSideSupabase()
       // Get user type
       const { data: userTypeData, error: userTypeError } = await supabase
         .from("user_types")
@@ -802,13 +809,14 @@ export class EnhancedAuthService {
    */
   private async updateLoginStatistics(userId: string, userRole: UserRole): Promise<void> {
     try {
+      const supabase = getClientSideSupabase()
       const now = new Date().toISOString()
 
       if (userRole === "recruit") {
-        await getServiceSupabase().from("recruit.users")
+        await supabase.from("recruit.users")
           .update({
             last_login_at: now,
-            login_count: getServiceSupabase().rpc("increment", {
+            login_count: supabase.rpc("increment", {
               row_id: userId,
               table: "recruit.users",
               column: "login_count",
@@ -817,10 +825,10 @@ export class EnhancedAuthService {
           })
           .eq("id", userId)
       } else if (userRole === "volunteer") {
-        await getServiceSupabase().from("volunteer.recruiters")
+        await supabase.from("volunteer.recruiters")
           .update({
             last_login_at: now,
-            login_count: getServiceSupabase().rpc("increment", {
+            login_count: supabase.rpc("increment", {
               row_id: userId,
               table: "volunteer.recruiters",
               column: "login_count",
@@ -829,10 +837,10 @@ export class EnhancedAuthService {
           })
           .eq("id", userId)
       } else if (userRole === "admin") {
-        await getServiceSupabase().from("admin.users")
+        await supabase.from("admin.users")
           .update({
             last_login_at: now,
-            login_count: getServiceSupabase().rpc("increment", {
+            login_count: supabase.rpc("increment", {
               row_id: userId,
               table: "admin.users",
               column: "login_count",
@@ -857,17 +865,14 @@ export class EnhancedAuthService {
     ipAddress?: string
   }): Promise<void> {
     try {
-      const client = createClient()
-      await client.from("login_audit_logs").insert({
+      const supabase = getClientSideSupabase()
+      const { error } = await supabase.from("login_attempts").insert({
         user_id: data.userId,
-        event_type: "login_attempt",
-        details: {
-          email: data.email,
-          method: data.method,
-          user_agent: data.userAgent,
-          ip_address: data.ipAddress,
-        },
-        created_at: new Date().toISOString(),
+        email: data.email,
+        method: data.method,
+        user_agent: data.userAgent,
+        ip_address: data.ipAddress,
+        timestamp: new Date().toISOString(),
       })
     } catch (error) {
       console.error("Error recording login attempt:", error)
@@ -885,22 +890,18 @@ export class EnhancedAuthService {
     isRegistration?: boolean
   }): Promise<void> {
     try {
-      const client = createClient()
-      await client.from("login_audit_logs").insert({
+      const supabase = getClientSideSupabase()
+      const { error } = await supabase.from("login_history").insert({
         user_id: data.userId,
-        event_type: data.isRegistration ? "registration" : "login_success",
-        details: {
-          email: data.email,
-          method: data.method,
-          user_role: data.userRole,
-          user_agent: this.getUserAgent(),
-          ip_address: "client-side",
-        },
-        created_at: new Date().toISOString(),
+        email: data.email,
+        method: data.method,
+        user_role: data.userRole,
+        is_registration: data.isRegistration,
+        timestamp: new Date().toISOString(),
       })
 
       // Record metrics
-      await client.from("login_metrics").insert({
+      await supabase.from("login_metrics").insert({
         user_role: data.userRole,
         login_method: data.method.split("/")[0] as LoginMethod,
         success: true,
@@ -922,23 +923,19 @@ export class EnhancedAuthService {
     method: string
   }): Promise<void> {
     try {
-      const client = createClient()
-      await client.from("login_errors").insert({
+      const supabase = getClientSideSupabase()
+      const { error } = await supabase.from("login_errors").insert({
         user_id: data.userId,
         email: data.email,
         error_type: data.errorType,
         error_message: data.errorMessage,
-        details: {
-          method: data.method,
-          user_agent: this.getUserAgent(),
-          timestamp: new Date().toISOString(),
-        },
-        created_at: new Date().toISOString(),
+        method: data.method,
+        timestamp: new Date().toISOString(),
       })
 
       // Record metrics
       const loginMethod = data.method.split("/")[0] as LoginMethod
-      await client.from("login_metrics").insert({
+      await supabase.from("login_metrics").insert({
         user_role: data.userId ? "unknown" : "anonymous",
         login_method: loginMethod,
         success: false,

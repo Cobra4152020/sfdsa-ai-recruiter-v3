@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
 import { PushNotificationPermission } from "@/components/push-notification-permission"
-import { getClientSideSupabase } from '@/lib/supabase/index'
 
 interface NotificationPreferencesProps {
   userId?: string | null
@@ -43,7 +42,9 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
       }
 
       try {
-        const { data, error } = await getClientSideSupabase()
+        const { getClientSideSupabase } = require("@/lib/supabase")
+        const supabase = getClientSideSupabase()
+        const { data, error } = await supabase
           .from("user_notification_settings")
           .select("*")
           .eq("user_id", userId)
@@ -84,7 +85,9 @@ export function NotificationPreferences({ userId }: NotificationPreferencesProps
     setSaving(true)
 
     try {
-      const { error } = await getClientSideSupabase()
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const supabase = getClientSideSupabase()
+      const { error } = await supabase
         .from("user_notification_settings")
         .upsert(
           {

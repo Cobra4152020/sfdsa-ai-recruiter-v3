@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
 import { useToast } from "@/components/ui/use-toast"
 import { Shield, AlertCircle, InfoIcon, Mail, Lock, Eye, EyeOff } from "lucide-react"
-import { supabase } from "@/lib/supabase-client"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export default function VolunteerLoginPage() {
   const router = useRouter()
@@ -26,6 +26,8 @@ export default function VolunteerLoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
+
+  const supabase = getClientSideSupabase()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

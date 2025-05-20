@@ -30,8 +30,8 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const loadClientModules = async () => {
-      const { getClientSideSupabase } = await import("@/lib/supabase")
-      const { useUser } = await import("@/context/user-context")
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const { useUser } = require("@/context/user-context")
       const supabaseInstance = getClientSideSupabase()
       const { currentUser, setCurrentUser } = useUser()
       setSupabase(supabaseInstance)

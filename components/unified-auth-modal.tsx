@@ -10,7 +10,6 @@ import { OptInForm } from "@/components/opt-in-form"
 import { useToast } from "@/components/ui/use-toast"
 import { useRouter } from "next/navigation"
 import { useUser } from "@/context/user-context"
-import { getClientSideSupabase } from "@/lib/supabase"
 
 export function UnifiedAuthModal() {
   const { isOpen, modalType, userType, referralCode, closeModal } = useAuthModal()
@@ -24,8 +23,6 @@ export function UnifiedAuthModal() {
   const { toast } = useToast()
   const router = useRouter()
 
-  const supabase = getClientSideSupabase()
-
   useEffect(() => {
     if (isOpen) {
       setActiveTab(modalType)
@@ -38,6 +35,8 @@ export function UnifiedAuthModal() {
     setIsLoading(true)
 
     try {
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -69,6 +68,8 @@ export function UnifiedAuthModal() {
     setIsLoading(true)
 
     try {
+      const { getClientSideSupabase } = require("@/lib/supabase")
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.signUp({
         email,
         password,

@@ -6,7 +6,6 @@ import { Shield, Award, FileText, Bell, LogOut } from "lucide-react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { getClientSideSupabase } from "@/lib/supabase"
 import Link from "next/link"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -26,6 +25,7 @@ export default function UserDashboard() {
   useEffect(() => {
     async function checkUser() {
       setLoading(true)
+      const { getClientSideSupabase } = require("@/lib/supabase")
       const supabase = getClientSideSupabase()
       const {
         data: { session },
@@ -103,6 +103,7 @@ export default function UserDashboard() {
   }, [router])
 
   const handleLogout = async () => {
+    const { getClientSideSupabase } = require("@/lib/supabase")
     const supabase = getClientSideSupabase()
     await supabase.auth.signOut()
     router.push("/login")

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react"
 import { toast } from "@/components/ui/use-toast"
-import { getClientSideSupabase } from '@/lib/supabase/index'
 import { useUser } from "@/context/user-context"
 import { Award, Heart } from "lucide-react"
 
@@ -14,6 +13,7 @@ export function NotificationToastListener() {
     if (!currentUser?.id || isSubscribed) return
 
     // Subscribe to new notifications for this user
+    const { getClientSideSupabase } = require("@/lib/supabase")
     const channel = getClientSideSupabase()
       .channel(`notifications:${currentUser.id}`)
       .on(

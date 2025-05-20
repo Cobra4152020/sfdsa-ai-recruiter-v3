@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase"
+import { getClientSideSupabase } from "@/lib/supabase"
 import { getServiceSupabase } from '@/app/lib/supabase/server'
 import { constructUrl } from "@/lib/url-utils"
 import type { Provider } from "@supabase/supabase-js"
@@ -46,6 +46,8 @@ export const authService = {
    */
   async signInWithPassword(email: string, password: string): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Authenticate with Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
@@ -117,6 +119,7 @@ export const authService = {
    */
   async signInWithSocialProvider(provider: Provider): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
@@ -160,6 +163,8 @@ export const authService = {
    */
   async handleSocialAuthCallback(code: string, provider: string): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Exchange code for session
       const { data, error } = await supabase.auth.exchangeCodeForSession(code)
 
@@ -220,6 +225,7 @@ export const authService = {
     provider: SocialProvider,
   ): Promise<{ success: boolean; error?: any }> {
     try {
+      const supabase = getClientSideSupabase()
       const { id, email, user_metadata } = user
 
       if (!email) {
@@ -281,6 +287,8 @@ export const authService = {
    */
   async linkSocialProvider(userId: string, provider: SocialProvider, providerUserId: string): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Check if this provider is already linked to another account
       const { data: existingLink } = await supabase
         .from("user_social_providers")
@@ -335,6 +343,8 @@ export const authService = {
    */
   async unlinkSocialProvider(userId: string, provider: SocialProvider): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Check if user has password auth before unlinking
       const { data: userAuth } = await getServiceSupabase.auth.admin.getUserById(userId)
 
@@ -403,6 +413,8 @@ export const authService = {
    */
   async userHasPassword(userId: string): Promise<boolean> {
     try {
+      const supabase = getClientSideSupabase()
+
       // This is a simplified check - in a real implementation,
       // you would need to use the Supabase admin API to check if the user has a password
       const { data } = await getServiceSupabase.auth.admin.getUserById(userId)
@@ -424,6 +436,7 @@ export const authService = {
    */
   async getLinkedSocialProviders(userId: string): Promise<SocialProvider[]> {
     try {
+      const supabase = getClientSideSupabase()
       const { data, error } = await supabase.from("user_social_providers").select("provider").eq("user_id", userId)
 
       if (error) {
@@ -443,6 +456,8 @@ export const authService = {
    */
   async signInWithMagicLink(email: string, redirectUrl?: string): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Check if user exists and get user type
       const { data: userData } = await getServiceSupabase
         .from("user_types")
@@ -495,6 +510,8 @@ export const authService = {
    */
   async registerRecruit(email: string, password: string, name: string): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Check if email already exists
       const { data: existingUser } = await getServiceSupabase
         .from("user_types")
@@ -596,6 +613,8 @@ export const authService = {
     location: string,
   ): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Check if email already exists
       const { data: existingUser } = await getServiceSupabase
         .from("user_types")
@@ -698,6 +717,8 @@ export const authService = {
    */
   async signOut(): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       const { error } = await supabase.auth.signOut()
 
       if (error) {
@@ -728,6 +749,8 @@ export const authService = {
    */
   async getSession() {
     try {
+      const supabase = getClientSideSupabase()
+
       const { data, error } = await supabase.auth.getSession()
 
       if (error) {
@@ -747,6 +770,8 @@ export const authService = {
    */
   async getCurrentUser(): Promise<UserProfile | null> {
     try {
+      const supabase = getClientSideSupabase()
+
       const { data, error } = await supabase.auth.getUser()
 
       if (error || !data.user) {
@@ -765,6 +790,8 @@ export const authService = {
    */
   async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Get user type
       const { data: userTypeData, error: userTypeError } = await supabase
         .from("user_types")
@@ -876,6 +903,8 @@ export const authService = {
    */
   async resetPassword(email: string): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: constructUrl("/reset-password"),
       })
@@ -908,6 +937,8 @@ export const authService = {
    */
   async updatePassword(password: string): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       const { error } = await supabase.auth.updateUser({
         password,
       })
@@ -939,6 +970,8 @@ export const authService = {
    */
   async updateProfile(userId: string, profileData: Partial<UserProfile>): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // Get user type
       const { data: userTypeData, error: userTypeError } = await supabase
         .from("user_types")
@@ -1051,8 +1084,15 @@ export const authService = {
    * Check if user is authenticated
    */
   async isAuthenticated(): Promise<boolean> {
-    const session = await this.getSession()
-    return !!session
+    try {
+      const supabase = getClientSideSupabase()
+
+      const session = await this.getSession()
+      return !!session
+    } catch (error) {
+      console.error("Get session error:", error)
+      return false
+    }
   },
 
   /**
@@ -1060,6 +1100,8 @@ export const authService = {
    */
   async hasRole(userId: string, role: UserType): Promise<boolean> {
     try {
+      const supabase = getClientSideSupabase()
+
       const { data } = await supabase.from("user_types").select("user_type").eq("user_id", userId).single()
 
       return data?.user_type === role
@@ -1090,6 +1132,8 @@ export const authService = {
    */
   async createAdminUser(email: string, password: string, name: string): Promise<AuthResult> {
     try {
+      const supabase = getClientSideSupabase()
+
       // This should only be callable by existing admins
       const currentUser = await this.getCurrentUser()
 
