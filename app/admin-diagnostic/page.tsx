@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { AlertCircle, CheckCircle, XCircle } from "lucide-react"
-import { supabase } from "@/lib/supabase"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 export default function AdminDiagnosticPage() {
   const [email, setEmail] = useState("")
@@ -19,6 +19,7 @@ export default function AdminDiagnosticPage() {
   const [userRole, setUserRole] = useState<any>(null)
 
   const runDiagnostic = async () => {
+    const supabase = getClientSideSupabase()
     if (!email) {
       setError("Email is required")
       return
