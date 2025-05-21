@@ -1,7 +1,7 @@
 {
   "framework": "nextjs",
-  "buildCommand": "pnpm build",
-  "installCommand": "pnpm install",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
   "outputDirectory": ".next",
   "env": {
     "NEXT_PUBLIC_DISABLE_DATABASE_CHECKS": "true",
@@ -47,5 +47,16 @@
         }
       ]
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "NODE_OPTIONS": "--max-old-space-size=8192"
+    }
+  },
+  "functions": {
+    "app/api/**/*": {
+      "memory": 3008,
+      "maxDuration": 60
+    }
+  }
 } 

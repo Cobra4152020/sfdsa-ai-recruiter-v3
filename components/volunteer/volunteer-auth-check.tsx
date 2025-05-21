@@ -6,8 +6,6 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { getClientSideSupabase } from "@/lib/supabase"
 
-const supabase = getClientSideSupabase()
-
 export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) {
   const [isVolunteer, setIsVolunteer] = useState<boolean | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -15,6 +13,7 @@ export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     let isMounted = true
+    const supabase = getClientSideSupabase()
 
     async function checkVolunteerStatus() {
       try {

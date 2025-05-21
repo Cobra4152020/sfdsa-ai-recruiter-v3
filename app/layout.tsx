@@ -1,7 +1,7 @@
-import type React from "react"
 import type { Metadata } from "next"
-import "./globals.css"
 import { Inter } from "next/font/google"
+import "./globals.css"
+import { ErrorBoundary } from "@/components/error-boundary"
 import RootLayoutClient from "@/components/RootLayoutClient"
 
 const inter = Inter({ subsets: ["latin"] })
@@ -51,7 +51,9 @@ export default function RootLayout({
         {/* All Tailwind CDN and fallback links removed. Only local CSS is used. */}
       </head>
       <body className={inter.className}>
-        <RootLayoutClient>{children}</RootLayoutClient>
+        <ErrorBoundary>
+          <RootLayoutClient>{children}</RootLayoutClient>
+        </ErrorBoundary>
       </body>
     </html>
   )
