@@ -12,10 +12,24 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { User, Settings, LogOut } from "lucide-react"
+import { useState, useEffect } from "react"
 
 export function UserNav() {
   const { currentUser, signOut } = useUser()
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+        <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      </Button>
+    )
+  }
 
   if (!currentUser) return null
 
@@ -32,7 +46,7 @@ export function UserNav() {
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
+      <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">{currentUser.name}</p>

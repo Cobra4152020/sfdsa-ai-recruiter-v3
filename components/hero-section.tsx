@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 
 interface HeroSectionProps {
   onGetStarted: () => void
@@ -11,8 +12,22 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
+  const router = useRouter()
+
+  const handleApplyNow = () => {
+    showOptInForm(true)
+  }
+
+  const handleMoreInfo = () => {
+    showOptInForm(false)
+  }
+
+  const handleSignUp = () => {
+    router.push('/register')
+  }
+
   return (
-    <section className="bg-[#0A3C1F] text-white pt-16 pb-12 relative">
+    <section className="bg-[#0A3C1F] text-white pt-24 pb-16 relative mt-12 md:mt-16">
       {/* Background pattern - subtle grid */}
       <div
         className="absolute inset-0 z-0 opacity-10"
@@ -25,7 +40,7 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
       />
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-12">
+        <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
             Join the <span className="text-[#FFD700]">San Francisco</span> Sheriff's Office
           </h1>
@@ -34,7 +49,7 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-7xl mx-auto items-stretch">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto items-stretch">
           {/* Benefits Box */}
           <div 
             className="transform-gpu bg-[#0A3C1F]/50 backdrop-blur-sm p-8 rounded-xl border border-white/20 
@@ -70,9 +85,9 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
                 <span>Tuition reimbursement program</span>
               </li>
             </ul>
-            <div className="mt-6 space-y-3">
+            <div className="mt-8 space-y-4">
               <Button
-                onClick={() => showOptInForm(true)}
+                onClick={handleApplyNow}
                 className="w-full bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold text-lg py-6 
                 transform-gpu transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]
                 shadow-[0_4px_8px_0px_rgba(0,0,0,0.2)] hover:shadow-[0_6px_12px_0px_rgba(0,0,0,0.3)]"
@@ -80,7 +95,7 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
                 Apply Now
               </Button>
               <Button
-                onClick={() => showOptInForm(false)}
+                onClick={handleMoreInfo}
                 variant="outline"
                 className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-[#FFD700] border-[#FFD700] font-medium text-lg py-6 
                 transform-gpu transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]
@@ -106,6 +121,7 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
                 className="object-cover"
                 priority
                 quality={90}
+                sizes="(max-width: 1024px) 100vw, 600px"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-[#0A3C1F] via-[#0A3C1F]/20 to-transparent">
                 <div className="absolute bottom-0 left-0 right-0 p-6">
@@ -118,11 +134,14 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
           </div>
         </div>
 
-        <div className="text-center mt-12">
+        <div className="text-center mt-16">
           <p className="text-white/90 mb-2">Already interested? Take the first step today</p>
-          <Link href="#sign-up" className="text-[#FFD700] hover:text-[#FFD700]/80 flex items-center justify-center">
+          <button
+            onClick={handleSignUp}
+            className="text-[#FFD700] hover:text-[#FFD700]/80 flex items-center justify-center mx-auto"
+          >
             Sign up for updates <ArrowRight className="ml-2 h-4 w-4" />
-          </Link>
+          </button>
         </div>
       </div>
     </section>

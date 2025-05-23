@@ -1,22 +1,24 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, type ReactNode, useEffect } from "react"
 import { UnifiedRegistrationPopup } from "@/components/unified-registration-popup"
 import { useUser } from "@/context/user-context"
 import { getClientSideSupabase } from '@/lib/supabase/index'
 
+interface RegistrationOptions {
+  points?: number
+  action?: string
+  referral?: string
+  applying?: boolean
+  userType?: "recruit" | "volunteer" | "admin"
+  callbackUrl?: string
+  initialTab?: "signin" | "signup" | "optin"
+  title?: string
+  description?: string
+}
+
 interface RegistrationContextType {
-  openRegistrationPopup: (options?: {
-    points?: number
-    action?: string
-    referral?: string
-    applying?: boolean
-    userType?: "recruit" | "volunteer" | "admin"
-    callbackUrl?: string
-    initialTab?: "signin" | "signup" | "optin"
-    title?: string
-    description?: string
-  }) => boolean
+  openRegistrationPopup: (options?: RegistrationOptions) => boolean
 }
 
 const RegistrationContext = createContext<RegistrationContextType | undefined>(undefined)
@@ -32,24 +34,29 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
   const [initialTab, setInitialTab] = useState<"signin" | "signup" | "optin">("signin")
   const [title, setTitle] = useState<string | undefined>(undefined)
   const [description, setDescription] = useState<string | undefined>(undefined)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const { currentUser } = useUser()
 
-  const openRegistrationPopup = (options = {}) => {
+  const openRegistrationPopup = (options: RegistrationOptions = {}) => {
     if (currentUser) {
       // User is already logged in
       return false
     }
 
-    setRequiredPoints(options?.points)
-    setActionName(options?.action)
-    setReferralCode(options?.referral)
-    setIsApplying(!!options?.applying)
-    setUserType(options?.userType || "recruit")
-    setCallbackUrl(options?.callbackUrl)
-    setInitialTab(options?.initialTab || "signin")
-    setTitle(options?.title)
-    setDescription(options?.description)
+    setRequiredPoints(options.points)
+    setActionName(options.action)
+    setReferralCode(options.referral)
+    setIsApplying(!!options.applying)
+    setUserType(options.userType || "recruit")
+    setCallbackUrl(options.callbackUrl)
+    setInitialTab(options.initialTab || "signin")
+    setTitle(options.title)
+    setDescription(options.description)
     setIsOpen(true)
     return true
   }
@@ -58,22 +65,29 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
     setIsOpen(false)
   }
 
+  // Return a placeholder during server-side rendering
+  if (!mounted) {
+    return <div className="min-h-screen" />
+  }
+
   return (
     <RegistrationContext.Provider value={{ openRegistrationPopup }}>
-      {children}
-      <UnifiedRegistrationPopup
-        isOpen={isOpen}
-        onClose={closeRegistrationPopup}
-        requiredPoints={requiredPoints}
-        actionName={actionName}
-        referralCode={referralCode}
-        isApplying={isApplying}
-        userType={userType}
-        callbackUrl={callbackUrl}
-        initialTab={initialTab}
-        title={title}
-        description={description}
-      />
+      <div className="min-h-screen">
+        {children}
+        <UnifiedRegistrationPopup
+          isOpen={isOpen}
+          onClose={closeRegistrationPopup}
+          requiredPoints={requiredPoints}
+          actionName={actionName}
+          referralCode={referralCode}
+          isApplying={isApplying}
+          userType={userType}
+          callbackUrl={callbackUrl}
+          initialTab={initialTab}
+          title={title}
+          description={description}
+        />
+      </div>
     </RegistrationContext.Provider>
   )
 }

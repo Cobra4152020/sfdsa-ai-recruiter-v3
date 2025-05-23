@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import type { Badge } from "@/lib/badge-utils"
 import { AchievementBadge } from "./achievement-badge"
 import { Progress } from "@/components/ui/progress"
@@ -32,7 +32,8 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   
-  const origin = useClientOnly(() => getWindowOrigin(), '')
+  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), [])
+  const origin = useClientOnly(memoizedGetWindowOrigin, '')
 
   const handleShareClick = () => {
     if (earned) {

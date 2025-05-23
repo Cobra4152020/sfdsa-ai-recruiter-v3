@@ -1,8 +1,18 @@
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import { ErrorBoundary } from "@/components/error-boundary"
-import RootLayoutClient from "@/components/RootLayoutClient"
+import { ThemeProvider } from "@/components/theme-provider"
+import { UserProvider } from "@/context/user-context"
+import { RegistrationProvider } from "@/context/registration-context"
+import { AuthModalProvider } from "@/context/auth-modal-context"
+import { ImprovedHeader } from "@/components/improved-header"
+import { ImprovedFooter } from "@/components/improved-footer"
+import { OptInForm } from "@/components/opt-in-form"
+import { UnifiedAuthModal } from "@/components/unified-auth-modal"
+import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
+import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
+import { ErrorMonitor } from "@/components/error-monitor"
+import PerformanceMonitor from "@/components/performance-monitor"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -48,12 +58,30 @@ export default function RootLayout({
         <title>SFDSA AI Recruiter</title>
         <meta name="description" content="San Francisco Deputy Sheriffs' Association AI Recruiter" />
         <meta name="generator" content="v0.dev" />
-        {/* All Tailwind CDN and fallback links removed. Only local CSS is used. */}
       </head>
-      <body className={inter.className}>
-        <ErrorBoundary>
-          <RootLayoutClient>{children}</RootLayoutClient>
-        </ErrorBoundary>
+      <body className={inter.className} suppressHydrationWarning>
+        <ThemeProvider defaultTheme="light" storageKey="app-theme">
+          <UserProvider>
+            <RegistrationProvider>
+              <AuthModalProvider>
+                <div className="min-h-screen flex flex-col">
+                  <ImprovedHeader />
+                  <main id="main-content" className="flex-1 pt-16 pb-12 bg-background dark:bg-[#121212]">
+                    <WebSocketErrorHandler />
+                    <ErrorMonitor />
+                    <PerformanceMonitor />
+                    {children}
+                  </main>
+                  <ImprovedFooter />
+                  <div className="fixed bottom-6 right-6 z-50">
+                    <AskSgtKenButton position="fixed" variant="secondary" />
+                  </div>
+                  <UnifiedAuthModal />
+                </div>
+              </AuthModalProvider>
+            </RegistrationProvider>
+          </UserProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

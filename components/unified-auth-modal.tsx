@@ -20,8 +20,13 @@ export function UnifiedAuthModal() {
   const [firstName, setFirstName] = useState("")
   const [lastName, setLastName] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     if (isOpen) {
@@ -29,6 +34,11 @@ export function UnifiedAuthModal() {
       setShowOptIn(modalType === "optin")
     }
   }, [isOpen, modalType])
+
+  // Return a placeholder during server-side rendering
+  if (!mounted) {
+    return null
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()

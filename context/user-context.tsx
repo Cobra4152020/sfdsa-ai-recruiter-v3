@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useState, type ReactNode } from "react"
+import { createContext, useContext, useState, type ReactNode, useEffect } from "react"
 import { useRouter } from "next/navigation"
 
 // Define the user type
@@ -47,7 +47,12 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const login = (user: User) => {
     setCurrentUser(user)
@@ -56,6 +61,11 @@ export function UserProvider({ children }: { children: ReactNode }) {
   const signOut = async () => {
     setCurrentUser(null)
     router.push("/")
+  }
+
+  // Return a placeholder during server-side rendering
+  if (!mounted) {
+    return <div className="min-h-screen" />
   }
 
   return (

@@ -34,37 +34,6 @@ import { useUser } from "@/context/user-context"
 import { useToast } from "@/components/ui/use-toast"
 import { AnimatePresence, motion } from "framer-motion"
 import confetti from "canvas-confetti"
-import type { User } from "@/types/user"
-
-// Add types for canvas-confetti
-declare module 'canvas-confetti' {
-  interface Options {
-    particleCount?: number;
-    spread?: number;
-    startVelocity?: number;
-    decay?: number;
-    gravity?: number;
-    drift?: number;
-    ticks?: number;
-    origin?: {
-      x?: number;
-      y?: number;
-    };
-    colors?: string[];
-    shapes?: string[];
-    scalar?: number;
-    zIndex?: number;
-    disableForReducedMotion?: boolean;
-  }
-
-  interface ConfettiFunction {
-    (options?: Options): Promise<null>;
-    reset: () => void;
-  }
-
-  const confetti: ConfettiFunction;
-  export default confetti;
-}
 
 interface LeaderboardUser {
   id: string
@@ -146,7 +115,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
     ]
 
     const mockData = Array.from({ length: Math.min(limit, names.length) }, (_, i) => {
-      const isCurrentUser = currentUserId && i === 2 // Make the 3rd user the current user if currentUserId is provided
+      const isCurrentUser = !!(currentUserId && i === 2) // Always boolean
       const randomLikes = Math.floor(Math.random() * 50) + 5
       const randomShares = Math.floor(Math.random() * 20) + 2
       const randomReferrals = Math.floor(Math.random() * 10)
@@ -169,7 +138,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
         nft_count: Math.floor(Math.random() * 3),
         has_applied: Math.random() > 0.7,
         avatar_url: avatarUrl,
-        is_current_user: isCurrentUser,
+        is_current_user: isCurrentUser, // Always boolean
         rank: i + 1 + offset,
         likes: randomLikes,
         shares: randomShares,
@@ -315,7 +284,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
   // Fetch data on initial load and when filters change
   useEffect(() => {
     fetchData()
-  }, [activeTab, timeframe, offset, searchQuery, currentUserId, useMockData])
+  }, [activeTab, timeframe, offset, searchQuery, currentUserId, useMockData, fetchData])
 
   const handleTabChange = (value: string) => {
     setActiveTab(value)
@@ -363,7 +332,7 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
             confetti({
               particleCount: 30,
               spread: 70,
-              origin: { y: 0.6 },
+              origin: { x: 0.5, y: 0.6 },
               colors: ["#FFD700", "#0A3C1F"],
             })
           }
@@ -464,38 +433,6 @@ export function AdvancedLeaderboard({ currentUserId, useMockData = false, classN
     if (rank === 3) return <Award className="h-5 w-5 text-amber-700" />
     return <span className="text-gray-500 font-medium">{rank}</span>
   }
-
-  // Get profile image based on user ID
-  const getProfileImage = (userId: number) => {
-    // Map user IDs to specific profile images
-    const imageMap: Record<number, string> = {
-      1: "/male-law-enforcement-headshot.png",
-      2: "/female-law-enforcement-headshot.png",
-      3: "/asian-male-officer-headshot.png",
-      4: "/san-francisco-deputy-sheriff.png",
-    }
-
-    // Use the mapped image or fall back to a default based on user ID modulo
-    return imageMap[userId] || `/placeholder.svg?height=40&width=40&query=avatar ${userId}`
-  }
-
-  // Filter users based on active tab - removed dependency on topUsers
-  const getFilteredUsers = () => {
-    // We're now using leaderboardData directly instead of topUsers
-    switch (activeTab) {
-      case "badges":
-        return [...leaderboardData].sort((a, b) => (b.badge_count || 0) - (a.badge_count || 0)).slice(0, 10)
-      case "nfts":
-        return [...leaderboardData].sort((a, b) => (b.nft_count || 0) - (a.nft_count || 0)).slice(0, 10)
-      case "application":
-        return [...leaderboardData].filter((user) => user.has_applied).slice(0, 10)
-      case "participation":
-      default:
-        return leaderboardData.slice(0, 10)
-    }
-  }
-
-  const filteredUsers = getFilteredUsers()
 
   return (
     <>

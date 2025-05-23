@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Trophy, Medal, User } from "lucide-react"
-import { getClientSideSupabase } from "@/lib/supabase"
+import { createClient } from "@/lib/supabase"
 import { useUser } from "@/context/user-context"
 
 interface LeaderboardEntry {
@@ -39,7 +39,7 @@ export function BriefingLeaderboard() {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const supabase = getClientSideSupabase()
+        const supabase = createClient()
 
         // Get leaderboard data
         const { data, error } = await supabase.rpc("get_briefing_leaderboard").limit(10)

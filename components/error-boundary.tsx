@@ -1,11 +1,11 @@
 "use client"
 
-import React from "react"
+import { Component, type ReactNode } from "react"
 import { errorTracking } from "@/lib/error-tracking"
 
 interface Props {
-  children: React.ReactNode
-  fallback?: React.ReactNode
+  children: ReactNode
+  fallback?: ReactNode
 }
 
 interface State {
@@ -13,7 +13,7 @@ interface State {
   error: Error | null
 }
 
-export class ErrorBoundary extends React.Component<Props, State> {
+export class ErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { hasError: false, error: null }

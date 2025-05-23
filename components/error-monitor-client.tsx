@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { initErrorMonitoring, getLoggedErrors, clearErrorLog } from "@/lib/error-monitoring"
+import { initErrorMonitoring, getLoggedErrors, clearErrorLog, type ErrorRecord } from "@/lib/error-monitoring"
 import { XCircle, AlertTriangle, Clock, RefreshCw, Trash2 } from "lucide-react"
 
 interface ErrorMonitorProps {
@@ -10,7 +10,7 @@ interface ErrorMonitorProps {
 
 export function ErrorMonitorClient({ initiallyExpanded = false }: ErrorMonitorProps) {
   const [isExpanded, setIsExpanded] = useState(initiallyExpanded)
-  const [errors, setErrors] = useState<ErrorLog[]>([])
+  const [errors, setErrors] = useState<ErrorRecord[]>([])
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {

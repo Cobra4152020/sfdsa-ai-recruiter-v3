@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -61,7 +61,8 @@ export function UnifiedRegistrationPopup({
   const { toast } = useToast()
   const { login } = useUser()
   const router = useRouter()
-  const origin = useClientOnly(() => getWindowOrigin(), '')
+  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), [])
+  const origin = useClientOnly(memoizedGetWindowOrigin, '')
 
   // Generate a unique tracking number for opt-in
   useEffect(() => {

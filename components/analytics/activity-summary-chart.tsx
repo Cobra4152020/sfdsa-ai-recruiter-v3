@@ -4,8 +4,14 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from "recharts"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
+interface ActivitySummary {
+  activity_type: string
+  count: number
+  percentage: number
+}
+
 interface ActivitySummaryChartProps {
-  data: any[]
+  data: ActivitySummary[]
   isLoading: boolean
 }
 

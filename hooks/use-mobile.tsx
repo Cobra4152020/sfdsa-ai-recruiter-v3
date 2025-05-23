@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useClientOnly } from "@/hooks/use-client-only"
 import { getWindowDimensions, isBrowser } from "@/lib/utils"
 
@@ -10,7 +10,8 @@ import { getWindowDimensions, isBrowser } from "@/lib/utils"
  * @returns boolean indicating if the current viewport is mobile
  */
 export function useMobile(breakpoint = 768) {
-  const { innerWidth } = useClientOnly(() => getWindowDimensions(), { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
+  const memoizedGetWindowDimensions = useCallback(() => getWindowDimensions(), [])
+  const { innerWidth } = useClientOnly(memoizedGetWindowDimensions, { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
   const [isMobile, setIsMobile] = useState(false)
 
   useEffect(() => {

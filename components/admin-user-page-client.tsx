@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -53,11 +53,7 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
   const [selectedRole, setSelectedRole] = useState<UserRole>("recruit")
   const [formData, setFormData] = useState<FormData["recruit"] | FormData["volunteer"] | FormData["admin"]>({})
 
-  useEffect(() => {
-    fetchUser()
-  }, [params.id])
-
-  const fetchUser = async () => {
+  const fetchUser = useCallback(async () => {
     try {
       setIsLoading(true)
       const supabase = getClientSideSupabase()
@@ -119,7 +115,11 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
     } finally {
       setIsLoading(false)
     }
-  }
+  }, [params.id, toast])
+
+  useEffect(() => {
+    fetchUser()
+  }, [fetchUser])
 
   const handleSave = async () => {
     if (!user) return
@@ -198,7 +198,7 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
       })
       fetchUser()
     } catch (error) {
-      console.error("Error changing user role:", error)
+      console.error("Error changing role:", error)
       toast({
         title: "Error",
         description: "An unexpected error occurred",
@@ -212,17 +212,10 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-3xl mx-auto">
-          <div className="animate-pulse space-y-4">
-            <div className="h-8 bg-gray-200 rounded w-1/4" />
-            <div className="h-4 bg-gray-200 rounded w-1/2" />
-            <div className="space-y-2">
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded" />
-              <div className="h-4 bg-gray-200 rounded w-3/4" />
-            </div>
-          </div>
+      <div className="container mx-auto px-4 py-8">
+        <div className="animate-pulse">
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-1/4 mb-4" />
+          <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded" />
         </div>
       </div>
     )
@@ -230,81 +223,117 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
 
   if (!user) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-2xl font-bold mb-4">User Not Found</h1>
-          <p className="text-gray-600 mb-6">The requested user could not be found.</p>
-          <Button asChild>
-            <Link href="/admin/users">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Users
-            </Link>
-          </Button>
-        </div>
+      <div className="container mx-auto px-4 py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>User Not Found</CardTitle>
+            <CardDescription>The requested user could not be found.</CardDescription>
+          </CardHeader>
+          <CardFooter>
+            <Button asChild>
+              <Link href="/admin/users">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Back to Users
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center">
-            <Button variant="ghost" asChild className="mr-4">
-              <Link href="/admin/users">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Link>
-            </Button>
-            <h1 className="text-2xl font-bold">Edit User</h1>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              className="text-red-600 border-red-200 hover:bg-red-50"
-              onClick={() => setShowDeleteConfirm(true)}
-            >
-              <Trash className="h-4 w-4 mr-2" />
-              Delete User
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setSelectedRole(user.user_type as UserRole)
-                setShowRoleChangeConfirm(true)
-              }}
-            >
-              <Shield className="h-4 w-4 mr-2" />
-              Change Role
-            </Button>
-          </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex justify-between items-center mb-6">
+        <Button asChild variant="ghost">
+          <Link href="/admin/users">
+            <ArrowLeft className="mr-2 h-4 w-4" />
+            Back to Users
+          </Link>
+        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setShowRoleChangeConfirm(true)}
+            disabled={isLoading}
+          >
+            <Shield className="mr-2 h-4 w-4" />
+            Change Role
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => setShowDeleteConfirm(true)}
+            disabled={isLoading || isDeleting}
+          >
+            <Trash className="mr-2 h-4 w-4" />
+            Delete User
+          </Button>
         </div>
+      </div>
 
-        <div className="grid gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>User Information</CardTitle>
-              <CardDescription>Update the user's basic information</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  value={formData.email || ""}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                />
-              </div>
+      <Card>
+        <CardHeader>
+          <CardTitle>User Details</CardTitle>
+          <CardDescription>View and edit user information</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Tabs defaultValue={user.user_type}>
+            <TabsList>
+              <TabsTrigger value="recruit">
+                <User className="mr-2 h-4 w-4" />
+                Recruit
+              </TabsTrigger>
+              <TabsTrigger value="volunteer">
+                <UserCog className="mr-2 h-4 w-4" />
+                Volunteer
+              </TabsTrigger>
+              <TabsTrigger value="admin">
+                <Shield className="mr-2 h-4 w-4" />
+                Admin
+              </TabsTrigger>
+            </TabsList>
 
-              {user.user_type === "recruit" && (
-                <>
+            <TabsContent value="recruit">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      value={(formData as FormData["recruit"]).email || ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input
+                      id="phone"
+                      value={(formData as FormData["recruit"]).phone || ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          phone: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="first_name">First Name</Label>
                     <Input
                       id="first_name"
                       value={(formData as FormData["recruit"]).first_name || ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, first_name: e.target.value } as FormData["recruit"])
+                        setFormData((prev) => ({
+                          ...prev,
+                          first_name: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -314,40 +343,30 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
                       id="last_name"
                       value={(formData as FormData["recruit"]).last_name || ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, last_name: e.target.value } as FormData["recruit"])
+                        setFormData((prev) => ({
+                          ...prev,
+                          last_name: e.target.value,
+                        }))
                       }
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone</Label>
-                    <Input
-                      id="phone"
-                      value={(formData as FormData["recruit"]).phone || ""}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value } as FormData["recruit"])}
-                    />
-                  </div>
-                </>
-              )}
+                </div>
+              </div>
+            </TabsContent>
 
-              {user.user_type === "volunteer" && (
-                <>
+            <TabsContent value="volunteer">
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label htmlFor="first_name">First Name</Label>
+                    <Label htmlFor="email">Email</Label>
                     <Input
-                      id="first_name"
-                      value={(formData as FormData["volunteer"]).first_name || ""}
+                      id="email"
+                      value={(formData as FormData["volunteer"]).email || ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, first_name: e.target.value } as FormData["volunteer"])
-                      }
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="last_name">Last Name</Label>
-                    <Input
-                      id="last_name"
-                      value={(formData as FormData["volunteer"]).last_name || ""}
-                      onChange={(e) =>
-                        setFormData({ ...formData, last_name: e.target.value } as FormData["volunteer"])
+                        setFormData((prev) => ({
+                          ...prev,
+                          email: e.target.value,
+                        }))
                       }
                     />
                   </div>
@@ -357,119 +376,171 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
                       id="phone"
                       value={(formData as FormData["volunteer"]).phone || ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, phone: e.target.value } as FormData["volunteer"])
+                        setFormData((prev) => ({
+                          ...prev,
+                          phone: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="first_name">First Name</Label>
+                    <Input
+                      id="first_name"
+                      value={(formData as FormData["volunteer"]).first_name || ""}
+                      onChange={(e) =>
+                        setFormData((prev) => ({
+                          ...prev,
+                          first_name: e.target.value,
+                        }))
                       }
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="organization">Organization</Label>
+                    <Label htmlFor="last_name">Last Name</Label>
                     <Input
-                      id="organization"
-                      value={(formData as FormData["volunteer"]).organization || ""}
+                      id="last_name"
+                      value={(formData as FormData["volunteer"]).last_name || ""}
                       onChange={(e) =>
-                        setFormData({ ...formData, organization: e.target.value } as FormData["volunteer"])
+                        setFormData((prev) => ({
+                          ...prev,
+                          last_name: e.target.value,
+                        }))
                       }
                     />
                   </div>
-                </>
-              )}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="organization">Organization</Label>
+                  <Input
+                    id="organization"
+                    value={(formData as FormData["volunteer"]).organization || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        organization: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            </TabsContent>
 
-              {user.user_type === "admin" && (
+            <TabsContent value="admin">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    value={(formData as FormData["admin"]).email || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        email: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="name">Name</Label>
                   <Input
                     id="name"
                     value={(formData as FormData["admin"]).name || ""}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value } as FormData["admin"])}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        name: e.target.value,
+                      }))
+                    }
                   />
                 </div>
-              )}
-            </CardContent>
-            <CardFooter className="flex justify-between">
-              <Button variant="outline" onClick={fetchUser}>
-                <RefreshCw className="h-4 w-4 mr-2" />
-                Reset
-              </Button>
-              <Button onClick={handleSave} disabled={isLoading}>
-                {isLoading ? (
-                  <>
-                    <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Changes
-                  </>
-                )}
-              </Button>
-            </CardFooter>
-          </Card>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </CardContent>
+        <CardFooter>
+          <Button onClick={handleSave} disabled={isLoading}>
+            <Save className="mr-2 h-4 w-4" />
+            Save Changes
+          </Button>
+        </CardFooter>
+      </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>User Activity</CardTitle>
-              <CardDescription>View user's recent activity and interactions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <UserActivity userId={user.id} />
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Delete User Dialog */}
-        <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Delete User</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete this user? This action cannot be undone.
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowDeleteConfirm(false)} disabled={isDeleting}>
-                Cancel
-              </Button>
-              <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
-                {isDeleting ? "Deleting..." : "Delete User"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-
-        {/* Change Role Dialog */}
-        <Dialog open={showRoleChangeConfirm} onOpenChange={setShowRoleChangeConfirm}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Change User Role</DialogTitle>
-              <DialogDescription>
-                Select a new role for this user. This will affect their permissions and access level.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="py-4">
-              <Label htmlFor="role">New Role</Label>
-              <Select value={selectedRole} onValueChange={(value) => setSelectedRole(value as UserRole)}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="recruit">Recruit</SelectItem>
-                  <SelectItem value="volunteer">Volunteer</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setShowRoleChangeConfirm(false)} disabled={isLoading}>
-                Cancel
-              </Button>
-              <Button onClick={handleChangeRole} disabled={isLoading || selectedRole === user.user_type}>
-                {isLoading ? "Changing..." : "Change Role"}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+      <div className="mt-8">
+        <UserActivity userId={user.id} />
       </div>
+
+      <Dialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete User</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this user? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash className="mr-2 h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showRoleChangeConfirm} onOpenChange={setShowRoleChangeConfirm}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Change User Role</DialogTitle>
+            <DialogDescription>
+              Select the new role for this user.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <Select value={selectedRole} onValueChange={(value: UserRole) => setSelectedRole(value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select a role" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recruit">Recruit</SelectItem>
+                <SelectItem value="volunteer">Volunteer</SelectItem>
+                <SelectItem value="admin">Admin</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowRoleChangeConfirm(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleChangeRole} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                  Changing...
+                </>
+              ) : (
+                <>
+                  <Shield className="mr-2 h-4 w-4" />
+                  Change Role
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 } 

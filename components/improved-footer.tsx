@@ -1,20 +1,86 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Facebook, Twitter, Youtube, Instagram, Linkedin } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ShieldLogo } from "@/components/shield-logo"
+import { useRouter } from "next/navigation"
 
 export function ImprovedFooter() {
+  const [mounted, setMounted] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const handleNavigation = (href: string) => {
+    router.push(href)
+  }
+
+  // Return a placeholder during server-side rendering
+  if (!mounted) {
+    return (
+      <footer className="bg-[#0A3C1F] text-white">
+        <div className="container mx-auto px-4 py-12">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
+            <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8">
+              <div className="w-32 h-8 bg-gray-700 animate-pulse rounded" />
+              <div className="w-64 h-4 bg-gray-700 animate-pulse rounded" />
+            </div>
+            <div className="flex space-x-4">
+              {[1, 2, 3, 4, 5].map((i) => (
+                <div key={i} className="w-6 h-6 bg-gray-700 animate-pulse rounded-full" />
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="md:col-span-3">
+                <div className="w-24 h-6 bg-gray-700 animate-pulse rounded mb-4" />
+                <div className="space-y-2">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div key={j} className="w-32 h-4 bg-gray-700 animate-pulse rounded" />
+                  ))}
+                </div>
+              </div>
+            ))}
+            <div className="md:col-span-6">
+              <div className="w-24 h-6 bg-gray-700 animate-pulse rounded mb-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                  <div className="w-32 h-32 bg-gray-700 animate-pulse rounded mb-2" />
+                  <div className="w-48 h-4 bg-gray-700 animate-pulse rounded mb-2" />
+                  <div className="space-y-2">
+                    {[1, 2, 3].map((i) => (
+                      <div key={i} className="w-32 h-4 bg-gray-700 animate-pulse rounded" />
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <div className="w-32 h-32 bg-gray-700 animate-pulse rounded mb-2" />
+                  <div className="w-48 h-4 bg-gray-700 animate-pulse rounded mb-2" />
+                  <div className="w-32 h-4 bg-gray-700 animate-pulse rounded mb-4" />
+                  <div className="w-full h-10 bg-gray-700 animate-pulse rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    )
+  }
+
   return (
     <footer className="bg-[#0A3C1F] text-white" role="contentinfo" aria-label="Site footer">
       <div className="container mx-auto px-4 py-12">
         {/* Brand Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
           <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8">
-            <Link 
-              href="/"
+            <button 
+              onClick={() => handleNavigation('/')}
               className="flex items-center group transition-transform duration-200 hover:scale-105"
               aria-label="Go to homepage"
             >
@@ -25,7 +91,7 @@ export function ImprovedFooter() {
                 <div className="font-bold">SF Deputy Sheriff</div>
                 <div className="text-[#FFD700] text-sm">AI Recruitment</div>
               </div>
-            </Link>
+            </button>
             <p className="text-sm text-white/80 max-w-md">
               Serving the City and County of San Francisco with honor, integrity, and commitment to public safety.
             </p>
@@ -65,14 +131,14 @@ export function ImprovedFooter() {
                 { href: "/gi-bill", label: "G.I. Bill" },
                 { href: "/discounted-housing", label: "Discounted Housing" }
               ].map(({ href, label }) => (
-                <Link
+                <button
                   key={href}
-                  href={href}
+                  onClick={() => handleNavigation(href)}
                   className="text-left text-white/80 hover:text-[#FFD700] transition-all duration-200 hover:translate-x-1 focus:outline-none focus:text-[#FFD700]"
                   aria-label={`Navigate to ${label}`}
                 >
                   {label}
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -87,14 +153,14 @@ export function ImprovedFooter() {
                 { href: "/volunteer-recruiter", label: "Volunteer Recruiter" },
                 { href: "/contact", label: "Contact Support" }
               ].map(({ href, label }) => (
-                <Link
+                <button
                   key={href}
-                  href={href}
+                  onClick={() => handleNavigation(href)}
                   className="text-left text-white/80 hover:text-[#FFD700] transition-all duration-200 hover:translate-x-1 focus:outline-none focus:text-[#FFD700]"
                   aria-label={`Navigate to ${label}`}
                 >
                   {label}
-                </Link>
+                </button>
               ))}
             </div>
           </div>
@@ -110,6 +176,7 @@ export function ImprovedFooter() {
                     alt="San Francisco Deputy Sheriffs' Association"
                     fill
                     className="object-contain"
+                    sizes="(max-width: 768px) 100vw, 240px"
                   />
                 </div>
                 <p className="text-sm text-white/80">San Francisco Deputy Sheriffs' Association 501(c)5</p>
@@ -130,6 +197,7 @@ export function ImprovedFooter() {
                     alt="Protecting San Francisco"
                     fill
                     className="object-contain"
+                    sizes="(max-width: 768px) 100vw, 240px"
                   />
                 </div>
                 <p className="text-sm text-white/80">Protecting San Francisco 501(c)3</p>
@@ -141,15 +209,13 @@ export function ImprovedFooter() {
                     Email: info@sfdeputysheriff.com
                   </a>
                 </p>
-                <Link 
-                  href="/donate"
-                  className="block mt-4 w-full transform transition-transform duration-200 hover:scale-105"
+                <Button 
+                  onClick={() => handleNavigation('/donate')}
+                  className="block mt-4 w-full transform transition-transform duration-200 hover:scale-105 bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 font-semibold"
                   aria-label="Support our mission - Make a donation"
                 >
-                  <Button className="w-full bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 font-semibold">
-                    Support Our Mission
-                  </Button>
-                </Link>
+                  Support Our Mission
+                </Button>
               </div>
             </div>
           </div>

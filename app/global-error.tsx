@@ -1,7 +1,5 @@
 "use client"
 
-import { useEffect } from "react"
-import { Button } from "@/components/ui/button"
 import { ShieldLogo } from "@/components/shield-logo"
 
 export default function GlobalError({
@@ -11,10 +9,6 @@ export default function GlobalError({
   error: Error & { digest?: string }
   reset: () => void
 }) {
-  useEffect(() => {
-    console.error(error)
-  }, [error])
-
   return (
     <html>
       <body>
@@ -30,19 +24,18 @@ export default function GlobalError({
               We apologize for the inconvenience. A critical error occurred.
             </p>
             <div className="space-y-4">
-              <Button
+              <button
                 onClick={reset}
-                className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-[#0A3C1F] dark:hover:bg-[#FFD700]/90"
+                className="px-4 py-2 bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-[#0A3C1F] dark:hover:bg-[#FFD700]/90 rounded"
               >
                 Try again
-              </Button>
-              <Button
-                variant="outline"
+              </button>
+              <button
                 onClick={() => window.location.href = "/"}
-                className="ml-4 border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10 dark:border-[#FFD700] dark:text-[#FFD700] dark:hover:bg-[#FFD700]/10"
+                className="ml-4 px-4 py-2 border border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10 dark:border-[#FFD700] dark:text-[#FFD700] dark:hover:bg-[#FFD700]/10 rounded"
               >
                 Return home
-              </Button>
+              </button>
             </div>
           </div>
         </div>

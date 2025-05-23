@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useCallback } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
@@ -45,7 +45,8 @@ export function BadgeSharingDialog({ isOpen, onClose, badges, userName }: BadgeS
   const [copied, setCopied] = useState(false)
   const [shareUrl, setShareUrl] = useState("")
   const qrCodeRef = useRef<HTMLDivElement>(null)
-  const origin = useClientOnly(() => getWindowOrigin(), '')
+  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), [])
+  const origin = useClientOnly(memoizedGetWindowOrigin, '')
 
   // Generate share URL when dialog opens
   const handleOpenChange = (open: boolean) => {

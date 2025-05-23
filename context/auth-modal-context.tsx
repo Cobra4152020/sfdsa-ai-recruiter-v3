@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, useEffect } from "react"
 
 type ModalType = "signin" | "signup" | "optin"
 type UserType = "recruit" | "volunteer" | "admin"
@@ -22,6 +22,11 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
   const [modalType, setModalType] = useState<ModalType>("signin")
   const [userType, setUserType] = useState<UserType>("recruit")
   const [referralCode, setReferralCode] = useState<string | undefined>(undefined)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const openModal = (type: ModalType, userType: UserType, referralCode?: string) => {
     setModalType(type)
@@ -34,18 +39,25 @@ export function AuthModalProvider({ children }: { children: React.ReactNode }) {
     setIsOpen(false)
   }
 
+  const value = {
+    isOpen,
+    modalType,
+    userType,
+    referralCode,
+    openModal,
+    closeModal,
+  }
+
+  // Return a placeholder during server-side rendering
+  if (!mounted) {
+    return <div className="min-h-screen" />
+  }
+
   return (
-    <AuthModalContext.Provider
-      value={{
-        isOpen,
-        modalType,
-        userType,
-        referralCode,
-        openModal,
-        closeModal,
-      }}
-    >
-      {children}
+    <AuthModalContext.Provider value={value}>
+      <div className="min-h-screen">
+        {children}
+      </div>
     </AuthModalContext.Provider>
   )
 }

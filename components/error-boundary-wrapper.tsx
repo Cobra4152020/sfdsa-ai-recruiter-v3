@@ -5,6 +5,7 @@ import type React from "react"
 import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { AlertTriangle, RefreshCw } from "lucide-react"
+import { logError } from "@/lib/error-monitoring"
 
 interface ErrorBoundaryWrapperProps {
   children: React.ReactNode
@@ -20,6 +21,7 @@ export function ErrorBoundaryWrapper({ children, fallback }: ErrorBoundaryWrappe
       console.error("Caught error:", error)
       setError(error.error)
       setHasError(true)
+      logError("Error in component", error.error, "ErrorBoundaryWrapper")
     }
 
     window.addEventListener("error", errorHandler)

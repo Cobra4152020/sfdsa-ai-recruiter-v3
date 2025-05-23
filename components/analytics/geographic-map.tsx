@@ -4,23 +4,20 @@ import { useState, useEffect } from "react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { getGeographicData } from "@/lib/analytics-service"
 
+interface GeographicData {
+  zip_code: string
+  count: number
+}
+
 interface GeographicMapProps {
-  data: any[]
+  data: GeographicData[]
   isLoading: boolean
 }
 
 export function GeographicMap({ data, isLoading }: GeographicMapProps) {
   const [userType, setUserType] = useState<"all" | "recruit" | "volunteer">("all")
-  const [mapData, setMapData] = useState<any[]>([])
+  const [mapData, setMapData] = useState<GeographicData[]>([])
   const [loading, setLoading] = useState(false)
-
-  useEffect(() => {
-    if (data && data.length > 0) {
-      setMapData(data)
-    } else {
-      loadData()
-    }
-  }, [data, userType])
 
   const loadData = async () => {
     setLoading(true)
@@ -33,6 +30,14 @@ export function GeographicMap({ data, isLoading }: GeographicMapProps) {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (data && data.length > 0) {
+      setMapData(data)
+    } else {
+      loadData()
+    }
+  }, [data, userType, loadData])
 
   if (isLoading || loading) {
     return (
@@ -54,7 +59,7 @@ export function GeographicMap({ data, isLoading }: GeographicMapProps) {
   return (
     <div>
       <div className="mb-4 flex justify-end">
-        <Select value={userType} onValueChange={(value: any) => setUserType(value)}>
+        <Select value={userType} onValueChange={(value) => setUserType(value as "all" | "recruit" | "volunteer")}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="User Type" />
           </SelectTrigger>

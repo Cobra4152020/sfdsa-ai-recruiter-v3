@@ -2,8 +2,15 @@
 import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 
+interface BadgeDistribution {
+  badge_id: string
+  badge_name: string
+  count: number
+  percentage: number
+}
+
 interface BadgeDistributionChartProps {
-  data: any[]
+  data: BadgeDistribution[]
   isLoading: boolean
 }
 
@@ -58,8 +65,8 @@ export function BadgeDistributionChart({ data, isLoading }: BadgeDistributionCha
               dataKey="value"
               label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
             >
-              {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+              {chartData.map((entry, i) => (
+                <Cell key={`cell-${entry.name}`} fill={COLORS[i % COLORS.length]} />
               ))}
             </Pie>
             <Tooltip formatter={(value) => [`${value} awards`, "Count"]} />
@@ -77,7 +84,7 @@ export function BadgeDistributionChart({ data, isLoading }: BadgeDistributionCha
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((badge, index) => (
+            {data.map((badge) => (
               <TableRow key={badge.badge_id}>
                 <TableCell className="font-medium">{badge.badge_name}</TableCell>
                 <TableCell className="text-right">{badge.count}</TableCell>

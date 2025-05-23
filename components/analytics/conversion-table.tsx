@@ -4,8 +4,16 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 
+interface ConversionRow {
+  volunteer_id: string
+  volunteer_name: string
+  referrals: number
+  conversions: number
+  conversion_rate: number
+}
+
 interface ConversionTableProps {
-  data: any[]
+  data: ConversionRow[]
   isLoading: boolean
 }
 

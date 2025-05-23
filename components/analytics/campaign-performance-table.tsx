@@ -27,10 +27,6 @@ export function CampaignPerformanceTable() {
     preset: "last90",
   })
 
-  useEffect(() => {
-    fetchCampaignData()
-  }, [dateRange])
-
   const fetchCampaignData = async () => {
     setIsLoading(true)
     setError(null)
@@ -56,8 +52,16 @@ export function CampaignPerformanceTable() {
     }
   }
 
+  useEffect(() => {
+    fetchCampaignData()
+  }, [dateRange, fetchCampaignData])
+
   const handleDateRangeChange = (range: { from: Date; to: Date; preset?: string }) => {
-    setDateRange(range)
+    setDateRange({
+      from: range.from,
+      to: range.to,
+      preset: range.preset || "last90",
+    })
   }
 
   if (error) {

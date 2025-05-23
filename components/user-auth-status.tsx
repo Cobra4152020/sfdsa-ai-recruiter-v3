@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -17,10 +17,27 @@ import { useAuthModal } from "@/context/auth-modal-context"
 import { LogOut, User, Settings, Award, ChevronDown } from "lucide-react"
 
 export function UserAuthStatus() {
-  const { user, userRole, userPoints, signOut } = useAuth()
+  const { user, signOut } = useAuth()
   const { openModal } = useAuthModal()
   const router = useRouter()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-2">
+        <div className="h-8 w-8 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+        <div className="hidden md:flex flex-col gap-1">
+          <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+          <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+        </div>
+      </div>
+    )
+  }
 
   if (!user) {
     return (
@@ -47,23 +64,16 @@ export function UserAuthStatus() {
   }
 
   const userInitials = user.email ? user.email.substring(0, 2).toUpperCase() : "U"
-
-  const displayName = user.user_metadata?.full_name || user.email || "User"
+  const displayName = user.name || user.email || "User"
+  const userRole = user.userType || "recruit"
 
   return (
     <div className="flex items-center gap-2">
-      {userPoints !== undefined && (
-        <div className="hidden md:flex items-center gap-1 bg-amber-100 text-amber-800 px-2 py-1 rounded-md">
-          <Award size={16} />
-          <span className="text-sm font-medium">{userPoints} pts</span>
-        </div>
-      )}
-
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2 p-1 hover:bg-gray-100">
             <Avatar className="h-8 w-8">
-              <AvatarImage src={user.user_metadata?.avatar_url || "/placeholder.svg"} />
+              <AvatarImage src={user.avatarUrl || "/placeholder.svg"} />
               <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
             <div className="hidden md:flex flex-col items-start">

@@ -8,7 +8,7 @@ const ERROR_SAMPLING_RATE = 1.0 // 1.0 = 100% of errors are logged
 const MAX_ERRORS_STORED = 50
 
 // Types
-interface ErrorRecord {
+export interface ErrorRecord {
   timestamp: string
   message: string
   source?: string

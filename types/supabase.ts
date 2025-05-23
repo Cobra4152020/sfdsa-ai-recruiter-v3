@@ -64,6 +64,18 @@ export interface Database {
           updated_at: string
         }
       }
+      login_audit: {
+        Row: {
+          id: string
+          user_id: string
+          user_email: string
+          event_type: 'login' | 'logout' | 'failed_attempt' | 'password_reset'
+          timestamp: string
+          ip_address: string
+          user_agent: string
+          location?: string
+        }
+      }
     }
     Functions: {
       add_timestamps_to_table: {

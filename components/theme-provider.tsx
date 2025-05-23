@@ -8,6 +8,17 @@ import { useClientOnly } from "@/hooks/use-client-only"
 import { isBrowser } from "@/lib/utils"
 
 export function ThemeProvider({ children, ...props }: { children: React.ReactNode } & Record<string, unknown>) {
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Return a placeholder during server-side rendering
+  if (!mounted) {
+    return <div className="min-h-screen">{children}</div>
+  }
+
   return <NextThemesProvider {...props}>{children}</NextThemesProvider>
 }
 
@@ -23,8 +34,20 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
     setMounted(true)
   }, [])
 
+  // Return a placeholder during server-side rendering
   if (!mounted) {
-    return null
+    return (
+      <Button
+        variant="outline"
+        size="icon"
+        className={className}
+        aria-label="Toggle theme"
+        disabled
+      >
+        <div className="h-4 w-4" />
+        <span className="sr-only">Toggle theme</span>
+      </Button>
+    )
   }
 
   return (
@@ -47,10 +70,10 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
 
 export function useTheme() {
   const { theme, setTheme } = useNextTheme()
-  const prefersDark = useClientOnly(() => {
+  const prefersDark = React.useMemo(() => {
     if (!isBrowser()) return false
     return window.matchMedia("(prefers-color-scheme: dark)").matches
-  }, false)
+  }, [])
 
   const isDark = theme === "dark" || (theme === "system" && prefersDark)
 
@@ -59,13 +82,12 @@ export function useTheme() {
 
     const root = document.documentElement
     const systemTheme = prefersDark ? "dark" : "light"
-    
-    if (theme === "system") {
+    let newTheme = theme === "system" ? systemTheme : theme || systemTheme
+
+    // Only update if the class is different
+    if (!root.classList.contains(newTheme)) {
       root.classList.remove("light", "dark")
-      root.classList.add(systemTheme)
-    } else {
-      root.classList.remove("light", "dark")
-      root.classList.add(theme || "")
+      root.classList.add(newTheme)
     }
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -31,7 +31,8 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
   const { toast } = useToast()
   const { currentUser } = useUser()
   const { openModal } = useAuthModal()
-  const origin = useClientOnly(() => getWindowOrigin(), '')
+  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), [])
+  const origin = useClientOnly(memoizedGetWindowOrigin, '')
 
   const handleShare = async (platform: string) => {
     if (!currentUser) {

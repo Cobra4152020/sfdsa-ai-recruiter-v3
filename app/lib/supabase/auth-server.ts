@@ -1,5 +1,5 @@
 import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { getClientSideSupabase } from "@/lib/supabase"
+import { createClient } from "@/lib/supabase"
 import type { AuthResult } from "@/lib/auth-service"
 
 /**
@@ -7,7 +7,7 @@ import type { AuthResult } from "@/lib/auth-service"
  */
 export async function registerRecruit(email: string, password: string, name: string): Promise<AuthResult> {
   try {
-    const supabase = getClientSideSupabase()
+    const supabase = createClient()
 
     // Create user in Supabase Auth
     const { data, error } = await supabase.auth.signUp({
@@ -92,7 +92,7 @@ export async function registerVolunteerRecruiter(
   location: string,
 ): Promise<AuthResult> {
   try {
-    const supabase = getClientSideSupabase()
+    const supabase = createClient()
 
     // Create user in Supabase Auth
     const { data, error } = await supabase.auth.signUp({

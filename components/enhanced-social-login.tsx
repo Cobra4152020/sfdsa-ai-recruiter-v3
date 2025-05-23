@@ -4,9 +4,9 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { enhancedAuthService } from "@/lib/enhanced-auth-service-client"
 import { useToast } from "@/components/ui/use-toast"
-import { Spinner } from "@/components/ui/spinner"
 import type { Provider } from "@supabase/supabase-js"
 import { Facebook, Twitter, Linkedin } from "lucide-react"
+import { Spinner } from "@/components/ui/spinner"
 
 interface EnhancedSocialLoginProps {
   onLoginStart?: () => void

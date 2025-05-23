@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import type { ReactNode } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { 
@@ -58,8 +58,14 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
   const [scrolled, setScrolled] = useState(false)
   const pathname = usePathname()
   const router = useRouter()
+  const [mounted, setMounted] = useState(false)
 
-  const { scrollY } = useClientOnly(() => getWindowDimensions(), { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
+  const memoizedGetWindowDimensions = useCallback(() => getWindowDimensions(), [])
+  const { scrollY } = useClientOnly(memoizedGetWindowDimensions, { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   useEffect(() => {
     setScrolled(scrollY > 10)
@@ -82,6 +88,10 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
     router.push(href)
     setIsMobileMenuOpen(false)
     setActiveDropdown(null)
+  }
+
+  const handleDropdownClick = (href: string) => {
+    handleNavigation(href)
   }
 
   const toggleTheme = () => {
@@ -154,6 +164,24 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
     ]
   } : null
 
+  // Return a placeholder during server-side rendering
+  if (!mounted) {
+    return (
+      <header className="fixed w-full z-50 bg-white/95 dark:bg-[#121212]/95 shadow-md backdrop-blur-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="w-32 h-8 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+            <div className="hidden md:flex space-x-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="w-24 h-6 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </header>
+    )
+  }
+
   return (
     <header className={cn(
       "fixed w-full z-50 transition-all duration-200",
@@ -167,7 +195,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               Join the San Francisco Deputy Sheriff's Department
             </span>
           </div>
-          <div className="hidden md:flex items-center space-x-3">
+          <div className="flex items-center space-x-3">
             <a href="https://www.facebook.com/SFDeputySheriff" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200">
               <Facebook size={16} />
             </a>
@@ -212,23 +240,40 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                 >
                   <button
                     className="flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] transition-colors duration-200 group"
+                    onClick={() => toggleDropdown(section.label)}
+                    aria-expanded={activeDropdown === section.label}
+                    aria-haspopup="true"
                   >
                     {section.icon && <span className="mr-1">{section.icon}</span>}
                     <span>{section.label}</span>
-                    <ChevronDown className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" />
+                    <ChevronDown className={cn(
+                      "w-4 h-4 transition-transform duration-200",
+                      activeDropdown === section.label ? "rotate-180" : ""
+                    )} />
                   </button>
-                  <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 absolute top-full left-0 mt-2 w-48 bg-white dark:bg-[#121212] rounded-md shadow-lg py-2 z-[100] transition-all duration-200">
-                    {section.items.map((item) => (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className="flex items-center w-full px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] transition-colors duration-200"
-                      >
-                        {item.icon && <span className="mr-2">{item.icon}</span>}
-                        {item.label}
-                      </Link>
-                    ))}
-                  </div>
+                  
+                  {activeDropdown === section.label && (
+                    <div 
+                      className="absolute left-0 mt-2 w-64 bg-white dark:bg-[#121212] rounded-lg shadow-lg overflow-hidden z-50 border border-gray-200 dark:border-gray-800"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby={`menu-button-${key}`}
+                    >
+                      <div className="py-1">
+                        {section.items.map((item) => (
+                          <button
+                            key={item.href}
+                            onClick={() => handleDropdownClick(item.href)}
+                            className="flex items-center w-full px-4 py-2 text-sm text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] transition-colors duration-200"
+                            role="menuitem"
+                          >
+                            {item.icon && <span className="mr-2">{item.icon}</span>}
+                            {item.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
               {currentUser ? (
@@ -253,13 +298,15 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
             </div>
 
             {/* Mobile menu button */}
-            <div className="md:hidden flex items-center space-x-4">
+            <div className="flex items-center space-x-4 md:hidden">
               <ThemeToggle />
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={toggleMobileMenu}
                 className="text-[#0A3C1F] dark:text-[#FFD700]"
+                aria-expanded={isMobileMenuOpen}
+                aria-controls="mobile-menu"
               >
                 {isMobileMenuOpen ? (
                   <X className="w-6 h-6" />
@@ -275,12 +322,13 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       {/* Mobile menu */}
       {isMobileMenuOpen && (
         <div 
+          id="mobile-menu"
           className="md:hidden fixed inset-x-0 top-[calc(4rem+2.5rem)] bottom-0 bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-gray-800"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation menu"
         >
-          <div className="container mx-auto px-4 py-4 h-full overflow-y-auto">
+          <div className="container mx-auto px-4 py-6">
             {Object.values(mainNavItems).map((section) => (
               <div key={section.label} className="mb-6">
                 <h3 className="text-[#0A3C1F] dark:text-[#FFD700] font-semibold mb-3 flex items-center text-lg">
@@ -302,23 +350,17 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               </div>
             ))}
             {!currentUser && (
-              <div className="mt-8 space-y-3 border-t border-gray-200 dark:border-gray-700 pt-6">
+              <div className="mt-6 space-y-3">
                 <Button
                   variant="ghost"
-                  onClick={() => {
-                    handleLogin()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full text-[#0A3C1F] dark:text-[#FFD700] text-lg font-medium"
+                  onClick={handleLogin}
+                  className="w-full text-[#0A3C1F] dark:text-[#FFD700]"
                 >
                   Login
                 </Button>
                 <Button
-                  onClick={() => {
-                    handleApplyNow()
-                    setIsMobileMenuOpen(false)
-                  }}
-                  className="w-full bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-black dark:hover:bg-[#FFD700]/90 text-lg font-medium"
+                  onClick={handleApplyNow}
+                  className="w-full bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-black dark:hover:bg-[#FFD700]/90"
                 >
                   Apply Now
                 </Button>

@@ -1,7 +1,6 @@
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
-import { NextResponse } from "next/server"
-import type { NextRequest } from "next/server"
+import { createClient } from '@/app/lib/supabase/server'
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
 import { getServiceSupabase } from '@/app/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
@@ -45,107 +44,69 @@ export async function GET(request: NextRequest) {
   }
 
   if (code) {
-    try {
-      // Create a Supabase client for this API route
-      const supabase = createRouteHandlerClient({ cookies })
-      
-      // Exchange code for session
-      const { data, error: sessionError } = await supabase.auth.exchangeCodeForSession(code)
-      
-      if (sessionError) {
-        throw sessionError
-      }
+    const supabase = await createClient()
+    await supabase.auth.exchangeCodeForSession(code)
 
-      if (!data.session) {
-        throw new Error("No session returned from code exchange")
-      }
-
-      // Get service client for admin operations
-      const serviceClient = getServiceSupabase()
-
-      // Get user type from user_types table
-      const { data: userTypeData, error: userTypeError } = await serviceClient
-        .from("user_types")
-        .select("user_type")
-        .eq("user_id", data.session.user.id)
-        .single()
-
-      if (userTypeError) {
-        console.error("Error fetching user type:", userTypeError)
-      }
-
-      // Get user profile data based on user type
-      let userData
-      let profileError
-
-      if (userTypeData?.user_type === "volunteer") {
-        const result = await serviceClient
-          .from("volunteer.recruiters")
-          .select("*")
-          .eq("id", data.session.user.id)
-          .single()
-        userData = result.data
-        profileError = result.error
-      } else if (userTypeData?.user_type === "admin") {
-        const result = await serviceClient
-          .from("admin.users")
-          .select("*")
-          .eq("id", data.session.user.id)
-          .single()
-        userData = result.data
-        profileError = result.error
-      } else {
-        // Default to recruit
-        const result = await serviceClient
-          .from("recruit.users")
-          .select("*")
-          .eq("id", data.session.user.id)
-          .single()
-        userData = result.data
-        profileError = result.error
-      }
-
-      if (profileError) {
-        console.error("Error fetching user profile:", profileError)
-      }
-
-      // Update last login timestamp in the appropriate table
-      const tableName = userTypeData?.user_type === "volunteer" 
-        ? "volunteer.recruiters" 
-        : userTypeData?.user_type === "admin" 
-          ? "admin.users" 
-          : "recruit.users"
-
-      await serviceClient
-        .from(tableName)
-        .update({ last_login: new Date().toISOString() })
-        .eq("id", data.session.user.id)
-        .single()
-
-      // Check if volunteer is active
-      if (userTypeData?.user_type === "volunteer") {
-        const { data: volunteerData } = await serviceClient
-          .from("volunteer.recruiters")
-          .select("is_active")
-          .eq("id", data.session.user.id)
-          .single()
-
-        if (!volunteerData?.is_active) {
-          return NextResponse.redirect(new URL("/volunteer-pending", requestUrl.origin))
-        }
-      }
-
-      // Redirect to the appropriate page
-      return NextResponse.redirect(new URL(redirectTo, requestUrl.origin))
-    } catch (error) {
-      console.error("Error exchanging code for session:", error)
-      const url = new URL("/login", requestUrl.origin)
-      url.searchParams.set("error", "auth_error")
-      url.searchParams.set("error_description", error instanceof Error ? error.message : "Failed to authenticate")
-      return NextResponse.redirect(url)
+    // Get user info
+    const { data: userDataResult, error: userError } = await supabase.auth.getUser()
+    const user = userDataResult?.user
+    if (!user || userError) {
+      console.error("No user found after exchanging code for session.", userError)
+      return NextResponse.redirect(new URL("/login", requestUrl.origin))
     }
+
+    // Get service client for admin operations
+    const serviceClient = getServiceSupabase()
+
+    // Get user type from user_types table
+    const { data: userTypeData, error: userTypeError } = await serviceClient
+      .from("user_types")
+      .select("user_type")
+      .eq("user_id", user.id)
+      .single()
+
+    if (userTypeError) {
+      console.error("Error fetching user type:", userTypeError)
+    }
+
+    // Get user profile data based on user type
+    let userData
+    let profileError
+
+    if (userTypeData?.user_type === "volunteer") {
+      const { data, error } = await serviceClient
+        .from("volunteer_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single()
+      userData = data
+      profileError = error
+    } else if (userTypeData?.user_type === "admin") {
+      const { data, error } = await serviceClient
+        .from("admin_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single()
+      userData = data
+      profileError = error
+    } else {
+      const { data, error } = await serviceClient
+        .from("recruit_profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single()
+      userData = data
+      profileError = error
+    }
+
+    if (profileError) {
+      console.error("Error fetching user profile:", profileError)
+    }
+
+    // Redirect to the appropriate page
+    return NextResponse.redirect(new URL(redirectTo, requestUrl.origin))
   }
 
-  // If no code is present, redirect to login page
+  // If no code, redirect to login
   return NextResponse.redirect(new URL("/login", requestUrl.origin))
 } 
