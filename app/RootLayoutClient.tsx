@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react"
 import { usePathname, useRouter } from "next/navigation"
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { Database } from "@/types/supabase"
-import { UserContext } from "@/contexts/user-context"
+import { User } from "@supabase/supabase-js"
+import { UserProvider } from "@/context/user-context"
 import { Spinner } from "@/components/ui/spinner"
 
 interface RootLayoutClientProps {
@@ -15,10 +15,10 @@ export default function RootLayoutClient({
   children,
 }: RootLayoutClientProps) {
   const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
   const pathname = usePathname()
   const router = useRouter()
-  const supabase = createClientComponentClient<Database>()
+  const supabase = createClientComponentClient()
 
   useEffect(() => {
     const checkUser = async () => {
@@ -47,8 +47,8 @@ export default function RootLayoutClient({
   }
 
   return (
-    <UserContext.Provider value={{ user, setUser }}>
+    <UserProvider>
       {children}
-    </UserContext.Provider>
+    </UserProvider>
   )
 } 

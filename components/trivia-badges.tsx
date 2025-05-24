@@ -1,291 +1,379 @@
 "use client"
 
-import React from "react"
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Award, Share2, Zap, Trophy } from "lucide-react"
+import { useState, useEffect, useCallback } from "react"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { useUser } from "@/context/user-context"
-import { getClientSideSupabase } from "@/lib/supabase"
+import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/components/ui/use-toast"
+import { Trophy, Share2, CheckCircle, AlertCircle, RefreshCw } from "lucide-react"
+import { logError } from "@/lib/error-monitoring"
+import { getClientSideSupabase } from "@/lib/supabase"
+import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
+import { Facebook, Twitter, Linkedin, Mail } from "lucide-react"
 
 interface TriviaAnswer {
-  answer_time: number
-  is_correct: boolean
+  questionId: string
+  isCorrect: boolean
+  timestamp: string
 }
 
 interface TriviaAttempt {
+  id: string
+  userId: string
+  answers: TriviaAnswer[]
   score: number
-  total_questions: number
-  game_mode?: string
-  trivia_answers?: TriviaAnswer[]
+  timestamp: string
 }
 
 interface TriviaBadge {
   id: string
-  type: string
   name: string
   description: string
-  requirement: number
+  requirements: {
+    correctAnswers: number
+    attempts: number
+    categories?: string[]
+  }
+  icon: string
+  rarity: "common" | "uncommon" | "rare" | "epic" | "legendary"
+}
+
+interface BadgeProgress {
+  id: string
+  userId: string
+  badgeId: string
   progress: number
-  earned: boolean
-  icon?: React.ReactElement
+  isUnlocked: boolean
+  unlockedAt: string | null
+  actionsCompleted: string[]
+  lastActionAt: string
+  badge: TriviaBadge
+}
+
+interface DatabaseBadgeProgress {
+  id: string
+  user_id: string
+  badge_id: string
+  progress: number
+  is_unlocked: boolean
+  unlocked_at: string | null
+  actions_completed: string[]
+  last_action_at: string
+  badge: {
+    id: string
+    name: string
+    description: string
+    requirements: {
+      correctAnswers: number
+      attempts: number
+      categories?: string[]
+    }
+    icon: string
+    rarity: "common" | "uncommon" | "rare" | "epic" | "legendary"
+  }
 }
 
 export function TriviaBadges() {
-  const [badges, setBadges] = useState<TriviaBadge[]>([
-    {
-      id: "trivia-participant",
-      type: "trivia-participant",
-      name: "Trivia Participant",
-      description: "Complete your first trivia round",
-      requirement: 1,
-      progress: 0,
-      earned: false,
-      icon: <Award className="h-5 w-5" />,
-    },
-    {
-      id: "trivia-enthusiast",
-      type: "trivia-enthusiast",
-      name: "Trivia Enthusiast",
-      description: "Complete 5 trivia rounds",
-      requirement: 5,
-      progress: 0,
-      earned: false,
-      icon: <Award className="h-5 w-5" />,
-    },
-    {
-      id: "trivia-master",
-      type: "trivia-master",
-      name: "Trivia Master",
-      description: "Achieve 3 perfect scores",
-      requirement: 3,
-      progress: 0,
-      earned: false,
-      icon: <Trophy className="h-5 w-5" />,
-    },
-    {
-      id: "speed-demon",
-      type: "speed-demon",
-      name: "Speed Demon",
-      description: "Answer 10 questions in under 5 seconds each",
-      requirement: 10,
-      progress: 0,
-      earned: false,
-      icon: <Zap className="h-5 w-5" />,
-    },
-    {
-      id: "challenge-champion",
-      type: "challenge-champion",
-      name: "Challenge Champion",
-      description: "Complete a perfect round in Challenge Mode",
-      requirement: 1,
-      progress: 0,
-      earned: false,
-      icon: <Trophy className="h-5 w-5 text-red-500" />,
-    },
-  ])
-
-  const { currentUser } = useUser()
+  const [badges, setBadges] = useState<BadgeProgress[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+  const [showShareDialog, setShowShareDialog] = useState(false)
+  const [selectedBadge, setSelectedBadge] = useState<TriviaBadge | null>(null)
   const { toast } = useToast()
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchUserBadges()
-    }
-  }, [currentUser])
-
-  const fetchUserBadges = async () => {
+  const fetchUserBadges = useCallback(async () => {
     try {
       const supabase = getClientSideSupabase()
+      const { data: { user } } = await supabase.auth.getUser()
 
-      // Get user's earned badges
-      const { data: userBadges, error: badgesError } = await supabase
-        .from("badges")
-        .select("badge_type")
-        .eq("user_id", currentUser!.id)
+      if (!user) {
+        throw new Error("User not authenticated")
+      }
 
-      if (badgesError) throw badgesError
-
-      // Get user's trivia attempts and fast answers
-      const { data: attempts, error: attemptsError } = await supabase
-        .from("trivia_attempts")
-        .select("*, trivia_answers(answer_time, is_correct)")
-        .eq("user_id", currentUser!.id)
-
-      if (attemptsError) throw attemptsError
-
-      // Calculate progress for each badge
-      const updatedBadges = badges.map((badge) => {
-        const isEarned = userBadges?.some((ub) => ub.badge_type === badge.type) || false
-
-        let progress = 0
-        switch (badge.type) {
-          case "trivia-participant":
-            progress = Math.min((attempts as TriviaAttempt[] || []).length, 1)
-            break
-          case "trivia-enthusiast":
-            progress = Math.min((attempts as TriviaAttempt[] || []).length, 5)
-            break
-          case "trivia-master":
-            const perfectScores = (attempts as TriviaAttempt[] || []).filter((a) => a.score === a.total_questions).length
-            progress = Math.min(perfectScores, 3)
-            break
-          case "speed-demon":
-            // Count answers under 5 seconds that were correct
-            const fastAnswers = (attempts as TriviaAttempt[] || []).flatMap(
-              (a) => a.trivia_answers?.filter((ans: TriviaAnswer) => ans.answer_time < 5 && ans.is_correct) || []
-            )
-            progress = Math.min(fastAnswers.length, 10)
-            break
-          case "challenge-champion":
-            const perfectChallengeRounds = (attempts as TriviaAttempt[] || []).filter(
-              (a) => a.score === a.total_questions && a.game_mode === "challenge"
-            ).length
-            progress = Math.min(perfectChallengeRounds, 1)
-            break
-        }
-
-        return {
-          ...badge,
+      const { data: badgeProgress, error: progressError } = await supabase
+        .from("badge_progress")
+        .select(`
+          id,
+          user_id,
+          badge_id,
           progress,
-          earned: isEarned,
-        }
-      })
+          is_unlocked,
+          unlocked_at,
+          actions_completed,
+          last_action_at,
+          badge:badges (
+            id,
+            name,
+            description,
+            requirements,
+            icon,
+            rarity
+          )
+        `)
+        .eq("user_id", user.id)
+        .order("unlocked_at", { ascending: false })
 
-      setBadges(updatedBadges)
+      if (progressError) {
+        throw progressError
+      }
+
+      // Transform database response to match our interface
+      const transformedBadges: BadgeProgress[] = (badgeProgress as unknown as DatabaseBadgeProgress[]).map(progress => ({
+        id: progress.id,
+        userId: progress.user_id,
+        badgeId: progress.badge_id,
+        progress: progress.progress,
+        isUnlocked: progress.is_unlocked,
+        unlockedAt: progress.unlocked_at,
+        actionsCompleted: progress.actions_completed,
+        lastActionAt: progress.last_action_at,
+        badge: progress.badge
+      }))
+
+      setBadges(transformedBadges)
     } catch (error) {
-      console.error("Error fetching user badges:", error)
+      const errorMessage = error instanceof Error ? error.message : "Failed to fetch badges"
+      logError("Error fetching user badges", error instanceof Error ? error : new Error(errorMessage), "TriviaBadges")
+      setError(error instanceof Error ? error : new Error(errorMessage))
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchUserBadges()
+  }, [fetchUserBadges])
+
+  const handleShare = useCallback(async (platform: string) => {
+    if (!selectedBadge) return
+
+    try {
+      const shareText = `I earned the ${selectedBadge.name} badge in the SFDSA Trivia Challenge! 🏆`
+      const shareUrl = window.location.href
+
+      switch (platform) {
+        case "facebook":
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, "_blank")
+          break
+        case "twitter":
+          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, "_blank")
+          break
+        case "linkedin":
+          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, "_blank")
+          break
+        case "email":
+          window.location.href = `mailto:?subject=${encodeURIComponent("I earned a badge!")}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`
+          break
+        default:
+          if (navigator.share) {
+            await navigator.share({
+              title: "SFDSA Trivia Badge",
+              text: shareText,
+              url: shareUrl,
+            })
+          }
+      }
+
+      // Record the share
+      const supabase = getClientSideSupabase()
+      const { error: shareError } = await supabase
+        .from("badge_shares")
+        .insert({
+          user_id: badges[0]?.userId,
+          badge_id: selectedBadge.id,
+          platform,
+          share_url: shareUrl
+        })
+
+      if (shareError) {
+        throw shareError
+      }
+
+      toast({
+        title: "Share recorded!",
+        description: "Thanks for sharing your achievement!",
+        variant: "default",
+      })
+    } catch (error) {
+      if (error instanceof Error && error.name !== "AbortError") {
+        logError("Error sharing badge", error, "TriviaBadges")
+        toast({
+          title: "Share failed",
+          description: "Could not share badge. Please try again.",
+          variant: "destructive",
+        })
+      }
+    } finally {
+      setShowShareDialog(false)
+    }
+  }, [selectedBadge, badges, toast])
+
+  const getRarityColor = (rarity: string): string => {
+    switch (rarity) {
+      case "legendary":
+        return "text-orange-500"
+      case "epic":
+        return "text-purple-500"
+      case "rare":
+        return "text-blue-500"
+      case "uncommon":
+        return "text-green-500"
+      default:
+        return "text-gray-500"
     }
   }
 
-  const handleShare = async (badge: TriviaBadge) => {
-    const shareText = `I earned the "${badge.name}" badge playing the San Francisco Trivia Game! Test your knowledge too!`
-    const shareUrl = `${window.location.origin}/trivia`
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Trivia Badges</CardTitle>
+          <CardDescription>Loading your achievements...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2" />
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
 
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "SFSO Trivia Badge Earned!",
-          text: shareText,
-          url: shareUrl,
-        })
-      } else {
-        // Fallback to clipboard
-        await navigator.clipboard.writeText(`${shareText} ${shareUrl}`)
-        toast({
-          title: "Link copied!",
-          description: "Share link copied to clipboard",
-        })
-      }
-
-      // Record the share if logged in
-      if (currentUser) {
-        const response = await fetch("/api/trivia/share", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            userId: currentUser.id,
-            platform: "native",
-            badgeType: badge.type,
-          }),
-        })
-
-        const result = await response.json()
-        if (result.success) {
-          toast({
-            title: "Points awarded!",
-            description: "You earned 20 points for sharing your badge!",
-            duration: 3000,
-          })
-        }
-      }
-    } catch (error) {
-      console.error("Error sharing badge:", error)
-      // Fallback to Twitter
-      window.open(
-        `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
-        "_blank",
-      )
-    }
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Trivia Badges</CardTitle>
+          <CardDescription>Error loading badges</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center text-red-500 dark:text-red-400 mb-4">
+            <AlertCircle className="h-5 w-5 mr-2" />
+            {error.message}
+          </div>
+          <Button
+            onClick={() => fetchUserBadges()}
+            className="mt-4"
+            variant="outline"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Retry
+          </Button>
+        </CardContent>
+      </Card>
+    )
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold">Trivia Badges</CardTitle>
-      </CardHeader>
-      <CardContent className="p-4">
-        <div className="space-y-4">
-          {badges.map((badge) => (
-            <div
-              key={badge.id}
-              className={`p-3 rounded-lg border ${
-                badge.earned
-                  ? "bg-[#0A3C1F]/10 border-[#0A3C1F]/30"
-                  : "bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
-              }`}
-            >
-              <div className="flex items-center">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
-                    badge.earned ? "bg-[#FFD700]/20" : "bg-gray-200 dark:bg-gray-700"
-                  }`}
-                >
-                  {React.cloneElement(badge.icon || <Award className="h-5 w-5" />, {
-                    className: `${badge.earned ? "text-[#FFD700]" : "text-gray-500"} ${
-                      badge.icon ? (badge.icon.props as { className?: string }).className || "" : ""
-                    }`,
-                  } as { className: string })}
-                </div>
-                <div className="flex-1">
-                  <div className="font-medium">{badge.name}</div>
-                  <div className="text-xs text-gray-500">{badge.description}</div>
-                </div>
-                {badge.earned && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="h-8 border-[#0A3C1F] text-[#0A3C1F]"
-                    onClick={() => handleShare(badge)}
-                  >
-                    <Share2 className="h-3.5 w-3.5 mr-1" />
-                    Share
-                  </Button>
-                )}
+    <>
+      <Card>
+        <CardHeader>
+          <CardTitle>Trivia Badges</CardTitle>
+          <CardDescription>Your achievements in the SFDSA Trivia Challenge</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {badges.length === 0 ? (
+              <div className="text-center py-8">
+                <Trophy className="h-12 w-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100">No badges yet</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                  Start playing trivia to earn badges!
+                </p>
               </div>
-
-              {!badge.earned && (
-                <div className="mt-2">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span>
-                      Progress: {badge.progress}/{badge.requirement}
-                    </span>
-                    <span>{Math.round((badge.progress / badge.requirement) * 100)}%</span>
+            ) : (
+              badges.map((badgeProgress) => (
+                <div key={badgeProgress.id} className="flex items-start space-x-4">
+                  <div className="flex-shrink-0">
+                    <Trophy className={`h-8 w-8 ${getRarityColor(badgeProgress.badge.rarity)}`} />
                   </div>
-                  <Progress value={(badge.progress / badge.requirement) * 100} className="h-2" />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-medium">{badgeProgress.badge.name}</h3>
+                      <Badge variant={badgeProgress.badge.rarity === "legendary" ? "default" : "secondary"}>
+                        {badgeProgress.badge.rarity}
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      {badgeProgress.badge.description}
+                    </p>
+                    <div className="mt-2">
+                      <Progress value={badgeProgress.progress} className="h-2" />
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {badgeProgress.progress}% complete
+                      </p>
+                    </div>
+                    {badgeProgress.isUnlocked && badgeProgress.unlockedAt && (
+                      <div className="flex items-center mt-2 text-sm text-green-600 dark:text-green-400">
+                        <CheckCircle className="h-4 w-4 mr-1" />
+                        Earned on {new Date(badgeProgress.unlockedAt).toLocaleDateString()}
+                      </div>
+                    )}
+                    {badgeProgress.isUnlocked && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="mt-2"
+                        onClick={() => {
+                          setSelectedBadge(badgeProgress.badge)
+                          setShowShareDialog(true)
+                        }}
+                      >
+                        <Share2 className="h-4 w-4 mr-2" />
+                        Share
+                      </Button>
+                    )}
+                  </div>
                 </div>
-              )}
-            </div>
-          ))}
+              ))
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-          {!currentUser && (
-            <div className="bg-[#0A3C1F]/5 p-3 rounded-lg text-center">
-              <p className="text-sm text-gray-600 mb-2">Sign in to track your badge progress!</p>
-              <Button
-                size="sm"
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
-                onClick={() => (window.location.href = "/trivia")}
-              >
-                Sign In
-              </Button>
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+      {/* Share Dialog */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogTitle>Share Your Badge</DialogTitle>
+          <DialogDescription>
+            Share your achievement with friends and colleagues!
+          </DialogDescription>
+
+          <div className="grid grid-cols-2 gap-4 my-4">
+            <Button className="bg-[#1877F2] hover:bg-[#1877F2]/90" onClick={() => handleShare("facebook")}>
+              <Facebook className="h-4 w-4 mr-2" />
+              Facebook
+            </Button>
+            <Button className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90" onClick={() => handleShare("twitter")}>
+              <Twitter className="h-4 w-4 mr-2" />
+              Twitter
+            </Button>
+            <Button className="bg-[#0A66C2] hover:bg-[#0A66C2]/90" onClick={() => handleShare("linkedin")}>
+              <Linkedin className="h-4 w-4 mr-2" />
+              LinkedIn
+            </Button>
+            <Button variant="outline" onClick={() => handleShare("email")} className="border-[#0A3C1F] text-[#0A3C1F]">
+              <Mail className="h-4 w-4 mr-2" />
+              Email
+            </Button>
+          </div>
+
+          <div className="bg-[#0A3C1F]/5 p-3 rounded-lg text-sm">
+            <p className="font-medium">Customize your message:</p>
+            <textarea
+              className="w-full mt-2 p-2 border rounded-md text-sm"
+              rows={3}
+              defaultValue={`I earned the ${selectedBadge?.name} badge in the SFDSA Trivia Challenge! 🏆`}
+            ></textarea>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }

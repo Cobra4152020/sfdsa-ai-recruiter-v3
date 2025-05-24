@@ -38,8 +38,6 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
   const { toast } = useToast()
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<UserWithRole | null>(null)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [isLoading, setIsLoading] = useState<string | null>(null)
 
   const handleEdit = (user: UserWithRole) => {
     router.push(`/admin/users/${user.id}`)
@@ -47,7 +45,6 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
 
   const handleDelete = async (userId: string) => {
     try {
-      setIsLoading(userId)
       const response = await fetch('/api/user-management', {
         method: 'POST',
         headers: {
@@ -76,7 +73,6 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
         variant: "destructive",
       })
     } finally {
-      setIsLoading(null)
       setDeleteDialogOpen(false)
       setUserToDelete(null)
     }
@@ -84,7 +80,6 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
 
   const handleApprove = async (userId: string) => {
     try {
-      setIsLoading(userId)
       const response = await fetch('/api/user-management', {
         method: 'POST',
         headers: {
@@ -112,14 +107,11 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
         description: "Failed to approve volunteer. Please try again.",
         variant: "destructive",
       })
-    } finally {
-      setIsLoading(null)
     }
   }
 
   const handleReject = async (userId: string) => {
     try {
-      setIsLoading(userId)
       const response = await fetch('/api/user-management', {
         method: 'POST',
         headers: {
@@ -147,8 +139,6 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
         description: "Failed to reject volunteer. Please try again.",
         variant: "destructive",
       })
-    } finally {
-      setIsLoading(null)
     }
   }
 
@@ -289,11 +279,11 @@ export function UserTable({ users, loading, onRefresh }: UserTableProps) {
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)} disabled={isDeleting}>
+            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={() => handleDelete(userToDelete?.id || "")} disabled={isDeleting}>
-              {isDeleting ? "Deleting..." : "Delete"}
+            <Button variant="destructive" onClick={() => handleDelete(userToDelete?.id || "")}>
+              Delete
             </Button>
           </DialogFooter>
         </DialogContent>

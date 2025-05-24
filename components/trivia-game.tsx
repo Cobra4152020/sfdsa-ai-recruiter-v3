@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, useCallback } from "react"
 import { useUser } from "@/context/user-context"
 import { useToast } from "@/components/ui/use-toast"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -27,8 +27,11 @@ import {
 } from "lucide-react"
 import confetti from "canvas-confetti"
 import Image from "next/image"
+import { logError } from "@/lib/error-monitoring"
+import { getClientSideSupabase } from "@/lib/supabase"
 
 interface TriviaQuestion {
+  id: string
   question: string
   options: string[]
   correctAnswer: number
@@ -37,12 +40,19 @@ interface TriviaQuestion {
   category: string
   imageUrl?: string
   imageAlt?: string
+  points: number
 }
 
 interface BadgeResult {
   id: string
   badge_type: string
   earned_at: string
+  progress: number
+  requirements: {
+    correctAnswers: number
+    attempts: number
+    categories?: string[]
+  }
 }
 
 interface GameStats {
@@ -50,6 +60,10 @@ interface GameStats {
   maxStreak: number
   difficultyMultiplier: number
   totalPoints: number
+  correctAnswers: number
+  totalAttempts: number
+  averageResponseTime: number
+  categories: Record<string, number>
 }
 
 interface User {
@@ -60,25 +74,35 @@ interface User {
   userType?: string
 }
 
+interface TriviaResponse {
+  questions: TriviaQuestion[]
+  error?: string
+}
+
 // Fallback questions in case API fails
 const FALLBACK_QUESTIONS: TriviaQuestion[] = [
   {
+    id: "fallback-1",
     question: "What year was the Golden Gate Bridge completed?",
     options: ["1927", "1937", "1947", "1957"],
     correctAnswer: 1,
     explanation: "The Golden Gate Bridge was completed in 1937 and opened to the public on May 27 of that year.",
     difficulty: "medium",
     category: "San Francisco Landmarks",
+    points: 10
   },
   {
+    id: "fallback-2",
     question: "Which San Francisco neighborhood is known as 'Little Italy'?",
     options: ["Mission District", "North Beach", "Chinatown", "Fisherman's Wharf"],
     correctAnswer: 1,
     explanation: "North Beach is San Francisco's Little Italy, known for its Italian restaurants, cafes, and history.",
     difficulty: "easy",
     category: "San Francisco Neighborhoods",
+    points: 5
   },
   {
+    id: "fallback-3",
     question: "What was the name of the famous prison located on Alcatraz Island?",
     options: ["San Quentin", "Folsom", "Alcatraz Federal Penitentiary", "Leavenworth"],
     correctAnswer: 2,
@@ -86,8 +110,10 @@ const FALLBACK_QUESTIONS: TriviaQuestion[] = [
       "Alcatraz Federal Penitentiary operated from 1934 to 1963 and housed notorious criminals like Al Capone.",
     difficulty: "easy",
     category: "San Francisco History",
+    points: 5
   },
   {
+    id: "fallback-4",
     question: "In what year did the great San Francisco earthquake and fire occur?",
     options: ["1896", "1906", "1916", "1926"],
     correctAnswer: 1,
@@ -95,8 +121,10 @@ const FALLBACK_QUESTIONS: TriviaQuestion[] = [
       "The devastating earthquake and subsequent fires occurred on April 18, 1906, destroying over 80% of the city.",
     difficulty: "medium",
     category: "San Francisco History",
+    points: 10
   },
   {
+    id: "fallback-5",
     question: "Which famous San Francisco street is known for its eight hairpin turns?",
     options: ["Market Street", "Lombard Street", "California Street", "Van Ness Avenue"],
     correctAnswer: 1,
@@ -104,14 +132,16 @@ const FALLBACK_QUESTIONS: TriviaQuestion[] = [
       "Lombard Street between Hyde and Leavenworth Streets is famous for its eight sharp turns and is often called 'the crookedest street in the world.'",
     difficulty: "easy",
     category: "San Francisco Landmarks",
+    points: 5
   },
 ]
 
 interface TriviaGameProps {
   mode?: "normal" | "study" | "challenge"
+  onGameComplete?: (stats: GameStats) => void
 }
 
-export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
+export function TriviaGame({ mode = "normal", onGameComplete }: TriviaGameProps) {
   const [questions, setQuestions] = useState<TriviaQuestion[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
@@ -135,56 +165,128 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
     currentStreak: 0,
     maxStreak: 0,
     difficultyMultiplier: 1,
-    totalPoints: 0
+    totalPoints: 0,
+    correctAnswers: 0,
+    totalAttempts: 0,
+    averageResponseTime: 0,
+    categories: {}
   })
   const [reviewCards, setReviewCards] = useState<TriviaQuestion[]>([])
   const [showExplanation, setShowExplanation] = useState(false)
+  const questionStartTime = useRef<number>(0)
 
   const { currentUser } = useUser()
   const { toast } = useToast()
 
   const isLoggedIn = !!currentUser
 
+  const handleAnswerSubmit = useCallback(async () => {
+    if (selectedAnswer === null || isAnswerSubmitted) return
+
+    setIsAnswerSubmitted(true)
+    setIsTimerRunning(false)
+
+    const currentQuestion = questions[currentQuestionIndex]
+    const isCorrect = selectedAnswer === currentQuestion.correctAnswer
+    const responseTime = Date.now() - questionStartTime.current
+    const streakBonus = getStreakBonus(gameStats.currentStreak)
+    const timeBonus = Math.max(0, 1 - responseTime / 30000) // Bonus for quick answers
+    const points = Math.round(
+      currentQuestion.points * (isCorrect ? 1 : 0) * (1 + streakBonus + timeBonus)
+    )
+
+    setPointsAwarded(points)
+    setScore((prev) => prev + points)
+
+    // Update game stats
+    const newStats = {
+      ...gameStats,
+      currentStreak: isCorrect ? gameStats.currentStreak + 1 : 0,
+      maxStreak: isCorrect ? Math.max(gameStats.maxStreak, gameStats.currentStreak + 1) : gameStats.maxStreak,
+      totalPoints: gameStats.totalPoints + points,
+      correctAnswers: isCorrect ? gameStats.correctAnswers + 1 : gameStats.correctAnswers,
+      totalAttempts: gameStats.totalAttempts + 1,
+      averageResponseTime: (gameStats.averageResponseTime * gameStats.totalAttempts + responseTime) / (gameStats.totalAttempts + 1),
+      categories: {
+        ...gameStats.categories,
+        [currentQuestion.category]: (gameStats.categories[currentQuestion.category] || 0) + (isCorrect ? 1 : 0)
+      }
+    }
+    setGameStats(newStats)
+
+    // Check for badge progress
+    if (isLoggedIn) {
+      try {
+        const supabase = getClientSideSupabase()
+        const { data: badgeProgress, error: badgeError } = await supabase
+          .from("badge_progress")
+          .select("*")
+          .eq("user_id", currentUser.id)
+          .eq("badge_type", "trivia_master")
+
+        if (badgeError) throw badgeError
+
+        if (badgeProgress && badgeProgress.length > 0) {
+          const progress = badgeProgress[0]
+          const updatedProgress = {
+            ...progress,
+            progress: Math.min(100, progress.progress + (isCorrect ? 10 : 0)),
+            actions_completed: [...(progress.actions_completed || []), `question_${currentQuestion.id}`]
+          }
+
+          const { error: updateError } = await supabase
+            .from("badge_progress")
+            .update(updatedProgress)
+            .eq("id", progress.id)
+
+          if (updateError) throw updateError
+
+          if (updatedProgress.progress >= 100 && !progress.is_unlocked) {
+            setEarnedBadge({
+              id: progress.id,
+              badge_type: "trivia_master",
+              earned_at: new Date().toISOString(),
+              progress: 100,
+              requirements: {
+                correctAnswers: newStats.correctAnswers,
+                attempts: newStats.totalAttempts,
+                categories: Object.keys(newStats.categories)
+              }
+            })
+            setShowBadgeDialog(true)
+          }
+        }
+      } catch (error) {
+        logError("Error updating badge progress", error instanceof Error ? error : new Error(String(error)), "TriviaGame")
+      }
+    }
+
+    // Add to review cards if incorrect
+    if (!isCorrect) {
+      setReviewCards((prev) => [...prev, currentQuestion])
+    }
+
+    // Show explanation
+    setShowExplanation(true)
+  }, [
+    selectedAnswer,
+    isAnswerSubmitted,
+    questions,
+    currentQuestionIndex,
+    gameStats,
+    isLoggedIn,
+    currentUser?.id,
+    setPointsAwarded,
+    setScore,
+    setGameStats,
+    setEarnedBadge,
+    setShowBadgeDialog,
+    setReviewCards,
+    setShowExplanation
+  ])
+
   // Fetch trivia questions
-  useEffect(() => {
-    fetchQuestions()
-  }, [])
-
-  // Timer logic
-  useEffect(() => {
-    let timer: NodeJS.Timeout
-
-    if (isTimerRunning && timeLeft > 0) {
-      timer = setTimeout(() => {
-        setTimeLeft((prev) => prev - 1)
-      }, 1000)
-    } else if (isTimerRunning && timeLeft === 0) {
-      // Time's up, auto-submit current answer or mark as incorrect
-      handleAnswerSubmit()
-    }
-
-    return () => clearTimeout(timer)
-  }, [timeLeft, isTimerRunning])
-
-  // Start timer when questions are loaded
-  useEffect(() => {
-    if (questions.length > 0 && !isGameOver && !isAnswerSubmitted && questions[currentQuestionIndex]) {
-      setTimeLeft(mode === "challenge" ? 15 : 30) // 15 seconds for challenge mode
-      setIsTimerRunning(true)
-    }
-  }, [questions, currentQuestionIndex, isAnswerSubmitted, isGameOver, mode])
-
-  // Show mid-game share prompt after the second question
-  useEffect(() => {
-    if (currentQuestionIndex === 2 && !isAnswerSubmitted && !sharePromptShown.current && !hasSharedMidGame) {
-      sharePromptShown.current = true
-      // Pause the timer while showing the share dialog
-      setIsTimerRunning(false)
-      setShowMidGameShareDialog(true)
-    }
-  }, [currentQuestionIndex, isAnswerSubmitted, hasSharedMidGame])
-
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     setIsLoading(true)
     setFetchError(null)
 
@@ -197,7 +299,7 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
         throw new Error(`API returned status: ${response.status}`)
       }
 
-      const data = await response.json()
+      const data = await response.json() as TriviaResponse
 
       if (data.questions && data.questions.length > 0) {
         // Pre-load images to avoid loading delays during gameplay
@@ -211,6 +313,7 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
             }
             img.onerror = () => {
               console.warn(`Image failed to pre-load: ${question.imageUrl}`)
+              setImageLoadError(prev => ({ ...prev, [index]: true }))
             }
           }
         })
@@ -221,16 +324,10 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
         setQuestions(FALLBACK_QUESTIONS)
       }
     } catch (error) {
-      // Don't destructure the error, just log it as is
-      console.error("Error fetching trivia questions:", error)
-
-      // Set a user-friendly error message
+      logError("Error fetching trivia questions", error instanceof Error ? error : new Error(String(error)), "TriviaGame")
       setFetchError("We're having trouble loading questions. Using offline questions instead.")
-
-      // Use fallback questions when API fails
       setQuestions(FALLBACK_QUESTIONS)
 
-      // Show toast notification
       toast({
         title: "Using offline questions",
         description: "We're having trouble connecting to our servers. Using local questions instead.",
@@ -240,7 +337,62 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
       setIsLoading(false)
       setIsTimerRunning(true)
     }
-  }
+  }, [toast])
+
+  useEffect(() => {
+    fetchQuestions()
+  }, [fetchQuestions])
+
+  // Timer logic
+  useEffect(() => {
+    let timer: NodeJS.Timeout
+
+    if (isTimerRunning && timeLeft > 0) {
+      timer = setTimeout(() => {
+        setTimeLeft((prev) => prev - 1)
+      }, 1000)
+    } else if (isTimerRunning && timeLeft === 0) {
+      // Time's up, auto-submit current answer or mark as incorrect
+      if (selectedAnswer === null) {
+        handleAnswerSubmit()
+      }
+    }
+
+    return () => {
+      if (timer) {
+        clearTimeout(timer)
+      }
+    }
+  }, [isTimerRunning, timeLeft, selectedAnswer, handleAnswerSubmit])
+
+  // Reset timer when moving to next question
+  useEffect(() => {
+    if (isTimerRunning) {
+      setTimeLeft(mode === "challenge" ? 15 : 30)
+      questionStartTime.current = Date.now()
+    }
+  }, [currentQuestionIndex, isTimerRunning, mode])
+
+  // Handle game completion
+  useEffect(() => {
+    if (isGameOver && onGameComplete) {
+      onGameComplete(gameStats)
+    }
+  }, [isGameOver, onGameComplete, gameStats])
+
+  // Handle mid-game share prompt
+  useEffect(() => {
+    if (
+      !sharePromptShown.current &&
+      !hasSharedMidGame &&
+      currentQuestionIndex > 0 &&
+      currentQuestionIndex < questions.length - 1 &&
+      score > 0
+    ) {
+      setShowMidGameShareDialog(true)
+      sharePromptShown.current = true
+    }
+  }, [currentQuestionIndex, questions.length, score, hasSharedMidGame])
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (!isAnswerSubmitted) {
@@ -248,150 +400,54 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
     }
   }
 
-  const getDifficultyMultiplier = (difficulty: "easy" | "medium" | "hard"): number => {
-    switch (difficulty) {
-      case "easy": return 1
-      case "medium": return 1.5
-      case "hard": return 2
-      default: return 1
-    }
-  }
-
   const getStreakBonus = (streak: number): number => {
-    if (streak >= 5) return 2
-    if (streak >= 3) return 1.5
+    if (streak >= 5) return 3
+    if (streak >= 3) return 2
+    if (streak >= 2) return 1.5
     return 1
   }
 
-  const handleAnswerSubmit = async () => {
-    setIsTimerRunning(false)
-    setIsAnswerSubmitted(true)
+  const handleNextQuestion = () => {
+    setShowExplanation(false)
+    setSelectedAnswer(null)
+    setIsAnswerSubmitted(false)
+    setPointsAwarded(0)
 
-    const currentQuestion = questions[currentQuestionIndex]
-    if (!currentQuestion) return
-
-    const isCorrect = selectedAnswer === currentQuestion.correctAnswer
-    const basePoints = mode === "challenge" ? 20 : 10 // Double base points in challenge mode
-
-    if (mode === "study") {
-      // In study mode, add incorrect answers to review cards
-      if (!isCorrect) {
-        setReviewCards(prev => [...prev, currentQuestion])
-      }
-      setShowExplanation(true)
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1)
     } else {
-      // Normal mode scoring logic
-      if (isCorrect) {
-        // Calculate points with multipliers
-        const difficultyMultiplier = getDifficultyMultiplier(currentQuestion.difficulty)
-        const newStreak = gameStats.currentStreak + 1
-        const streakBonus = getStreakBonus(newStreak)
-        const timeBonus = Math.max(0, timeLeft) / (mode === "challenge" ? 15 : 30)
-        
-        // Add challenge mode multiplier
-        const challengeMultiplier = mode === "challenge" ? 2 : 1
-        
-        const pointsEarned = Math.round(
-          basePoints * difficultyMultiplier * streakBonus * (1 + timeBonus) * challengeMultiplier
-        )
-
-        // Update game stats
-        setGameStats(prev => ({
-          currentStreak: newStreak,
-          maxStreak: Math.max(prev.maxStreak, newStreak),
-          difficultyMultiplier: difficultyMultiplier,
-          totalPoints: prev.totalPoints + pointsEarned
-        }))
-
-        setScore(prev => prev + 1)
-
-        // Show score breakdown toast with challenge bonus
-        toast({
-          title: `+${pointsEarned} Points!`,
-          description: `Base: ${basePoints} × Difficulty: ${difficultyMultiplier}x × Streak: ${streakBonus}x ${
-            timeBonus > 0 ? `× Time: ${timeBonus.toFixed(1)}x` : ""
-          }${mode === "challenge" ? " × Challenge: 2x" : ""}`,
-          duration: 3000
-        })
-
-        // Show confetti for correct answers
-        confetti({
-          particleCount: mode === "challenge" ? 150 : 100, // More confetti in challenge mode
-          spread: 70,
-          origin: { y: 0.6 },
-          colors: ["#FFD700", "#0A3C1F", "#FFFFFF"]
-        })
-      } else {
-        // Reset streak on wrong answer
-        setGameStats(prev => ({
-          ...prev,
-          currentStreak: 0
-        }))
-      }
-
-      // If this is the last question, end the game
-      if (currentQuestionIndex === questions.length - 1) {
-        if (isLoggedIn && currentUser) {
-          try {
-            const response = await fetch("/api/trivia/submit", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                userId: currentUser.id,
-                score: isCorrect ? score + 1 : score,
-                totalQuestions: questions.length,
-              }),
-            })
-
-            const result = await response.json()
-
-            if (result.success) {
-              setPointsAwarded(result.pointsAwarded)
-
-              // If a badge was awarded, show the badge dialog
-              if (result.badgeAwarded) {
-                setEarnedBadge(result.badgeAwarded)
-                setShowBadgeDialog(true)
-              }
-            }
-          } catch (error) {
-            console.error("Error submitting trivia results:", error)
-          }
-        }
-
-        setIsGameOver(true)
+      setIsGameOver(true)
+      if (onGameComplete) {
+        onGameComplete(gameStats)
       }
     }
   }
 
-  const handleNextQuestion = () => {
-    setSelectedAnswer(null)
-    setIsAnswerSubmitted(false)
-    setCurrentQuestionIndex((prev) => prev + 1)
-    setTimeLeft(30) // Reset timer for next question
-    setIsTimerRunning(true)
-  }
-
   const handleRestartGame = () => {
-    setQuestions([])
     setCurrentQuestionIndex(0)
     setSelectedAnswer(null)
     setIsAnswerSubmitted(false)
     setIsGameOver(false)
     setScore(0)
-    setTimeLeft(30)
+    setTimeLeft(mode === "challenge" ? 15 : 30)
+    setShowBadgeDialog(false)
+    setShowShareDialog(false)
+    setShowMidGameShareDialog(false)
+    setPointsAwarded(0)
     setHasSharedMidGame(false)
-    setImageLoadError({})
-    imageRetries.current = {}
-    sharePromptShown.current = false
+    setReviewCards([])
+    setShowExplanation(false)
     setGameStats({
       currentStreak: 0,
       maxStreak: 0,
       difficultyMultiplier: 1,
-      totalPoints: 0
+      totalPoints: 0,
+      correctAnswers: 0,
+      totalAttempts: 0,
+      averageResponseTime: 0,
+      categories: {}
     })
+    sharePromptShown.current = false
     fetchQuestions()
   }
 
@@ -401,92 +457,82 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
   }
 
   const handleShare = async (platform: string) => {
-    const isMidGameShare = showMidGameShareDialog
-    const shareText = isMidGameShare
-      ? `I'm playing the San Francisco Trivia Game with Sgt. Ken! Test your knowledge of SF and see if you can beat my score!`
-      : earnedBadge
-        ? `I just earned the ${getBadgeName(earnedBadge?.badge_type || "")} badge playing the San Francisco Trivia Game! Test your knowledge too!`
-        : `I scored ${score}/${questions.length} on the San Francisco Trivia Game! Think you can beat me?`
+    try {
+      const shareText = `I earned the ${getBadgeName(earnedBadge?.badge_type || "")} badge in the SFDSA Trivia Challenge! 🏆`
+      const shareUrl = window.location.href
 
-    const shareUrl = `${window.location.origin}/trivia`
-    let shareLink = ""
+      switch (platform) {
+        case "facebook":
+          window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`, "_blank")
+          break
+        case "twitter":
+          window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, "_blank")
+          break
+        case "linkedin":
+          window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`, "_blank")
+          break
+        case "email":
+          window.location.href = `mailto:?subject=${encodeURIComponent("I earned a badge!")}&body=${encodeURIComponent(`${shareText}\n\n${shareUrl}`)}`
+          break
+        default:
+          if (navigator.share) {
+            await navigator.share({
+              title: "SFDSA Trivia Badge",
+              text: shareText,
+              url: shareUrl,
+            })
+          }
+      }
 
-    switch (platform) {
-      case "twitter":
-        shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`
-        break
-      case "facebook":
-        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`
-        break
-      case "linkedin":
-        shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`
-        break
-      default:
-        // Copy to clipboard
-        navigator.clipboard.writeText(`${shareText} ${shareUrl}`)
-        toast({
-          title: "Link copied!",
-          description: "Share link copied to clipboard",
-        })
-        if (isMidGameShare) {
-          setShowMidGameShareDialog(false)
-          setIsTimerRunning(true)
-          setHasSharedMidGame(true)
-        } else {
-          setShowShareDialog(false)
-        }
-
-        // Record the share and award points
-        if (isLoggedIn && currentUser) {
-          recordShare("clipboard", isMidGameShare)
-        }
-        return
-    }
-
-    // Open share link in new window
-    window.open(shareLink, "_blank")
-
-    if (isMidGameShare) {
-      setShowMidGameShareDialog(false)
-      setIsTimerRunning(true)
-      setHasSharedMidGame(true)
-    } else {
+      await recordShare(platform, false)
       setShowShareDialog(false)
-    }
-
-    // Record the share and award points
-    if (isLoggedIn && currentUser) {
-      recordShare(platform, isMidGameShare)
+    } catch (error) {
+      if (error instanceof Error && error.name !== "AbortError") {
+        logError("Error sharing badge", error, "TriviaGame")
+        toast({
+          title: "Share failed",
+          description: "Could not share badge. Please try again.",
+          variant: "destructive",
+        })
+      }
     }
   }
 
   const recordShare = async (platform: string, isMidGameShare: boolean) => {
-    try {
-      const currentQuestion = isMidGameShare && questions[currentQuestionIndex] ? currentQuestionIndex : null
+    if (!isLoggedIn) return
 
-      const response = await fetch("/api/trivia/share", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          userId: currentUser?.id,
-          platform,
-          questionId: currentQuestion,
-        }),
+    try {
+      const supabase = getClientSideSupabase()
+      const { error } = await supabase.from("social_shares").insert({
+        user_id: currentUser.id,
+        platform,
+        content_type: "trivia_game",
+        is_mid_game: isMidGameShare,
+        game_stats: gameStats
       })
 
-      const result = await response.json()
+      if (error) throw error
 
-      if (result.success) {
-        toast({
-          title: "Points awarded!",
-          description: "You earned 15 points for sharing!",
-          duration: 3000,
-        })
-      }
+      // Update points for sharing
+      const sharePoints = isMidGameShare ? 5 : 10
+      setScore((prev) => prev + sharePoints)
+      setGameStats((prev) => ({
+        ...prev,
+        totalPoints: prev.totalPoints + sharePoints
+      }))
+
+      toast({
+        title: "Points awarded!",
+        description: `You earned ${sharePoints} points for sharing!`,
+        variant: "default"
+      })
     } catch (error) {
-      console.error("Error recording share:", error)
+      logError("Error recording share", error instanceof Error ? error : new Error(String(error)), "TriviaGame")
+      toast({
+        title: "Error",
+        description: "Failed to record your share. Please try again.",
+        variant: "destructive"
+      })
     }
   }
 
@@ -496,69 +542,41 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
   }
 
   const handleImageError = (index: number) => {
-    // Track retry attempts for this image
-    const retries = imageRetries.current[index] || 0
-
-    // Only allow 2 retries before marking as error
-    if (retries < 2) {
-      imageRetries.current[index] = retries + 1
-
-      // Try to reload with a cache buster
-      const question = questions[index]
-      if (question && question.imageUrl) {
-        // Add timestamp to bust cache
-        const cacheBuster = new Date().getTime()
-        let newUrl = question.imageUrl
-
-        // If it's a placeholder.svg URL, regenerate it
-        if (question.imageUrl.includes("placeholder.svg")) {
-          newUrl = `/placeholder.svg?height=300&width=500&query=${encodeURIComponent(question.question)}&_=${cacheBuster}`
-        } else if (!question.imageUrl.includes("?")) {
-          newUrl = `${question.imageUrl}?_=${cacheBuster}`
-        } else {
-          newUrl = `${question.imageUrl}&_=${cacheBuster}`
-        }
-
-        // Update the image URL
-        const updatedQuestions = [...questions]
-        updatedQuestions[index] = {
-          ...question,
-          imageUrl: newUrl,
-        }
-        setQuestions(updatedQuestions)
-
-        // Don't mark as error yet
-        return
-      }
+    const retryCount = imageRetries.current[index] || 0
+    if (retryCount < 3) {
+      imageRetries.current[index] = retryCount + 1
+      // Retry loading the image after a short delay
+      setTimeout(() => {
+        setImageLoadError(prev => ({ ...prev, [index]: false }))
+      }, 1000)
+    } else {
+      setImageLoadError(prev => ({ ...prev, [index]: true }))
     }
-
-    // If we've exceeded retries or couldn't reload, mark as error
-    setImageLoadError((prev) => ({ ...prev, [index]: true }))
   }
 
   const getBadgeName = (badgeType: string): string => {
     switch (badgeType) {
-      case "trivia-participant":
-        return "Trivia Participant"
-      case "trivia-enthusiast":
-        return "Trivia Enthusiast"
       case "trivia-master":
         return "Trivia Master"
+      case "speed-demon":
+        return "Speed Demon"
+      case "challenge-champion":
+        return "Challenge Champion"
       default:
-        return "SF Trivia Badge"
+        return "Trivia Badge"
     }
   }
 
   const getBadgeDescription = (badgeType: string): string => {
     switch (badgeType) {
-      case "trivia-participant":
-        return "Awarded for participating in your first SF Trivia Game round."
-      case "trivia-enthusiast":
-        return "Awarded for completing 5 rounds of the SF Trivia Game."
       case "trivia-master":
-        return "Awarded for achieving 3 perfect scores in the SF Trivia Game."
+        return "Achieve a perfect score in a trivia round"
+      case "speed-demon":
+        return "Answer 10 questions in under 5 seconds each"
+      case "challenge-champion":
+        return "Complete a perfect round in Challenge Mode"
       default:
-        return "A special badge earned through the SF Trivia Game."
+        return "Earned a trivia badge"
     }
   }
 
@@ -1038,3 +1056,4 @@ export function TriviaGame({ mode = "normal" }: TriviaGameProps) {
     </div>
   )
 }
+

@@ -1,7 +1,9 @@
 "use client"
 
 import { Component, type ReactNode } from "react"
-import { errorTracking } from "@/lib/error-tracking"
+import { logError } from "@/lib/error-monitoring"
+import { Button } from "@/components/ui/button"
+import { AlertTriangle, RefreshCw } from "lucide-react"
 
 interface Props {
   children: ReactNode
@@ -24,9 +26,8 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    errorTracking.trackError(error, {
+    logError("Error in component", error, "ErrorBoundary", {
       componentStack: errorInfo.componentStack,
-      location: "ErrorBoundary",
     })
   }
 
@@ -37,22 +38,19 @@ export class ErrorBoundary extends Component<Props, State> {
       }
 
       return (
-        <div className="flex items-center justify-center min-h-screen">
-          <div className="text-center">
-            <h2 className="text-xl font-semibold text-red-600 mb-2">Something went wrong</h2>
-            <p className="text-gray-600 mb-4">We've been notified and are working on fixing the issue.</p>
-            <button
-              onClick={() => {
-                errorTracking.trackAction("Error boundary retry clicked", {
-                  location: "ErrorBoundary",
-                })
-                this.setState({ hasError: false, error: null })
-              }}
-              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-            >
-              Try again
-            </button>
-          </div>
+        <div className="flex flex-col items-center justify-center p-6 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+          <AlertTriangle className="h-12 w-12 text-red-500 mb-4" />
+          <h3 className="text-lg font-semibold text-red-700 dark:text-red-300 mb-2">Something went wrong</h3>
+          <p className="text-sm text-red-600 dark:text-red-200 mb-4 max-w-md text-center">
+            {this.state.error?.message || "An unexpected error occurred. We've been notified and are working on fixing the issue."}
+          </p>
+          <Button
+            onClick={() => this.setState({ hasError: false, error: null })}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Try Again
+          </Button>
         </div>
       )
     }

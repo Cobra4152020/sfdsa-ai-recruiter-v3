@@ -7,12 +7,18 @@ import { RecruiterAnalyticsDashboard } from "@/components/recruiter-analytics-da
 import { ReferralLinkGenerator } from "@/components/referral-link-generator";
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
+import { User } from "@supabase/supabase-js";
+import { logError } from "@/lib/error-monitoring";
+
+interface UserRole {
+  role: string;
+}
 
 export default function VolunteerDashboardClient() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -43,21 +49,25 @@ export default function VolunteerDashboardClient() {
           .single();
 
         if (error || !userRoles || userRoles.role !== "volunteer_recruiter") {
-          console.error("Role verification failed:", error || "No volunteer role found");
+          logError("Role verification failed", error || new Error("No volunteer role found"), "VolunteerDashboardClient");
           if (isMounted) {
             router.push("/volunteer-login");
           }
           return;
         }
 
-        const { data: userData } = await supabase.auth.getUser();
+        const { data: userData, error: userError } = await supabase.auth.getUser();
+
+        if (userError) {
+          throw userError;
+        }
 
         if (isMounted) {
           setUser(userData.user);
           setIsLoading(false);
         }
       } catch (error) {
-        console.error("Auth check error:", error);
+        logError("Auth check error", error instanceof Error ? error : new Error(String(error)), "VolunteerDashboardClient");
         if (isMounted) {
           router.push("/volunteer-login");
         }

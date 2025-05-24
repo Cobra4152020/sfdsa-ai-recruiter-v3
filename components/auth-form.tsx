@@ -14,10 +14,18 @@ import { useUser } from "@/context/user-context"
 import { getClientSideSupabase } from "@/lib/supabase"
 import { Eye, EyeOff, Mail, Lock, User, Github, Twitter } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { logError } from "@/lib/error-monitoring"
+import type { PostgrestError } from "@supabase/supabase-js"
 
 interface AuthFormProps {
   onSuccess?: () => void
   className?: string
+}
+
+interface RegisterResponse {
+  success: boolean
+  message?: string
+  error?: string
 }
 
 export function AuthForm({ onSuccess, className }: AuthFormProps) {
@@ -32,6 +40,12 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
   const { toast } = useToast()
   const { login } = useUser()
   const supabase = getClientSideSupabase()
+
+  const validatePassword = (password: string): boolean => {
+    // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
+    return passwordRegex.test(password)
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -71,14 +85,14 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
           .single()
 
         if (profileError) {
-          console.error("Error fetching user profile:", profileError)
+          logError("Error fetching user profile", new Error(profileError.message), "AuthForm")
         }
 
         // Login the user in the context
         login({
           id: data.user.id,
           name: userData?.name || data.user.email?.split("@")[0] || "User",
-          email: data.user.email,
+          email: data.user.email || "",
           participation_count: userData?.participation_count || 0,
           has_applied: userData?.has_applied || false,
         })
@@ -93,7 +107,7 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
         }
       }
     } catch (error) {
-      console.error("Sign in error:", error)
+      logError("Sign in error", error instanceof Error ? error : new Error(String(error)), "AuthForm")
       toast({
         title: "Sign in failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
@@ -114,6 +128,10 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
         throw new Error("Please enter your name")
       }
 
+      if (!validatePassword(password)) {
+        throw new Error("Password must be at least 8 characters long and contain uppercase, lowercase, and numbers")
+      }
+
       // Use the API endpoint instead of direct Supabase calls
       const response = await fetch("/api/auth/register", {
         method: "POST",
@@ -127,10 +145,10 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
         }),
       })
 
-      const data = await response.json()
+      const data = (await response.json()) as RegisterResponse
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to create account")
+        throw new Error(data.message || data.error || "Failed to create account")
       }
 
       toast({
@@ -141,7 +159,7 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
       // Switch to sign in tab
       setActiveTab("signin")
     } catch (error) {
-      console.error("Sign up error:", error)
+      logError("Sign up error", error instanceof Error ? error : new Error(String(error)), "AuthForm")
       toast({
         title: "Sign up failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
@@ -153,6 +171,7 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
   }
 
   const handleSocialAuth = async (provider: "github" | "twitter") => {
+    setIsLoading(true)
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -165,12 +184,14 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
         throw error
       }
     } catch (error) {
-      console.error(`${provider} auth error:`, error)
+      logError(`${provider} auth error`, error instanceof Error ? error : new Error(String(error)), "AuthForm")
       toast({
         title: "Authentication failed",
         description: error instanceof Error ? error.message : "An unexpected error occurred",
         variant: "destructive",
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 

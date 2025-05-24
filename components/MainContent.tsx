@@ -7,8 +7,9 @@ import { Send, Gamepad2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { logError } from "@/lib/error-monitoring"
 
-type MessageType = {
+export type MessageType = {
   role: "assistant" | "user"
   content: string | React.ReactNode
   quickReplies?: string[]
@@ -34,6 +35,11 @@ export default function MainContent({ messages, onSendMessage, isLoading, displa
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
   }, [messages, displayedResponse])
 
+  // Focus input on mount
+  useEffect(() => {
+    inputRef.current?.focus()
+  }, [])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (input.trim() && !isLoading) {
@@ -42,20 +48,25 @@ export default function MainContent({ messages, onSendMessage, isLoading, displa
         setInput("")
       } catch (error) {
         console.error("Error sending message:", error)
-        // Optionally display an error message to the user
+        logError("Failed to send message", error instanceof Error ? error : new Error(String(error)), "MainContent")
       }
     }
   }
 
   const handleQuickReply = (reply: string) => {
     if (!isLoading) {
-      // Special handling for trivia game link
-      if (reply.toLowerCase().includes("trivia") || reply.toLowerCase().includes("play sf trivia")) {
-        router.push("/trivia")
-        return
-      }
+      try {
+        // Special handling for trivia game link
+        if (reply.toLowerCase().includes("trivia") || reply.toLowerCase().includes("play sf trivia")) {
+          router.push("/trivia")
+          return
+        }
 
-      onSendMessage(reply)
+        onSendMessage(reply)
+      } catch (error) {
+        console.error("Error handling quick reply:", error)
+        logError("Failed to handle quick reply", error instanceof Error ? error : new Error(String(error)), "MainContent")
+      }
     }
   }
 
