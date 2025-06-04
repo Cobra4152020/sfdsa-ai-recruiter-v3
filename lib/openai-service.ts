@@ -1,10 +1,30 @@
 import OpenAI from "openai";
 import { webSearchService, WebSearchService } from "./web-search-service";
 
-// Initialize OpenAI with API key
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Only initialize OpenAI on the server-side
+let openai: OpenAI | null = null;
+
+// Initialize OpenAI client only on server-side
+function getOpenAIClient(): OpenAI | null {
+  // Check if we're on the server-side
+  if (typeof window !== 'undefined') {
+    console.warn('OpenAI client should not be instantiated on client-side');
+    return null;
+  }
+
+  if (!openai && process.env.OPENAI_API_KEY) {
+    try {
+      openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+      });
+    } catch (error) {
+      console.error('Failed to initialize OpenAI client:', error);
+      return null;
+    }
+  }
+  
+  return openai;
+}
 
 // Enhanced Sgt. Ken personality system prompt
 const ENHANCED_SYSTEM_PROMPT = `You are Sergeant Ken (Sgt. Ken), a veteran recruiter and training supervisor for the San Francisco Sheriff's Office with 15+ years of experience. 
@@ -61,6 +81,11 @@ export async function generateChatResponse(
   chatHistory: ChatMessage[] = [],
 ): Promise<{ response: string; success: boolean; error?: string; searchUsed?: boolean }> {
   try {
+    // Ensure this function is only called server-side
+    if (typeof window !== 'undefined') {
+      throw new Error('generateChatResponse should only be called server-side');
+    }
+
     // Start timing for response time tracking
     const startTime = Date.now();
 
@@ -69,6 +94,17 @@ export async function generateChatResponse(
       return {
         response: "Hey there! I didn't quite catch that. What would you like to know about joining the San Francisco Sheriff's Office? I'm here to help!",
         success: true,
+      };
+    }
+
+    // Get OpenAI client
+    const client = getOpenAIClient();
+    if (!client) {
+      console.warn('OpenAI client not available, using fallback response');
+      return {
+        response: FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)],
+        success: false,
+        error: "OpenAI client not available",
       };
     }
 
@@ -126,7 +162,7 @@ export async function generateChatResponse(
     });
 
     // Make the API call with function calling enabled for potential future tools
-    const apiPromise = openai.chat.completions
+    const apiPromise = client.chat.completions
       .create({
         model: "gpt-4o", // Using latest model for better performance
         messages,
@@ -184,6 +220,11 @@ export async function generateChatResponse(
 // Add a specialized function for getting current SFSO information
 export async function getCurrentSFSOInfo(): Promise<string> {
   try {
+    // Ensure this function is only called server-side
+    if (typeof window !== 'undefined') {
+      throw new Error('getCurrentSFSOInfo should only be called server-side');
+    }
+
     const searchResult = await webSearchService.searchSFSOInfo('San Francisco Sheriff\'s Office current recruitment updates SFSO');
     return searchResult.content;
   } catch (error) {

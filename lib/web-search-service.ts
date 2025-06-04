@@ -28,6 +28,18 @@ export class WebSearchService {
     success: boolean;
   }> {
     try {
+      // Check if we're on the server-side (preferred for web search)
+      if (typeof window !== 'undefined') {
+        console.warn('Web search should preferably run server-side');
+        // Return fallback content for client-side calls
+        return {
+          content: this.getFallbackContent(),
+          sources: ['SFSO Knowledge Base'],
+          lastUpdated: new Date().toLocaleDateString(),
+          success: false
+        };
+      }
+
       console.log(`🔍 Searching for: ${query}`);
       
       // Determine search type based on query

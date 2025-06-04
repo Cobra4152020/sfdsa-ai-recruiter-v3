@@ -17,7 +17,6 @@ import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/context/user-context";
 import { generateResponse } from "@/lib/sgt-ken-knowledge-base";
-import { generateChatResponse } from "@/lib/openai-service";
 
 interface AskSgtKenButtonProps {
   variant?:
@@ -378,10 +377,29 @@ export function AskSgtKenButton({
           content: msg.content
         }));
 
-        // Use the enhanced OpenAI service with web search capabilities
-        const result = await generateChatResponse(userMessage, chatHistory);
+        // Use the enhanced chat API endpoint
+        const apiResponse = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            message: userMessage,
+            chatHistory: chatHistory,
+            userId: currentUser?.id,
+            sessionId,
+          }),
+        });
+
+        if (!apiResponse.ok) {
+          throw new Error(`API error: ${apiResponse.status}`);
+        }
+
+        const result = await apiResponse.json();
         
-        let response = result.response;
+        if (!result.success) {
+          throw new Error(result.error || "API request failed");
+        }
+
+        let response = result.message;
 
         // Update salary information to latest figures
         response = response.replace(
@@ -425,22 +443,7 @@ export function AskSgtKenButton({
           });
         }
 
-        // Track successful interaction in the database
-        try {
-          await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              message: userMessage,
-              response: response,
-              userId: currentUser?.id,
-              sessionId,
-              searchUsed: result.searchUsed,
-            }),
-          });
-        } catch (dbError) {
-          console.error("Database logging error (non-fatal):", dbError);
-        }
+        // Note: Database logging is now handled by the API endpoint
 
       } catch (error) {
         console.error("Error in enhanced chat flow:", error);
