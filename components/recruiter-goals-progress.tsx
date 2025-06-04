@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { CheckCircle, TrendingUp } from "lucide-react"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { CheckCircle, TrendingUp } from "lucide-react";
 
 interface Goal {
-  id: string
-  title: string
-  description: string
-  target: number
-  current: number
-  unit: string
+  id: string;
+  title: string;
+  description: string;
+  target: number;
+  current: number;
+  unit: string;
 }
 
 const initialGoals: Goal[] = [
@@ -47,48 +53,61 @@ const initialGoals: Goal[] = [
     current: 80,
     unit: "%",
   },
-]
+];
 
 export function RecruiterGoalsProgress() {
-  const [goals] = useState<Goal[]>(initialGoals)
+  const [goals] = useState<Goal[]>(initialGoals);
 
   return (
     <Card className="w-full max-w-2xl mx-auto">
       <CardHeader>
         <CardTitle>Recruiter Goals Progress</CardTitle>
         <CardDescription>
-          Track your progress towards key recruiting goals. These targets are set to be challenging but achievable for dedicated recruiters.
+          Track your progress towards key recruiting goals. These targets are
+          set to be challenging but achievable for dedicated recruiters.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {goals.map((goal) => {
-          const percent = Math.min(100, Math.round((goal.current / goal.target) * 100))
-          const completed = percent >= 100
+          const percent = Math.min(
+            100,
+            Math.round((goal.current / goal.target) * 100),
+          );
+          const completed = percent >= 100;
           return (
             <div key={goal.id} className="space-y-2">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="font-medium text-lg flex items-center gap-2">
                     {goal.title}
-                    {completed ? <CheckCircle className="text-green-600 h-5 w-5" /> : <TrendingUp className="text-blue-600 h-5 w-5" />}
+                    {completed ? (
+                      <CheckCircle className="text-green-600 h-5 w-5" />
+                    ) : (
+                      <TrendingUp className="text-blue-600 h-5 w-5" />
+                    )}
                   </div>
-                  <div className="text-sm text-gray-500">{goal.description}</div>
+                  <div className="text-sm text-gray-500">
+                    {goal.description}
+                  </div>
                 </div>
                 <div className="text-right min-w-[80px] font-semibold">
                   {goal.current} / {goal.target} {goal.unit}
                 </div>
               </div>
-              <Progress value={percent} className={completed ? "bg-green-100" : ""} />
+              <Progress
+                value={percent}
+                className={completed ? "bg-green-100" : ""}
+              />
               <div className="text-xs text-gray-400 text-right">{percent}%</div>
             </div>
-          )
+          );
         })}
         <div className="pt-2 text-xs text-gray-500">
           Goals are updated monthly and quarterly. Keep up the great work!
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
-export default RecruiterGoalsProgress 
+export default RecruiterGoalsProgress;

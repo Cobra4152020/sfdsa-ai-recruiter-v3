@@ -1,15 +1,19 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { CheckCircle2, Circle, Trophy } from "lucide-react"
+import { CheckCircle2, Circle, Trophy } from "lucide-react";
 
 interface BadgeRequirementsProps {
-  requirements: string[]
-  rewards?: string[]
-  earned?: boolean
-  progress?: number
+  requirements: string[];
+  rewards?: string[];
+  earned?: boolean;
+  progress?: number;
 }
 
-export function BadgeRequirements({ requirements, rewards = [], earned = false, progress = 0 }: BadgeRequirementsProps) {
-  const completedCount = Math.floor((progress / 100) * requirements.length)
+export function BadgeRequirements({
+  requirements,
+  rewards = [],
+  earned = false,
+  progress = 0,
+}: BadgeRequirementsProps) {
+  const completedCount = Math.floor((progress / 100) * requirements.length);
 
   return (
     <div className="space-y-6">
@@ -23,7 +27,13 @@ export function BadgeRequirements({ requirements, rewards = [], earned = false, 
               ) : (
                 <Circle className="h-5 w-5 text-gray-400 mt-0.5 flex-shrink-0" />
               )}
-              <span className={earned || index < completedCount ? "text-gray-900" : "text-gray-600"}>
+              <span
+                className={
+                  earned || index < completedCount
+                    ? "text-gray-900"
+                    : "text-gray-600"
+                }
+              >
                 {requirement}
               </span>
             </li>
@@ -47,5 +57,5 @@ export function BadgeRequirements({ requirements, rewards = [], earned = false, 
         </div>
       )}
     </div>
-  )
-} 
+  );
+}

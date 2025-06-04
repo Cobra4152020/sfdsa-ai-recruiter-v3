@@ -1,26 +1,26 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Heart, MessageCircle, Share2 } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Heart, MessageCircle, Share2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type FeedItem = {
-  id: string
-  userId: string
-  userName: string
-  userAvatarUrl: string
-  content: string
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatarUrl: string;
+  content: string;
   badgeEarned?: {
-    name: string
-    type: string
-  }
-  timestamp: string
-  likes: number
-  comments: number
-  shares: number
-}
+    name: string;
+    type: string;
+  };
+  timestamp: string;
+  likes: number;
+  comments: number;
+  shares: number;
+};
 
 // Sample data with avatar URLs
 const sampleFeedData: FeedItem[] = [
@@ -80,22 +80,22 @@ const sampleFeedData: FeedItem[] = [
     comments: 6,
     shares: 4,
   },
-]
+];
 
 interface SocialFeedProps {
-  className?: string
-  limit?: number
+  className?: string;
+  limit?: number;
 }
 
 export function SocialFeed({ className, limit = 4 }: SocialFeedProps) {
-  const [feedItems, setFeedItems] = useState<FeedItem[]>([])
-  const [loading, setLoading] = useState(true)
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     // In a real app, you would fetch this data from your API
-    setFeedItems(sampleFeedData.slice(0, limit))
-    setLoading(false)
-  }, [limit])
+    setFeedItems(sampleFeedData.slice(0, limit));
+    setLoading(false);
+  }, [limit]);
 
   if (loading) {
     return (
@@ -109,7 +109,7 @@ export function SocialFeed({ className, limit = 4 }: SocialFeedProps) {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -120,11 +120,19 @@ export function SocialFeed({ className, limit = 4 }: SocialFeedProps) {
       <CardContent>
         <div className="space-y-6">
           {feedItems.map((item) => (
-            <div key={item.id} className="border-b border-gray-100 pb-6 last:border-0 last:pb-0">
+            <div
+              key={item.id}
+              className="border-b border-gray-100 pb-6 last:border-0 last:pb-0"
+            >
               <div className="flex items-start gap-3 mb-3">
                 <Avatar className="h-10 w-10 border border-gray-200">
-                  <AvatarImage src={item.userAvatarUrl || "/placeholder.svg"} alt={item.userName} />
-                  <AvatarFallback>{item.userName.substring(0, 2)}</AvatarFallback>
+                  <AvatarImage
+                    src={item.userAvatarUrl || "/placeholder.svg"}
+                    alt={item.userName}
+                  />
+                  <AvatarFallback>
+                    {item.userName.substring(0, 2)}
+                  </AvatarFallback>
                 </Avatar>
                 <div>
                   <p className="font-medium">{item.userName}</p>
@@ -136,7 +144,9 @@ export function SocialFeed({ className, limit = 4 }: SocialFeedProps) {
 
               {item.badgeEarned && (
                 <div className="bg-[#F0F7F2] p-3 rounded-lg mb-3">
-                  <p className="text-sm font-medium text-[#0A3C1F]">🏆 Earned the {item.badgeEarned.name} badge!</p>
+                  <p className="text-sm font-medium text-[#0A3C1F]">
+                    🏆 Earned the {item.badgeEarned.name} badge!
+                  </p>
                 </div>
               )}
 
@@ -159,5 +169,5 @@ export function SocialFeed({ className, limit = 4 }: SocialFeedProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

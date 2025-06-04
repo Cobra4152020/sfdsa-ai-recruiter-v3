@@ -1,9 +1,9 @@
 interface BadgeEarnedTemplateProps {
-  recipientName: string
-  badgeName: string
-  badgeDescription: string
-  badgeShareMessage?: string
-  badgeUrl: string
+  recipientName: string;
+  badgeName: string;
+  badgeDescription: string;
+  badgeShareMessage?: string;
+  badgeUrl: string;
 }
 
 export function badgeEarned({
@@ -97,5 +97,5 @@ export function badgeEarned({
       </div>
     </body>
     </html>
-  `
+  `;
 }

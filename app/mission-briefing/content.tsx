@@ -1,22 +1,40 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { FileText, Briefcase, GraduationCap, DollarSign, Clock, Shield, Users, Clipboard, Rocket } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import Image from "next/image"
-import type { Route } from "next"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  FileText,
+  Briefcase,
+  GraduationCap,
+  DollarSign,
+  Clock,
+  Shield,
+  Users,
+  Clipboard,
+  Rocket,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import Image from "next/image";
+import type { Route } from "next";
 
 export default function MissionBriefingContent() {
   return (
     <div className="container mx-auto px-4 py-4">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">Mission Briefing</h1>
+          <h1 className="text-3xl font-bold text-primary mb-2">
+            Mission Briefing
+          </h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Your comprehensive guide to becoming a San Francisco Deputy Sheriff. Learn about the role, requirements, and
-            application process.
+            Your comprehensive guide to becoming a San Francisco Deputy Sheriff.
+            Learn about the role, requirements, and application process.
           </p>
         </div>
 
@@ -26,7 +44,8 @@ export default function MissionBriefingContent() {
               <Shield className="h-4 w-4 mr-2 hidden sm:inline" /> The Role
             </TabsTrigger>
             <TabsTrigger value="requirements" className="text-sm sm:text-base">
-              <Clipboard className="h-4 w-4 mr-2 hidden sm:inline" /> Requirements
+              <Clipboard className="h-4 w-4 mr-2 hidden sm:inline" />{" "}
+              Requirements
             </TabsTrigger>
             <TabsTrigger value="benefits" className="text-sm sm:text-base">
               <DollarSign className="h-4 w-4 mr-2 hidden sm:inline" /> Benefits
@@ -35,7 +54,8 @@ export default function MissionBriefingContent() {
               <Clock className="h-4 w-4 mr-2 hidden sm:inline" /> Process
             </TabsTrigger>
             <TabsTrigger value="training" className="text-sm sm:text-base">
-              <GraduationCap className="h-4 w-4 mr-2 hidden sm:inline" /> Training
+              <GraduationCap className="h-4 w-4 mr-2 hidden sm:inline" />{" "}
+              Training
             </TabsTrigger>
           </TabsList>
 
@@ -74,20 +94,29 @@ export default function MissionBriefingContent() {
               <div>
                 <h3 className="text-lg font-semibold mb-2">Apply Now</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Start your application process today and begin your career in law enforcement with the San Francisco
-                  Sheriff's Department.
+                  Start your application process today and begin your career in
+                  law enforcement with the San Francisco Sheriff&apos;s
+                  Department.
                 </p>
                 <Link href={"/apply" as Route}>
-                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Apply Now</Button>
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Apply Now
+                  </Button>
                 </Link>
               </div>
               <div>
-                <h3 className="text-lg font-semibold mb-2">Explore the Deputy Launchpad</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Explore the Deputy Launchpad
+                </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Learn about our points system, badges, and rewards as you progress through the recruitment process.
+                  Learn about our points system, badges, and rewards as you
+                  progress through the recruitment process.
                 </p>
                 <Link href={"/deputy-launchpad" as Route}>
-                  <Button variant="outline" className="border-primary text-primary">
+                  <Button
+                    variant="outline"
+                    className="border-primary text-primary"
+                  >
                     <Rocket className="h-4 w-4 mr-2" />
                     Visit Deputy Launchpad
                   </Button>
@@ -98,14 +127,15 @@ export default function MissionBriefingContent() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
 
 function RoleExplainer() {
   const responsibilities = [
     {
       title: "Jail Operations",
-      description: "Supervise inmates in county jails, ensuring safety and security",
+      description:
+        "Supervise inmates in county jails, ensuring safety and security",
       icon: <Shield className="h-6 w-6 text-primary" />,
     },
     {
@@ -115,7 +145,8 @@ function RoleExplainer() {
     },
     {
       title: "Inmate Transportation",
-      description: "Safely transport inmates to and from court appearances and medical appointments",
+      description:
+        "Safely transport inmates to and from court appearances and medical appointments",
       icon: <Users className="h-6 w-6 text-primary" />,
     },
     {
@@ -123,7 +154,7 @@ function RoleExplainer() {
       description: "Serve legal documents and enforce civil judgments",
       icon: <FileText className="h-6 w-6 text-primary" />,
     },
-  ]
+  ];
 
   return (
     <Card>
@@ -133,7 +164,8 @@ function RoleExplainer() {
           The Deputy Sheriff Role
         </CardTitle>
         <CardDescription className="text-gray-200">
-          Learn about the duties and responsibilities of a San Francisco Deputy Sheriff
+          Learn about the duties and responsibilities of a San Francisco Deputy
+          Sheriff
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
@@ -142,13 +174,17 @@ function RoleExplainer() {
             <div className="md:w-2/3">
               <h3 className="text-xl font-semibold mb-4">Overview</h3>
               <p className="mb-4">
-                San Francisco Deputy Sheriffs play a vital role in maintaining public safety and upholding the law
-                within the city and county. As a Deputy Sheriff, you'll be responsible for a variety of duties related
-                to law enforcement, corrections, and court services.
+                San Francisco Deputy Sheriffs play a vital role in maintaining
+                public safety and upholding the law within the city and county.
+                As a Deputy Sheriff, you&apos;ll be responsible for a variety of
+                duties related to law enforcement, corrections, and court
+                services.
               </p>
               <p className="mb-4">
-                The San Francisco Sheriff's Department is committed to progressive law enforcement practices, community
-                engagement, and rehabilitation programs that help reduce recidivism and promote public safety.
+                The San Francisco Sheriff&apos;s Department is committed to
+                progressive law enforcement practices, community engagement, and
+                rehabilitation programs that help reduce recidivism and promote
+                public safety.
               </p>
             </div>
             <div className="md:w-1/3 relative h-48 md:h-auto rounded-lg overflow-hidden">
@@ -171,17 +207,22 @@ function RoleExplainer() {
                     {item.icon}
                     <h4 className="font-semibold ml-2">{item.title}</h4>
                   </div>
-                  <p className="text-sm text-muted-foreground">{item.description}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {item.description}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h3 className="font-semibold text-lg mb-2 text-primary">Career Growth</h3>
+            <h3 className="font-semibold text-lg mb-2 text-primary">
+              Career Growth
+            </h3>
             <p className="mb-2">
-              The San Francisco Sheriff's Department offers excellent opportunities for career advancement. Deputies can
-              specialize in various areas, including:
+              The San Francisco Sheriff&apos;s Department offers excellent
+              opportunities for career advancement. Deputies can specialize in
+              various areas, including:
             </p>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
               <li>Investigations</li>
@@ -192,14 +233,15 @@ function RoleExplainer() {
               <li>Administration</li>
             </ul>
             <p className="mt-2">
-              With experience and additional training, deputies can advance to supervisory and management positions,
-              including Sergeant, Lieutenant, Captain, and beyond.
+              With experience and additional training, deputies can advance to
+              supervisory and management positions, including Sergeant,
+              Lieutenant, Captain, and beyond.
             </p>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function RequirementsExplainer() {
@@ -207,19 +249,22 @@ export function RequirementsExplainer() {
     "Must be at least 18 years old",
     "U.S. citizenship or permanent resident alien status",
     "High school diploma or equivalent (GED)",
-    "Valid California driver's license",
+    "Valid California driver&apos;s license",
     "No felony convictions",
     "Pass background investigation",
     "Pass medical and psychological examinations",
     "Physical fitness meeting department standards",
-  ]
+  ];
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader className="bg-primary text-primary-foreground">
           <CardTitle>Requirements</CardTitle>
-          <CardDescription>These are the basic requirements to become a San Francisco Deputy Sheriff</CardDescription>
+          <CardDescription>
+            These are the basic requirements to become a San Francisco Deputy
+            Sheriff
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2">
@@ -238,33 +283,39 @@ export function RequirementsExplainer() {
       <Card>
         <CardHeader>
           <CardTitle>Testing Requirements</CardTitle>
-          <CardDescription>These tests are required to become a San Francisco Deputy Sheriff</CardDescription>
+          <CardDescription>
+            These tests are required to become a San Francisco Deputy Sheriff
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="border rounded-lg p-4">
               <h4 className="font-semibold mb-2">Written Exam</h4>
               <p className="text-sm text-gray-600">
-                Tests basic reading comprehension, writing skills, and problem-solving abilities. Preparation materials
-                are available through our platform.
+                Tests basic reading comprehension, writing skills, and
+                problem-solving abilities. Preparation materials are available
+                through our platform.
               </p>
             </div>
             <div className="border rounded-lg p-4">
               <h4 className="font-semibold mb-2">Physical Ability Test</h4>
               <p className="text-sm text-gray-600">
-                Includes push-ups, sit-ups, and a 1.5-mile run to assess physical fitness and endurance.
+                Includes push-ups, sit-ups, and a 1.5-mile run to assess
+                physical fitness and endurance.
               </p>
             </div>
             <div className="border rounded-lg p-4">
               <h4 className="font-semibold mb-2">Oral Interview</h4>
               <p className="text-sm text-gray-600">
-                Evaluates communication skills, judgment, and suitability for law enforcement work.
+                Evaluates communication skills, judgment, and suitability for
+                law enforcement work.
               </p>
             </div>
             <div className="border rounded-lg p-4">
               <h4 className="font-semibold mb-2">Background Check</h4>
               <p className="text-sm text-gray-600">
-                Thorough investigation of personal history, employment, education, and criminal record.
+                Thorough investigation of personal history, employment,
+                education, and criminal record.
               </p>
             </div>
           </div>
@@ -274,7 +325,9 @@ export function RequirementsExplainer() {
       <Card>
         <CardHeader>
           <CardTitle>Preferred Qualifications</CardTitle>
-          <CardDescription>These qualities will strengthen your application</CardDescription>
+          <CardDescription>
+            These qualities will strengthen your application
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2">
@@ -306,7 +359,7 @@ export function RequirementsExplainer() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
 
 function BenefitsExplainer() {
@@ -318,7 +371,8 @@ function BenefitsExplainer() {
           Benefits & Compensation
         </CardTitle>
         <CardDescription className="text-gray-200">
-          Learn about the competitive salary and benefits package for San Francisco Deputy Sheriffs
+          Learn about the competitive salary and benefits package for San
+          Francisco Deputy Sheriffs
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
@@ -328,7 +382,8 @@ function BenefitsExplainer() {
             <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
               <h4 className="font-semibold mb-2">Competitive Compensation</h4>
               <p className="mb-2">
-                San Francisco Deputy Sheriffs enjoy one of the most competitive salary packages in law enforcement:
+                San Francisco Deputy Sheriffs enjoy one of the most competitive
+                salary packages in law enforcement:
               </p>
               <ul className="list-disc list-inside space-y-1 text-gray-700">
                 <li>Starting salary range: $116,428 to $184,362</li>
@@ -342,7 +397,9 @@ function BenefitsExplainer() {
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-4">Health & Retirement Benefits</h3>
+            <h3 className="text-xl font-semibold mb-4">
+              Health & Retirement Benefits
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="border rounded-lg p-4">
                 <h4 className="font-semibold mb-2">Health Benefits</h4>
@@ -398,8 +455,12 @@ function BenefitsExplainer() {
           </div>
 
           <div className="bg-accent/10 p-4 rounded-lg border border-accent/20">
-            <h3 className="font-semibold text-lg mb-2 text-primary">Special Opportunities</h3>
-            <p className="mb-2">San Francisco Deputy Sheriffs may qualify for special programs:</p>
+            <h3 className="font-semibold text-lg mb-2 text-primary">
+              Special Opportunities
+            </h3>
+            <p className="mb-2">
+              San Francisco Deputy Sheriffs may qualify for special programs:
+            </p>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
               <li>G.I. Bill benefits for veterans</li>
               <li>Discounted housing programs for law enforcement</li>
@@ -407,7 +468,10 @@ function BenefitsExplainer() {
             </ul>
             <div className="mt-4">
               <Link href="/deputy-launchpad">
-                <Button variant="outline" className="border-primary text-primary">
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary"
+                >
                   Learn More in Deputy Launchpad
                 </Button>
               </Link>
@@ -416,7 +480,7 @@ function BenefitsExplainer() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }
 
 export function ProcessExplainer() {
@@ -424,39 +488,46 @@ export function ProcessExplainer() {
     {
       step: 1,
       title: "Online Application",
-      description: "Complete the initial application form with your personal information and qualifications.",
+      description:
+        "Complete the initial application form with your personal information and qualifications.",
     },
     {
       step: 2,
       title: "Written Examination",
-      description: "Take the written test to assess your basic skills and aptitude for law enforcement work.",
+      description:
+        "Take the written test to assess your basic skills and aptitude for law enforcement work.",
     },
     {
       step: 3,
       title: "Physical Ability Test",
-      description: "Complete the physical fitness assessment to ensure you meet the physical requirements.",
+      description:
+        "Complete the physical fitness assessment to ensure you meet the physical requirements.",
     },
     {
       step: 4,
       title: "Oral Interview",
-      description: "Participate in an interview with department representatives to assess your suitability.",
+      description:
+        "Participate in an interview with department representatives to assess your suitability.",
     },
     {
       step: 5,
       title: "Background Investigation",
-      description: "Undergo a thorough background check of your personal and professional history.",
+      description:
+        "Undergo a thorough background check of your personal and professional history.",
     },
     {
       step: 6,
       title: "Medical & Psychological Exams",
-      description: "Complete medical and psychological evaluations to ensure fitness for duty.",
+      description:
+        "Complete medical and psychological evaluations to ensure fitness for duty.",
     },
     {
       step: 7,
       title: "Final Selection",
-      description: "Receive a conditional offer of employment if you successfully complete all steps.",
+      description:
+        "Receive a conditional offer of employment if you successfully complete all steps.",
     },
-  ]
+  ];
 
   return (
     <div className="space-y-6">
@@ -479,14 +550,17 @@ export function ProcessExplainer() {
       </div>
 
       <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-        <h3 className="font-semibold text-lg mb-2 text-primary">Tips for Success</h3>
+        <h3 className="font-semibold text-lg mb-2 text-primary">
+          Tips for Success
+        </h3>
         <ul className="space-y-2">
           <li className="flex items-start">
             <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
               <Shield className="h-4 w-4 text-primary" />
             </div>
             <span>
-              <strong>Prepare thoroughly</strong> for each step of the process, especially the written and physical tests.
+              <strong>Prepare thoroughly</strong> for each step of the process,
+              especially the written and physical tests.
             </span>
           </li>
           <li className="flex items-start">
@@ -494,7 +568,8 @@ export function ProcessExplainer() {
               <Shield className="h-4 w-4 text-primary" />
             </div>
             <span>
-              <strong>Be honest</strong> throughout the entire process, particularly during the background investigation.
+              <strong>Be honest</strong> throughout the entire process,
+              particularly during the background investigation.
             </span>
           </li>
           <li className="flex items-start">
@@ -502,7 +577,8 @@ export function ProcessExplainer() {
               <Shield className="h-4 w-4 text-primary" />
             </div>
             <span>
-              <strong>Stay in touch</strong> with your background investigator and respond promptly to requests for information.
+              <strong>Stay in touch</strong> with your background investigator
+              and respond promptly to requests for information.
             </span>
           </li>
           <li className="flex items-start">
@@ -510,13 +586,14 @@ export function ProcessExplainer() {
               <Shield className="h-4 w-4 text-primary" />
             </div>
             <span>
-              <strong>Maintain physical fitness</strong> throughout the process to ensure you're ready for the academy.
+              <strong>Maintain physical fitness</strong> throughout the process
+              to ensure you&apos;re ready for the academy.
             </span>
           </li>
         </ul>
       </div>
     </div>
-  )
+  );
 }
 
 function TrainingExplainer() {
@@ -528,7 +605,8 @@ function TrainingExplainer() {
           Academy & Training
         </CardTitle>
         <CardDescription className="text-gray-200">
-          Learn about the training you'll receive as a San Francisco Deputy Sheriff
+          Learn about the training you&apos;ll receive as a San Francisco Deputy
+          Sheriff
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
@@ -537,12 +615,15 @@ function TrainingExplainer() {
             <div className="md:w-2/3">
               <h3 className="text-xl font-semibold mb-4">Academy Overview</h3>
               <p className="mb-4">
-                After receiving a conditional offer of employment, you'll attend the San Francisco Sheriff's Department
-                Academy, a comprehensive training program designed to prepare you for the challenges of law enforcement.
+                After receiving a conditional offer of employment, you&apos;ll
+                attend the San Francisco Sheriff&apos;s Department Academy, a
+                comprehensive training program designed to prepare you for the
+                challenges of law enforcement.
               </p>
               <p className="mb-4">
-                The academy is a full-time, paid position. During this time, you'll be a Deputy Sheriff Trainee,
-                receiving instruction in all aspects of law enforcement and corrections.
+                The academy is a full-time, paid position. During this time,
+                you&apos;ll be a Deputy Sheriff Trainee, receiving instruction
+                in all aspects of law enforcement and corrections.
               </p>
             </div>
             <div className="md:w-1/3 relative h-48 md:h-auto rounded-lg overflow-hidden">
@@ -609,19 +690,22 @@ function TrainingExplainer() {
                 <div>
                   <h4 className="font-semibold mb-2">Duration</h4>
                   <p className="text-sm text-gray-600">
-                    The academy typically lasts 16 weeks, with full-time training Monday through Friday.
+                    The academy typically lasts 16 weeks, with full-time
+                    training Monday through Friday.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Physical Training</h4>
                   <p className="text-sm text-gray-600">
-                    Regular physical training sessions to build strength, endurance, and fitness.
+                    Regular physical training sessions to build strength,
+                    endurance, and fitness.
                   </p>
                 </div>
                 <div>
                   <h4 className="font-semibold mb-2">Testing</h4>
                   <p className="text-sm text-gray-600">
-                    Regular written and practical exams to assess knowledge and skills.
+                    Regular written and practical exams to assess knowledge and
+                    skills.
                   </p>
                 </div>
               </div>
@@ -631,8 +715,10 @@ function TrainingExplainer() {
           <div>
             <h3 className="text-xl font-semibold mb-4">After the Academy</h3>
             <p className="mb-4">
-              Upon successful completion of the academy, you'll begin a field training program where you'll work
-              alongside experienced deputies to apply your training in real-world situations.
+              Upon successful completion of the academy, you&apos;ll begin a
+              field training program where you&apos;ll work alongside
+              experienced deputies to apply your training in real-world
+              situations.
             </p>
             <div className="border rounded-lg p-4">
               <h4 className="font-semibold mb-2">Field Training Program</h4>
@@ -647,10 +733,13 @@ function TrainingExplainer() {
           </div>
 
           <div className="bg-accent/10 p-4 rounded-lg border border-accent/20">
-            <h3 className="font-semibold text-lg mb-2 text-primary">Continuing Education</h3>
+            <h3 className="font-semibold text-lg mb-2 text-primary">
+              Continuing Education
+            </h3>
             <p className="mb-2">
-              Your training doesn't end with the academy. The San Francisco Sheriff's Department offers ongoing
-              professional development opportunities:
+              Your training doesn&apos;t end with the academy. The San Francisco
+              Sheriff&apos;s Department offers ongoing professional development
+              opportunities:
             </p>
             <ul className="list-disc list-inside space-y-1 text-gray-700">
               <li>Specialized training courses</li>
@@ -660,7 +749,10 @@ function TrainingExplainer() {
             </ul>
             <div className="mt-4">
               <Link href="/deputy-launchpad">
-                <Button variant="outline" className="border-primary text-primary">
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary"
+                >
                   Learn More in Deputy Launchpad
                 </Button>
               </Link>
@@ -669,5 +761,5 @@ function TrainingExplainer() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

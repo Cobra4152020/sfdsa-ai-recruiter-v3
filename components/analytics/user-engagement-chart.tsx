@@ -1,30 +1,56 @@
-"use client"
+"use client";
 
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Line, LineChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer, Bar, BarChart } from "recharts"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import {
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Bar,
+  BarChart,
+} from "recharts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-interface UserEngagementChartProps {
-  data: any[]
-  isLoading: boolean
+export interface UserEngagementDataPoint {
+  date: string;
+  active_users: number;
+  average_session_time: number;
+  interactions: number;
 }
 
-export function UserEngagementChart({ data, isLoading }: UserEngagementChartProps) {
+interface UserEngagementChartProps {
+  data: UserEngagementDataPoint[];
+  isLoading: boolean;
+}
+
+export function UserEngagementChart({
+  data,
+  isLoading,
+}: UserEngagementChartProps) {
   if (isLoading) {
     return (
       <div className="w-full h-[400px] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0A3C1F]"></div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-[400px] flex flex-col items-center justify-center">
         <p className="text-lg font-medium text-gray-500">No data available</p>
-        <p className="text-sm text-gray-400">Try selecting a different time period</p>
+        <p className="text-sm text-gray-400">
+          Try selecting a different time period
+        </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -46,19 +72,30 @@ export function UserEngagementChart({ data, isLoading }: UserEngagementChartProp
           className="h-[400px]"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <BarChart
+              data={data}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
                 tickFormatter={(value) => {
-                  const date = new Date(value)
-                  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
                 }}
               />
               <YAxis />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Legend />
-              <Bar dataKey="active_users" fill="var(--color-active_users)" name="Active Users" radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="active_users"
+                fill="var(--color-active_users)"
+                name="Active Users"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
@@ -75,13 +112,19 @@ export function UserEngagementChart({ data, isLoading }: UserEngagementChartProp
           className="h-[400px]"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <LineChart
+              data={data}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
                 tickFormatter={(value) => {
-                  const date = new Date(value)
-                  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
                 }}
               />
               <YAxis />
@@ -110,23 +153,34 @@ export function UserEngagementChart({ data, isLoading }: UserEngagementChartProp
           className="h-[400px]"
         >
           <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+            <BarChart
+              data={data}
+              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="date"
                 tickFormatter={(value) => {
-                  const date = new Date(value)
-                  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" })
+                  const date = new Date(value);
+                  return date.toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                  });
                 }}
               />
               <YAxis />
               <ChartTooltip content={<ChartTooltipContent />} />
               <Legend />
-              <Bar dataKey="interactions" fill="var(--color-interactions)" name="Interactions" radius={[4, 4, 0, 0]} />
+              <Bar
+                dataKey="interactions"
+                fill="var(--color-interactions)"
+                name="Interactions"
+                radius={[4, 4, 0, 0]}
+              />
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
       </TabsContent>
     </Tabs>
-  )
+  );
 }

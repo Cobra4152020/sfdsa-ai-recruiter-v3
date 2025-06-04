@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Share2 } from "lucide-react"
-import { BadgeSharingDialog } from "./badge-sharing-dialog"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Share2 } from "lucide-react";
+import { BadgeSharingDialog } from "./badge-sharing-dialog";
 
 interface RecruitmentBadgeProps {
-  userName: string
-  showShareOptions?: boolean
-  size?: "sm" | "md" | "lg"
-  className?: string
+  userName: string;
+  showShareOptions?: boolean;
+  size?: "sm" | "md" | "lg";
+  className?: string;
 }
 
 export function RecruitmentBadge({
@@ -18,7 +18,7 @@ export function RecruitmentBadge({
   size = "md",
   className = "",
 }: RecruitmentBadgeProps) {
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
   // Size classes
   const sizeClasses = {
@@ -40,7 +40,7 @@ export function RecruitmentBadge({
       title: "text-base",
       subtitle: "text-sm",
     },
-  }
+  };
 
   return (
     <div className={`flex flex-col items-center ${className}`}>
@@ -61,8 +61,14 @@ export function RecruitmentBadge({
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
             <div className="text-center">
-              <div className={`font-bold text-[#FFD700] ${sizeClasses[size].title}`}>SF DEPUTY SHERIFF</div>
-              <div className={`mt-1 font-medium ${sizeClasses[size].subtitle}`}>RECRUIT CANDIDATE</div>
+              <div
+                className={`font-bold text-[#FFD700] ${sizeClasses[size].title}`}
+              >
+                SF DEPUTY SHERIFF
+              </div>
+              <div className={`mt-1 font-medium ${sizeClasses[size].subtitle}`}>
+                RECRUIT CANDIDATE
+              </div>
             </div>
           </div>
         </div>
@@ -74,7 +80,12 @@ export function RecruitmentBadge({
       </div>
 
       {showShareOptions && (
-        <Button variant="outline" size="sm" className="mt-2 text-xs h-8" onClick={() => setIsShareDialogOpen(true)}>
+        <Button
+          variant="outline"
+          size="sm"
+          className="mt-2 text-xs h-8"
+          onClick={() => setIsShareDialogOpen(true)}
+        >
           <Share2 className="h-3 w-3 mr-1" />
           Share Badge
         </Button>
@@ -87,5 +98,5 @@ export function RecruitmentBadge({
         userName={userName}
       />
     </div>
-  )
+  );
 }

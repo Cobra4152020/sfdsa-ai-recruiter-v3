@@ -1,16 +1,21 @@
-import { generateUserStaticParams } from "@/lib/static-params"
-import { AdminUserPageClient } from "@/components/admin-user-page-client"
-import { PageWrapper } from "@/components/page-wrapper"
+import { AdminUserPageClient } from "@/components/admin-user-page-client";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export async function generateStaticParams() {
   // Add dummy params for testing
-  return [{ id: "user1" }, { id: "user2" }, { id: "user3" }]
+  return [{ id: "user1" }, { id: "user2" }, { id: "user3" }];
 }
 
-export default function AdminUserPage({ params }: { params: { id: string } }) {
+export default async function AdminUserPage({ 
+  params 
+}: { 
+  params: Promise<{ id: string }> 
+}) {
+  const resolvedParams = await params;
+  
   return (
     <PageWrapper>
-      <AdminUserPageClient params={params} />
+      <AdminUserPageClient params={resolvedParams} />
     </PageWrapper>
-  )
+  );
 }

@@ -1,44 +1,51 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Shield, AlertCircle } from "lucide-react"
-import { getClientSideSupabase } from "@/lib/supabase"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Shield, AlertCircle } from "lucide-react";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 export function AdminLoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const router = useRouter()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
 
       // Sign in with email and password
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const { data, error: signInError } =
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
       if (signInError) {
-        setError(signInError.message)
-        return
+        setError(signInError.message);
+        return;
       }
 
       if (!data.user) {
-        setError("No user returned from authentication")
-        return
+        setError("No user returned from authentication");
+        return;
       }
 
       // Check if user has admin role
@@ -46,17 +53,17 @@ export function AdminLoginForm() {
         .from("user_types")
         .select("user_type")
         .eq("user_id", data.user.id)
-        .single()
+        .single();
 
       if (userTypeError) {
-        setError("Failed to verify admin status")
-        return
+        setError("Failed to verify admin status");
+        return;
       }
 
       if (!userTypeData || userTypeData.user_type !== "admin") {
-        setError("You do not have admin privileges")
-        await supabase.auth.signOut()
-        return
+        setError("You do not have admin privileges");
+        await supabase.auth.signOut();
+        return;
       }
 
       // Log the successful login
@@ -67,22 +74,26 @@ export function AdminLoginForm() {
           email: data.user.email,
           method: "password",
         },
-      })
+      });
 
-      router.push("/admin/dashboard")
+      router.push("/admin/dashboard");
     } catch (err) {
-      console.error("Login error:", err)
-      setError("An unexpected error occurred")
+      console.error("Login error:", err);
+      setError("An unexpected error occurred");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Card className="border-t-4 border-t-[#0A3C1F] shadow-lg">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">Admin Access</CardTitle>
-        <CardDescription className="text-center">Secure access for authorized administrators only</CardDescription>
+        <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+          Admin Access
+        </CardTitle>
+        <CardDescription className="text-center">
+          Secure access for authorized administrators only
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex justify-center mb-6">
@@ -134,9 +145,11 @@ export function AdminLoginForm() {
 
         <div className="text-center text-sm text-muted-foreground">
           <p>This access is for authorized administrators only.</p>
-          <p>If you need assistance, please contact the system administrator.</p>
+          <p>
+            If you need assistance, please contact the system administrator.
+          </p>
         </div>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

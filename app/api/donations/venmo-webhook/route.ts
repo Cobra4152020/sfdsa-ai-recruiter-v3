@@ -1,28 +1,28 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { headers } from "next/headers"
-import crypto from "crypto"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { headers } from "next/headers";
+import crypto from "crypto";
 
 // This is your Venmo webhook secret
-const VENMO_WEBHOOK_SECRET = process.env.VENMO_WEBHOOK_SECRET!
+const VENMO_WEBHOOK_SECRET = process.env.VENMO_WEBHOOK_SECRET!;
 
 export async function POST(request: Request) {
-  const body = await request.text()
-  const signature = headers().get("venmo-signature")!
+  const body = await request.text();
+  const signature = headers().get("venmo-signature")!;
 
   // Verify webhook signature
-  const hmac = crypto.createHmac("sha256", VENMO_WEBHOOK_SECRET)
-  const expectedSignature = hmac.update(body).digest("hex")
+  const hmac = crypto.createHmac("sha256", VENMO_WEBHOOK_SECRET);
+  const expectedSignature = hmac.update(body).digest("hex");
 
   if (signature !== expectedSignature) {
-    return NextResponse.json({ error: "Invalid signature" }, { status: 401 })
+    return NextResponse.json({ error: "Invalid signature" }, { status: 401 });
   }
 
-  const payload = JSON.parse(body)
-  const supabase = getServiceSupabase()
+  const payload = JSON.parse(body);
+  const supabase = getServiceSupabase();
 
   // Handle different event types
   switch (payload.type) {
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
         status: "completed",
         venmo_username: payload.data.sender.username,
         organization: "protecting", // Always set to Protecting SF
-      })
+      });
 
       // Send receipt if email is available
       if (payload.data.sender.email) {
@@ -52,13 +52,13 @@ export async function POST(request: Request) {
             isRecurring: false,
             organization: "protecting", // Always set to Protecting SF
           }),
-        })
+        });
       }
-      break
+      break;
 
     default:
-      console.log(`Unhandled event type ${payload.type}`)
+      console.log(`Unhandled event type ${payload.type}`);
   }
 
-  return NextResponse.json({ received: true })
+  return NextResponse.json({ received: true });
 }

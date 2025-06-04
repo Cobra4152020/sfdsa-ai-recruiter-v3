@@ -1,36 +1,33 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
-import { getClientSideSupabase } from "@/lib/supabase"
-import { Award, Trophy, Star, Clock, User, FileText, BadgeCheck, Bell, Settings, LogOut } from "lucide-react"
-import { RecruitDashboard } from "@/components/recruit-dashboard"
-import { ApplicationProgressGamification } from "@/components/application-progress-gamification"
-import { EarnedBadges } from "@/components/earned-badges"
-import { useUser } from "@/context/user-context"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Trophy, Star, Clock, Settings } from "lucide-react";
+import { RecruitDashboard } from "@/components/recruit-dashboard";
+import { ApplicationProgressGamification } from "@/components/application-progress-gamification";
+import { EarnedBadges } from "@/components/earned-badges";
+import { useUser } from "@/context/user-context";
 
 export default function DashboardPage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const { currentUser, isLoading: isUserLoading } = useUser()
-  const router = useRouter()
-  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState(true);
+  const { currentUser, isLoading: isUserLoading } = useUser();
+  const router = useRouter();
 
   useEffect(() => {
     if (!currentUser && !isUserLoading) {
-      router.push('/login')
-      return
+      router.push("/login");
+      return;
     }
 
     // Only stop loading when we have user data
     if (!isUserLoading) {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [currentUser, isUserLoading, router])
+  }, [currentUser, isUserLoading, router]);
 
   // Show loading state while checking user or loading data
   if (isLoading || isUserLoading) {
@@ -52,21 +49,25 @@ export default function DashboardPage() {
 
         <Skeleton className="h-96" />
       </main>
-    )
+    );
   }
 
   // If no user is found after loading, redirect to login
   if (!currentUser) {
-    router.push('/login')
-    return null
+    router.push("/login");
+    return null;
   }
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#0A3C1F] dark:text-[#FFD700] mb-2">Welcome back, {currentUser?.name || "Recruit"}!</h1>
-          <p className="text-gray-600 dark:text-gray-300">Track your progress and stay updated on your recruitment journey.</p>
+          <h1 className="text-3xl font-bold text-[#0A3C1F] dark:text-[#FFD700] mb-2">
+            Welcome back, {currentUser?.name || "Recruit"}!
+          </h1>
+          <p className="text-gray-600 dark:text-gray-300">
+            Track your progress and stay updated on your recruitment journey.
+          </p>
         </div>
         <Button
           onClick={() => router.push("/profile/settings")}
@@ -88,7 +89,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold mb-2">12</div>
-            <p className="text-gray-600 dark:text-gray-300">Badges earned this month</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Badges earned this month
+            </p>
           </CardContent>
         </Card>
 
@@ -101,7 +104,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold mb-2">850</div>
-            <p className="text-gray-600 dark:text-gray-300">Total points accumulated</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Total points accumulated
+            </p>
           </CardContent>
         </Card>
 
@@ -114,7 +119,9 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold mb-2">2</div>
-            <p className="text-gray-600 dark:text-gray-300">Tasks pending completion</p>
+            <p className="text-gray-600 dark:text-gray-300">
+              Tasks pending completion
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -139,5 +146,5 @@ export default function DashboardPage() {
         </TabsContent>
       </Tabs>
     </main>
-  )
+  );
 }

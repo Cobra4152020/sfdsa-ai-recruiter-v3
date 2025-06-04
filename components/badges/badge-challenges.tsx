@@ -1,45 +1,45 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
-import { BadgeChallenge, UserChallengeProgress, BadgeWithProgress } from '@/types/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Progress } from '@/components/ui/progress'
-import { Button } from '@/components/ui/button'
-import { Trophy, Calendar, Flame, Share2 } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { BadgeChallenge, UserChallengeProgress } from "@/types/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Trophy, Calendar, Flame, Share2 } from "lucide-react";
 
 interface BadgeChallengesProps {
-  activeChallenges: BadgeChallenge[]
-  userProgress: UserChallengeProgress[]
-  streakCount: number
-  onShare?: (challenge: BadgeChallenge) => void
+  activeChallenges: BadgeChallenge[];
+  userProgress: UserChallengeProgress[];
+  streakCount: number;
+  onShare?: (challenge: BadgeChallenge) => void;
 }
 
 export function BadgeChallenges({
   activeChallenges,
   userProgress,
   streakCount,
-  onShare
+  onShare,
 }: BadgeChallengesProps) {
-  const [timeLeft, setTimeLeft] = useState<string>('')
+  const [timeLeft, setTimeLeft] = useState<string>("");
 
   // Calculate time left until daily reset
   useEffect(() => {
     const updateTimeLeft = () => {
-      const now = new Date()
-      const tomorrow = new Date(now)
-      tomorrow.setHours(24, 0, 0, 0)
-      const diff = tomorrow.getTime() - now.getTime()
-      
-      const hours = Math.floor(diff / (1000 * 60 * 60))
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-      setTimeLeft(`${hours}h ${minutes}m`)
-    }
+      const now = new Date();
+      const tomorrow = new Date(now);
+      tomorrow.setHours(24, 0, 0, 0);
+      const diff = tomorrow.getTime() - now.getTime();
 
-    updateTimeLeft()
-    const interval = setInterval(updateTimeLeft, 60000)
-    return () => clearInterval(interval)
-  }, [])
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      setTimeLeft(`${hours}h ${minutes}m`);
+    };
+
+    updateTimeLeft();
+    const interval = setInterval(updateTimeLeft, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -67,19 +67,27 @@ export function BadgeChallenges({
               <Calendar className="h-6 w-6 text-blue-500" />
               <div>
                 <h3 className="font-medium">Daily Reset In</h3>
-                <p className="text-sm text-gray-500">New challenges coming soon</p>
+                <p className="text-sm text-gray-500">
+                  New challenges coming soon
+                </p>
               </div>
             </div>
-            <div className="text-xl font-semibold text-blue-500">{timeLeft}</div>
+            <div className="text-xl font-semibold text-blue-500">
+              {timeLeft}
+            </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Active Challenges */}
       <div className="grid gap-4">
-        {activeChallenges.map(challenge => {
-          const progress = userProgress.find(p => p.challengeId === challenge.id)
-          const progressValue = progress ? calculateProgress(progress.progress) : 0
+        {activeChallenges.map((challenge) => {
+          const progress = userProgress.find(
+            (p) => p.challengeId === challenge.id,
+          );
+          const progressValue = progress
+            ? calculateProgress(progress.progress)
+            : 0;
 
           return (
             <motion.div
@@ -97,12 +105,16 @@ export function BadgeChallenges({
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-gray-500 mb-4">{challenge.description}</p>
+                  <p className="text-sm text-gray-500 mb-4">
+                    {challenge.description}
+                  </p>
                   <div className="space-y-4">
                     <Progress value={progressValue} />
                     <div className="flex items-center justify-between text-sm">
                       <span>{progressValue}% Complete</span>
-                      <span className="text-blue-500">{challenge.xpReward} XP</span>
+                      <span className="text-blue-500">
+                        {challenge.xpReward} XP
+                      </span>
                     </div>
                     {progressValue === 100 && onShare && (
                       <Button
@@ -119,15 +131,15 @@ export function BadgeChallenges({
                 </CardContent>
               </Card>
             </motion.div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }
 
-function calculateProgress(progress: Record<string, any>): number {
-  const total = Object.keys(progress).length
-  const completed = Object.values(progress).filter(Boolean).length
-  return Math.round((completed / total) * 100)
-} 
+function calculateProgress(progress: Record<string, number>): number {
+  const total = Object.keys(progress).length;
+  const completed = Object.values(progress).filter(Boolean).length;
+  return Math.round((completed / total) * 100);
+}

@@ -1,20 +1,34 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
-    const data = await request.json()
-    const { userId, platform, contentType, contentId, contentTitle, url, animated, videoUrl, videoDuration } = data
+    const data = await request.json();
+    const {
+      userId,
+      platform,
+      contentType,
+      contentId,
+      contentTitle,
+      url,
+      animated,
+      videoUrl,
+      videoDuration,
+    } = data;
 
     if (!userId || !platform || !contentType) {
-      return NextResponse.json({ error: "Missing required parameters" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing required parameters" },
+        { status: 400 },
+      );
     }
 
     // Record the share in the database
-    const { data: shareData, error } = await getServiceSupabase().from("social_shares")
+    const { data: shareData, error } = await getServiceSupabase()
+      .from("social_shares")
       .insert({
         user_id: userId,
         platform,
@@ -31,11 +45,14 @@ export async function POST(request: Request) {
         video_url: videoUrl || null,
         video_duration: videoDuration || null,
       })
-      .select()
+      .select();
 
     if (error) {
-      console.error("Error recording social share:", error)
-      return NextResponse.json({ error: "Failed to record share" }, { status: 500 })
+      console.error("Error recording social share:", error);
+      return NextResponse.json(
+        { error: "Failed to record share" },
+        { status: 500 },
+      );
     }
 
     // Award points (this is handled by database triggers)
@@ -44,9 +61,12 @@ export async function POST(request: Request) {
       success: true,
       message: "Share recorded successfully",
       data: shareData,
-    })
+    });
   } catch (error) {
-    console.error("Error processing social share:", error)
-    return NextResponse.json({ error: "Failed to process share" }, { status: 500 })
+    console.error("Error processing social share:", error);
+    return NextResponse.json(
+      { error: "Failed to process share" },
+      { status: 500 },
+    );
   }
 }

@@ -1,15 +1,21 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef, useCallback } from "react"
-import { useUser } from "@/context/user-context"
-import { useToast } from "@/components/ui/use-toast"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog"
-import { Skeleton } from "@/components/ui/skeleton"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect, useRef, useCallback } from "react";
+import { useUser } from "@/context/user-context";
+import { useToast } from "@/components/ui/use-toast";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Share2,
   Award,
@@ -28,89 +34,100 @@ import {
   VolumeX,
   Info,
   WifiOff,
-} from "lucide-react"
-import confetti from "canvas-confetti"
-import Image from "next/image"
-import { trackEngagement } from "@/lib/analytics"
+} from "lucide-react";
+import confetti from "canvas-confetti";
+import Image from "next/image";
+import { trackEngagement } from "@/lib/analytics";
 
 export interface TriviaQuestion {
-  id: string
-  question: string
-  options: string[]
-  correctAnswer: number
-  explanation: string
-  difficulty: "easy" | "medium" | "hard"
-  category: string
-  imageUrl?: string
-  imageAlt?: string
+  id: string;
+  question: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+  difficulty: "easy" | "medium" | "hard";
+  category: string;
+  imageUrl?: string;
+  imageAlt?: string;
 }
 
 interface BadgeResult {
-  id: string
-  badge_type: string
-  earned_at: string
+  id: string;
+  badge_type: string;
+  earned_at: string;
 }
 
 interface EnhancedTriviaGameProps {
-  gameId: string
-  gameName: string
-  gameDescription: string
-  fetchQuestionsEndpoint: string
-  submitEndpoint: string
-  shareEndpoint: string
+  gameId: string;
+  gameName: string;
+  gameDescription: string;
+  fetchQuestionsEndpoint: string;
+  submitEndpoint: string;
+  shareEndpoint: string;
   badgeTypes: {
-    participant: string
-    enthusiast: string
-    master: string
-  }
-  pointsPerQuestion?: number
-  pointsPerGame?: number
-  pointsForSharing?: number
+    participant: string;
+    enthusiast: string;
+    master: string;
+  };
+  pointsPerQuestion?: number;
+  pointsPerGame?: number;
+  pointsForSharing?: number;
 }
 
 // Fallback questions in case API fails
-const fallbackQuestions = [
+const fallbackQuestions: TriviaQuestion[] = [
   {
     id: "fallback-1",
     question: "What year was the Golden Gate Bridge completed?",
     options: ["1937", "1927", "1947", "1957"],
     correctAnswer: 0,
-    explanation: "The Golden Gate Bridge was completed in 1937 after four years of construction.",
-    difficulty: "easy",
+    explanation:
+      "The Golden Gate Bridge was completed in 1937 after four years of construction.",
+    difficulty: "easy" as const,
     category: "landmarks",
     imageUrl: "/golden-gate-bridge.png",
     imageAlt: "The Golden Gate Bridge in San Francisco",
   },
   {
     id: "fallback-2",
-    question: "Which famous prison is located on an island in San Francisco Bay?",
+    question:
+      "Which famous prison is located on an island in San Francisco Bay?",
     options: ["Rikers Island", "San Quentin", "Alcatraz", "Folsom"],
     correctAnswer: 2,
-    explanation: "Alcatraz Federal Penitentiary operated from 1934 to 1963 on Alcatraz Island in San Francisco Bay.",
-    difficulty: "easy",
+    explanation:
+      "Alcatraz Federal Penitentiary operated from 1934 to 1963 on Alcatraz Island in San Francisco Bay.",
+    difficulty: "easy" as const,
     category: "landmarks",
     imageUrl: "/alcatraz-prison-san-francisco.png",
     imageAlt: "Alcatraz prison on its island in San Francisco Bay",
   },
   {
     id: "fallback-3",
-    question: "What was the name of the 1906 natural disaster that devastated San Francisco?",
-    options: ["Great Quake", "San Francisco Tremor", "Golden Gate Disaster", "California Shaker"],
+    question:
+      "What was the name of the 1906 natural disaster that devastated San Francisco?",
+    options: [
+      "Great Quake",
+      "San Francisco Tremor",
+      "Golden Gate Disaster",
+      "California Shaker",
+    ],
     correctAnswer: 0,
-    explanation: "The Great Quake of 1906 caused devastating fires and destroyed over 80% of the city.",
-    difficulty: "medium",
+    explanation:
+      "The Great Quake of 1906 caused devastating fires and destroyed over 80% of the city.",
+    difficulty: "medium" as const,
     category: "history",
     imageUrl: "/1906-san-francisco-earthquake.png",
     imageAlt: "Aftermath of the 1906 San Francisco earthquake",
   },
   {
     id: "fallback-4",
-    question: "Which famous San Francisco neighborhood is known for its LGBT history and activism?",
+    question:
+      "Which famous San Francisco neighborhood is known for its LGBT history and activism?",
     options: ["Haight-Ashbury", "Mission District", "Castro", "North Beach"],
     correctAnswer: 2,
     explanation:
       "The Castro District has been the center of LGBT activism and culture in San Francisco since the 1960s.",
-    difficulty: "medium",
+    difficulty: "medium" as const,
     category: "culture",
     imageUrl: "/castro-district-san-francisco.png",
     imageAlt: "The iconic Castro Theater in San Francisco's Castro District",
@@ -118,21 +135,26 @@ const fallbackQuestions = [
   {
     id: "fallback-5",
     question: "What is the name of San Francisco's famous cable car system?",
-    options: ["Market Street Railway", "Muni Metro", "BART", "San Francisco Municipal Railway"],
+    options: [
+      "Market Street Railway",
+      "Muni Metro",
+      "BART",
+      "San Francisco Municipal Railway",
+    ],
     correctAnswer: 3,
     explanation:
       "San Francisco Municipal Railway (Muni) operates the historic cable car system, which is the last manually operated cable car system in the world.",
-    difficulty: "easy",
+    difficulty: "easy" as const,
     category: "transportation",
     imageUrl: "/san-francisco-cable-car.png",
     imageAlt: "A San Francisco cable car climbing up a hill",
   },
-]
+];
 
 export function EnhancedTriviaGame({
   gameId,
   gameName,
-  gameDescription,
+  gameDescription, // eslint-disable-line @typescript-eslint/no-unused-vars
   fetchQuestionsEndpoint,
   submitEndpoint,
   shareEndpoint,
@@ -141,308 +163,329 @@ export function EnhancedTriviaGame({
   pointsPerGame = 50,
   pointsForSharing = 15,
 }: EnhancedTriviaGameProps) {
-  const [questions, setQuestions] = useState<TriviaQuestion[]>([])
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null)
-  const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
-  const [score, setScore] = useState(0)
-  const [isGameOver, setIsGameOver] = useState(false)
-  const [timeLeft, setTimeLeft] = useState(30)
-  const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [showBadgeDialog, setShowBadgeDialog] = useState(false)
-  const [earnedBadge, setEarnedBadge] = useState<BadgeResult | null>(null)
-  const [showShareDialog, setShowShareDialog] = useState(false)
-  const [showMidGameShareDialog, setShowMidGameShareDialog] = useState(false)
-  const [pointsAwarded, setPointsAwarded] = useState(0)
-  const [hasSharedMidGame, setHasSharedMidGame] = useState(false)
-  const [imageLoadError, setImageLoadError] = useState<Record<number, boolean>>({})
-  const [showFeedback, setShowFeedback] = useState(false)
-  const [isCorrectAnswer, setIsCorrectAnswer] = useState(false)
-  const [volume, setVolume] = useState<number>(0.7) // Default volume: 70%
-  const [isMuted, setIsMuted] = useState<boolean>(false)
-  const [fetchError, setFetchError] = useState<string | null>(null)
-  const [correctAnswers, setCorrectAnswers] = useState(0)
-  const [retryCount, setRetryCount] = useState(0)
-  const [isOnline, setIsOnline] = useState<boolean>(true)
-  const [showNetworkError, setShowNetworkError] = useState<boolean>(false)
-  const [questionSource, setQuestionSource] = useState<string>("loading")
-  const [requestId, setRequestId] = useState<string | null>(null)
+  const [questions, setQuestions] = useState<TriviaQuestion[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [score, setScore] = useState(0);
+  const [isGameOver, setIsGameOver] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [showBadgeDialog, setShowBadgeDialog] = useState(false);
+  const [earnedBadge, setEarnedBadge] = useState<BadgeResult | null>(null);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [showMidGameShareDialog, setShowMidGameShareDialog] = useState(false);
+  const [pointsAwarded, setPointsAwarded] = useState(0);
+  const [hasSharedMidGame, setHasSharedMidGame] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState<Record<number, boolean>>(
+    {},
+  );
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [isCorrectAnswer, setIsCorrectAnswer] = useState(false);
+  const [volume, setVolume] = useState<number>(0.7); // Default volume: 70%
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [retryCount, setRetryCount] = useState(0);
+  // const [isOnline, setIsOnline] = useState<boolean>(true);
+  const [showNetworkError, setShowNetworkError] = useState<boolean>(false);
+  const [questionSource, setQuestionSource] = useState<string>("loading");
+  const [requestId, setRequestId] = useState<string | null>(null);
 
   // Create refs for audio elements
-  const correctAudioRef = useRef<HTMLAudioElement | null>(null)
-  const wrongAudioRef = useRef<HTMLAudioElement | null>(null)
+  const correctAudioRef = useRef<HTMLAudioElement | null>(null);
+  const wrongAudioRef = useRef<HTMLAudioElement | null>(null);
 
-  const sharePromptShown = useRef(false)
-  const imageRetries = useRef<Record<number, number>>({})
-  const abortControllerRef = useRef<AbortController | null>(null)
-  const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const sharePromptShown = useRef(false);
+  const imageRetries = useRef<Record<number, number>>({});
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const fetchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { currentUser, isLoggedIn } = useUser()
-  const { toast } = useToast()
+  const { currentUser, isLoggedIn } = useUser();
+  const { toast } = useToast();
 
   // Network status monitoring
   useEffect(() => {
     const handleOnline = () => {
-      setIsOnline(true)
+      // setIsOnline(true);
       toast({
-        title: "You're back online!",
+        title: "You&apos;re back online!",
         description: "Reconnected to the network. Game functionality restored.",
         variant: "default",
-      })
-    }
+      });
+    };
 
     const handleOffline = () => {
-      setIsOnline(false)
+      // setIsOnline(false);
       toast({
-        title: "You're offline",
+        title: "You&apos;re offline",
         description: "Some game features may be limited until you reconnect.",
         variant: "destructive",
-      })
-    }
+      });
+    };
 
-    window.addEventListener("online", handleOnline)
-    window.addEventListener("offline", handleOffline)
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     // Set initial online status
-    setIsOnline(navigator.onLine)
+    // setIsOnline(navigator.onLine);
 
     return () => {
-      window.removeEventListener("online", handleOnline)
-      window.removeEventListener("offline", handleOffline)
-    }
-  }, [toast])
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
+    };
+  }, [toast]);
 
   // Initialize audio elements
   useEffect(() => {
     try {
-      correctAudioRef.current = new Audio("/sounds/correct-answer.mp3")
-      wrongAudioRef.current = new Audio("/sounds/wrong-answer.mp3")
+      correctAudioRef.current = new Audio("/sounds/correct-answer.mp3");
+      wrongAudioRef.current = new Audio("/sounds/wrong-answer.mp3");
     } catch (error) {
-      console.error("Error initializing audio:", error)
+      console.error("Error initializing audio:", error);
     }
 
     // Cleanup function
     return () => {
       if (correctAudioRef.current) {
-        correctAudioRef.current.pause()
-        correctAudioRef.current = null
+        correctAudioRef.current.pause();
+        correctAudioRef.current = null;
       }
       if (wrongAudioRef.current) {
-        wrongAudioRef.current.pause()
-        wrongAudioRef.current = null
+        wrongAudioRef.current.pause();
+        wrongAudioRef.current = null;
       }
-    }
-  }, [])
+    };
+  }, []);
 
   // Fetch trivia questions
   useEffect(() => {
-    fetchQuestions()
+    fetchQuestions();
 
     // Cleanup function to abort any in-progress fetches when component unmounts
     return () => {
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
+        abortControllerRef.current.abort();
       }
       if (fetchTimeoutRef.current) {
-        clearTimeout(fetchTimeoutRef.current)
+        clearTimeout(fetchTimeoutRef.current);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   // Timer logic
   useEffect(() => {
-    let timer: NodeJS.Timeout
+    let timer: NodeJS.Timeout;
 
     if (isTimerRunning && timeLeft > 0) {
       timer = setTimeout(() => {
-        setTimeLeft((prev) => prev - 1)
-      }, 1000)
+        setTimeLeft((prev) => prev - 1);
+      }, 1000);
     } else if (isTimerRunning && timeLeft === 0) {
       // Time's up, auto-submit current answer or mark as incorrect
-      handleAnswerSubmit()
+      handleAnswerSubmit();
     }
 
-    return () => clearTimeout(timer)
-  }, [timeLeft, isTimerRunning])
+    return () => clearTimeout(timer);
+  }, [timeLeft, isTimerRunning]);
 
   // Start timer when questions are loaded
   useEffect(() => {
-    if (questions.length > 0 && !isGameOver && !isAnswerSubmitted && questions[currentQuestionIndex]) {
-      setIsTimerRunning(true)
+    if (
+      questions.length > 0 &&
+      !isGameOver &&
+      !isAnswerSubmitted &&
+      questions[currentQuestionIndex]
+    ) {
+      setIsTimerRunning(true);
     }
-  }, [questions, currentQuestionIndex, isAnswerSubmitted, isGameOver])
+  }, [questions, currentQuestionIndex, isAnswerSubmitted, isGameOver]);
 
   // Show mid-game share prompt after the second question
   useEffect(() => {
-    if (currentQuestionIndex === 2 && !isAnswerSubmitted && !sharePromptShown.current && !hasSharedMidGame) {
-      sharePromptShown.current = true
+    if (
+      currentQuestionIndex === 2 &&
+      !isAnswerSubmitted &&
+      !sharePromptShown.current &&
+      !hasSharedMidGame
+    ) {
+      sharePromptShown.current = true;
       // Pause the timer while showing the share dialog
-      setIsTimerRunning(false)
-      setShowMidGameShareDialog(true)
+      setIsTimerRunning(false);
+      setShowMidGameShareDialog(true);
     }
-  }, [currentQuestionIndex, isAnswerSubmitted, hasSharedMidGame])
+  }, [currentQuestionIndex, isAnswerSubmitted, hasSharedMidGame]);
 
   // Hide feedback after 2 seconds
   useEffect(() => {
-    let timer: NodeJS.Timeout
+    let timer: NodeJS.Timeout;
     if (showFeedback) {
       timer = setTimeout(() => {
-        setShowFeedback(false)
-      }, 2000)
+        setShowFeedback(false);
+      }, 2000);
     }
-    return () => clearTimeout(timer)
-  }, [showFeedback])
+    return () => clearTimeout(timer);
+  }, [showFeedback]);
 
   // Initialize volume from localStorage and set up event listeners
   useEffect(() => {
     try {
       // Load volume settings from localStorage
-      const savedVolume = localStorage.getItem("triviaGameVolume")
-      const savedMuted = localStorage.getItem("triviaGameMuted")
+      const savedVolume = localStorage.getItem("triviaGameVolume");
+      const savedMuted = localStorage.getItem("triviaGameMuted");
 
       if (savedVolume !== null) {
-        setVolume(Number.parseFloat(savedVolume))
+        setVolume(Number.parseFloat(savedVolume));
       }
 
       if (savedMuted !== null) {
-        setIsMuted(savedMuted === "true")
+        setIsMuted(savedMuted === "true");
       }
 
       // Apply initial volume settings to audio elements
       if (correctAudioRef.current) {
-        correctAudioRef.current.volume = isMuted ? 0 : volume
+        correctAudioRef.current.volume = isMuted ? 0 : volume;
       }
       if (wrongAudioRef.current) {
-        wrongAudioRef.current.volume = isMuted ? 0 : volume
+        wrongAudioRef.current.volume = isMuted ? 0 : volume;
       }
     } catch (error) {
-      console.error("Error initializing volume settings:", error)
+      console.error("Error initializing volume settings:", error);
     }
-  }, [])
+  }, []);
 
   const handleVolumeChange = (newVolume: number) => {
     try {
-      setVolume(newVolume)
-      localStorage.setItem("triviaGameVolume", newVolume.toString())
+      setVolume(newVolume);
+      localStorage.setItem("triviaGameVolume", newVolume.toString());
 
       // Apply volume to audio elements
       if (correctAudioRef.current) {
-        correctAudioRef.current.volume = isMuted ? 0 : newVolume
+        correctAudioRef.current.volume = isMuted ? 0 : newVolume;
       }
       if (wrongAudioRef.current) {
-        wrongAudioRef.current.volume = isMuted ? 0 : newVolume
+        wrongAudioRef.current.volume = isMuted ? 0 : newVolume;
       }
     } catch (error) {
-      console.error("Error changing volume:", error)
+      console.error("Error changing volume:", error);
     }
-  }
+  };
 
   const toggleMute = () => {
     try {
-      const newMuted = !isMuted
-      setIsMuted(newMuted)
-      localStorage.setItem("triviaGameMuted", newMuted.toString())
+      const newMuted = !isMuted;
+      setIsMuted(newMuted);
+      localStorage.setItem("triviaGameMuted", newMuted.toString());
 
       // Apply mute state to audio elements
       if (correctAudioRef.current) {
-        correctAudioRef.current.volume = newMuted ? 0 : volume
+        correctAudioRef.current.volume = newMuted ? 0 : volume;
       }
       if (wrongAudioRef.current) {
-        wrongAudioRef.current.volume = newMuted ? 0 : volume
+        wrongAudioRef.current.volume = newMuted ? 0 : volume;
       }
     } catch (error) {
-      console.error("Error toggling mute:", error)
+      console.error("Error toggling mute:", error);
     }
-  }
+  };
 
   const fetchQuestions = useCallback(async () => {
     // Reset state for a new fetch
-    setIsLoading(true)
-    setFetchError(null)
-    setShowNetworkError(false)
+    setIsLoading(true);
+    setFetchError(null);
+    setShowNetworkError(false);
 
     // Cancel any previous fetch
     if (abortControllerRef.current) {
-      abortControllerRef.current.abort()
+      abortControllerRef.current.abort();
     }
 
     // Clear any existing timeout
     if (fetchTimeoutRef.current) {
-      clearTimeout(fetchTimeoutRef.current)
+      clearTimeout(fetchTimeoutRef.current);
     }
 
     // Create a new abort controller for this fetch
-    abortControllerRef.current = new AbortController()
+    abortControllerRef.current = new AbortController();
 
     // Set a timeout for the fetch operation
     const fetchTimeout = setTimeout(() => {
       if (abortControllerRef.current) {
-        abortControllerRef.current.abort()
-        setFetchError(`Request timed out after 10 seconds. Please check your connection and try again.`)
-        setIsLoading(false)
+        abortControllerRef.current.abort();
+        setFetchError(
+          `Request timed out after 10 seconds. Please check your connection and try again.`,
+        );
+        setIsLoading(false);
       }
-    }, 10000)
+    }, 10000);
 
-    fetchTimeoutRef.current = fetchTimeout
+    fetchTimeoutRef.current = fetchTimeout;
 
     try {
       // Check if we're online before attempting to fetch
       if (!navigator.onLine) {
-        throw new Error("You appear to be offline. Please check your internet connection and try again.")
+        throw new Error(
+          "You appear to be offline. Please check your internet connection and try again.",
+        );
       }
 
       // Add cache busting parameter to avoid cached responses
-      const cacheBuster = new Date().getTime()
-      const response = await fetch(`${fetchQuestionsEndpoint}?count=5&gameId=${gameId}&_=${cacheBuster}`, {
-        signal: abortControllerRef.current.signal,
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          Pragma: "no-cache",
-          Expires: "0",
+      const cacheBuster = new Date().getTime();
+      const response = await fetch(
+        `${fetchQuestionsEndpoint}?count=5&gameId=${gameId}&_=${cacheBuster}`,
+        {
+          signal: abortControllerRef.current.signal,
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            Pragma: "no-cache",
+            Expires: "0",
+          },
         },
-      })
+      );
 
       // Clear the timeout since we got a response
-      clearTimeout(fetchTimeout)
-      fetchTimeoutRef.current = null
+      clearTimeout(fetchTimeout);
+      fetchTimeoutRef.current = null;
 
       if (!response.ok) {
-        throw new Error(`API returned status: ${response.status}`)
+        throw new Error(`API returned status: ${response.status}`);
       }
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.error) {
-        throw new Error(data.error)
+        throw new Error(data.error);
       }
 
       if (!data.questions || data.questions.length === 0) {
-        throw new Error(`No questions returned for ${gameName}`)
+        throw new Error(`No questions returned for ${gameName}`);
       }
 
       // Store the request ID and source for diagnostics
-      setRequestId(data.requestId || null)
-      setQuestionSource(data.source || "unknown")
+      setRequestId(data.requestId || null);
+      setQuestionSource(data.source || "unknown");
 
       // Pre-load images to avoid loading delays during gameplay
       data.questions.forEach((question: TriviaQuestion) => {
         if (question.imageUrl && !question.imageUrl.startsWith("data:")) {
           try {
-            const img = new Image()
-            img.src = question.imageUrl
-            img.crossOrigin = "anonymous"
+            const img = new window.Image();
+            img.src = question.imageUrl;
+            img.crossOrigin = "anonymous";
           } catch (error) {
-            console.error("Error preloading image:", error)
+            console.error("Error preloading image:", error);
           }
         }
-      })
+      });
 
-      setQuestions(data.questions)
-      console.log(`Loaded ${data.questions.length} questions for ${gameId} from ${data.source}`)
+      setQuestions(data.questions);
+      console.log(
+        `Loaded ${data.questions.length} questions for ${gameId} from ${data.source}`,
+      );
 
       // Reset retry count on successful fetch
-      setRetryCount(0)
+      setRetryCount(0);
 
       // Track successful question load
       try {
@@ -451,43 +494,49 @@ export function EnhancedTriviaGame({
           source: data.source,
           questionCount: data.questions.length,
           requestId: data.requestId,
-        })
+        });
       } catch (error) {
-        console.error("Error tracking engagement:", error)
+        console.error("Error tracking engagement:", error);
       }
     } catch (error) {
       // Clear the timeout if there was an error
-      clearTimeout(fetchTimeout)
-      fetchTimeoutRef.current = null
+      clearTimeout(fetchTimeout);
+      fetchTimeoutRef.current = null;
 
       // Handle abort errors differently
-      if (error.name === "AbortError") {
-        setFetchError("Request was cancelled. Please try again.")
+      if (error instanceof Error && error.name === "AbortError") {
+        setFetchError("Request was cancelled. Please try again.");
         // Use fallback questions
-        setQuestions(fallbackQuestions)
-        setQuestionSource("fallback-abort")
-        return
+        setQuestions(fallbackQuestions);
+        setQuestionSource("fallback-abort");
+        return;
       }
 
       // Check if it's a network error
       if (
         !navigator.onLine ||
-        (error.message && (error.message.includes("offline") || error.message.includes("network")))
+        (error instanceof Error &&
+          error.message &&
+          (error.message.includes("offline") ||
+            error.message.includes("network")))
       ) {
-        setShowNetworkError(true)
+        setShowNetworkError(true);
       }
 
       // Safely handle the error without destructuring
-      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred"
-      console.error(`Error fetching ${gameId} trivia questions:`, error)
-      setFetchError(`We're having trouble loading ${gameName} questions. ${errorMessage}`)
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
+      console.error(`Error fetching ${gameId} trivia questions:`, error);
+      setFetchError(
+        `We're having trouble loading ${gameName} questions. ${errorMessage}`,
+      );
 
       // Use fallback questions
-      setQuestions(fallbackQuestions)
-      setQuestionSource("fallback-error")
+      setQuestions(fallbackQuestions);
+      setQuestionSource("fallback-error");
 
       // Increment retry count
-      setRetryCount((prev) => prev + 1)
+      setRetryCount((prev) => prev + 1);
 
       // Track failed question load
       try {
@@ -495,83 +544,93 @@ export function EnhancedTriviaGame({
           gameId,
           error: errorMessage,
           retryCount: retryCount + 1,
-        })
+        });
       } catch (trackError) {
-        console.error("Error tracking engagement:", trackError)
+        console.error("Error tracking engagement:", trackError);
       }
 
       toast({
         title: "Using backup questions",
-        description: "We're having trouble connecting to our servers. Using local questions instead.",
+        description:
+          "We're having trouble connecting to our servers. Using local questions instead.",
         variant: "default",
-      })
+      });
     } finally {
-      setIsLoading(false)
-      setIsTimerRunning(true)
+      setIsLoading(false);
+      setIsTimerRunning(true);
 
       // Clear the abort controller reference
-      abortControllerRef.current = null
+      abortControllerRef.current = null;
     }
-  }, [fetchQuestionsEndpoint, gameId, gameName, retryCount, toast])
+  }, [fetchQuestionsEndpoint, gameId, gameName, retryCount, toast]);
 
   const handleAnswerSelect = (answerIndex: number) => {
     if (!isAnswerSubmitted) {
-      setSelectedAnswer(answerIndex)
-      handleAnswerSubmit(answerIndex)
+      setSelectedAnswer(answerIndex);
+      handleAnswerSubmit(answerIndex);
     }
-  }
+  };
 
-  const handleAnswerSubmit = async (selectedIdx: number = selectedAnswer) => {
-    if (selectedIdx === null) return
+  const handleSubmitClick = () => {
+    handleAnswerSubmit();
+  };
 
-    setIsTimerRunning(false)
-    setIsAnswerSubmitted(true)
+  const handleAnswerSubmit = async (selectedIdx?: number) => {
+    const answerIndex = selectedIdx ?? selectedAnswer;
+    if (answerIndex === null) return;
 
-    const currentQuestion = questions[currentQuestionIndex]
-    if (!currentQuestion) return // Safety check
+    setIsTimerRunning(false);
+    setIsAnswerSubmitted(true);
 
-    const isCorrect = selectedIdx === currentQuestion.correctAnswer
+    const currentQuestion = questions[currentQuestionIndex];
+    if (!currentQuestion) return; // Safety check
+
+    const isCorrect = answerIndex === currentQuestion.correctAnswer;
 
     // Show visual feedback
-    setIsCorrectAnswer(isCorrect)
-    setShowFeedback(true)
+    setIsCorrectAnswer(isCorrect);
+    setShowFeedback(true);
 
     // Play sound effects
     if (isCorrect) {
       try {
         if (correctAudioRef.current) {
-          correctAudioRef.current.volume = isMuted ? 0 : volume
-          correctAudioRef.current.currentTime = 0
-          correctAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
+          correctAudioRef.current.volume = isMuted ? 0 : volume;
+          correctAudioRef.current.currentTime = 0;
+          correctAudioRef.current
+            .play()
+            .catch((err) => console.error("Error playing sound:", err));
         }
       } catch (error) {
-        console.error("Error playing correct sound:", error)
+        console.error("Error playing correct sound:", error);
       }
 
       // Rest of the isCorrect code remains the same
-      setScore((prev) => prev + 1)
-      setCorrectAnswers((prev) => prev + 1)
+      setScore((prev) => prev + 1);
+      setCorrectAnswers((prev) => prev + 1);
 
       // Show confetti for correct answers
       try {
         confetti({
           particleCount: 100,
           spread: 70,
-          origin: { y: 0.6 },
+          origin: { x: 0.5, y: 0.6 },
           colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
-        })
+        });
       } catch (error) {
-        console.error("Error showing confetti:", error)
+        console.error("Error showing confetti:", error);
       }
     } else {
       try {
         if (wrongAudioRef.current) {
-          wrongAudioRef.current.volume = isMuted ? 0 : volume
-          wrongAudioRef.current.currentTime = 0
-          wrongAudioRef.current.play().catch((err) => console.error("Error playing sound:", err))
+          wrongAudioRef.current.volume = isMuted ? 0 : volume;
+          wrongAudioRef.current.currentTime = 0;
+          wrongAudioRef.current
+            .play()
+            .catch((err) => console.error("Error playing sound:", err));
         }
       } catch (error) {
-        console.error("Error playing wrong sound:", error)
+        console.error("Error playing wrong sound:", error);
       }
     }
 
@@ -584,9 +643,9 @@ export function EnhancedTriviaGame({
         timeSpent: 30 - timeLeft,
         difficulty: currentQuestion.difficulty,
         requestId,
-      })
+      });
     } catch (error) {
-      console.error("Error tracking answer:", error)
+      console.error("Error tracking answer:", error);
     }
 
     // If this is the last question, end the game
@@ -607,154 +666,159 @@ export function EnhancedTriviaGame({
               timeSpent: questions.length * 30 - timeLeft,
               requestId,
             }),
-          })
+          });
 
-          const result = await response.json()
+          const result = await response.json();
 
           if (result.success) {
-            setPointsAwarded(result.pointsAwarded || score * pointsPerQuestion + pointsPerGame)
+            setPointsAwarded(
+              result.pointsAwarded || score * pointsPerQuestion + pointsPerGame,
+            );
 
             // If a badge was awarded, show the badge dialog
             if (result.badgeAwarded) {
-              setEarnedBadge(result.badgeAwarded)
+              setEarnedBadge(result.badgeAwarded);
               setTimeout(() => {
-                setShowBadgeDialog(true)
-              }, 2000) // Show after feedback disappears
+                setShowBadgeDialog(true);
+              }, 2000); // Show after feedback disappears
             } else {
               setTimeout(() => {
-                setIsGameOver(true)
-              }, 2000) // Show after feedback disappears
+                setIsGameOver(true);
+              }, 2000); // Show after feedback disappears
             }
           } else {
             setTimeout(() => {
-              setIsGameOver(true)
-            }, 2000)
+              setIsGameOver(true);
+            }, 2000);
           }
         } catch (error) {
-          console.error(`Error submitting ${gameId} trivia results:`, error)
+          console.error(`Error submitting ${gameId} trivia results:`, error);
           setTimeout(() => {
-            setIsGameOver(true)
-          }, 2000) // Show after feedback disappears
+            setIsGameOver(true);
+          }, 2000); // Show after feedback disappears
         }
       } else {
         setTimeout(() => {
-          setIsGameOver(true)
-        }, 2000) // Show after feedback disappears
+          setIsGameOver(true);
+        }, 2000); // Show after feedback disappears
       }
     }
-  }
+  };
 
   const handleNextQuestion = () => {
-    setSelectedAnswer(null)
-    setIsAnswerSubmitted(false)
-    setCurrentQuestionIndex((prev) => prev + 1)
-    setTimeLeft(30) // Reset timer for next question
-    setIsTimerRunning(true)
-  }
+    setSelectedAnswer(null);
+    setIsAnswerSubmitted(false);
+    setCurrentQuestionIndex((prev) => prev + 1);
+    setTimeLeft(30); // Reset timer for next question
+    setIsTimerRunning(true);
+  };
 
   const handleRestartGame = () => {
-    setQuestions([])
-    setCurrentQuestionIndex(0)
-    setSelectedAnswer(null)
-    setIsAnswerSubmitted(false)
-    setIsGameOver(false)
-    setScore(0)
-    setCorrectAnswers(0)
-    setTimeLeft(30)
-    setHasSharedMidGame(false)
-    setImageLoadError({})
-    imageRetries.current = {}
-    sharePromptShown.current = false
-    fetchQuestions()
-  }
+    setQuestions([]);
+    setCurrentQuestionIndex(0);
+    setSelectedAnswer(null);
+    setIsAnswerSubmitted(false);
+    setIsGameOver(false);
+    setScore(0);
+    setCorrectAnswers(0);
+    setTimeLeft(30);
+    setHasSharedMidGame(false);
+    setImageLoadError({});
+    imageRetries.current = {};
+    sharePromptShown.current = false;
+    fetchQuestions();
+  };
 
   const handleShareBadge = () => {
-    setShowBadgeDialog(false)
-    setShowShareDialog(true)
-  }
+    setShowBadgeDialog(false);
+    setShowShareDialog(true);
+  };
 
   const handleShare = async (platform: string) => {
-    const isMidGameShare = showMidGameShareDialog
+    const isMidGameShare = showMidGameShareDialog;
     const shareText = isMidGameShare
       ? `I'm playing the ${gameName} with Sgt. Ken! Test your knowledge of SF and see if you can beat my score!`
       : earnedBadge
         ? `I just earned the ${getBadgeName(earnedBadge?.badge_type || "")} badge playing the ${gameName}! Test your knowledge too!`
-        : `I scored ${score}/${questions.length} on the ${gameName}! Think you can beat me?`
+        : `I scored ${score}/${questions.length} on the ${gameName}! Think you can beat me?`;
 
-    const shareUrl = `${window.location.origin}/trivia/${gameId}`
-    let shareLink = ""
+    const shareUrl = `${window.location.origin}/trivia/${gameId}`;
+    let shareLink = "";
 
     switch (platform) {
       case "twitter":
-        shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`
-        break
+        shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+        break;
       case "facebook":
-        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`
-        break
+        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+        break;
       case "linkedin":
-        shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`
-        break
+        shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent(shareText)}`;
+        break;
       default:
         // Copy to clipboard
         try {
-          navigator.clipboard.writeText(`${shareText} ${shareUrl}`)
+          navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
           toast({
             title: "Link copied!",
             description: "Share link copied to clipboard",
-          })
+          });
         } catch (error) {
-          console.error("Error copying to clipboard:", error)
+          console.error("Error copying to clipboard:", error);
           toast({
             title: "Couldn't copy link",
             description: "Please try another sharing method",
             variant: "destructive",
-          })
+          });
         }
 
         if (isMidGameShare) {
-          setShowMidGameShareDialog(false)
-          setIsTimerRunning(true)
-          setHasSharedMidGame(true)
+          setShowMidGameShareDialog(false);
+          setIsTimerRunning(true);
+          setHasSharedMidGame(true);
         } else {
-          setShowShareDialog(false)
+          setShowShareDialog(false);
         }
 
         // Record the share and award points
         if (isLoggedIn && currentUser) {
-          recordShare("clipboard", isMidGameShare)
+          recordShare("clipboard", isMidGameShare);
         }
-        return
+        return;
     }
 
     // Open share link in new window
     try {
-      window.open(shareLink, "_blank")
+      window.open(shareLink, "_blank");
     } catch (error) {
-      console.error("Error opening share link:", error)
+      console.error("Error opening share link:", error);
       toast({
         title: "Couldn't open sharing page",
         description: "Please try another sharing method",
         variant: "destructive",
-      })
+      });
     }
 
     if (isMidGameShare) {
-      setShowMidGameShareDialog(false)
-      setIsTimerRunning(true)
-      setHasSharedMidGame(true)
+      setShowMidGameShareDialog(false);
+      setIsTimerRunning(true);
+      setHasSharedMidGame(true);
     } else {
-      setShowShareDialog(false)
+      setShowShareDialog(false);
     }
 
     // Record the share and award points
     if (isLoggedIn && currentUser) {
-      recordShare(platform, isMidGameShare)
+      recordShare(platform, isMidGameShare);
     }
-  }
+  };
 
   const recordShare = async (platform: string, isMidGameShare: boolean) => {
     try {
-      const currentQuestion = isMidGameShare && questions[currentQuestionIndex] ? currentQuestionIndex : null
+      const currentQuestion =
+        isMidGameShare && questions[currentQuestionIndex]
+          ? currentQuestionIndex
+          : null;
 
       const response = await fetch(shareEndpoint, {
         method: "POST",
@@ -768,97 +832,97 @@ export function EnhancedTriviaGame({
           questionId: currentQuestion,
           requestId,
         }),
-      })
+      });
 
-      const result = await response.json()
+      const result = await response.json();
 
       if (result.success) {
         toast({
           title: "Points awarded!",
           description: `You earned ${pointsForSharing} points for sharing!`,
           duration: 3000,
-        })
+        });
       }
     } catch (error) {
-      console.error(`Error recording ${gameId} share:`, error)
+      console.error(`Error recording ${gameId} share:`, error);
     }
-  }
+  };
 
   const handleSkipShare = () => {
-    setShowMidGameShareDialog(false)
-    setIsTimerRunning(true)
-  }
+    setShowMidGameShareDialog(false);
+    setIsTimerRunning(true);
+  };
 
   const handleImageError = (index: number) => {
     // Track retry attempts for this image
-    const retries = imageRetries.current[index] || 0
+    const retries = imageRetries.current[index] || 0;
 
     // Only allow 2 retries before marking as error
     if (retries < 2) {
-      imageRetries.current[index] = retries + 1
+      imageRetries.current[index] = retries + 1;
 
       // Try to reload with a cache buster
-      const question = questions[index]
+      const question = questions[index];
       if (question && question.imageUrl) {
         try {
           // Add timestamp to bust cache
-          const cacheBuster = new Date().getTime()
-          let newUrl = question.imageUrl
+          const cacheBuster = new Date().getTime();
+          let newUrl = question.imageUrl;
 
           // If it's a placeholder.svg URL, regenerate it
           if (question.imageUrl.includes("placeholder.svg")) {
-            newUrl = `/placeholder.svg?height=300&width=500&query=${encodeURIComponent(question.question)}&_=${cacheBuster}`
+            newUrl = `/placeholder.svg?height=300&width=500&query=${encodeURIComponent(question.question)}&_=${cacheBuster}`;
           } else if (!question.imageUrl.includes("?")) {
-            newUrl = `${question.imageUrl}?_=${cacheBuster}`
+            newUrl = `${question.imageUrl}?_=${cacheBuster}`;
           } else {
-            newUrl = `${question.imageUrl}&_=${cacheBuster}`
+            newUrl = `${question.imageUrl}&_=${cacheBuster}`;
           }
 
           // Update the image URL
-          const updatedQuestions = [...questions]
+          const updatedQuestions = [...questions];
           updatedQuestions[index] = {
             ...question,
             imageUrl: newUrl,
-          }
-          setQuestions(updatedQuestions)
+          };
+          setQuestions(updatedQuestions);
 
           // Don't mark as error yet
-          return
+          return;
         } catch (error) {
-          console.error("Error updating image URL:", error)
+          console.error("Error updating image URL:", error);
         }
       }
     }
 
     // If we've exceeded retries or couldn't reload, mark as error
-    setImageLoadError((prev) => ({ ...prev, [index]: true }))
-  }
+    setImageLoadError((prev) => ({ ...prev, [index]: true }));
+  };
 
   const getBadgeName = (badgeType: string): string => {
     switch (badgeType) {
       case badgeTypes.participant:
-        return `${gameName} Participant`
+        return `${gameName} Participant`;
       case badgeTypes.enthusiast:
-        return `${gameName} Enthusiast`
+        return `${gameName} Enthusiast`;
       case badgeTypes.master:
-        return `${gameName} Master`
+        return `${gameName} Master`;
       default:
-        return `SF Trivia Badge`
+        return `SF Trivia Badge`;
     }
-  }
+  };
 
   const getBadgeDescription = (badgeType: string): string => {
     switch (badgeType) {
       case badgeTypes.participant:
-        return `Awarded for participating in your first ${gameName} round.`
+        return `Awarded for participating in your first ${gameName} round.`;
       case badgeTypes.enthusiast:
-        return `Awarded for completing 5 rounds of the ${gameName}.`
+        return `Awarded for completing 5 rounds of the ${gameName}.`;
       case badgeTypes.master:
-        return `Awarded for achieving 3 perfect scores in the ${gameName}.`
+        return `Awarded for achieving 3 perfect scores in the ${gameName}.`;
       default:
-        return `A special badge earned through the ${gameName}.`
+        return `A special badge earned through the ${gameName}.`;
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -867,7 +931,8 @@ export function EnhancedTriviaGame({
           <Skeleton className="h-8 w-3/4 mb-4" />
           <Skeleton className="h-4 w-full mb-2" />
           <Skeleton className="h-4 w-full mb-6" />
-          <Skeleton className="h-48 w-full mb-6 rounded-lg" /> {/* Image placeholder */}
+          <Skeleton className="h-48 w-full mb-6 rounded-lg" />{" "}
+          {/* Image placeholder */}
           <div className="space-y-4">
             {[1, 2, 3, 4].map((i) => (
               <Skeleton key={i} className="h-12 w-full" />
@@ -879,7 +944,7 @@ export function EnhancedTriviaGame({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (isGameOver) {
@@ -911,7 +976,10 @@ export function EnhancedTriviaGame({
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Button onClick={handleRestartGame} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+            <Button
+              onClick={handleRestartGame}
+              className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            >
               <RefreshCw className="h-4 w-4 mr-2" />
               Play Again
             </Button>
@@ -938,7 +1006,7 @@ export function EnhancedTriviaGame({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   // Make sure we have questions and a valid currentQuestion before rendering
@@ -961,11 +1029,17 @@ export function EnhancedTriviaGame({
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md text-red-800">
               <WifiOff className="h-5 w-5 inline-block mr-2" />
               <p className="font-medium">Network connection issue detected</p>
-              <p className="text-sm mt-1">Please check your internet connection and try again.</p>
+              <p className="text-sm mt-1">
+                Please check your internet connection and try again.
+              </p>
             </div>
           )}
 
-          <Button onClick={fetchQuestions} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
+          <Button
+            onClick={fetchQuestions}
+            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            disabled={isLoading}
+          >
             {isLoading ? (
               <>
                 <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -982,21 +1056,30 @@ export function EnhancedTriviaGame({
           {retryCount > 2 && (
             <div className="mt-4 text-sm text-gray-600">
               <Info className="h-4 w-4 inline-block mr-1" />
-              Still having trouble? Try refreshing the page or coming back later.
+              Still having trouble? Try refreshing the page or coming back
+              later.
             </div>
           )}
         </CardContent>
       </Card>
-    )
+    );
   }
 
-  const currentQuestion = questions[currentQuestionIndex]
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <>
       {/* Hidden audio elements for sounds */}
-      <audio ref={correctAudioRef} src="/sounds/correct-answer.mp3" preload="auto" />
-      <audio ref={wrongAudioRef} src="/sounds/wrong-answer.mp3" preload="auto" />
+      <audio
+        ref={correctAudioRef}
+        src="/sounds/correct-answer.mp3"
+        preload="auto"
+      />
+      <audio
+        ref={wrongAudioRef}
+        src="/sounds/wrong-answer.mp3"
+        preload="auto"
+      />
 
       <Card className="shadow-md">
         <CardContent className="p-6">
@@ -1010,7 +1093,10 @@ export function EnhancedTriviaGame({
                 Score: {score}/{currentQuestionIndex}
               </span>
             </div>
-            <Progress value={(currentQuestionIndex / questions.length) * 100} className="h-2" />
+            <Progress
+              value={(currentQuestionIndex / questions.length) * 100}
+              className="h-2"
+            />
           </div>
 
           {/* Timer */}
@@ -1018,7 +1104,9 @@ export function EnhancedTriviaGame({
             <Badge variant="outline" className="px-3 py-1">
               {currentQuestion.difficulty.toUpperCase()}
             </Badge>
-            <div className={`flex items-center gap-1 ${timeLeft <= 10 ? "text-red-500" : "text-gray-600"}`}>
+            <div
+              className={`flex items-center gap-1 ${timeLeft <= 10 ? "text-red-500" : "text-gray-600"}`}
+            >
               <Clock className="h-4 w-4" />
               <span className="font-mono">{timeLeft}s</span>
             </div>
@@ -1029,7 +1117,9 @@ export function EnhancedTriviaGame({
             <button
               onClick={toggleMute}
               className="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-              aria-label={isMuted ? "Unmute sound effects" : "Mute sound effects"}
+              aria-label={
+                isMuted ? "Unmute sound effects" : "Mute sound effects"
+              }
             >
               {isMuted ? (
                 <VolumeX className="h-5 w-5 text-gray-500" />
@@ -1044,7 +1134,9 @@ export function EnhancedTriviaGame({
               max="1"
               step="0.01"
               value={volume}
-              onChange={(e) => handleVolumeChange(Number.parseFloat(e.target.value))}
+              onChange={(e) =>
+                handleVolumeChange(Number.parseFloat(e.target.value))
+              }
               className="w-24 h-2 bg-gray-300 dark:bg-gray-600 rounded-lg appearance-none cursor-pointer"
               aria-label="Volume control"
               aria-valuemin={0}
@@ -1064,7 +1156,10 @@ export function EnhancedTriviaGame({
             {!imageLoadError[currentQuestionIndex] ? (
               <Image
                 src={currentQuestion.imageUrl || "/placeholder.svg"}
-                alt={currentQuestion.imageAlt || `Image for question about ${currentQuestion.category}`}
+                alt={
+                  currentQuestion.imageAlt ||
+                  `Image for question about ${currentQuestion.category}`
+                }
                 fill
                 className="object-cover"
                 onError={() => handleImageError(currentQuestionIndex)}
@@ -1077,7 +1172,9 @@ export function EnhancedTriviaGame({
                 <div className="text-center">
                   <ImageIcon className="h-12 w-12 mx-auto text-gray-400" />
                   <p className="text-sm text-gray-500 mt-2">
-                    {currentQuestion.category ? `Image related to ${currentQuestion.category}` : "Image unavailable"}
+                    {currentQuestion.category
+                      ? `Image related to ${currentQuestion.category}`
+                      : "Image unavailable"}
                   </p>
                 </div>
               </div>
@@ -1113,7 +1210,9 @@ export function EnhancedTriviaGame({
           </div>
 
           {/* Question */}
-          <h3 className="text-xl font-semibold mb-6">{currentQuestion.question}</h3>
+          <h3 className="text-xl font-semibold mb-6">
+            {currentQuestion.question}
+          </h3>
 
           {/* Answer options */}
           <div className="space-y-3">
@@ -1129,7 +1228,8 @@ export function EnhancedTriviaGame({
                         ? "bg-green-100 border-green-500 dark:bg-green-900/30 dark:border-green-500"
                         : "bg-red-100 border-red-500 dark:bg-red-900/30 dark:border-red-500"
                       : "bg-[#0A3C1F]/10 border-[#0A3C1F] dark:bg-[#0A3C1F]/30"
-                    : isAnswerSubmitted && index === currentQuestion.correctAnswer
+                    : isAnswerSubmitted &&
+                        index === currentQuestion.correctAnswer
                       ? "bg-green-100 border-green-500 dark:bg-green-900/30 dark:border-green-500"
                       : "hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
                 }`}
@@ -1170,8 +1270,12 @@ export function EnhancedTriviaGame({
                 <div className="flex items-start">
                   <AlertCircle className="h-5 w-5 text-blue-500 mr-2 mt-0.5" />
                   <div>
-                    <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-1">Explanation</h4>
-                    <p className="text-sm text-blue-600 dark:text-blue-200">{currentQuestion.explanation}</p>
+                    <h4 className="font-semibold text-blue-700 dark:text-blue-300 mb-1">
+                      Explanation
+                    </h4>
+                    <p className="text-sm text-blue-600 dark:text-blue-200">
+                      {currentQuestion.explanation}
+                    </p>
                   </div>
                 </div>
               </motion.div>
@@ -1182,19 +1286,28 @@ export function EnhancedTriviaGame({
           <div className="flex justify-between mt-6">
             {!isAnswerSubmitted ? (
               <Button
-                onClick={handleAnswerSubmit}
+                onClick={handleSubmitClick}
                 disabled={selectedAnswer === null}
                 className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
               >
                 Submit Answer
               </Button>
             ) : (
-              <Button onClick={handleNextQuestion} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-                {currentQuestionIndex === questions.length - 1 ? "See Results" : "Next Question"}
+              <Button
+                onClick={handleNextQuestion}
+                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+              >
+                {currentQuestionIndex === questions.length - 1
+                  ? "See Results"
+                  : "Next Question"}
               </Button>
             )}
 
-            <Button variant="outline" onClick={handleRestartGame} className="border-[#0A3C1F] text-[#0A3C1F]">
+            <Button
+              variant="outline"
+              onClick={handleRestartGame}
+              className="border-[#0A3C1F] text-[#0A3C1F]"
+            >
               <RefreshCw className="h-4 w-4 mr-2" />
               Restart
             </Button>
@@ -1205,18 +1318,26 @@ export function EnhancedTriviaGame({
             <div className="mt-4 text-xs text-gray-400 flex items-center">
               <Info className="h-3 w-3 mr-1" />
               Source: {questionSource}
-              {requestId && <span className="ml-1">| ID: {requestId.substring(0, 8)}</span>}
+              {requestId && (
+                <span className="ml-1">| ID: {requestId.substring(0, 8)}</span>
+              )}
             </div>
           )}
         </CardContent>
       </Card>
 
       {/* Mid-Game Share Dialog */}
-      <Dialog open={showMidGameShareDialog} onOpenChange={setShowMidGameShareDialog}>
+      <Dialog
+        open={showMidGameShareDialog}
+        onOpenChange={setShowMidGameShareDialog}
+      >
         <DialogContent className="sm:max-w-md">
-          <DialogTitle className="text-center">Share and Earn Points!</DialogTitle>
+          <DialogTitle className="text-center">
+            Share and Earn Points!
+          </DialogTitle>
           <DialogDescription className="text-center">
-            Share this trivia game with friends and earn {pointsForSharing} bonus points!
+            Share this trivia game with friends and earn {pointsForSharing}{" "}
+            bonus points!
           </DialogDescription>
 
           <div className="py-4 flex flex-col items-center">
@@ -1224,23 +1345,37 @@ export function EnhancedTriviaGame({
               <Share2 className="h-12 w-12 text-[#0A3C1F]" />
             </div>
             <p className="text-center mb-4">
-              Help us recruit more deputies by sharing this trivia game on social media!
+              Help us recruit more deputies by sharing this trivia game on
+              social media!
             </p>
 
             <div className="grid grid-cols-2 gap-4 w-full">
-              <Button className="bg-[#1877F2] hover:bg-[#1877F2]/90" onClick={() => handleShare("facebook")}>
+              <Button
+                className="bg-[#1877F2] hover:bg-[#1877F2]/90"
+                onClick={() => handleShare("facebook")}
+              >
                 <Facebook className="h-4 w-4 mr-2" />
                 Facebook
               </Button>
-              <Button className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90" onClick={() => handleShare("twitter")}>
+              <Button
+                className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90"
+                onClick={() => handleShare("twitter")}
+              >
                 <Twitter className="h-4 w-4 mr-2" />
                 Twitter
               </Button>
-              <Button className="bg-[#0A66C2] hover:bg-[#0A66C2]/90" onClick={() => handleShare("linkedin")}>
+              <Button
+                className="bg-[#0A66C2] hover:bg-[#0A66C2]/90"
+                onClick={() => handleShare("linkedin")}
+              >
                 <Linkedin className="h-4 w-4 mr-2" />
                 LinkedIn
               </Button>
-              <Button variant="outline" onClick={() => handleShare("copy")} className="border-[#0A3C1F] text-[#0A3C1F]">
+              <Button
+                variant="outline"
+                onClick={() => handleShare("copy")}
+                className="border-[#0A3C1F] text-[#0A3C1F]"
+              >
                 <Mail className="h-4 w-4 mr-2" />
                 Copy Link
               </Button>
@@ -1248,7 +1383,11 @@ export function EnhancedTriviaGame({
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={handleSkipShare} className="w-full">
+            <Button
+              variant="outline"
+              onClick={handleSkipShare}
+              className="w-full"
+            >
               Skip for now
             </Button>
           </DialogFooter>
@@ -1263,8 +1402,12 @@ export function EnhancedTriviaGame({
             <div className="w-32 h-32 rounded-full bg-[#FFD700]/20 flex items-center justify-center mb-4">
               <Award className="h-16 w-16 text-[#FFD700]" />
             </div>
-            <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">{getBadgeName(earnedBadge?.badge_type || "")}</h3>
-            <p className="text-center text-gray-600">{getBadgeDescription(earnedBadge?.badge_type || "")}</p>
+            <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
+              {getBadgeName(earnedBadge?.badge_type || "")}
+            </h3>
+            <p className="text-center text-gray-600">
+              {getBadgeDescription(earnedBadge?.badge_type || "")}
+            </p>
           </div>
           <DialogFooter>
             <Button onClick={handleShareBadge} className="w-full bg-[#0A3C1F]">
@@ -1286,19 +1429,32 @@ export function EnhancedTriviaGame({
           </DialogDescription>
 
           <div className="grid grid-cols-2 gap-4 my-4">
-            <Button className="bg-[#1877F2] hover:bg-[#1877F2]/90" onClick={() => handleShare("facebook")}>
+            <Button
+              className="bg-[#1877F2] hover:bg-[#1877F2]/90"
+              onClick={() => handleShare("facebook")}
+            >
               <Facebook className="h-4 w-4 mr-2" />
               Facebook
             </Button>
-            <Button className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90" onClick={() => handleShare("twitter")}>
+            <Button
+              className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90"
+              onClick={() => handleShare("twitter")}
+            >
               <Twitter className="h-4 w-4 mr-2" />
               Twitter
             </Button>
-            <Button className="bg-[#0A66C2] hover:bg-[#0A66C2]/90" onClick={() => handleShare("linkedin")}>
+            <Button
+              className="bg-[#0A66C2] hover:bg-[#0A66C2]/90"
+              onClick={() => handleShare("linkedin")}
+            >
               <Linkedin className="h-4 w-4 mr-2" />
               LinkedIn
             </Button>
-            <Button variant="outline" onClick={() => handleShare("copy")} className="border-[#0A3C1F] text-[#0A3C1F]">
+            <Button
+              variant="outline"
+              onClick={() => handleShare("copy")}
+              className="border-[#0A3C1F] text-[#0A3C1F]"
+            >
               <Mail className="h-4 w-4 mr-2" />
               Copy Link
             </Button>
@@ -1319,5 +1475,5 @@ export function EnhancedTriviaGame({
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

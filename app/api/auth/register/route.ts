@@ -1,29 +1,37 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
-    const { name, email, password } = await request.json()
+    const { name, email, password } = await request.json();
 
     // Validate inputs
     if (!name || !email || !password) {
-      return NextResponse.json({ message: "Missing required fields" }, { status: 400 })
+      return NextResponse.json(
+        { message: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
     // Check if user already exists
-    const supabase = getServiceSupabase()
-    const { data: existingUser } = await supabase.from("user_types").select("user_id, user_type")
+    const supabase = getServiceSupabase();
+    const { data: existingUser } = await supabase
+      .from("user_types")
+      .select("user_id, user_type")
       .eq("email", email)
-      .maybeSingle()
+      .maybeSingle();
 
     if (existingUser) {
       return NextResponse.json(
-        { message: "An account with this email already exists. Please sign in instead." },
+        {
+          message:
+            "An account with this email already exists. Please sign in instead.",
+        },
         { status: 400 },
-      )
+      );
     }
 
     // Create the user in Auth
@@ -34,15 +42,18 @@ export async function POST(request: Request) {
       user_metadata: {
         name,
       },
-    })
+    });
 
     if (error) {
-      console.error("Error creating user:", error)
-      return NextResponse.json({ message: error.message }, { status: 500 })
+      console.error("Error creating user:", error);
+      return NextResponse.json({ message: error.message }, { status: 500 });
     }
 
     if (!data.user) {
-      return NextResponse.json({ message: "Failed to create user" }, { status: 500 })
+      return NextResponse.json(
+        { message: "Failed to create user" },
+        { status: 500 },
+      );
     }
 
     // Create the user profile in the database
@@ -53,11 +64,14 @@ export async function POST(request: Request) {
       points: 50, // Initial points
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-    })
+    });
 
     if (insertError) {
-      console.error("Error creating user profile:", insertError)
-      return NextResponse.json({ message: "User created but profile setup failed" }, { status: 500 })
+      console.error("Error creating user profile:", insertError);
+      return NextResponse.json(
+        { message: "User created but profile setup failed" },
+        { status: 500 },
+      );
     }
 
     // Set user type
@@ -65,11 +79,14 @@ export async function POST(request: Request) {
       user_id: data.user.id,
       user_type: "recruit",
       email: data.user.email,
-    })
+    });
 
     if (typeError) {
-      console.error("Error setting user type:", typeError)
-      return NextResponse.json({ message: "User created but type setup failed" }, { status: 500 })
+      console.error("Error setting user type:", typeError);
+      return NextResponse.json(
+        { message: "User created but type setup failed" },
+        { status: 500 },
+      );
     }
 
     // Log the initial points
@@ -81,9 +98,9 @@ export async function POST(request: Request) {
           action: "Initial signup bonus",
           created_at: new Date().toISOString(),
         },
-      ])
+      ]);
     } catch (logError) {
-      console.error("Error logging initial points:", logError)
+      console.error("Error logging initial points:", logError);
     }
 
     return NextResponse.json({
@@ -93,12 +110,17 @@ export async function POST(request: Request) {
       userType: "recruit",
       email: data.user.email,
       name: name,
-    })
+    });
   } catch (error) {
-    console.error("Registration error:", error)
+    console.error("Registration error:", error);
     return NextResponse.json(
-      { message: error instanceof Error ? error.message : "An unexpected error occurred" },
+      {
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      },
       { status: 500 },
-    )
+    );
   }
 }

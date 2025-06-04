@@ -1,20 +1,25 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { motion } from "framer-motion"
-import { X } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { createClient } from "@supabase/supabase-js"
-import { useUserContext } from "@/context/user-context"
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { X } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { createClient } from "@supabase/supabase-js";
+import { useUserContext } from "@/context/user-context";
+import Image from "next/image";
+import type { Notification } from "@/lib/notification-service";
 
 export function NotificationToastListener() {
-  const { toast } = useToast()
-  const { user } = useUserContext()
+  const { toast } = useToast();
+  const { currentUser } = useUserContext();
 
   useEffect(() => {
-    if (!user?.id) return
+    if (!currentUser?.id) return;
 
-    const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    );
 
     // Subscribe to notifications table changes
     const subscription = supabase
@@ -25,10 +30,10 @@ export function NotificationToastListener() {
           event: "INSERT",
           schema: "public",
           table: "notifications",
-          filter: `user_id=eq.${user.id}`,
+          filter: `user_id=eq.${currentUser.id}`,
         },
         (payload) => {
-          const notification = payload.new as any
+          const notification = payload.new as Notification;
 
           // Show toast notification
           toast({
@@ -43,17 +48,17 @@ export function NotificationToastListener() {
                 View
               </a>
             ) : undefined,
-          })
+          });
         },
       )
-      .subscribe()
+      .subscribe();
 
     return () => {
-      supabase.removeChannel(subscription)
-    }
-  }, [user?.id, toast])
+      supabase.removeChannel(subscription);
+    };
+  }, [currentUser?.id, toast]);
 
-  return null
+  return null;
 }
 
 export function NotificationToast({
@@ -64,23 +69,23 @@ export function NotificationToast({
   actionUrl,
   actionLabel = "View",
 }: {
-  title: string
-  message: string
-  type?: "default" | "badge" | "donation"
-  onClose: () => void
-  actionUrl?: string
-  actionLabel?: string
+  title: string;
+  message: string;
+  type?: "default" | "badge" | "donation";
+  onClose: () => void;
+  actionUrl?: string;
+  actionLabel?: string;
 }) {
   const getIconForType = (type: string) => {
     switch (type) {
       case "badge":
-        return "/generic-badge.png"
+        return "/generic-badge.png";
       case "donation":
-        return "/donation-icon.png"
+        return "/donation-icon.png";
       default:
-        return "/notification-icon.png"
+        return "/notification-icon.png";
     }
-  }
+  };
 
   return (
     <motion.div
@@ -91,11 +96,19 @@ export function NotificationToast({
     >
       <div className="flex items-start">
         <div className="flex-shrink-0 mr-3">
-          <img src={getIconForType(type) || "/placeholder.svg"} alt="" className="w-10 h-10 rounded-full" />
+          <Image
+            src={getIconForType(type) || "/placeholder.svg"}
+            alt=""
+            width={40}
+            height={40}
+            className="w-10 h-10 rounded-full"
+          />
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start">
-            <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">{title}</h4>
+            <h4 className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              {title}
+            </h4>
             <button
               type="button"
               className="ml-4 inline-flex text-gray-400 hover:text-gray-500 focus:outline-none"
@@ -105,7 +118,9 @@ export function NotificationToast({
               <X className="h-4 w-4" />
             </button>
           </div>
-          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">{message}</p>
+          <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+            {message}
+          </p>
           {actionUrl && (
             <div className="mt-3">
               <a
@@ -119,5 +134,5 @@ export function NotificationToast({
         </div>
       </div>
     </motion.div>
-  )
+  );
 }

@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
+import { useEffect } from "react";
 
 export function MermaidInitializer() {
   useEffect(() => {
@@ -19,15 +19,15 @@ export function MermaidInitializer() {
           fill: "white",
           fontSize: 12,
         },
-      })
+      });
 
       try {
-        mermaid.default.init(".mermaid")
+        mermaid.default.init(".mermaid");
       } catch (error) {
-        console.error("Error initializing mermaid:", error)
+        console.error("Error initializing mermaid:", error);
       }
-    })
-  }, [])
+    });
+  }, []);
 
-  return null
+  return null;
 }

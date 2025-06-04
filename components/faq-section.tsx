@@ -1,24 +1,26 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ChevronDown, ChevronUp } from "lucide-react"
+import { useState } from "react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 type FAQItem = {
-  question: string
-  answer: string
-}
+  question: string;
+  answer: string;
+};
 
 export function FAQSection() {
-  const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const faqs: FAQItem[] = [
     {
-      question: "What are the basic requirements to become a San Francisco Deputy Sheriff?",
+      question:
+        "What are the basic requirements to become a San Francisco Deputy Sheriff?",
       answer:
         "To become a San Francisco Deputy Sheriff, you must be at least 21 years old, have a high school diploma or GED, be a U.S. citizen or permanent resident who has applied for citizenship, have a valid driver's license, and have no felony convictions. You must also pass a background check, medical examination, psychological evaluation, and physical abilities test.",
     },
     {
-      question: "What is the starting salary for a San Francisco Deputy Sheriff?",
+      question:
+        "What is the starting salary for a San Francisco Deputy Sheriff?",
       answer:
         "The starting salary range for a San Francisco Deputy Sheriff is $116,428 to $184,362, depending on experience and qualifications. This is complemented by excellent benefits including healthcare, retirement plans, and various allowances.",
     },
@@ -47,20 +49,23 @@ export function FAQSection() {
       answer:
         "While deputies are not required to live within San Francisco city limits, there are benefits to living locally, including housing assistance programs. Deputies should consider reasonable commute times as emergency call-backs may occur, and you need to be able to respond within a reasonable timeframe.",
     },
-  ]
+  ];
 
   const toggleFAQ = (index: number) => {
-    setOpenIndex(openIndex === index ? null : index)
-  }
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
     <section className="w-full py-8 sm:py-12 md:py-20 bg-[#0A3C1F] text-white">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-[#F8F5EE] text-center sm:text-left">Frequently Asked Questions</h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-[#F8F5EE] text-center sm:text-left">
+            Frequently Asked Questions
+          </h2>
           <div className="text-center sm:text-left mb-8 sm:mb-12">
             <p className="text-sm sm:text-base text-[#F8F5EE]/80 max-w-3xl mx-auto">
-              Find answers to common questions about becoming a San Francisco Deputy Sheriff.
+              Find answers to common questions about becoming a San Francisco
+              Deputy Sheriff.
             </p>
           </div>
 
@@ -73,7 +78,9 @@ export function FAQSection() {
                   aria-expanded={openIndex === index}
                   aria-controls={`faq-answer-${index}`}
                 >
-                  <h3 className="text-base sm:text-lg font-medium text-[#FFD700] pr-4 group-hover:text-[#FFD700]/80 transition-colors">{faq.question}</h3>
+                  <h3 className="text-base sm:text-lg font-medium text-[#FFD700] pr-4 group-hover:text-[#FFD700]/80 transition-colors">
+                    {faq.question}
+                  </h3>
                   <span className="ml-4 flex-shrink-0 transition-transform duration-200">
                     {openIndex === index ? (
                       <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-[#FFD700]" />
@@ -86,7 +93,9 @@ export function FAQSection() {
                   id={`faq-answer-${index}`}
                   className={`mt-2 transition-all duration-300 overflow-hidden ${openIndex === index ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}
                 >
-                  <p className="text-sm sm:text-base text-white/80 pr-8">{faq.answer}</p>
+                  <p className="text-sm sm:text-base text-white/80 pr-8">
+                    {faq.answer}
+                  </p>
                 </div>
               </div>
             ))}
@@ -94,5 +103,5 @@ export function FAQSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

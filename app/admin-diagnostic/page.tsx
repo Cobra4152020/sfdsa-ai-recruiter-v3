@@ -1,54 +1,90 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle, XCircle } from "lucide-react"
-import { getClientSideSupabase } from "@/lib/supabase"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle, XCircle } from "lucide-react";
+import { getClientSideSupabase } from "@/lib/supabase";
+
+interface AuthUserStatus {
+  exists: boolean;
+  message: string;
+}
+
+interface UserTypeStatus {
+  exists: boolean;
+  message?: string;
+  data?: { user_type: string; user_id: string };
+}
+
+interface AdminUserStatus {
+  exists: boolean;
+  message?: string;
+  data?: { id: string; email: string };
+}
+
+interface UserRoleStatus {
+  exists: boolean;
+  message?: string;
+  data?: { user_id: string; role: string };
+}
 
 export default function AdminDiagnosticPage() {
-  const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [authUser, setAuthUser] = useState<any>(null)
-  const [userType, setUserType] = useState<any>(null)
-  const [adminUser, setAdminUser] = useState<any>(null)
-  const [userRole, setUserRole] = useState<any>(null)
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [authUser, setAuthUser] = useState<AuthUserStatus | null>(null);
+  const [userType, setUserType] = useState<UserTypeStatus | null>(null);
+  const [adminUser, setAdminUser] = useState<AdminUserStatus | null>(null);
+  const [userRole, setUserRole] = useState<UserRoleStatus | null>(null);
 
   const runDiagnostic = async () => {
-    const supabase = getClientSideSupabase()
+    const supabase = getClientSideSupabase();
     if (!email) {
-      setError("Email is required")
-      return
+      setError("Email is required");
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
-    setAuthUser(null)
-    setUserType(null)
-    setAdminUser(null)
-    setUserRole(null)
+    setIsLoading(true);
+    setError(null);
+    setAuthUser(null);
+    setUserType(null);
+    setAdminUser(null);
+    setUserRole(null);
 
     try {
       // Check auth user
-      const { data: authData, error: authError } = await supabase.auth.signInWithOtp({
+      const { error: authError } = await supabase.auth.signInWithOtp({
         email,
         options: {
           shouldCreateUser: false,
         },
-      })
+      });
 
       if (authError) {
         if (authError.message.includes("User not found")) {
-          setAuthUser({ exists: false, message: "User does not exist in Auth" })
+          setAuthUser({
+            exists: false,
+            message: "User does not exist in Auth",
+          });
         } else {
-          setAuthUser({ exists: false, message: authError.message })
+          setAuthUser({ exists: false, message: authError.message });
         }
       } else {
-        setAuthUser({ exists: true, message: "Magic link sent. User exists in Auth." })
+        setAuthUser({
+          exists: true,
+          message: "Magic link sent. User exists in Auth.",
+        });
       }
 
       // Check user_types
@@ -56,14 +92,14 @@ export default function AdminDiagnosticPage() {
         .from("user_types")
         .select("*")
         .eq("email", email)
-        .maybeSingle()
+        .maybeSingle();
 
       if (typeError) {
-        setUserType({ exists: false, message: typeError.message })
+        setUserType({ exists: false, message: typeError.message });
       } else if (!typeData) {
-        setUserType({ exists: false, message: "No entry in user_types table" })
+        setUserType({ exists: false, message: "No entry in user_types table" });
       } else {
-        setUserType({ exists: true, data: typeData })
+        setUserType({ exists: true, data: typeData });
 
         // If we have a user_id, check admin.users
         if (typeData.user_id) {
@@ -71,18 +107,24 @@ export default function AdminDiagnosticPage() {
             .from("admin.users")
             .select("*")
             .eq("id", typeData.user_id)
-            .maybeSingle()
+            .maybeSingle();
 
           if (adminError) {
             if (adminError.message.includes("does not exist")) {
-              setAdminUser({ exists: false, message: "admin.users table does not exist" })
+              setAdminUser({
+                exists: false,
+                message: "admin.users table does not exist",
+              });
             } else {
-              setAdminUser({ exists: false, message: adminError.message })
+              setAdminUser({ exists: false, message: adminError.message });
             }
           } else if (!adminData) {
-            setAdminUser({ exists: false, message: "No entry in admin.users table" })
+            setAdminUser({
+              exists: false,
+              message: "No entry in admin.users table",
+            });
           } else {
-            setAdminUser({ exists: true, data: adminData })
+            setAdminUser({ exists: true, data: adminData });
           }
 
           // Check user_roles
@@ -91,36 +133,49 @@ export default function AdminDiagnosticPage() {
             .select("*")
             .eq("user_id", typeData.user_id)
             .eq("role", "admin")
-            .maybeSingle()
+            .maybeSingle();
 
           if (roleError) {
             if (roleError.message.includes("does not exist")) {
-              setUserRole({ exists: false, message: "user_roles table does not exist" })
+              setUserRole({
+                exists: false,
+                message: "user_roles table does not exist",
+              });
             } else {
-              setUserRole({ exists: false, message: roleError.message })
+              setUserRole({ exists: false, message: roleError.message });
             }
           } else if (!roleData) {
-            setUserRole({ exists: false, message: "No admin role entry in user_roles table" })
+            setUserRole({
+              exists: false,
+              message: "No admin role entry in user_roles table",
+            });
           } else {
-            setUserRole({ exists: true, data: roleData })
+            setUserRole({ exists: true, data: roleData });
           }
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred")
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-[#0A3C1F] mb-6 text-center">Admin Account Diagnostic</h1>
+      <h1 className="text-3xl font-bold text-[#0A3C1F] mb-6 text-center">
+        Admin Account Diagnostic
+      </h1>
 
       <Card className="max-w-md mx-auto mb-8">
         <CardHeader>
           <CardTitle>Check Admin Account Status</CardTitle>
-          <CardDescription>This tool will check the status of your admin account in the database</CardDescription>
+          <CardDescription>
+            This tool will check the status of your admin account in the
+            database
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error && (
@@ -144,7 +199,11 @@ export default function AdminDiagnosticPage() {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={runDiagnostic} className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
+          <Button
+            onClick={runDiagnostic}
+            className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            disabled={isLoading}
+          >
             {isLoading ? (
               <span className="flex items-center">
                 <span className="animate-spin mr-2">⟳</span>
@@ -188,9 +247,9 @@ export default function AdminDiagnosticPage() {
                   <h3 className="font-medium">User Type</h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  {userType.exists
-                    ? `Type: ${userType.data.user_type}, User ID: ${userType.data.user_id}`
-                    : userType.message}
+                  {userType.exists && userType.data
+                    ? `Type: ${userType.data?.user_type}, User ID: ${userType.data?.user_id}`
+                    : userType?.message}
                 </p>
               </div>
             )}
@@ -206,9 +265,9 @@ export default function AdminDiagnosticPage() {
                   <h3 className="font-medium">Admin User</h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  {adminUser.exists
-                    ? `Name: ${adminUser.data.name}, Email: ${adminUser.data.email}`
-                    : adminUser.message}
+                  {adminUser.exists && adminUser.data
+                    ? `ID: ${adminUser.data?.id}, Email: ${adminUser.data?.email}`
+                    : adminUser?.message}
                 </p>
               </div>
             )}
@@ -224,9 +283,9 @@ export default function AdminDiagnosticPage() {
                   <h3 className="font-medium">Admin Role</h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  {userRole.exists
-                    ? `Role: ${userRole.data.role}, Active: ${userRole.data.is_active ? "Yes" : "No"}`
-                    : userRole.message}
+                  {userRole.exists && userRole.data
+                    ? `Role: ${userRole.data?.role}`
+                    : userRole?.message}
                 </p>
               </div>
             )}
@@ -234,30 +293,45 @@ export default function AdminDiagnosticPage() {
             {authUser && userType && adminUser && userRole && (
               <Alert
                 className={
-                  authUser.exists && userType.exists && adminUser.exists && userRole.exists
+                  authUser.exists &&
+                  userType.exists &&
+                  adminUser.exists &&
+                  userRole.exists
                     ? "bg-green-50 border-green-200"
                     : "bg-amber-50 border-amber-200"
                 }
               >
                 <AlertTitle
                   className={
-                    authUser.exists && userType.exists && adminUser.exists && userRole.exists
+                    authUser.exists &&
+                    userType.exists &&
+                    adminUser.exists &&
+                    userRole.exists
                       ? "text-green-800"
                       : "text-amber-800"
                   }
                 >
-                  {authUser.exists && userType.exists && adminUser.exists && userRole.exists
+                  {authUser.exists &&
+                  userType.exists &&
+                  adminUser.exists &&
+                  userRole.exists
                     ? "All checks passed"
                     : "Some checks failed"}
                 </AlertTitle>
                 <AlertDescription
                   className={
-                    authUser.exists && userType.exists && adminUser.exists && userRole.exists
+                    authUser.exists &&
+                    userType.exists &&
+                    adminUser.exists &&
+                    userRole.exists
                       ? "text-green-700"
                       : "text-amber-700"
                   }
                 >
-                  {authUser.exists && userType.exists && adminUser.exists && userRole.exists
+                  {authUser.exists &&
+                  userType.exists &&
+                  adminUser.exists &&
+                  userRole.exists
                     ? "Your admin account appears to be properly set up. You should be able to log in."
                     : "Your admin account has issues. Use the Admin Recovery tool to fix them."}
                 </AlertDescription>
@@ -267,5 +341,5 @@ export default function AdminDiagnosticPage() {
         </Card>
       )}
     </div>
-  )
+  );
 }

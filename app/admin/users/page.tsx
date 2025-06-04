@@ -1,19 +1,49 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
-import { UserTable } from "@/components/admin/user-table"
-import { UserStats } from "@/components/admin/user-stats"
-import { PendingVolunteers } from "@/components/admin/pending-volunteers"
-import { Pagination } from "@/components/ui/pagination"
-import { Search, Filter, X } from "lucide-react"
-import type { UserWithRole, UserRole, UserStatus, UserStats as UserStatsType } from "@/types/user"
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { UserTable } from "@/components/admin/user-table";
+import { UserStats } from "@/components/admin/user-stats";
+import { PendingVolunteers } from "@/components/admin/pending-volunteers";
+import { Pagination } from "@/components/ui/pagination";
+import { Search, Filter, X } from "lucide-react";
+
+// Temporary fallback types if '@/types/user' is missing
+type UserRole = "recruit" | "volunteer" | "admin";
+type UserStatus = "active" | "pending" | "inactive";
+interface UserWithRole {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
+  created_at: string;
+  type: string;
+  has_applied: boolean;
+  has_completed_profile: boolean;
+  has_verified_email: boolean;
+  is_active?: boolean;
+}
+interface UserStatsType {
+  total_users: number;
+  active_users: number;
+  recruits: number;
+  volunteers: number;
+  admins: number;
+  pending_volunteers: number;
+  recent_signups: number;
+}
 
 // Static mock data
 const mockUsers: UserWithRole[] = [
@@ -27,7 +57,7 @@ const mockUsers: UserWithRole[] = [
     type: "recruit",
     has_applied: false,
     has_completed_profile: true,
-    has_verified_email: true
+    has_verified_email: true,
   },
   {
     id: "2",
@@ -40,8 +70,8 @@ const mockUsers: UserWithRole[] = [
     has_applied: true,
     has_completed_profile: true,
     has_verified_email: true,
-    is_active: true
-  }
+    is_active: true,
+  },
 ];
 
 // Static mock stats
@@ -52,49 +82,49 @@ const mockStats: UserStatsType = {
   volunteers: 30,
   admins: 10,
   pending_volunteers: 5,
-  recent_signups: 15
+  recent_signups: 15,
 };
 
 export default function AdminUsersPage() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { toast } = useToast()
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   // Get query parameters
-  const pageParam = searchParams.get("page")
-  const searchParam = searchParams.get("search")
-  const roleParam = searchParams.get("role") as UserRole | null
-  const statusParam = searchParams.get("status") as UserStatus | null
-  const tabParam = searchParams.get("tab") || "all"
+  const pageParam = searchParams?.get("page");
+  const searchParam = searchParams?.get("search");
+  const roleParam = searchParams?.get("role") as UserRole | null;
+  const statusParam = searchParams?.get("status") as UserStatus | null;
+  const tabParam = searchParams?.get("tab") || "all";
 
   // State
-  const [users, setUsers] = useState<UserWithRole[]>(mockUsers)
-  const [stats] = useState<UserStatsType>(mockStats)
-  const [loading] = useState(false)
-  const [searchTerm, setSearchTerm] = useState(searchParam || "")
-  const [role, setRole] = useState<UserRole | "">(roleParam || "")
-  const [status, setStatus] = useState<UserStatus | "">(statusParam || "")
-  const [page, setPage] = useState(pageParam ? Number.parseInt(pageParam) : 1)
-  const [totalUsers] = useState(mockStats.total_users)
-  const [activeTab, setActiveTab] = useState(tabParam)
+  const [users, setUsers] = useState<UserWithRole[]>(mockUsers);
+  const [stats] = useState<UserStatsType>(mockStats);
+  const [loading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState(searchParam || "");
+  const [role, setRole] = useState<UserRole | "">(roleParam || "");
+  const [status, setStatus] = useState<UserStatus | "">(statusParam || "");
+  const [page, setPage] = useState(pageParam ? Number.parseInt(pageParam) : 1);
+  const [totalUsers] = useState(mockStats.total_users);
+  const [activeTab, setActiveTab] = useState(tabParam);
 
   // Update URL when filters change
   useEffect(() => {
-    const params = new URLSearchParams()
-    if (page > 1) params.set("page", page.toString())
-    if (searchTerm) params.set("search", searchTerm)
-    if (role) params.set("role", role)
-    if (status) params.set("status", status)
-    if (activeTab !== "all") params.set("tab", activeTab)
+    const params = new URLSearchParams();
+    if (page > 1) params.set("page", page.toString());
+    if (searchTerm) params.set("search", searchTerm);
+    if (role) params.set("role", role);
+    if (status) params.set("status", status);
+    if (activeTab !== "all") params.set("tab", activeTab);
 
-    const queryString = params.toString()
-    router.push(queryString ? `?${queryString}` : "/admin/users")
-  }, [page, searchTerm, role, status, activeTab, router])
+    const queryString = params.toString();
+    router.push(queryString ? `?${queryString}` : "/admin/users");
+  }, [page, searchTerm, role, status, activeTab, router]);
 
   // Filter users based on search term, role, and status
   useEffect(() => {
-    const filteredUsers = mockUsers.filter(user => {
-      const matchesSearch = !searchTerm || 
+    const filteredUsers = mockUsers.filter((user) => {
+      const matchesSearch =
+        !searchTerm ||
         user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         user.email.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesRole = !role || user.role === role;
@@ -116,7 +146,11 @@ export default function AdminUsersPage() {
 
       {stats && <UserStats stats={stats} />}
 
-      <Tabs defaultValue={activeTab} onValueChange={(value) => setActiveTab(value)} className="mt-8">
+      <Tabs
+        defaultValue={activeTab}
+        onValueChange={(value) => setActiveTab(value)}
+        className="mt-8"
+      >
         <TabsList className="mb-6">
           <TabsTrigger value="all">All Users</TabsTrigger>
           <TabsTrigger value="recruits">Recruits</TabsTrigger>
@@ -149,7 +183,10 @@ export default function AdminUsersPage() {
                 </form>
 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Select value={role} onValueChange={(value) => setRole(value as UserRole | "")}>
+                  <Select
+                    value={role}
+                    onValueChange={(value) => setRole(value as UserRole | "")}
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Role" />
                     </SelectTrigger>
@@ -161,7 +198,12 @@ export default function AdminUsersPage() {
                     </SelectContent>
                   </Select>
 
-                  <Select value={status} onValueChange={(value) => setStatus(value as UserStatus | "")}>
+                  <Select
+                    value={status}
+                    onValueChange={(value) =>
+                      setStatus(value as UserStatus | "")
+                    }
+                  >
                     <SelectTrigger className="w-[180px]">
                       <SelectValue placeholder="Status" />
                     </SelectTrigger>
@@ -174,12 +216,16 @@ export default function AdminUsersPage() {
                   </Select>
 
                   {(searchTerm || role || status) && (
-                    <Button variant="outline" onClick={() => {
-                      setSearchTerm("")
-                      setRole("")
-                      setStatus("")
-                      setPage(1)
-                    }} className="flex items-center">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setRole("");
+                        setStatus("");
+                        setPage(1);
+                      }}
+                      className="flex items-center"
+                    >
                       <X className="h-4 w-4 mr-2" />
                       Clear
                     </Button>
@@ -193,31 +239,36 @@ export default function AdminUsersPage() {
         <TabsContent value="all">
           <UserTable users={users} loading={loading} onRefresh={() => {}} />
           {totalUsers > 10 && (
-            <Pagination currentPage={page} totalPages={Math.ceil(totalUsers / 10)} onPageChange={setPage} className="mt-6" />
+            <Pagination
+              currentPage={page}
+              totalPages={Math.ceil(totalUsers / 10)}
+              onPageChange={setPage}
+              className="mt-6"
+            />
           )}
         </TabsContent>
 
         <TabsContent value="recruits">
-          <UserTable 
-            users={users.filter(u => u.role === "recruit")} 
-            loading={loading} 
-            onRefresh={() => {}} 
+          <UserTable
+            users={users.filter((u) => u.role === "recruit")}
+            loading={loading}
+            onRefresh={() => {}}
           />
         </TabsContent>
 
         <TabsContent value="volunteers">
-          <UserTable 
-            users={users.filter(u => u.role === "volunteer")} 
-            loading={loading} 
-            onRefresh={() => {}} 
+          <UserTable
+            users={users.filter((u) => u.role === "volunteer")}
+            loading={loading}
+            onRefresh={() => {}}
           />
         </TabsContent>
 
         <TabsContent value="admins">
-          <UserTable 
-            users={users.filter(u => u.role === "admin")} 
-            loading={loading} 
-            onRefresh={() => {}} 
+          <UserTable
+            users={users.filter((u) => u.role === "admin")}
+            loading={loading}
+            onRefresh={() => {}}
           />
         </TabsContent>
 
@@ -226,5 +277,5 @@ export default function AdminUsersPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

@@ -1,16 +1,29 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, UserCheck, UserCog, Shield, Clock, UserPlus } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Users,
+  UserCheck,
+  UserCog,
+  Shield,
+  Clock,
+  UserPlus,
+} from "lucide-react";
 
 interface UserStatsProps {
   stats: {
-    total_users: number
-    active_users: number
-    recruits: number
-    volunteers: number
-    admins: number
-    pending_volunteers: number
-    recent_signups: number
-  }
+    total_users: number;
+    active_users: number;
+    recruits: number;
+    volunteers: number;
+    admins: number;
+    pending_volunteers: number;
+    recent_signups: number;
+  };
 }
 
 export function UserStats({ stats }: UserStatsProps) {
@@ -84,7 +97,9 @@ export function UserStats({ stats }: UserStatsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="space-y-1">
-            <CardTitle className="text-sm font-medium">Pending Approval</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Pending Approval
+            </CardTitle>
             <CardDescription>Volunteers awaiting approval</CardDescription>
           </div>
           <Clock className="h-4 w-4 text-yellow-500" />
@@ -97,7 +112,9 @@ export function UserStats({ stats }: UserStatsProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="space-y-1">
-            <CardTitle className="text-sm font-medium">Recent Signups</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Recent Signups
+            </CardTitle>
             <CardDescription>New users in last 7 days</CardDescription>
           </div>
           <UserPlus className="h-4 w-4 text-green-500" />
@@ -107,5 +124,5 @@ export function UserStats({ stats }: UserStatsProps) {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

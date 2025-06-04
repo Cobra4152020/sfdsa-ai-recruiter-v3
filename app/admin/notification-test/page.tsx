@@ -1,42 +1,57 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
-import { NotificationBell } from "@/components/notification-bell"
-import { useUser } from "@/context/user-context"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
+import { NotificationBell } from "@/components/notification-bell";
+import { useUser } from "@/context/user-context";
 
 export default function NotificationTestPage() {
-  const { currentUser } = useUser()
-  const { toast } = useToast()
+  const { currentUser } = useUser();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     type: "test",
     title: "Test Notification",
     message: "This is a test notification message.",
     actionUrl: "",
     imageUrl: "",
-  })
-  const [isLoading, setIsLoading] = useState(false)
+  });
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       const response = await fetch("/api/notifications/test", {
@@ -45,29 +60,32 @@ export default function NotificationTestPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to create test notification")
+        throw new Error(data.error || "Failed to create test notification");
       }
 
       toast({
         title: "Notification Created",
         description: "Test notification has been created successfully.",
-      })
+      });
     } catch (error) {
-      console.error("Error creating test notification:", error)
+      console.error("Error creating test notification:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create test notification",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to create test notification",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   if (!currentUser) {
     return (
@@ -75,11 +93,13 @@ export default function NotificationTestPage() {
         <Card>
           <CardHeader>
             <CardTitle>Notification Test</CardTitle>
-            <CardDescription>You must be logged in to use this feature.</CardDescription>
+            <CardDescription>
+              You must be logged in to use this feature.
+            </CardDescription>
           </CardHeader>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -92,13 +112,18 @@ export default function NotificationTestPage() {
       <Card>
         <CardHeader>
           <CardTitle>Create Test Notification</CardTitle>
-          <CardDescription>Use this form to create test notifications for the current user.</CardDescription>
+          <CardDescription>
+            Use this form to create test notifications for the current user.
+          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="type">Notification Type</Label>
-              <Select value={formData.type} onValueChange={(value) => handleSelectChange("type", value)}>
+              <Select
+                value={formData.type}
+                onValueChange={(value) => handleSelectChange("type", value)}
+              >
                 <SelectTrigger id="type">
                   <SelectValue placeholder="Select notification type" />
                 </SelectTrigger>
@@ -166,5 +191,5 @@ export default function NotificationTestPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }

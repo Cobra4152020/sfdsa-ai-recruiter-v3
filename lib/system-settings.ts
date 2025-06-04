@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 /**
  * Get a system setting from the database
@@ -6,21 +6,30 @@ import { getServiceSupabase } from "@/app/lib/supabase/server"
  * @param defaultValue Default value if setting doesn't exist
  * @returns The setting value or default value
  */
-export async function getSystemSetting(key: string, defaultValue = ""): Promise<string> {
+export async function getSystemSetting(
+  key: string,
+  defaultValue = "",
+): Promise<string> {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
-    const { data, error } = await supabase.from("system_settings").select("value").eq("key", key).single()
+    const { data, error } = await supabase
+      .from("system_settings")
+      .select("value")
+      .eq("key", key)
+      .single();
 
     if (error || !data) {
-      console.warn(`System setting ${key} not found, using default value: ${defaultValue}`)
-      return defaultValue
+      console.warn(
+        `System setting ${key} not found, using default value: ${defaultValue}`,
+      );
+      return defaultValue;
     }
 
-    return data.value
+    return data.value;
   } catch (error) {
-    console.error(`Error fetching system setting ${key}:`, error)
-    return defaultValue
+    console.error(`Error fetching system setting ${key}:`, error);
+    return defaultValue;
   }
 }
 
@@ -31,9 +40,13 @@ export async function getSystemSetting(key: string, defaultValue = ""): Promise<
  * @param description Optional description
  * @returns Success status
  */
-export async function setSystemSetting(key: string, value: string, description?: string): Promise<boolean> {
+export async function setSystemSetting(
+  key: string,
+  value: string,
+  description?: string,
+): Promise<boolean> {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     const { error } = await supabase.from("system_settings").upsert(
       {
@@ -45,16 +58,16 @@ export async function setSystemSetting(key: string, value: string, description?:
       {
         onConflict: "key",
       },
-    )
+    );
 
     if (error) {
-      console.error(`Error setting system setting ${key}:`, error)
-      return false
+      console.error(`Error setting system setting ${key}:`, error);
+      return false;
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error(`Error setting system setting ${key}:`, error)
-    return false
+    console.error(`Error setting system setting ${key}:`, error);
+    return false;
   }
 }

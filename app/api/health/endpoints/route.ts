@@ -1,35 +1,40 @@
-
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { API_CACHE_HEADERS } from "@/lib/cache-utils"
+import { NextResponse } from "next/server";
+import { API_CACHE_HEADERS } from "@/lib/cache-utils";
 
 export async function GET() {
   try {
-    const endpoints = ["/api/leaderboard", "/api/badges", "/api/users/current/profile"]
+    const endpoints = [
+      "/api/leaderboard",
+      "/api/badges",
+      "/api/users/current/profile",
+    ];
 
-    const results = []
+    const results = [];
 
     for (const endpoint of endpoints) {
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_VERCEL_URL}${endpoint}`)
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_VERCEL_URL}${endpoint}`,
+        );
         results.push({
           endpoint,
           status: response.status,
           ok: response.ok,
-        })
+        });
       } catch (error) {
         results.push({
           endpoint,
           status: 0,
           ok: false,
           error: `${error}`,
-        })
+        });
       }
     }
 
-    const failedEndpoints = results.filter((r) => !r.ok)
+    const failedEndpoints = results.filter((r) => !r.ok);
 
     if (failedEndpoints.length > 0) {
       return NextResponse.json(
@@ -39,7 +44,7 @@ export async function GET() {
           details: results,
         },
         { status: 500, headers: API_CACHE_HEADERS },
-      )
+      );
     }
 
     return NextResponse.json(
@@ -49,11 +54,14 @@ export async function GET() {
         details: results,
       },
       { headers: API_CACHE_HEADERS },
-    )
+    );
   } catch (error) {
     return NextResponse.json(
-      { success: false, message: `API endpoints health check failed: ${error}` },
+      {
+        success: false,
+        message: `API endpoints health check failed: ${error}`,
+      },
       { status: 500, headers: API_CACHE_HEADERS },
-    )
+    );
   }
 }

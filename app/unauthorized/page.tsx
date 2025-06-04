@@ -1,9 +1,16 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { ShieldAlert } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { ShieldAlert } from "lucide-react";
 
 export default function UnauthorizedPage() {
   return (
@@ -13,13 +20,18 @@ export default function UnauthorizedPage() {
           <div className="flex justify-center mb-4">
             <ShieldAlert className="h-16 w-16 text-red-600" />
           </div>
-          <CardTitle className="text-2xl font-bold text-center">Unauthorized Access</CardTitle>
-          <CardDescription className="text-center">You do not have permission to access this page.</CardDescription>
+          <CardTitle className="text-2xl font-bold text-center">
+            Unauthorized Access
+          </CardTitle>
+          <CardDescription className="text-center">
+            You do not have permission to access this page.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-red-50 border border-red-200 rounded-md p-4">
             <p className="text-red-800">
-              This area is restricted. You may not have the correct role or permissions to view this content.
+              This area is restricted. You may not have the correct role or
+              permissions to view this content.
             </p>
           </div>
         </CardContent>
@@ -39,5 +51,5 @@ export default function UnauthorizedPage() {
         </CardFooter>
       </Card>
     </main>
-  )
+  );
 }

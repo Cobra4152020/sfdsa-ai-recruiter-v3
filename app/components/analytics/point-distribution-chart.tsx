@@ -19,4 +19,4 @@ export function PointDistributionChart({ data }: PointDistributionChartProps) {
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
   );
-} 
+}

@@ -5,7 +5,7 @@ export const mockData = {
       { id: 1, name: "John Doe", points: 1000, rank: 1 },
       { id: 2, name: "Jane Smith", points: 950, rank: 2 },
       { id: 3, name: "Bob Johnson", points: 900, rank: 3 },
-    ]
+    ],
   },
   badges: [
     {
@@ -14,7 +14,7 @@ export const mockData = {
       description: "Completed written test preparation",
       category: "application",
       color: "bg-blue-500",
-      icon: "/placeholder.svg"
+      icon: "/placeholder.svg",
     },
     {
       id: "2",
@@ -22,8 +22,8 @@ export const mockData = {
       description: "Prepared for oral board interviews",
       category: "application",
       color: "bg-green-700",
-      icon: "/placeholder.svg"
-    }
+      icon: "/placeholder.svg",
+    },
   ],
   triviaQuestions: [
     {
@@ -33,16 +33,16 @@ export const mockData = {
         "Law enforcement",
         "Court security",
         "Jail operations",
-        "All of the above"
+        "All of the above",
       ],
-      correctAnswer: 3
-    }
+      correctAnswer: 3,
+    },
   ],
   stats: {
     totalUsers: 1000,
     activeUsers: 750,
     completedChallenges: 5000,
-    averageScore: 85
+    averageScore: 85,
   },
   notifications: [
     {
@@ -50,8 +50,8 @@ export const mockData = {
       title: "New Challenge Available",
       message: "Check out the latest trivia challenge!",
       type: "challenge",
-      read: false
-    }
+      read: false,
+    },
   ],
   userProfile: {
     name: "Demo User",
@@ -62,7 +62,7 @@ export const mockData = {
     progress: {
       written: 80,
       physical: 60,
-      oral: 90
-    }
-  }
-}; 
+      oral: 90,
+    },
+  },
+};

@@ -1,31 +1,28 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { OptInForm } from "@/components/opt-in-form"
-import { UserProvider } from "@/context/user-context"
-import { AuthModalProvider } from "@/context/auth-modal-context"
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
+import { useState } from "react";
+import { OptInForm } from "@/components/opt-in-form";
+import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
 
 interface PageWrapperProps {
-  children: React.ReactNode
+  children: React.ReactNode;
 }
 
 export function PageWrapper({ children }: PageWrapperProps) {
-  const [isOptInFormOpen, setIsOptInFormOpen] = useState(false)
-  const [isApplying, setIsApplying] = useState(false)
+  const [isOptInFormOpen, setIsOptInFormOpen] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const showOptInForm = (applying = false) => {
-    setIsApplying(applying)
-    setIsOptInFormOpen(true)
-  }
+    setIsApplying(applying);
+    setIsOptInFormOpen(true);
+  };
 
   const handleCloseOptInForm = () => {
-    setIsOptInFormOpen(false)
-  }
+    setIsOptInFormOpen(false);
+  };
 
   return (
     <>
@@ -33,11 +30,15 @@ export function PageWrapper({ children }: PageWrapperProps) {
         {children}
       </main>
       {isOptInFormOpen && (
-        <OptInForm onClose={handleCloseOptInForm} isApplying={isApplying} isOpen={isOptInFormOpen} />
+        <OptInForm
+          onClose={handleCloseOptInForm}
+          isApplying={isApplying}
+          isOpen={isOptInFormOpen}
+        />
       )}
       <div className="fixed bottom-6 right-6 z-50">
         <AskSgtKenButton position="fixed" variant="secondary" />
       </div>
     </>
-  )
+  );
 }

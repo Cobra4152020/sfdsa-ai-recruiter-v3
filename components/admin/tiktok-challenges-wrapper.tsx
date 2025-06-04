@@ -1,27 +1,39 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { TrendingUp, Users, Video } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { TrendingUp, Users, Video } from "lucide-react";
 
 interface TikTokChallenge {
-  id: string
-  title: string
-  participants: number
-  views: number
-  status: "active" | "completed"
-  hashtag: string
-  endDate: string
+  id: string;
+  title: string;
+  participants: number;
+  views: number;
+  status: "active" | "completed";
+  hashtag: string;
+  endDate: string;
 }
 
 interface TikTokChallengesWrapperProps {
-  challenges: TikTokChallenge[]
+  challenges: TikTokChallenge[];
 }
 
-export function TikTokChallengesWrapper({ challenges }: TikTokChallengesWrapperProps) {
-  const activeChallenges = challenges.filter((challenge) => challenge.status === "active")
-  const completedChallenges = challenges.filter((challenge) => challenge.status === "completed")
+export function TikTokChallengesWrapper({
+  challenges,
+}: TikTokChallengesWrapperProps) {
+  const activeChallenges = challenges.filter(
+    (challenge) => challenge.status === "active",
+  );
+  const completedChallenges = challenges.filter(
+    (challenge) => challenge.status === "completed",
+  );
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -29,12 +41,16 @@ export function TikTokChallengesWrapper({ challenges }: TikTokChallengesWrapperP
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-bold text-[#0A3C1F]">Active Challenges</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#0A3C1F]">
+              Active Challenges
+            </CardTitle>
             <Badge variant="outline" className="bg-green-50 text-[#0A3C1F]">
               {activeChallenges.length} Active
             </Badge>
           </div>
-          <CardDescription>Currently running TikTok recruitment challenges</CardDescription>
+          <CardDescription>
+            Currently running TikTok recruitment challenges
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <ScrollArea className="h-[300px] pr-4">
@@ -49,8 +65,12 @@ export function TikTokChallengesWrapper({ challenges }: TikTokChallengesWrapperP
                       <Video className="h-4 w-4 text-[#0A3C1F]" />
                       <p className="font-medium">{challenge.title}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">#{challenge.hashtag}</p>
-                    <p className="text-sm text-muted-foreground">Ends: {challenge.endDate}</p>
+                    <p className="text-sm text-muted-foreground">
+                      #{challenge.hashtag}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Ends: {challenge.endDate}
+                    </p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
@@ -73,7 +93,9 @@ export function TikTokChallengesWrapper({ challenges }: TikTokChallengesWrapperP
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-bold text-[#0A3C1F]">Completed Challenges</CardTitle>
+            <CardTitle className="text-lg font-bold text-[#0A3C1F]">
+              Completed Challenges
+            </CardTitle>
             <Badge variant="outline" className="bg-gray-50">
               {completedChallenges.length} Completed
             </Badge>
@@ -93,8 +115,12 @@ export function TikTokChallengesWrapper({ challenges }: TikTokChallengesWrapperP
                       <Video className="h-4 w-4 text-gray-500" />
                       <p className="font-medium">{challenge.title}</p>
                     </div>
-                    <p className="text-sm text-muted-foreground">#{challenge.hashtag}</p>
-                    <p className="text-sm text-muted-foreground">Ended: {challenge.endDate}</p>
+                    <p className="text-sm text-muted-foreground">
+                      #{challenge.hashtag}
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Ended: {challenge.endDate}
+                    </p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
@@ -113,5 +139,5 @@ export function TikTokChallengesWrapper({ challenges }: TikTokChallengesWrapperP
         </CardContent>
       </Card>
     </div>
-  )
-} 
+  );
+}

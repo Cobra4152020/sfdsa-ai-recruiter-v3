@@ -1,17 +1,18 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function GET() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Instead of querying the view directly, use the equivalent SQL query
     const { data, error } = await supabase
       .from("users")
-      .select(`
+      .select(
+        `
         id,
         name,
         avatar_url,
@@ -21,25 +22,39 @@ export async function GET() {
           total_questions,
           created_at
         )
-      `)
-      .limit(10)
+      `,
+      )
+      .limit(10);
 
     if (error) {
-      throw error
+      throw error;
     }
 
     // Process the data to match the expected format
     const leaderboard = data.map((user) => {
-      const attempts = user.trivia_attempts || []
-      const attemptsCount = attempts.length
-      const totalCorrectAnswers = attempts.reduce((sum, attempt) => sum + attempt.score, 0)
-      const totalQuestions = attempts.reduce((sum, attempt) => sum + attempt.total_questions, 0)
-      const accuracyPercent = totalQuestions > 0 ? (totalCorrectAnswers / totalQuestions) * 100 : 0
-      const perfectGames = attempts.filter((attempt) => attempt.score === attempt.total_questions).length
+      const attempts = user.trivia_attempts || [];
+      const attemptsCount = attempts.length;
+      const totalCorrectAnswers = attempts.reduce(
+        (sum, attempt) => sum + attempt.score,
+        0,
+      );
+      const totalQuestions = attempts.reduce(
+        (sum, attempt) => sum + attempt.total_questions,
+        0,
+      );
+      const accuracyPercent =
+        totalQuestions > 0 ? (totalCorrectAnswers / totalQuestions) * 100 : 0;
+      const perfectGames = attempts.filter(
+        (attempt) => attempt.score === attempt.total_questions,
+      ).length;
       const lastAttemptAt =
         attempts.length > 0
-          ? attempts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())[0].created_at
-          : null
+          ? attempts.sort(
+              (a, b) =>
+                new Date(b.created_at).getTime() -
+                new Date(a.created_at).getTime(),
+            )[0].created_at
+          : null;
 
       return {
         user_id: user.id,
@@ -51,23 +66,25 @@ export async function GET() {
         accuracy_percent: Number.parseFloat(accuracyPercent.toFixed(1)),
         perfect_games: perfectGames,
         last_attempt_at: lastAttemptAt,
-      }
-    })
+      };
+    });
 
     // Sort by total correct answers descending
-    leaderboard.sort((a, b) => b.total_correct_answers - a.total_correct_answers)
+    leaderboard.sort(
+      (a, b) => b.total_correct_answers - a.total_correct_answers,
+    );
 
-    return NextResponse.json({ leaderboard: leaderboard || [] })
+    return NextResponse.json({ leaderboard: leaderboard || [] });
   } catch (error) {
-    console.error("Error fetching trivia leaderboard:", error)
+    console.error("Error fetching trivia leaderboard:", error);
 
     // Generate mock data as fallback
-    const mockLeaderboard = getMockLeaderboard()
+    const mockLeaderboard = getMockLeaderboard();
 
     return NextResponse.json({
       leaderboard: mockLeaderboard,
       isMock: true,
-    })
+    });
   }
 }
 
@@ -83,12 +100,12 @@ function getMockLeaderboard() {
     "Robert Davis",
     "Jennifer Wilson",
     "Thomas Moore",
-  ]
+  ];
 
   return names
     .map((name, index) => {
-      const totalQuestions = Math.floor(Math.random() * 50) + 10
-      const correctAnswers = Math.floor(Math.random() * totalQuestions)
+      const totalQuestions = Math.floor(Math.random() * 50) + 10;
+      const correctAnswers = Math.floor(Math.random() * totalQuestions);
 
       return {
         user_id: `mock-${index}`,
@@ -97,10 +114,12 @@ function getMockLeaderboard() {
         attempts_count: Math.floor(Math.random() * 20) + 1,
         total_correct_answers: correctAnswers,
         total_questions: totalQuestions,
-        accuracy_percent: Number.parseFloat(((correctAnswers / totalQuestions) * 100).toFixed(1)),
+        accuracy_percent: Number.parseFloat(
+          ((correctAnswers / totalQuestions) * 100).toFixed(1),
+        ),
         perfect_games: Math.floor(Math.random() * 3),
         last_attempt_at: new Date().toISOString(),
-      }
+      };
     })
-    .sort((a, b) => b.total_correct_answers - a.total_correct_answers)
+    .sort((a, b) => b.total_correct_answers - a.total_correct_answers);
 }

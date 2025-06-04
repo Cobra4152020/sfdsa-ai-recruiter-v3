@@ -1,47 +1,49 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
 interface UserActivityProps {
-  userId: string
+  userId: string;
 }
 
 export function UserActivity({ userId }: UserActivityProps) {
-  const [activities, setActivities] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [activities, setActivities] = useState<unknown[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchActivities() {
       try {
-        setIsLoading(true)
-        const response = await fetch(`/api/user-management?action=activity&userId=${userId}`)
+        setIsLoading(true);
+        const response = await fetch(
+          `/api/user-management?action=activity&userId=${userId}`,
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch activities')
+          throw new Error("Failed to fetch activities");
         }
-        const data = await response.json()
-        setActivities(data)
+        const data = await response.json();
+        setActivities(data);
       } catch (err) {
-        console.error("Error fetching user activity:", err)
-        setError("Failed to load user activity")
+        console.error("Error fetching user activity:", err);
+        setError("Failed to load user activity");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchActivities()
-  }, [userId])
+    fetchActivities();
+  }, [userId]);
 
   if (isLoading) {
-    return <div>Loading activity...</div>
+    return <div>Loading activity...</div>;
   }
 
   if (error) {
-    return <div className="text-red-500">{error}</div>
+    return <div className="text-red-500">{error}</div>;
   }
 
   if (activities.length === 0) {
-    return <div>No activity found</div>
+    return <div>No activity found</div>;
   }
 
   return (
@@ -60,5 +62,5 @@ export function UserActivity({ userId }: UserActivityProps) {
         </div>
       ))}
     </div>
-  )
+  );
 }

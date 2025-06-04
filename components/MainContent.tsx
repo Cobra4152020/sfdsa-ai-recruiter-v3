@@ -1,74 +1,90 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef, useEffect } from "react"
-import { Send, Gamepad2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { logError } from "@/lib/error-monitoring"
+import { useState, useRef, useEffect } from "react";
+import { Send, Gamepad2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { logError } from "@/lib/error-monitoring";
 
 export type MessageType = {
-  role: "assistant" | "user"
-  content: string | React.ReactNode
-  quickReplies?: string[]
-  source?: string
-  id?: string
-}
+  role: "assistant" | "user";
+  content: string | React.ReactNode;
+  quickReplies?: string[];
+  source?: string;
+  id?: string;
+};
 
 interface MainContentProps {
-  messages: MessageType[]
-  onSendMessage: (message: string) => void
-  isLoading: boolean
-  displayedResponse: string
+  messages: MessageType[];
+  onSendMessage: (message: string) => void;
+  isLoading: boolean;
+  displayedResponse: string;
 }
 
-export default function MainContent({ messages, onSendMessage, isLoading, displayedResponse }: MainContentProps) {
-  const [input, setInput] = useState("")
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
-  const router = useRouter()
+export default function MainContent({
+  messages,
+  onSendMessage,
+  isLoading,
+  displayedResponse,
+}: MainContentProps) {
+  const [input, setInput] = useState("");
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const router = useRouter();
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages, displayedResponse])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, displayedResponse]);
 
   // Focus input on mount
   useEffect(() => {
-    inputRef.current?.focus()
-  }, [])
+    inputRef.current?.focus();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (input.trim() && !isLoading) {
       try {
-        onSendMessage(input.trim())
-        setInput("")
+        onSendMessage(input.trim());
+        setInput("");
       } catch (error) {
-        console.error("Error sending message:", error)
-        logError("Failed to send message", error instanceof Error ? error : new Error(String(error)), "MainContent")
+        console.error("Error sending message:", error);
+        logError(
+          "Failed to send message",
+          error instanceof Error ? error : new Error(String(error)),
+          "MainContent",
+        );
       }
     }
-  }
+  };
 
   const handleQuickReply = (reply: string) => {
     if (!isLoading) {
       try {
         // Special handling for trivia game link
-        if (reply.toLowerCase().includes("trivia") || reply.toLowerCase().includes("play sf trivia")) {
-          router.push("/trivia")
-          return
+        if (
+          reply.toLowerCase().includes("trivia") ||
+          reply.toLowerCase().includes("play sf trivia")
+        ) {
+          router.push("/trivia");
+          return;
         }
 
-        onSendMessage(reply)
+        onSendMessage(reply);
       } catch (error) {
-        console.error("Error handling quick reply:", error)
-        logError("Failed to handle quick reply", error instanceof Error ? error : new Error(String(error)), "MainContent")
+        console.error("Error handling quick reply:", error);
+        logError(
+          "Failed to handle quick reply",
+          error instanceof Error ? error : new Error(String(error)),
+          "MainContent",
+        );
       }
     }
-  }
+  };
 
   return (
     <>
@@ -76,7 +92,10 @@ export default function MainContent({ messages, onSendMessage, isLoading, displa
         <div className="space-y-6">
           {/* Trivia game banner at the top */}
           <div className="bg-[#FFD700]/20 p-3 rounded-lg border border-[#FFD700] mb-4">
-            <Link href="/trivia" className="flex items-center justify-between text-[#0A3C1F] hover:underline">
+            <Link
+              href="/trivia"
+              className="flex items-center justify-between text-[#0A3C1F] hover:underline"
+            >
               <span className="font-medium">Play SF Trivia with Sgt. Ken!</span>
               <span className="flex items-center">
                 <Gamepad2 className="h-4 w-4 mr-1" />
@@ -97,7 +116,9 @@ export default function MainContent({ messages, onSendMessage, isLoading, displa
                     : "bg-[#0A3C1F] text-white"
                 }`}
               >
-                {message.role === "assistant" && index === messages.length - 1 ? displayedResponse : message.content}
+                {message.role === "assistant" && index === messages.length - 1
+                  ? displayedResponse
+                  : message.content}
                 {message.quickReplies && message.quickReplies.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-2">
                     {message.quickReplies.map((reply, i) => (
@@ -165,5 +186,5 @@ export default function MainContent({ messages, onSendMessage, isLoading, displa
         </form>
       </div>
     </>
-  )
+  );
 }

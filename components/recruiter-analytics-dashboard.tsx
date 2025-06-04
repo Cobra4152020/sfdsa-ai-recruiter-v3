@@ -1,47 +1,134 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
-import { DateRangePicker } from "@/components/ui/date-range-picker"
-import { RecruiterPerformanceChart } from "@/components/recruiter-performance-chart"
-import { RecruiterConversionFunnel } from "@/components/recruiter-conversion-funnel"
-import { RecruiterReferralTable } from "@/components/recruiter-referral-table"
-import { RecruiterComparisonChart } from "@/components/recruiter-comparison-chart"
-import { RecruiterDemographicsChart } from "@/components/recruiter-demographics-chart"
-import { RecruiterActivityTimeline } from "@/components/recruiter-activity-timeline"
-import { RecruiterMetricsCards } from "@/components/recruiter-metrics-cards"
-import { useUser } from "@/context/user-context"
-import { Download, RefreshCw, Share2 } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
+import { RecruiterPerformanceChart } from "@/components/recruiter-performance-chart";
+import { RecruiterConversionFunnel } from "@/components/recruiter-conversion-funnel";
+import { RecruiterReferralTable } from "@/components/recruiter-referral-table";
+import { RecruiterComparisonChart } from "@/components/recruiter-comparison-chart";
+import { RecruiterDemographicsChart } from "@/components/recruiter-demographics-chart";
+import { RecruiterActivityTimeline } from "@/components/recruiter-activity-timeline";
+import { RecruiterMetricsCards } from "@/components/recruiter-metrics-cards";
+import { useUser } from "@/context/user-context";
+import { Download, RefreshCw, Share2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+interface Referral {
+  id: string;
+  name: string;
+  email: string;
+  source: string;
+  status: string;
+  date: string;
+  daysToHire?: number;
+  daysInProcess?: number;
+}
+
+interface DashboardData {
+  metrics: {
+    totalReferrals: number;
+    activeReferrals: number;
+    conversionRate: number;
+    averageTimeToHire: number;
+    totalHires: number;
+    pendingApplications: number;
+    totalClicks: number;
+    clickToReferralRate: number;
+  };
+  performanceData: {
+    month: string;
+    referrals: number;
+    hires: number;
+    clicks: number;
+  }[];
+  funnelData: {
+    linkClicks: number;
+    pageViews: number;
+    formStarts: number;
+    formCompletions: number;
+    initialContacts: number;
+    interviews: number;
+    hires: number;
+  };
+  referrals: Referral[];
+  comparisonData: {
+    you: {
+      referrals: number;
+      hires: number;
+      conversionRate: number;
+      avgTimeToHire: number;
+    };
+    topPerformer: {
+      referrals: number;
+      hires: number;
+      conversionRate: number;
+      avgTimeToHire: number;
+    };
+    average: {
+      referrals: number;
+      hires: number;
+      conversionRate: number;
+      avgTimeToHire: number;
+    };
+  };
+  demographicsData: {
+    gender: { name: string; value: number }[];
+    age: { name: string; value: number }[];
+    source: { name: string; value: number }[];
+  };
+  activityTimeline: {
+    id: string;
+    type: string;
+    name?: string;
+    action: string;
+    date: string;
+    count?: number;
+  }[];
+}
 
 export function RecruiterAnalyticsDashboard() {
-  const { currentUser } = useUser()
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(true)
+  const { currentUser } = useUser();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
   const [dateRange, setDateRange] = useState({
     from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     to: new Date(),
-  })
-  const [filterSource, setFilterSource] = useState("all")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [dashboardData, setDashboardData] = useState<any>(null)
-  const [activeTab, setActiveTab] = useState("overview")
+  });
+  const [filterSource, setFilterSource] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
+  );
+  const [activeTab, setActiveTab] = useState("overview");
 
   useEffect(() => {
-    fetchDashboardData()
-  }, [dateRange, filterSource, filterStatus])
+    fetchDashboardData();
+  }, [dateRange, filterSource, filterStatus]);
 
   const fetchDashboardData = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       // In a real implementation, this would be an API call with proper filters
       // For now, we'll simulate the data
 
       // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       // Mock data for the dashboard
       const mockData = {
@@ -197,97 +284,111 @@ export function RecruiterAnalyticsDashboard() {
             date: "2023-07-24T00:00:00Z",
           },
         ],
-      }
+      };
 
-      setDashboardData(mockData)
+      setDashboardData(mockData);
     } catch (error) {
-      console.error("Error fetching dashboard data:", error)
+      console.error("Error fetching dashboard data:", error);
       toast({
         title: "Error",
         description: "Failed to load dashboard data. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleRefresh = () => {
-    fetchDashboardData()
+    fetchDashboardData();
     toast({
       title: "Dashboard Refreshed",
       description: "The dashboard data has been updated.",
-    })
-  }
+    });
+  };
 
   const handleExport = () => {
     // In a real implementation, this would generate and download a CSV/Excel file
     toast({
       title: "Export Started",
-      description: "Your data is being exported. The download will begin shortly.",
-    })
+      description:
+        "Your data is being exported. The download will begin shortly.",
+    });
 
     // Simulate download delay
     setTimeout(() => {
       // Create a simple CSV from the referrals data
       if (dashboardData && dashboardData.referrals) {
-        const headers = ["ID", "Name", "Email", "Source", "Status", "Date"]
+        const headers = ["ID", "Name", "Email", "Source", "Status", "Date"];
         const csvContent = [
           headers.join(","),
-          ...dashboardData.referrals.map((ref: any) =>
-            [ref.id, ref.name, ref.email, ref.source, ref.status, ref.date].join(","),
+          ...dashboardData.referrals.map((ref: Referral) =>
+            [
+              ref.id,
+              ref.name,
+              ref.email,
+              ref.source,
+              ref.status,
+              ref.date,
+            ].join(","),
           ),
-        ].join("\n")
+        ].join("\n");
 
         // Create a blob and download it
-        const blob = new Blob([csvContent], { type: "text/csv" })
-        const url = window.URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.setAttribute("hidden", "")
-        a.setAttribute("href", url)
-        a.setAttribute("download", "recruiter_analytics.csv")
-        document.body.appendChild(a)
-        a.click()
-        document.body.removeChild(a)
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.setAttribute("hidden", "");
+        a.setAttribute("href", url);
+        a.setAttribute("download", "recruiter_analytics.csv");
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
       }
-    }, 1000)
-  }
+    }, 1000);
+  };
 
-  const handleDateRangeChange = (range: { from: Date; to: Date }) => {
-    setDateRange(range)
-  }
+  const handleDateRangeChange = (range: DateRange | undefined) => {
+    if (range?.from && range?.to) {
+      setDateRange(range);
+    }
+  };
 
   const handleShare = () => {
     // In a real implementation, this would generate a shareable link or report
     toast({
       title: "Dashboard Shared",
       description: "A shareable link has been copied to your clipboard.",
-    })
+    });
 
     // Simulate copying to clipboard
     navigator.clipboard.writeText(
       `${window.location.origin}/volunteer-dashboard/analytics?share=true&user=${currentUser?.id}`,
-    )
-  }
+    );
+  };
 
   if (isLoading && !dashboardData) {
     return (
       <div className="flex justify-center items-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
       </div>
-    )
+    );
   }
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-[#0A3C1F]">Recruiter Analytics Dashboard</h2>
-          <p className="text-gray-600">Track and optimize your recruitment performance</p>
+          <h2 className="text-2xl font-bold text-[#0A3C1F]">
+            Recruiter Analytics Dashboard
+          </h2>
+          <p className="text-gray-600">
+            Track and optimize your recruitment performance
+          </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <DateRangePicker date={dateRange} onDateChange={handleDateRangeChange} />
+          <DateRangePicker onChange={handleDateRangeChange} />
 
           <Select value={filterSource} onValueChange={setFilterSource}>
             <SelectTrigger className="w-[150px]">
@@ -349,41 +450,57 @@ export function RecruiterAnalyticsDashboard() {
 
             <TabsContent value="overview" className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <RecruiterPerformanceChart data={dashboardData.performanceData} />
+                <RecruiterPerformanceChart
+                  data={dashboardData.performanceData}
+                />
                 <RecruiterConversionFunnel data={dashboardData.funnelData} />
               </div>
-              <RecruiterActivityTimeline activities={dashboardData.activityTimeline} />
+              <RecruiterActivityTimeline
+                activities={dashboardData.activityTimeline}
+              />
             </TabsContent>
 
             <TabsContent value="performance" className="space-y-6">
-              <RecruiterPerformanceChart data={dashboardData.performanceData} showDetailed={true} />
+              <RecruiterPerformanceChart
+                data={dashboardData.performanceData}
+                showDetailed={true}
+              />
               <Card>
                 <CardHeader>
                   <CardTitle>Performance Insights</CardTitle>
-                  <CardDescription>Key insights based on your recruitment performance</CardDescription>
+                  <CardDescription>
+                    Key insights based on your recruitment performance
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <h3 className="font-medium text-green-800">Strong Performance</h3>
+                      <h3 className="font-medium text-green-800">
+                        Strong Performance
+                      </h3>
                       <p className="text-green-700">
-                        Your conversion rate of 18.4% is above the average of 14.5%. Keep up the good work!
+                        Your conversion rate of 18.4% is above the average of
+                        14.5%. Keep up the good work!
                       </p>
                     </div>
 
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <h3 className="font-medium text-blue-800">Opportunity</h3>
                       <p className="text-blue-700">
-                        Your LinkedIn referrals have a 22% conversion rate, which is your highest performing channel.
-                        Consider focusing more efforts here.
+                        Your LinkedIn referrals have a 22% conversion rate,
+                        which is your highest performing channel. Consider
+                        focusing more efforts here.
                       </p>
                     </div>
 
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                      <h3 className="font-medium text-amber-800">Area for Improvement</h3>
+                      <h3 className="font-medium text-amber-800">
+                        Area for Improvement
+                      </h3>
                       <p className="text-amber-700">
-                        Your Twitter referrals have only a 9% conversion rate. Consider revising your messaging or
-                        targeting on this platform.
+                        Your Twitter referrals have only a 9% conversion rate.
+                        Consider revising your messaging or targeting on this
+                        platform.
                       </p>
                     </div>
                   </div>
@@ -400,78 +517,136 @@ export function RecruiterAnalyticsDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle>Benchmark Analysis</CardTitle>
-                  <CardDescription>How you compare to other recruiters</CardDescription>
+                  <CardDescription>
+                    How you compare to other recruiters
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="p-4 bg-gray-50 border rounded-lg">
-                        <h3 className="font-medium text-gray-800">Your Performance</h3>
+                        <h3 className="font-medium text-gray-800">
+                          Your Performance
+                        </h3>
                         <div className="mt-2 space-y-2">
                           <div className="flex justify-between">
                             <span className="text-gray-600">Referrals:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.you.referrals}</span>
+                            <span className="font-medium">
+                              {dashboardData.comparisonData.you.referrals}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-gray-600">Hires:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.you.hires}</span>
+                            <span className="font-medium">
+                              {dashboardData.comparisonData.you.hires}
+                            </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Conversion Rate:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.you.conversionRate}%</span>
+                            <span className="text-gray-600">
+                              Conversion Rate:
+                            </span>
+                            <span className="font-medium">
+                              {dashboardData.comparisonData.you.conversionRate}%
+                            </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-600">Avg Time to Hire:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.you.avgTimeToHire} days</span>
+                            <span className="text-gray-600">
+                              Avg Time to Hire:
+                            </span>
+                            <span className="font-medium">
+                              {dashboardData.comparisonData.you.avgTimeToHire}{" "}
+                              days
+                            </span>
                           </div>
                         </div>
                       </div>
 
                       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                        <h3 className="font-medium text-green-800">Top Performer</h3>
+                        <h3 className="font-medium text-green-800">
+                          Top Performer
+                        </h3>
                         <div className="mt-2 space-y-2">
                           <div className="flex justify-between">
                             <span className="text-green-600">Referrals:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.topPerformer.referrals}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-600">Hires:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.topPerformer.hires}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-green-600">Conversion Rate:</span>
                             <span className="font-medium">
-                              {dashboardData.comparisonData.topPerformer.conversionRate}%
+                              {
+                                dashboardData.comparisonData.topPerformer
+                                  .referrals
+                              }
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-green-600">Avg Time to Hire:</span>
+                            <span className="text-green-600">Hires:</span>
                             <span className="font-medium">
-                              {dashboardData.comparisonData.topPerformer.avgTimeToHire} days
+                              {dashboardData.comparisonData.topPerformer.hires}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-green-600">
+                              Conversion Rate:
+                            </span>
+                            <span className="font-medium">
+                              {
+                                dashboardData.comparisonData.topPerformer
+                                  .conversionRate
+                              }
+                              %
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-green-600">
+                              Avg Time to Hire:
+                            </span>
+                            <span className="font-medium">
+                              {
+                                dashboardData.comparisonData.topPerformer
+                                  .avgTimeToHire
+                              }{" "}
+                              days
                             </span>
                           </div>
                         </div>
                       </div>
 
                       <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                        <h3 className="font-medium text-blue-800">Average Recruiter</h3>
+                        <h3 className="font-medium text-blue-800">
+                          Average Recruiter
+                        </h3>
                         <div className="mt-2 space-y-2">
                           <div className="flex justify-between">
                             <span className="text-blue-600">Referrals:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.average.referrals}</span>
+                            <span className="font-medium">
+                              {dashboardData.comparisonData.average.referrals}
+                            </span>
                           </div>
                           <div className="flex justify-between">
                             <span className="text-blue-600">Hires:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.average.hires}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-600">Conversion Rate:</span>
-                            <span className="font-medium">{dashboardData.comparisonData.average.conversionRate}%</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-blue-600">Avg Time to Hire:</span>
                             <span className="font-medium">
-                              {dashboardData.comparisonData.average.avgTimeToHire} days
+                              {dashboardData.comparisonData.average.hires}
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-blue-600">
+                              Conversion Rate:
+                            </span>
+                            <span className="font-medium">
+                              {
+                                dashboardData.comparisonData.average
+                                  .conversionRate
+                              }
+                              %
+                            </span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-blue-600">
+                              Avg Time to Hire:
+                            </span>
+                            <span className="font-medium">
+                              {
+                                dashboardData.comparisonData.average
+                                  .avgTimeToHire
+                              }{" "}
+                              days
                             </span>
                           </div>
                         </div>
@@ -479,12 +654,25 @@ export function RecruiterAnalyticsDashboard() {
                     </div>
 
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                      <h3 className="font-medium text-amber-800">Improvement Opportunities</h3>
+                      <h3 className="font-medium text-amber-800">
+                        Improvement Opportunities
+                      </h3>
                       <ul className="mt-2 space-y-1 list-disc list-inside text-amber-700">
-                        <li>Your average time to hire is 4 days faster than the average recruiter</li>
-                        <li>Your conversion rate is 3.9% higher than the average</li>
-                        <li>The top performer generates 28.7% more referrals than you</li>
-                        <li>The top performer's conversion rate is 3% higher than yours</li>
+                        <li>
+                          Your average time to hire is 4 days faster than the
+                          average recruiter
+                        </li>
+                        <li>
+                          Your conversion rate is 3.9% higher than the average
+                        </li>
+                        <li>
+                          The top performer generates 28.7% more referrals than
+                          you
+                        </li>
+                        <li>
+                          The top performer&apos;s conversion rate is 3% higher
+                          than yours
+                        </li>
                       </ul>
                     </div>
                   </div>
@@ -493,35 +681,48 @@ export function RecruiterAnalyticsDashboard() {
             </TabsContent>
 
             <TabsContent value="demographics" className="space-y-6">
-              <RecruiterDemographicsChart data={dashboardData.demographicsData} />
+              <RecruiterDemographicsChart
+                data={dashboardData.demographicsData}
+              />
               <Card>
                 <CardHeader>
                   <CardTitle>Demographic Insights</CardTitle>
-                  <CardDescription>Understanding your referral demographics</CardDescription>
+                  <CardDescription>
+                    Understanding your referral demographics
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                      <h3 className="font-medium text-blue-800">Gender Distribution</h3>
+                      <h3 className="font-medium text-blue-800">
+                        Gender Distribution
+                      </h3>
                       <p className="text-blue-700">
-                        Your referrals are well-balanced with 52% male and 45% female candidates, which is close to the
-                        ideal 50/50 split.
+                        Your referrals are well-balanced with 52% male and 45%
+                        female candidates, which is close to the ideal 50/50
+                        split.
                       </p>
                     </div>
 
                     <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                      <h3 className="font-medium text-green-800">Age Distribution</h3>
+                      <h3 className="font-medium text-green-800">
+                        Age Distribution
+                      </h3>
                       <p className="text-green-700">
-                        The majority (42%) of your referrals are in the 25-34 age range, which aligns well with the
-                        department's recruitment goals.
+                        The majority (42%) of your referrals are in the 25-34
+                        age range, which aligns well with the department&apos;s
+                        recruitment goals.
                       </p>
                     </div>
 
                     <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-                      <h3 className="font-medium text-amber-800">Source Distribution</h3>
+                      <h3 className="font-medium text-amber-800">
+                        Source Distribution
+                      </h3>
                       <p className="text-amber-700">
-                        Email (35%) and Facebook (25%) are your top referral sources. Consider diversifying to reach
-                        different demographic groups.
+                        Email (35%) and Facebook (25%) are your top referral
+                        sources. Consider diversifying to reach different
+                        demographic groups.
                       </p>
                     </div>
                   </div>
@@ -532,5 +733,5 @@ export function RecruiterAnalyticsDashboard() {
         </>
       )}
     </div>
-  )
+  );
 }

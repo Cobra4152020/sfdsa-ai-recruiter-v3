@@ -1,40 +1,43 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
-export async function runSqlQuery(query: string, revalidatePaths: string[] = []) {
+export async function runSqlQuery(query: string) {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Execute the SQL query using the exec_sql RPC function
-    const { data, error } = await supabase.rpc("exec_sql", { sql_query: query })
+    const { data, error } = await supabase.rpc("exec_sql", {
+      sql_query: query,
+    });
 
     if (error) {
-      console.error("Error executing SQL query:", error)
+      console.error("Error executing SQL query:", error);
       return {
         success: false,
         error: error.message,
         query,
-      }
+      };
     }
 
     // Revalidate any paths that might be affected by this query
-    
+
     return {
       success: true,
       data,
       query,
-    }
+    };
   } catch (error) {
-    console.error("Unexpected error executing SQL query:", error)
+    console.error("Unexpected error executing SQL query:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
       query,
-    }
+    };
   }
 }
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
 export async function POST(request: Request) {
@@ -44,9 +47,15 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error(`Error in runSqlQuery:`, error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      },
+      { status: 500 },
+    );
   }
 }

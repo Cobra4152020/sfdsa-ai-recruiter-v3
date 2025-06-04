@@ -2,9 +2,9 @@
 // In a production environment, this would be replaced with a more sophisticated system
 
 type KnowledgeEntry = {
-  keywords: string[]
-  response: string
-}
+  keywords: string[];
+  response: string;
+};
 
 const knowledgeBase: KnowledgeEntry[] = [
   {
@@ -118,25 +118,26 @@ const knowledgeBase: KnowledgeEntry[] = [
     response:
       "I'm here to help answer your questions about becoming a San Francisco Deputy Sheriff. You can ask me about the application process, requirements, training, benefits, salary, career opportunities, or any other aspects of the job you're curious about.",
   },
-]
+];
 
 export function generateResponse(userInput: string): string {
-  const input = userInput.toLowerCase()
+  const input = userInput.toLowerCase();
 
   // Check each knowledge entry for keyword matches
   for (const entry of knowledgeBase) {
     // Skip the default entry initially
-    if (entry.keywords.includes("default")) continue
+    if (entry.keywords.includes("default")) continue;
 
     // Check if any keywords match
     if (entry.keywords.some((keyword) => input.includes(keyword))) {
-      return entry.response
+      return entry.response;
     }
   }
 
   // If no matches, return the default response
   return (
-    knowledgeBase.find((entry) => entry.keywords.includes("default"))?.response ||
+    knowledgeBase.find((entry) => entry.keywords.includes("default"))
+      ?.response ||
     "I'm not sure about that, but I'd be happy to help with questions about becoming a San Francisco Deputy Sheriff."
-  )
+  );
 }

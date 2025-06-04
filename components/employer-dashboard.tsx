@@ -1,16 +1,22 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Calendar } from "@/components/ui/calendar"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Calendar } from "@/components/ui/calendar";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import {
   BarChart,
   Bar,
@@ -23,7 +29,7 @@ import {
   PieChart,
   Pie,
   Cell,
-} from "recharts"
+} from "recharts";
 import {
   User,
   Users,
@@ -36,32 +42,80 @@ import {
   Mail,
   Phone,
   Briefcase,
-} from "lucide-react"
+} from "lucide-react";
+
+interface Applicant {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  status: "new" | "in-progress" | "on-hold" | "approved" | "rejected";
+  applicationDate: string;
+  progress: number;
+  documents: number;
+  interviews: number;
+  background: "pending" | "in-progress" | "cleared" | "failed";
+  rating: number;
+  notes: string;
+  avatar: string;
+}
+
+interface Interview {
+  id: string;
+  applicantId: string;
+  applicantName: string;
+  date: string;
+  type: string;
+  location: string;
+  status: string;
+  interviewers: string[];
+}
+
+interface Analytics {
+  applicationsByStatus: { name: string; value: number }[];
+  applicationsByMonth: {
+    name: string;
+    applications: number;
+    approved: number;
+  }[];
+  conversionRates: { name: string; rate: number }[];
+  topRecruitmentSources: { name: string; value: number }[];
+}
+
+interface DashboardData {
+  applicants: Applicant[];
+  interviews: Interview[];
+  analytics: Analytics;
+}
 
 interface EmployerDashboardProps {
-  className?: string
+  className?: string;
 }
 
 export function EmployerDashboard({ className }: EmployerDashboardProps) {
-  const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState("overview")
-  const [isLoading, setIsLoading] = useState(true)
-  const [dashboardData, setDashboardData] = useState<any>(null)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [selectedStatus, setSelectedStatus] = useState("all")
-  const [selectedApplicant, setSelectedApplicant] = useState<any>(null)
-  const [feedbackText, setFeedbackText] = useState("")
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
+  );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
+    null,
+  );
+  const [feedbackText, setFeedbackText] = useState("");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         // In a real implementation, this would be an API call
         // For now, we'll use mock data
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const mockApplicants = [
+        const mockApplicants: Applicant[] = [
           {
             id: "app1",
             name: "John Smith",
@@ -89,7 +143,8 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             interviews: 1,
             background: "in-progress",
             rating: 5,
-            notes: "Excellent communication skills, previous law enforcement experience.",
+            notes:
+              "Excellent communication skills, previous law enforcement experience.",
             avatar: "/user-app2.png",
           },
           {
@@ -152,9 +207,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             notes: "Did not meet minimum requirements for physical fitness.",
             avatar: "/placeholder.svg?height=64&width=64&query=user-app6",
           },
-        ]
+        ];
 
-        const mockInterviews = [
+        const mockInterviews: Interview[] = [
           {
             id: "int1",
             applicantId: "app2",
@@ -185,7 +240,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             status: "scheduled",
             interviewers: ["Sheriff Smith", "Undersheriff Jones"],
           },
-        ]
+        ];
 
         const mockAnalytics = {
           applicationsByStatus: [
@@ -215,22 +270,22 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             { name: "Social Media", value: 15 },
             { name: "Other", value: 5 },
           ],
-        }
+        };
 
         setDashboardData({
           applicants: mockApplicants,
           interviews: mockInterviews,
           analytics: mockAnalytics,
-        })
+        });
       } catch (error) {
-        console.error("Error fetching dashboard data:", error)
+        console.error("Error fetching dashboard data:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchDashboardData()
-  }, [])
+    fetchDashboardData();
+  }, []);
 
   const handleScheduleInterview = () => {
     if (!selectedApplicant || !selectedDate) {
@@ -238,17 +293,17 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
         title: "Missing information",
         description: "Please select an applicant and a date",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     toast({
       title: "Interview Scheduled",
       description: `Interview with ${selectedApplicant.name} has been scheduled for ${selectedDate.toLocaleDateString()}.`,
-    })
+    });
 
-    setSelectedDate(undefined)
-  }
+    setSelectedDate(undefined);
+  };
 
   const handleSendFeedback = () => {
     if (!selectedApplicant || !feedbackText.trim()) {
@@ -256,44 +311,47 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
         title: "Missing information",
         description: "Please select an applicant and enter feedback",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     toast({
       title: "Feedback Sent",
       description: `Feedback has been sent to ${selectedApplicant.name}.`,
-    })
+    });
 
-    setFeedbackText("")
-  }
+    setFeedbackText("");
+  };
 
   const filteredApplicants =
-    dashboardData?.applicants.filter((applicant: any) => {
+    dashboardData?.applicants.filter((applicant) => {
       const matchesSearch =
         applicant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        applicant.email.toLowerCase().includes(searchQuery.toLowerCase())
-      const matchesStatus = selectedStatus === "all" || applicant.status === selectedStatus
-      return matchesSearch && matchesStatus
-    }) || []
+        applicant.email.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesStatus =
+        selectedStatus === "all" || applicant.status === selectedStatus;
+      return matchesSearch && matchesStatus;
+    }) || [];
 
-  if (isLoading) {
+  if (isLoading || !dashboardData) {
     return (
       <div className={className}>
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </div>
-    )
+    );
   }
 
-  const COLORS = ["primary", "secondary", "accent", "muted", "background"]
+  const COLORS = ["primary", "secondary", "accent", "muted", "background"];
 
   return (
     <div className={className}>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-primary dark:text-accent">Employer Dashboard</h2>
+          <h2 className="text-2xl font-bold text-primary dark:text-accent">
+            Employer Dashboard
+          </h2>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="applicants">Applicants</TabsTrigger>
@@ -307,22 +365,36 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Applicants</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Applicants
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.applicants.length}</div>
-                <div className="text-xs text-muted-foreground mt-1">+3 this week</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.applicants.length}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  +3 this week
+                </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">In Progress</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  In Progress
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {dashboardData.applicants.filter((a: any) => a.status === "in-progress").length}
+                  {
+                    dashboardData.applicants.filter(
+                      (a) => a.status === "in-progress",
+                    ).length
+                  }
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">+2 this week</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  +2 this week
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -331,18 +403,30 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {dashboardData.applicants.filter((a: any) => a.status === "approved").length}
+                  {
+                    dashboardData.applicants.filter(
+                      (a) => a.status === "approved",
+                    ).length
+                  }
                 </div>
-                <div className="text-xs text-muted-foreground mt-1">+1 this week</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  +1 this week
+                </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Upcoming Interviews</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Upcoming Interviews
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.interviews.length}</div>
-                <div className="text-xs text-muted-foreground mt-1">Next: May 20</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.interviews.length}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Next: May 20
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -352,7 +436,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Application Status</CardTitle>
-                <CardDescription>Current distribution of applicant statuses</CardDescription>
+                <CardDescription>
+                  Current distribution of applicant statuses
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -363,14 +449,21 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                        }
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {dashboardData.analytics.applicationsByStatus.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
+                        {dashboardData.analytics.applicationsByStatus.map(
+                          (entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ),
+                        )}
                       </Pie>
                       <Tooltip />
                       <Legend />
@@ -383,19 +476,31 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Applications Over Time</CardTitle>
-                <CardDescription>Monthly application and approval rates</CardDescription>
+                <CardDescription>
+                  Monthly application and approval rates
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dashboardData.analytics.applicationsByMonth}>
+                    <BarChart
+                      data={dashboardData.analytics.applicationsByMonth}
+                    >
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="applications" fill="var(--primary)" name="Total Applications" />
-                      <Bar dataKey="approved" fill="var(--accent)" name="Approved" />
+                      <Bar
+                        dataKey="applications"
+                        fill="var(--primary)"
+                        name="Total Applications"
+                      />
+                      <Bar
+                        dataKey="approved"
+                        fill="var(--accent)"
+                        name="Approved"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -417,8 +522,12 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                     </div>
                     <div>
                       <h4 className="font-medium">New Application</h4>
-                      <p className="text-sm text-muted-foreground">John Smith submitted a new application</p>
-                      <p className="text-xs text-muted-foreground mt-1">Today at 2:30 PM</p>
+                      <p className="text-sm text-muted-foreground">
+                        John Smith submitted a new application
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Today at 2:30 PM
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -427,8 +536,12 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                     </div>
                     <div>
                       <h4 className="font-medium">Application Approved</h4>
-                      <p className="text-sm text-muted-foreground">Michael Brown's application was approved</p>
-                      <p className="text-xs text-muted-foreground mt-1">Yesterday at 11:10 AM</p>
+                      <p className="text-sm text-muted-foreground">
+                        Michael Brown&apos;s application was approved
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Yesterday at 11:10 AM
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -440,7 +553,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       <p className="text-sm text-muted-foreground">
                         Oral Board interview scheduled with Maria Rodriguez
                       </p>
-                      <p className="text-xs text-muted-foreground mt-1">Yesterday at 9:45 AM</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Yesterday at 9:45 AM
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -449,8 +564,12 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                     </div>
                     <div>
                       <h4 className="font-medium">Document Verified</h4>
-                      <p className="text-sm text-muted-foreground">David Chen's background check completed</p>
-                      <p className="text-xs text-muted-foreground mt-1">May 15, 2023 at 3:20 PM</p>
+                      <p className="text-sm text-muted-foreground">
+                        David Chen&apos;s background check completed
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        May 15, 2023 at 3:20 PM
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -464,15 +583,20 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
               <CardContent>
                 <div className="space-y-4">
                   {dashboardData.applicants
-                    .filter((a: any) => a.rating >= 4)
-                    .sort((a: any, b: any) => b.rating - a.rating)
+                    .filter((a) => a.rating >= 4)
+                    .sort((a, b) => b.rating - a.rating)
                     .slice(0, 3)
-                    .map((applicant: any) => (
-                      <div key={applicant.id} className="flex items-start space-x-4">
+                    .map((applicant) => (
+                      <div
+                        key={applicant.id}
+                        className="flex items-start space-x-4"
+                      >
                         <div className="relative">
                           <div
                             className="w-12 h-12 rounded-full bg-cover bg-center border-2 border-primary"
-                            style={{ backgroundImage: `url(${applicant.avatar})` }}
+                            style={{
+                              backgroundImage: `url(${applicant.avatar})`,
+                            }}
                           ></div>
                           <div className="absolute -bottom-1 -right-1 bg-accent rounded-full p-1">
                             <Star className="h-3 w-3 text-primary" />
@@ -486,7 +610,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                                 <Star
                                   key={i}
                                   className={`h-3 w-3 ${
-                                    i < applicant.rating ? "text-accent fill-accent" : "text-gray-300"
+                                    i < applicant.rating
+                                      ? "text-accent fill-accent"
+                                      : "text-gray-300"
                                   }`}
                                 />
                               ))}
@@ -498,7 +624,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                               {applicant.progress}% Complete
                             </Badge>
                           </div>
-                          <p className="text-xs text-muted-foreground mt-1">{applicant.notes}</p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {applicant.notes}
+                          </p>
                         </div>
                       </div>
                     ))}
@@ -545,7 +673,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                     <p>No applicants found matching your criteria.</p>
                   </div>
                 ) : (
-                  filteredApplicants.map((applicant: any) => (
+                  filteredApplicants.map((applicant) => (
                     <div
                       key={applicant.id}
                       className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
@@ -554,7 +682,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                         <div className="flex items-center space-x-4">
                           <div
                             className="w-12 h-12 rounded-full bg-cover bg-center border-2 border-primary"
-                            style={{ backgroundImage: `url(${applicant.avatar})` }}
+                            style={{
+                              backgroundImage: `url(${applicant.avatar})`,
+                            }}
                           ></div>
                           <div>
                             <h4 className="font-medium">{applicant.name}</h4>
@@ -583,18 +713,21 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                           >
                             {applicant.status
                               .split("-")
-                              .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                              .map(
+                                (word: string) =>
+                                  word.charAt(0).toUpperCase() + word.slice(1),
+                              )
                               .join(" ")}
                           </Badge>
                           <Button
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              setSelectedApplicant(applicant)
+                              setSelectedApplicant(applicant);
                               toast({
                                 title: "Applicant Selected",
                                 description: `${applicant.name} has been selected for review.`,
-                              })
+                              });
                             }}
                           >
                             View Details
@@ -613,11 +746,15 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       <div className="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="flex items-center space-x-2">
                           <FileText className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{applicant.documents} Documents</span>
+                          <span className="text-sm">
+                            {applicant.documents} Documents
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Users className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm">{applicant.interviews} Interviews</span>
+                          <span className="text-sm">
+                            {applicant.interviews} Interviews
+                          </span>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Briefcase className="h-4 w-4 text-muted-foreground" />
@@ -632,7 +769,8 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                                     : "text-yellow-600"
                               }
                             >
-                              {applicant.background.charAt(0).toUpperCase() + applicant.background.slice(1)}
+                              {applicant.background.charAt(0).toUpperCase() +
+                                applicant.background.slice(1)}
                             </span>
                           </span>
                         </div>
@@ -647,12 +785,16 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
           {selectedApplicant && (
             <Card>
               <CardHeader>
-                <CardTitle>Applicant Details: {selectedApplicant.name}</CardTitle>
+                <CardTitle>
+                  Applicant Details: {selectedApplicant.name}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
-                    <h3 className="text-lg font-medium mb-4">Personal Information</h3>
+                    <h3 className="text-lg font-medium mb-4">
+                      Personal Information
+                    </h3>
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
                         <User className="h-4 w-4 text-muted-foreground" />
@@ -672,11 +814,17 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       <div className="flex items-center space-x-2">
                         <CalendarIcon className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">Applied:</span>
-                        <span>{new Date(selectedApplicant.applicationDate).toLocaleDateString()}</span>
+                        <span>
+                          {new Date(
+                            selectedApplicant.applicationDate,
+                          ).toLocaleDateString()}
+                        </span>
                       </div>
                     </div>
 
-                    <h3 className="text-lg font-medium mt-6 mb-4">Application Status</h3>
+                    <h3 className="text-lg font-medium mt-6 mb-4">
+                      Application Status
+                    </h3>
                     <div className="space-y-3">
                       <div className="flex items-center space-x-2">
                         <span className="font-medium">Current Status:</span>
@@ -696,7 +844,10 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                         >
                           {selectedApplicant.status
                             .split("-")
-                            .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                            .map(
+                              (word: string) =>
+                                word.charAt(0).toUpperCase() + word.slice(1),
+                            )
                             .join(" ")}
                         </Badge>
                       </div>
@@ -715,7 +866,10 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                                 : "text-yellow-600"
                           }
                         >
-                          {selectedApplicant.background.charAt(0).toUpperCase() + selectedApplicant.background.slice(1)}
+                          {selectedApplicant.background
+                            .charAt(0)
+                            .toUpperCase() +
+                            selectedApplicant.background.slice(1)}
                         </span>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -725,7 +879,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                             <Star
                               key={i}
                               className={`h-4 w-4 ${
-                                i < selectedApplicant.rating ? "text-accent fill-accent" : "text-gray-300"
+                                i < selectedApplicant.rating
+                                  ? "text-accent fill-accent"
+                                  : "text-gray-300"
                               }`}
                             />
                           ))}
@@ -734,7 +890,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                     </div>
 
                     <h3 className="text-lg font-medium mt-6 mb-4">Notes</h3>
-                    <p className="text-sm text-muted-foreground">{selectedApplicant.notes}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {selectedApplicant.notes}
+                    </p>
                   </div>
 
                   <div>
@@ -782,8 +940,8 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                           onClick={() => {
                             toast({
                               title: "Documents Downloaded",
-                              description: `${selectedApplicant.name}'s documents have been downloaded.`,
-                            })
+                              description: `${selectedApplicant.name}&apos;s documents have been downloaded.`,
+                            });
                           }}
                         >
                           <Download className="h-4 w-4 mr-2" />
@@ -796,7 +954,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                             toast({
                               title: "Email Sent",
                               description: `An email has been sent to ${selectedApplicant.name}.`,
-                            })
+                            });
                           }}
                         >
                           <Mail className="h-4 w-4 mr-2" />
@@ -816,11 +974,13 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Upcoming Interviews</CardTitle>
-                <CardDescription>Scheduled interviews with applicants</CardDescription>
+                <CardDescription>
+                  Scheduled interviews with applicants
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboardData.interviews.map((interview: any) => (
+                  {dashboardData.interviews.map((interview) => (
                     <div
                       key={interview.id}
                       className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
@@ -839,26 +999,39 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                               Scheduled
                             </Badge>
                           </div>
-                          <p className="text-sm font-medium">Applicant: {interview.applicantName}</p>
-                          <p className="text-sm text-muted-foreground">{interview.location}</p>
+                          <p className="text-sm font-medium">
+                            Applicant: {interview.applicantName}
+                          </p>
+                          <p className="text-sm text-muted-foreground">
+                            {interview.location}
+                          </p>
                           <p className="text-sm font-medium mt-1">
-                            {new Date(interview.date).toLocaleString(undefined, {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                              hour: "numeric",
-                              minute: "numeric",
-                            })}
+                            {new Date(interview.date).toLocaleString(
+                              undefined,
+                              {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                                hour: "numeric",
+                                minute: "numeric",
+                              },
+                            )}
                           </p>
                           <div className="mt-2">
                             <p className="text-sm font-medium">Interviewers:</p>
                             <div className="flex flex-wrap gap-1 mt-1">
-                              {interview.interviewers.map((interviewer: string, index: number) => (
-                                <Badge key={index} variant="secondary" className="text-xs">
-                                  {interviewer}
-                                </Badge>
-                              ))}
+                              {interview.interviewers.map(
+                                (interviewer: string, index: number) => (
+                                  <Badge
+                                    key={index}
+                                    variant="secondary"
+                                    className="text-xs"
+                                  >
+                                    {interviewer}
+                                  </Badge>
+                                ),
+                              )}
                             </div>
                           </div>
                         </div>
@@ -871,7 +1044,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                             toast({
                               title: "Calendar Added",
                               description: `"${interview.type}" has been added to your calendar.`,
-                            })
+                            });
                           }}
                         >
                           Add to Calendar
@@ -883,7 +1056,7 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                             toast({
                               title: "Interview Details",
                               description: `Viewing details for "${interview.type}" with ${interview.applicantName}`,
-                            })
+                            });
                           }}
                         >
                           View Details
@@ -898,7 +1071,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Schedule New Interview</CardTitle>
-                <CardDescription>Set up an interview with an applicant</CardDescription>
+                <CardDescription>
+                  Set up an interview with an applicant
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -908,14 +1083,16 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       id="applicant-select"
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                       onChange={(e) => {
-                        const applicant = dashboardData.applicants.find((a: any) => a.id === e.target.value)
-                        setSelectedApplicant(applicant || null)
+                        const applicant = dashboardData.applicants.find(
+                          (a) => a.id === e.target.value,
+                        );
+                        setSelectedApplicant(applicant || null);
                       }}
                     >
                       <option value="">Select an applicant</option>
                       {dashboardData.applicants
-                        .filter((a: any) => a.status !== "rejected")
-                        .map((applicant: any) => (
+                        .filter((a) => a.status !== "rejected")
+                        .map((applicant) => (
                           <option key={applicant.id} value={applicant.id}>
                             {applicant.name}
                           </option>
@@ -946,9 +1123,10 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                       className="border rounded-md p-3"
                       disabled={(date) => {
                         // Disable weekends and past dates
-                        const day = date.getDay()
-                        const isPastDate = date < new Date(new Date().setHours(0, 0, 0, 0))
-                        return day === 0 || day === 6 || isPastDate
+                        const day = date.getDay();
+                        const isPastDate =
+                          date < new Date(new Date().setHours(0, 0, 0, 0));
+                        return day === 0 || day === 6 || isPastDate;
                       }}
                     />
                   </div>
@@ -971,7 +1149,10 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
 
                   <div>
                     <Label htmlFor="interviewers">Interviewers</Label>
-                    <Input id="interviewers" placeholder="Enter interviewer names (comma separated)" />
+                    <Input
+                      id="interviewers"
+                      placeholder="Enter interviewer names (comma separated)"
+                    />
                   </div>
 
                   <Button
@@ -991,7 +1172,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Application Status Distribution</CardTitle>
-                <CardDescription>Current distribution of applicant statuses</CardDescription>
+                <CardDescription>
+                  Current distribution of applicant statuses
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -1002,14 +1185,21 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                        }
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {dashboardData.analytics.applicationsByStatus.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
+                        {dashboardData.analytics.applicationsByStatus.map(
+                          (entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ),
+                        )}
                       </Pie>
                       <Tooltip />
                       <Legend />
@@ -1022,19 +1212,31 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Applications Over Time</CardTitle>
-                <CardDescription>Monthly application and approval rates</CardDescription>
+                <CardDescription>
+                  Monthly application and approval rates
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={dashboardData.analytics.applicationsByMonth}>
+                    <BarChart
+                      data={dashboardData.analytics.applicationsByMonth}
+                    >
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="name" />
                       <YAxis />
                       <Tooltip />
                       <Legend />
-                      <Bar dataKey="applications" fill="var(--primary)" name="Total Applications" />
-                      <Bar dataKey="approved" fill="var(--accent)" name="Approved" />
+                      <Bar
+                        dataKey="applications"
+                        fill="var(--primary)"
+                        name="Total Applications"
+                      />
+                      <Bar
+                        dataKey="approved"
+                        fill="var(--accent)"
+                        name="Approved"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
@@ -1046,11 +1248,13 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Conversion Rates</CardTitle>
-                <CardDescription>Application process conversion metrics</CardDescription>
+                <CardDescription>
+                  Application process conversion metrics
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboardData.analytics.conversionRates.map((item: any) => (
+                  {dashboardData.analytics.conversionRates.map((item) => (
                     <div key={item.name}>
                       <div className="flex justify-between text-sm mb-1">
                         <span>{item.name}</span>
@@ -1066,7 +1270,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Top Recruitment Sources</CardTitle>
-                <CardDescription>Where applicants are coming from</CardDescription>
+                <CardDescription>
+                  Where applicants are coming from
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="h-[300px]">
@@ -1077,14 +1283,21 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                         cx="50%"
                         cy="50%"
                         labelLine={false}
-                        label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                        label={({ name, percent }) =>
+                          `${name}: ${(percent * 100).toFixed(0)}%`
+                        }
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {dashboardData.analytics.topRecruitmentSources.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
+                        {dashboardData.analytics.topRecruitmentSources.map(
+                          (entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={COLORS[index % COLORS.length]}
+                            />
+                          ),
+                        )}
                       </Pie>
                       <Tooltip />
                       <Legend />
@@ -1098,7 +1311,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
           <Card>
             <CardHeader>
               <CardTitle>Download Reports</CardTitle>
-              <CardDescription>Export recruitment analytics data</CardDescription>
+              <CardDescription>
+                Export recruitment analytics data
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -1108,8 +1323,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                   onClick={() => {
                     toast({
                       title: "Report Downloaded",
-                      description: "Applicant Status Report has been downloaded.",
-                    })
+                      description:
+                        "Applicant Status Report has been downloaded.",
+                    });
                   }}
                 >
                   <Download className="h-4 w-4 mr-2" />
@@ -1121,8 +1337,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                   onClick={() => {
                     toast({
                       title: "Report Downloaded",
-                      description: "Conversion Metrics Report has been downloaded.",
-                    })
+                      description:
+                        "Conversion Metrics Report has been downloaded.",
+                    });
                   }}
                 >
                   <Download className="h-4 w-4 mr-2" />
@@ -1134,8 +1351,9 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
                   onClick={() => {
                     toast({
                       title: "Report Downloaded",
-                      description: "Recruitment Sources Report has been downloaded.",
-                    })
+                      description:
+                        "Recruitment Sources Report has been downloaded.",
+                    });
                   }}
                 >
                   <Download className="h-4 w-4 mr-2" />
@@ -1147,5 +1365,5 @@ export function EmployerDashboard({ className }: EmployerDashboardProps) {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

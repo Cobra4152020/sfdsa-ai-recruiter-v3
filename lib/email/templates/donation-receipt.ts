@@ -1,9 +1,9 @@
 interface DonationReceiptProps {
-  amount: number
-  donorName: string
-  donationDate: string
-  donationId: string
-  isRecurring: boolean
+  amount: number;
+  donorName: string;
+  donationDate: string;
+  donationId: string;
+  isRecurring: boolean;
 }
 
 export function donationReceiptTemplate({
@@ -118,5 +118,5 @@ export function donationReceiptTemplate({
       </div>
     </body>
     </html>
-  `
+  `;
 }

@@ -1,53 +1,56 @@
 "use client";
 
-import { HeroSection } from "@/components/hero-section"
-import { BenefitsSection } from "@/components/benefits-section"
-import { TestimonialsSection } from "@/components/testimonials-section"
-import { FAQSection } from "@/components/faq-section"
-import { CTASection } from "@/components/cta-section"
-import { DebugUser } from "@/components/debug-user"
-import { TopRecruitsScroll } from "@/components/top-recruits-scroll"
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
-import { ApplicationProgressGamification } from "@/components/application-progress-gamification"
-import { PointsIntroduction } from "@/components/points-introduction"
-import { ErrorBoundary } from "@/components/error-boundary"
-import { useUser } from "@/context/user-context"
-import { useRegistration } from "@/context/registration-context"
-import { UserProvider } from "@/context/user-context"
-import { RegistrationProvider } from "@/context/registration-context"
-import { AuthModalProvider } from "@/context/auth-modal-context"
-import { useState, useEffect } from "react"
-import { Spinner } from "@/components/ui/spinner"
+import { HeroSection } from "@/components/hero-section";
+import { BenefitsSection } from "@/components/benefits-section";
+import { TestimonialsSection } from "@/components/testimonials-section";
+import { FAQSection } from "@/components/faq-section";
+import { CTASection } from "@/components/cta-section";
+import { DebugUser } from "@/components/debug-user";
+import TopRecruitsScroll from "@/components/top-recruits-scroll";
+import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
+import { ApplicationProgressGamification } from "@/components/application-progress-gamification";
+import { PointsIntroduction } from "@/components/points-introduction";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { useUser } from "@/context/user-context";
+import { useRegistration } from "@/context/registration-context";
+import { UserProvider } from "@/context/user-context";
+import { RegistrationProvider } from "@/context/registration-context";
+import { AuthModalProvider } from "@/context/auth-modal-context";
+import { useState, useEffect } from "react";
+import { Spinner } from "@/components/ui/spinner";
 
 function HomeContent() {
-  const { currentUser } = useUser()
-  const { openRegistrationPopup } = useRegistration()
-  const [mounted, setMounted] = useState(false)
+  const { currentUser } = useUser();
+  const { openRegistrationPopup } = useRegistration();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Spinner size="lg" />
       </div>
-    )
+    );
   }
 
   const showOptInForm = (applying = false) => {
-    if (!openRegistrationPopup) return
+    if (!openRegistrationPopup) return;
     openRegistrationPopup({
       applying,
       initialTab: applying ? "optin" : "signin",
-    })
-  }
+    });
+  };
 
   return (
     <ErrorBoundary>
       <main className="flex-1 w-full">
-        <HeroSection onGetStarted={() => showOptInForm(true)} showOptInForm={showOptInForm} />
+        <HeroSection
+          onGetStarted={() => showOptInForm(true)}
+          showOptInForm={showOptInForm}
+        />
 
         <TopRecruitsScroll />
 
@@ -84,26 +87,29 @@ function HomeContent() {
         <CTASection showOptInForm={showOptInForm} />
       </main>
 
-      {process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true" ? <DebugUser /> : null}
+      {process.env.NODE_ENV === "development" ||
+      process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true" ? (
+        <DebugUser />
+      ) : null}
 
       <AskSgtKenButton position="fixed" variant="secondary" />
     </ErrorBoundary>
-  )
+  );
 }
 
 export default function Home() {
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Spinner size="lg" />
       </div>
-    )
+    );
   }
 
   return (
@@ -116,5 +122,5 @@ export default function Home() {
         </RegistrationProvider>
       </UserProvider>
     </ErrorBoundary>
-  )
-} 
+  );
+}

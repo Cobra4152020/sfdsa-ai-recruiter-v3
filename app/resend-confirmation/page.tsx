@@ -1,58 +1,67 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
-import { Mail, AlertCircle, CheckCircle2 } from "lucide-react"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { Mail, AlertCircle, CheckCircle2 } from "lucide-react";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 export default function ResendConfirmationPage() {
-  const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [isSuccess, setIsSuccess] = useState(false)
-  const { toast } = useToast()
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { error } = await supabase.auth.resend({
         type: "signup",
         email,
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
-      setIsSuccess(true)
+      setIsSuccess(true);
       toast({
         title: "Confirmation email sent!",
         description: "Please check your email for the confirmation link.",
-      })
+      });
     } catch (error) {
-      console.error("Error resending confirmation:", error)
+      console.error("Error resending confirmation:", error);
       toast({
         title: "Error",
         description: "Failed to resend confirmation email. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <main className="container mx-auto px-4 py-8 md:py-12">
       <div className="max-w-md mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">Resend Confirmation</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Resend Confirmation
+            </CardTitle>
             <CardDescription className="text-center">
               Enter your email to receive a new confirmation link
             </CardDescription>
@@ -63,9 +72,12 @@ export default function ResendConfirmationPage() {
                 <div className="flex justify-center">
                   <CheckCircle2 className="h-12 w-12 text-green-500" />
                 </div>
-                <h3 className="text-lg font-semibold">Confirmation Email Sent!</h3>
+                <h3 className="text-lg font-semibold">
+                  Confirmation Email Sent!
+                </h3>
                 <p className="text-gray-600">
-                  Please check your email for the confirmation link. If you don't see it, check your spam folder.
+                  Please check your email for the confirmation link. If you
+                  don&apos;t see it, check your spam folder.
                 </p>
               </div>
             ) : (
@@ -100,11 +112,11 @@ export default function ResendConfirmationPage() {
           <CardFooter className="flex justify-center">
             <div className="text-sm text-gray-500 flex items-center">
               <AlertCircle className="h-4 w-4 mr-2" />
-              Check your spam folder if you don't see the email
+              Check your spam folder if you don&apos;t see the email
             </div>
           </CardFooter>
         </Card>
       </div>
     </main>
-  )
+  );
 }

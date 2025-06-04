@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { AchievementBadge } from "./achievement-badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Share2, Trophy } from "lucide-react"
-import { BadgeSharingDialog } from "./badge-sharing-dialog"
-import { useUser } from "@/context/user-context"
+import { useState, useEffect } from "react";
+import { AchievementBadge } from "./achievement-badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Share2, Trophy } from "lucide-react";
+import { BadgeSharingDialog } from "./badge-sharing-dialog";
+import { useUser } from "@/context/user-context";
 
 type BadgeType =
   | "written"
@@ -20,46 +20,46 @@ type BadgeType =
   | "application-completed"
   | "first-response"
   | "frequent-user"
-  | "resource-downloader"
+  | "resource-downloader";
 
 interface UserBadge {
-  id: string
-  badge_type: BadgeType
-  name: string
-  description: string
-  earned_at: string
+  id: string;
+  badge_type: BadgeType;
+  name: string;
+  description: string;
+  earned_at: string;
 }
 
 export function EarnedBadges() {
-  const { currentUser, isLoggedIn } = useUser()
-  const [badges, setBadges] = useState<UserBadge[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isSharingOpen, setIsSharingOpen] = useState(false)
+  const { currentUser, isLoggedIn } = useUser();
+  const [badges, setBadges] = useState<UserBadge[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isSharingOpen, setIsSharingOpen] = useState(false);
 
   useEffect(() => {
     const fetchUserBadges = async () => {
       if (!currentUser?.id) {
-        setBadges([])
-        setIsLoading(false)
-        return
+        setBadges([]);
+        setIsLoading(false);
+        return;
       }
 
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       try {
-        const response = await fetch(`/api/users/${currentUser.id}/badges`)
-        const data = await response.json()
+        const response = await fetch(`/api/users/${currentUser.id}/badges`);
+        const data = await response.json();
 
         if (!data.success) {
-          throw new Error(data.message || "Failed to fetch badges")
+          throw new Error(data.message || "Failed to fetch badges");
         }
 
-        setBadges(data.badges)
+        setBadges(data.badges);
       } catch (err) {
-        console.error("Error fetching user badges:", err)
-        setError("Failed to load your badges. Please try again later.")
+        console.error("Error fetching user badges:", err);
+        setError("Failed to load your badges. Please try again later.");
 
         // For demo purposes, show some sample badges
         if (process.env.NODE_ENV === "development") {
@@ -78,18 +78,18 @@ export function EarnedBadges() {
               description: "Received first response from Sgt. Ken",
               earned_at: new Date().toISOString(),
             },
-          ])
+          ]);
         }
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchUserBadges()
-  }, [currentUser?.id])
+    fetchUserBadges();
+  }, [currentUser?.id]);
 
   if (!isLoggedIn) {
-    return null
+    return null;
   }
 
   return (
@@ -122,15 +122,22 @@ export function EarnedBadges() {
           ) : error ? (
             <div className="text-center py-8 text-red-500">{error}</div>
           ) : badges.length === 0 ? (
-            <div className="text-center py-8 text-muted-foreground">
-              <p>You haven't earned any badges yet.</p>
-              <p className="mt-2">Interact with Sgt. Ken and explore the application process to earn badges!</p>
+            <div className="text-center py-8 text-gray-500">
+              You haven&apos;t earned any badges yet. Start participating to
+              earn your first badge!
             </div>
           ) : (
             <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4 mt-4">
               {badges.map((badge) => (
-                <div key={badge.id} className="flex flex-col items-center text-center p-2">
-                  <AchievementBadge type={badge.badge_type} size="md" earned={true} />
+                <div
+                  key={badge.id}
+                  className="flex flex-col items-center text-center p-2"
+                >
+                  <AchievementBadge
+                    type={badge.badge_type}
+                    size="md"
+                    earned={true}
+                  />
                   <h3 className="font-medium mt-2 text-sm">{badge.name}</h3>
                 </div>
               ))}
@@ -146,5 +153,5 @@ export function EarnedBadges() {
         userName={currentUser?.name || "Recruit"}
       />
     </>
-  )
+  );
 }

@@ -22,4 +22,4 @@ export function ConversionRatesChart({ data }: ConversionRatesChartProps) {
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
   );
-} 
+}

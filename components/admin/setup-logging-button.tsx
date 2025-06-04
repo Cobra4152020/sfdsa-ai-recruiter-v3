@@ -1,50 +1,51 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { setupLoggingSystem } from "@/lib/actions/setup-logging-system"
-import { AlertCircle, CheckCircle, Database } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { setupLoggingSystem } from "@/lib/actions/setup-logging-system";
+import { AlertCircle, CheckCircle, Database } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export function SetupLoggingButton() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<{
-    success?: boolean
-    message?: string
-    created?: boolean
-  } | null>(null)
+    success?: boolean;
+    message?: string;
+    created?: boolean;
+  } | null>(null);
 
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const handleSetup = async () => {
-    setIsLoading(true)
-    setResult(null)
+    setIsLoading(true);
+    setResult(null);
 
     try {
-      const setupResult = await setupLoggingSystem({})
-      setResult(setupResult)
+      const setupResult = await setupLoggingSystem({});
+      setResult(setupResult);
 
       toast({
         title: setupResult.success ? "Setup Successful" : "Setup Failed",
         description: setupResult.message,
         variant: setupResult.success ? "default" : "destructive",
-      })
+      });
     } catch (error) {
-      console.error("Error setting up logging system:", error)
+      console.error("Error setting up logging system:", error);
       setResult({
         success: false,
-        message: error instanceof Error ? error.message : "Unknown error occurred",
-      })
+        message:
+          error instanceof Error ? error.message : "Unknown error occurred",
+      });
 
       toast({
         title: "Setup Failed",
         description: "An unexpected error occurred during setup",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -56,7 +57,9 @@ export function SetupLoggingButton() {
       {result && (
         <div
           className={`p-4 rounded-md ${
-            result.success ? "bg-green-50 border border-green-200" : "bg-red-50 border border-red-200"
+            result.success
+              ? "bg-green-50 border border-green-200"
+              : "bg-red-50 border border-red-200"
           }`}
         >
           {result.success ? (
@@ -65,9 +68,13 @@ export function SetupLoggingButton() {
               <div>
                 <p className="font-medium text-green-800">{result.message}</p>
                 {result.created ? (
-                  <p className="text-sm text-green-600 mt-1">Logging system tables were created successfully.</p>
+                  <p className="text-sm text-green-600 mt-1">
+                    Logging system tables were created successfully.
+                  </p>
                 ) : (
-                  <p className="text-sm text-green-600 mt-1">Logging system tables already exist.</p>
+                  <p className="text-sm text-green-600 mt-1">
+                    Logging system tables already exist.
+                  </p>
                 )}
               </div>
             </div>
@@ -83,5 +90,5 @@ export function SetupLoggingButton() {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,113 +1,125 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
-import { getClientSideSupabase } from "@/lib/supabase"
-import { Lock, AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react"
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { ImprovedHeader } from "@/components/improved-header";
+import { ImprovedFooter } from "@/components/improved-footer";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { getClientSideSupabase } from "@/lib/supabase";
+import { Lock, AlertCircle, CheckCircle2, Eye, EyeOff } from "lucide-react";
 
 export default function ResetPasswordPage() {
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const { toast } = useToast()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { toast } = useToast();
 
-  const supabase = getClientSideSupabase()
+  const supabase = getClientSideSupabase();
 
   // Extract token from URL if present
   useEffect(() => {
     // Check if we have the necessary parameters from the reset email
     if (!searchParams.has("type") || searchParams.get("type") !== "recovery") {
-      setError("Invalid password reset link. Please request a new one.")
+      setError("Invalid password reset link. Please request a new one.");
     }
 
     // Handle hash fragment for auth session
-    const hash = window.location.hash
+    const hash = window.location.hash;
     if (hash && hash.includes("access_token")) {
       // The hash contains the token, Supabase client will handle it
-      console.log("Hash fragment detected, Supabase will process it")
+      console.log("Hash fragment detected, Supabase will process it");
     }
-  }, [searchParams])
+  }, [searchParams]);
 
   const validatePasswords = () => {
-    if (!password) return "Password is required"
-    if (password.length < 6) return "Password must be at least 6 characters"
-    if (password !== confirmPassword) return "Passwords do not match"
-    return null
-  }
+    if (!password) return "Password is required";
+    if (password.length < 6) return "Password must be at least 6 characters";
+    if (password !== confirmPassword) return "Passwords do not match";
+    return null;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
-    const validationError = validatePasswords()
+    const validationError = validatePasswords();
     if (validationError) {
-      setError(validationError)
+      setError(validationError);
       toast({
         title: "Password reset failed",
         description: validationError,
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
-    setSuccess(false)
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
 
     try {
       // Get the current session
       const {
         data: { session },
-      } = await supabase.auth.getSession()
+      } = await supabase.auth.getSession();
 
       if (!session) {
-        throw new Error("No active session found. Please try the reset link again or request a new one.")
+        throw new Error(
+          "No active session found. Please try the reset link again or request a new one.",
+        );
       }
 
       const { error } = await supabase.auth.updateUser({
         password,
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
-      setSuccess(true)
+      setSuccess(true);
       toast({
         title: "Password updated",
         description: "Your password has been reset successfully",
-      })
+      });
 
       // Redirect to login after a short delay
       setTimeout(() => {
-        router.push("/login")
-      }, 3000)
+        router.push("/login");
+      }, 3000);
     } catch (error) {
-      console.error("Password reset error:", error)
-      setError(error instanceof Error ? error.message : "Failed to reset password")
+      console.error("Password reset error:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to reset password",
+      );
       toast({
         title: "Reset failed",
-        description: error instanceof Error ? error.message : "Failed to reset password",
+        description:
+          error instanceof Error ? error.message : "Failed to reset password",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -116,8 +128,12 @@ export default function ResetPasswordPage() {
         <div className="max-w-md mx-auto">
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">Create new password</CardTitle>
-              <CardDescription className="text-center">Enter your new password below</CardDescription>
+              <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+                Create new password
+              </CardTitle>
+              <CardDescription className="text-center">
+                Enter your new password below
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {error && (
@@ -132,7 +148,10 @@ export default function ResetPasswordPage() {
                   <CheckCircle2 className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
                   <div>
                     <p className="font-medium">Password reset successful!</p>
-                    <p className="text-sm mt-1">Your password has been updated. Redirecting to login page...</p>
+                    <p className="text-sm mt-1">
+                      Your password has been updated. Redirecting to login
+                      page...
+                    </p>
                   </div>
                 </div>
               ) : (
@@ -157,7 +176,9 @@ export default function ResetPasswordPage() {
                           size="icon"
                           className="absolute right-1 top-1"
                           onClick={() => setShowPassword(!showPassword)}
-                          aria-label={showPassword ? "Hide password" : "Show password"}
+                          aria-label={
+                            showPassword ? "Hide password" : "Show password"
+                          }
                         >
                           {showPassword ? (
                             <EyeOff className="h-4 w-4 text-gray-400" />
@@ -166,10 +187,14 @@ export default function ResetPasswordPage() {
                           )}
                         </Button>
                       </div>
-                      <p className="text-xs text-gray-500">Password must be at least 6 characters</p>
+                      <p className="text-xs text-gray-500">
+                        Password must be at least 6 characters
+                      </p>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Label htmlFor="confirmPassword">
+                        Confirm New Password
+                      </Label>
                       <div className="relative">
                         <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                         <Input
@@ -186,8 +211,14 @@ export default function ResetPasswordPage() {
                           variant="ghost"
                           size="icon"
                           className="absolute right-1 top-1"
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                          onClick={() =>
+                            setShowConfirmPassword(!showConfirmPassword)
+                          }
+                          aria-label={
+                            showConfirmPassword
+                              ? "Hide password"
+                              : "Show password"
+                          }
                         >
                           {showConfirmPassword ? (
                             <EyeOff className="h-4 w-4 text-gray-400" />
@@ -197,7 +228,11 @@ export default function ResetPasswordPage() {
                         </Button>
                       </div>
                     </div>
-                    <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
+                    <Button
+                      type="submit"
+                      className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                      disabled={isLoading}
+                    >
                       {isLoading ? (
                         <span className="flex items-center">
                           <span className="animate-spin mr-2">⟳</span>
@@ -212,7 +247,10 @@ export default function ResetPasswordPage() {
               )}
             </CardContent>
             <CardFooter className="flex justify-center">
-              <Link href="/login" className="text-sm text-[#0A3C1F] hover:underline">
+              <Link
+                href="/login"
+                className="text-sm text-[#0A3C1F] hover:underline"
+              >
                 Back to login
               </Link>
             </CardFooter>
@@ -221,5 +259,5 @@ export default function ResetPasswordPage() {
       </main>
       <ImprovedFooter />
     </>
-  )
+  );
 }

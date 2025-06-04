@@ -1,10 +1,10 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
-import { UserWithRole } from "@/app/types/user"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { UserWithRole } from "@/app/types/user";
 
 // Static mock data
 const mockPendingVolunteers: UserWithRole[] = [
@@ -19,7 +19,7 @@ const mockPendingVolunteers: UserWithRole[] = [
     has_applied: true,
     has_completed_profile: true,
     has_verified_email: true,
-    is_active: false
+    is_active: false,
   },
   {
     id: "4",
@@ -32,92 +32,98 @@ const mockPendingVolunteers: UserWithRole[] = [
     has_applied: true,
     has_completed_profile: true,
     has_verified_email: true,
-    is_active: false
-  }
+    is_active: false,
+  },
 ];
 
 export function PendingVolunteers() {
-  const [pendingVolunteers, setPendingVolunteers] = useState<UserWithRole[]>(mockPendingVolunteers)
-  const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
+  const [pendingVolunteers, setPendingVolunteers] = useState<UserWithRole[]>(
+    mockPendingVolunteers,
+  );
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const handleApprove = async (userId: string) => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       // In static export, just update the state
       if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
-        setPendingVolunteers(pendingVolunteers.filter(v => v.id !== userId))
+        setPendingVolunteers(pendingVolunteers.filter((v) => v.id !== userId));
         toast({
           title: "Success",
           description: "Volunteer approved successfully (Demo Mode)",
-        })
-        return
+        });
+        return;
       }
 
       const response = await fetch(`/api/admin/volunteers/${userId}/approve`, {
         method: "POST",
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to approve volunteer")
+        throw new Error("Failed to approve volunteer");
       }
 
-      setPendingVolunteers(pendingVolunteers.filter(v => v.id !== userId))
+      setPendingVolunteers(pendingVolunteers.filter((v) => v.id !== userId));
       toast({
         title: "Success",
         description: "Volunteer approved successfully",
-      })
+      });
     } catch (error) {
-      console.error("Error approving volunteer:", error)
+      console.error("Error approving volunteer:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to approve volunteer",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to approve volunteer",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleReject = async (userId: string) => {
     try {
-      setLoading(true)
+      setLoading(true);
 
       // In static export, just update the state
       if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
-        setPendingVolunteers(pendingVolunteers.filter(v => v.id !== userId))
+        setPendingVolunteers(pendingVolunteers.filter((v) => v.id !== userId));
         toast({
           title: "Success",
           description: "Volunteer rejected successfully (Demo Mode)",
-        })
-        return
+        });
+        return;
       }
 
       const response = await fetch(`/api/admin/volunteers/${userId}/reject`, {
         method: "POST",
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to reject volunteer")
+        throw new Error("Failed to reject volunteer");
       }
 
-      setPendingVolunteers(pendingVolunteers.filter(v => v.id !== userId))
+      setPendingVolunteers(pendingVolunteers.filter((v) => v.id !== userId));
       toast({
         title: "Success",
         description: "Volunteer rejected successfully",
-      })
+      });
     } catch (error) {
-      console.error("Error rejecting volunteer:", error)
+      console.error("Error rejecting volunteer:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to reject volunteer",
+        description:
+          error instanceof Error ? error.message : "Failed to reject volunteer",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -137,7 +143,10 @@ export function PendingVolunteers() {
               <div className="flex flex-col md:flex-row justify-between gap-4">
                 <div>
                   <p className="text-gray-600">{volunteer.email}</p>
-                  <p className="text-sm text-gray-500">Applied on {new Date(volunteer.created_at).toLocaleDateString()}</p>
+                  <p className="text-sm text-gray-500">
+                    Applied on{" "}
+                    {new Date(volunteer.created_at).toLocaleDateString()}
+                  </p>
                 </div>
                 <div className="flex gap-2">
                   <Button
@@ -160,5 +169,5 @@ export function PendingVolunteers() {
         ))
       )}
     </div>
-  )
+  );
 }

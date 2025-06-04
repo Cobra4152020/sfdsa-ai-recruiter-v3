@@ -1,44 +1,63 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
+import type { Badge } from "@/types/badge";
+import type { NFTAward } from "@/lib/nft-utils";
+
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar_url: string;
+  bio: string;
+  participation_count: number;
+  has_applied: boolean;
+  created_at: string;
+  rank?: number;
+  badge_count: number;
+  nft_count: number;
+  badges: Badge[];
+  nft_awards: NFTAward[];
+}
 
 export function useUserProfile(userId: string, enabled = true) {
-  const [profile, setProfile] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!enabled) return
+    if (!enabled) return;
 
     const fetchProfile = async () => {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       try {
         // Try to fetch from API first
         try {
-          const response = await fetch(`/api/users/${userId}/profile`)
+          const response = await fetch(`/api/users/${userId}/profile`);
 
           if (!response.ok) {
-            throw new Error("Failed to fetch user profile")
+            throw new Error("Failed to fetch user profile");
           }
 
-          const result = await response.json()
+          const result = await response.json();
 
           if (!result.success) {
-            throw new Error(result.message || "Failed to fetch user profile")
+            throw new Error(result.message || "Failed to fetch user profile");
           }
 
-          setProfile(result.profile)
+          setProfile(result.profile);
         } catch (apiError) {
-          console.error("API error:", apiError)
+          console.error("API error:", apiError);
 
           // Fallback to Supabase direct query
-          const { supabase } = require("@/lib/supabase/index")
+          const { supabase } = require("@/lib/supabase/index");
           try {
             const { data: userData, error: userError } = await supabase
               .from("users")
-              .select(`
+              .select(
+                `
                 id, 
                 name, 
                 email,
@@ -47,32 +66,33 @@ export function useUserProfile(userId: string, enabled = true) {
                 participation_count, 
                 has_applied,
                 created_at
-              `)
+              `,
+              )
               .eq("id", userId)
-              .single()
+              .single();
 
             if (userError) {
-              throw userError
+              throw userError;
             }
 
             // Get badges count
             const { count: badgeCount, error: badgeError } = await supabase
               .from("badges")
               .select("id", { count: "exact", head: true })
-              .eq("user_id", userId)
+              .eq("user_id", userId);
 
             if (badgeError) {
-              console.error("Error counting badges:", badgeError)
+              console.error("Error counting badges:", badgeError);
             }
 
             // Get NFT awards count
             const { count: nftCount, error: nftError } = await supabase
               .from("user_nft_awards")
               .select("id", { count: "exact", head: true })
-              .eq("user_id", userId)
+              .eq("user_id", userId);
 
             if (nftError) {
-              console.error("Error counting NFT awards:", nftError)
+              console.error("Error counting NFT awards:", nftError);
             }
 
             setProfile({
@@ -81,9 +101,9 @@ export function useUserProfile(userId: string, enabled = true) {
               nft_count: nftCount || 0,
               badges: [],
               nft_awards: [],
-            })
+            });
           } catch (supabaseErr) {
-            console.error("Supabase fallback error:", supabaseErr)
+            console.error("Supabase fallback error:", supabaseErr);
 
             // Use mock data as last resort
             setProfile({
@@ -100,23 +120,25 @@ export function useUserProfile(userId: string, enabled = true) {
               nft_count: 1,
               badges: [],
               nft_awards: [],
-            })
+            });
           }
         }
       } catch (err) {
-        console.error("Error in useUserProfile:", err)
-        setError(err instanceof Error ? err.message : "An unexpected error occurred")
+        console.error("Error in useUserProfile:", err);
+        setError(
+          err instanceof Error ? err.message : "An unexpected error occurred",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchProfile()
-  }, [userId, enabled])
+    fetchProfile();
+  }, [userId, enabled]);
 
   return {
     profile,
     isLoading,
     error,
-  }
+  };
 }

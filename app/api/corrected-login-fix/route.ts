@@ -1,12 +1,12 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Execute a corrected fix that matches the actual table structure
     const { data, error } = await supabase.rpc("exec_sql", {
@@ -38,10 +38,10 @@ export async function GET(request: Request) {
         
         COMMIT;
       `,
-    })
+    });
 
     if (error) {
-      console.error("Error executing corrected login fix API:", error)
+      console.error("Error executing corrected login fix API:", error);
       return NextResponse.json(
         {
           success: false,
@@ -50,24 +50,24 @@ export async function GET(request: Request) {
           details: error,
         },
         { status: 500 },
-      )
+      );
     }
 
     return NextResponse.json({
       success: true,
       message: "Login issues fixed successfully. Try logging in now.",
       data,
-    })
-  } catch (error: any) {
-    console.error("Unexpected error in corrected login fix API:", error)
+    });
+  } catch (error: unknown) {
+    console.error("Unexpected error in corrected login fix API:", error);
     return NextResponse.json(
       {
         success: false,
         message: "An unexpected error occurred",
-        error: error.message,
-        stack: error.stack,
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
       },
       { status: 500 },
-    )
+    );
   }
 }

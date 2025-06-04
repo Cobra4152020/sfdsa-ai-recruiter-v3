@@ -1,42 +1,33 @@
-"use client"
+"use client";
 
-import type { Applicant } from "./applicant-dashboard"
+import type { Applicant } from "./applicant-dashboard";
 
 interface ApplicantStatsProps {
-  applicants: Applicant[]
+  applicants: Applicant[];
 }
 
 export function ApplicantStats({ applicants }: ApplicantStatsProps) {
   // Calculate stats
-  const totalApplicants = applicants.length
+  const totalApplicants = applicants.length;
 
   const statusCounts = applicants.reduce(
     (acc, applicant) => {
-      const status = applicant.application_status
-      acc[status] = (acc[status] || 0) + 1
-      return acc
+      const status = applicant.application_status;
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
     },
     {} as Record<string, number>,
-  )
-
-  const referralCounts = applicants.reduce(
-    (acc, applicant) => {
-      const source = applicant.referral_source || "Direct"
-      acc[source] = (acc[source] || 0) + 1
-      return acc
-    },
-    {} as Record<string, number>,
-  )
+  );
 
   // Get counts for specific statuses
-  const pendingCount = statusCounts["pending"] || 0
-  const interestedCount = statusCounts["interested"] || 0
-  const appliedCount = statusCounts["applied"] || 0
-  const hiredCount = statusCounts["hired"] || 0
+  const pendingCount = statusCounts["pending"] || 0;
+  const appliedCount = statusCounts["applied"] || 0;
+  const hiredCount = statusCounts["hired"] || 0;
 
   // Calculate conversion rates
-  const applicationRate = totalApplicants > 0 ? (appliedCount / totalApplicants) * 100 : 0
-  const hireRate = appliedCount > 0 ? (hiredCount / appliedCount) * 100 : 0
+  const applicationRate =
+    totalApplicants > 0 ? (appliedCount / totalApplicants) * 100 : 0;
+  const hireRate = appliedCount > 0 ? (hiredCount / appliedCount) * 100 : 0;
 
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -60,5 +51,5 @@ export function ApplicantStats({ applicants }: ApplicantStatsProps) {
         <p className="text-2xl font-bold">{hireRate.toFixed(1)}%</p>
       </div>
     </div>
-  )
+  );
 }

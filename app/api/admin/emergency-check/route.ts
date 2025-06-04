@@ -1,14 +1,17 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { NextResponse } from "next/server"
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
     // Simple check of database connection
-    const supabase = getServiceSupabase()
-    const { data, error } = await supabase.from("user_types").select("*").limit(1)
+    const supabase = getServiceSupabase();
+    const { data, error } = await supabase
+      .from("user_types")
+      .select("*")
+      .limit(1);
 
     if (error) {
       return NextResponse.json(
@@ -19,7 +22,7 @@ export async function GET() {
           details: error,
         },
         { status: 500 },
-      )
+      );
     }
 
     return NextResponse.json({
@@ -30,7 +33,7 @@ export async function GET() {
         connectionStatus: "ok",
         sample: data,
       },
-    })
+    });
   } catch (error) {
     return NextResponse.json(
       {
@@ -39,6 +42,6 @@ export async function GET() {
         error: error instanceof Error ? error.message : "Unknown error",
       },
       { status: 500 },
-    )
+    );
   }
 }

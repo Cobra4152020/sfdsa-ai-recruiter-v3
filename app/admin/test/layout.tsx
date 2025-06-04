@@ -6,4 +6,4 @@ export default function AdminTestLayout({ children }: { children: ReactNode }) {
       <body>{children}</body>
     </html>
   );
-} 
+}

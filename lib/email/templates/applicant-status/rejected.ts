@@ -1,18 +1,18 @@
-import { emailTheme } from '../../theme';
+import { emailTheme } from "../../theme";
 
 interface RejectedTemplateProps {
-  firstName: string
-  lastName: string
-  trackingNumber: string
-  dashboardUrl: string
-  reapplyDate?: string
+  firstName: string;
+  lastName: string;
+  trackingNumber: string;
+  dashboardUrl: string;
+  reapplyDate?: string;
 }
 
 export function rejected({
   firstName,
-  lastName,
+  lastName, // eslint-disable-line @typescript-eslint/no-unused-vars
   trackingNumber,
-  dashboardUrl,
+  dashboardUrl, // eslint-disable-line @typescript-eslint/no-unused-vars
   reapplyDate = "in six months",
 }: RejectedTemplateProps): string {
   return `
@@ -130,5 +130,5 @@ export function rejected({
       </div>
     </body>
     </html>
-  `
+  `;
 }

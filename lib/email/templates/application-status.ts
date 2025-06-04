@@ -1,10 +1,10 @@
-import { emailTheme, getEmailThemeValue } from '../theme';
+import { emailTheme, getEmailThemeValue } from "../theme"; // eslint-disable-line @typescript-eslint/no-unused-vars
 
 interface ApplicationStatusTemplateProps {
-  recipientName: string
-  statusUpdate: string
-  nextSteps: string[]
-  dashboardUrl: string
+  recipientName: string;
+  statusUpdate: string;
+  nextSteps: string[];
+  dashboardUrl: string;
 }
 
 export function applicationStatus({
@@ -114,5 +114,5 @@ export function applicationStatus({
       </div>
     </body>
     </html>
-  `
+  `;
 }

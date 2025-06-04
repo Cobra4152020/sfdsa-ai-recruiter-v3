@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from "@/components/ui/button";
 
 const SUGGESTED_QUESTIONS = [
   "What are the requirements to become a deputy sheriff?",
@@ -6,11 +6,11 @@ const SUGGESTED_QUESTIONS = [
   "What is the starting salary?",
   "What benefits do deputies receive?",
   "What is the work schedule like?",
-  "Can you tell me about career advancement opportunities?"
-]
+  "Can you tell me about career advancement opportunities?",
+];
 
 interface ChatSuggestionsProps {
-  onSelect: (suggestion: string) => void
+  onSelect: (suggestion: string) => void;
 }
 
 export function ChatSuggestions({ onSelect }: ChatSuggestionsProps) {
@@ -28,5 +28,5 @@ export function ChatSuggestions({ onSelect }: ChatSuggestionsProps) {
         </Button>
       ))}
     </div>
-  )
-} 
+  );
+}

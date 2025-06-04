@@ -1,14 +1,18 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
-export async function setupAdminUser(userId: string, email: string, name: string) {
+export async function setupAdminUser(
+  userId: string,
+  email: string,
+  name: string,
+) {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Step 1: Create admin schema if it doesn't exist
     await supabase.rpc("exec_sql", {
       sql_query: "CREATE SCHEMA IF NOT EXISTS admin;",
-    })
+    });
 
     // Step 2: Create admin.users table if it doesn't exist
     await supabase.rpc("exec_sql", {
@@ -21,7 +25,7 @@ export async function setupAdminUser(userId: string, email: string, name: string
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         );
       `,
-    })
+    });
 
     // Step 3: Insert the admin user
     const { error: insertError } = await supabase.from("admin.users").upsert({
@@ -29,7 +33,7 @@ export async function setupAdminUser(userId: string, email: string, name: string
       email: email,
       name: name,
       updated_at: new Date().toISOString(),
-    })
+    });
 
     if (insertError) {
       // If direct insert fails, try using RPC
@@ -42,14 +46,14 @@ export async function setupAdminUser(userId: string, email: string, name: string
             name = EXCLUDED.name,
             updated_at = EXCLUDED.updated_at;
         `,
-      })
+      });
     }
 
     // Step 4: Ensure user_types entry exists
     const { error: userTypeError } = await supabase.from("user_types").upsert({
       user_id: userId,
       user_type: "admin",
-    })
+    });
 
     if (userTypeError) {
       await supabase.rpc("exec_sql", {
@@ -58,7 +62,7 @@ export async function setupAdminUser(userId: string, email: string, name: string
           VALUES ('${userId}', 'admin')
           ON CONFLICT (user_id) DO UPDATE SET user_type = 'admin';
         `,
-      })
+      });
     }
 
     // Step 5: Ensure user_roles entry exists
@@ -67,7 +71,7 @@ export async function setupAdminUser(userId: string, email: string, name: string
       role: "admin",
       assigned_at: new Date().toISOString(),
       is_active: true,
-    })
+    });
 
     if (userRoleError) {
       await supabase.rpc("exec_sql", {
@@ -78,7 +82,7 @@ export async function setupAdminUser(userId: string, email: string, name: string
             is_active = true,
             assigned_at = EXCLUDED.assigned_at;
         `,
-      })
+      });
     }
 
     // Step 6: Set up RLS policies for admin.users
@@ -96,19 +100,23 @@ export async function setupAdminUser(userId: string, email: string, name: string
           )
         );
       `,
-    })
+    });
 
-        return { success: true, message: "Admin user setup completed successfully" }
+    return {
+      success: true,
+      message: "Admin user setup completed successfully",
+    };
   } catch (error) {
-    console.error("Error setting up admin user:", error)
+    console.error("Error setting up admin user:", error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "An unexpected error occurred",
-    }
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
 export async function POST(request: Request) {
@@ -118,9 +126,15 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error(`Error in setupAdminUser:`, error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      },
+      { status: 500 },
+    );
   }
 }

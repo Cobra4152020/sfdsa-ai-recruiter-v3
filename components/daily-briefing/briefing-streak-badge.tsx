@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion } from "framer-motion"
-import { Flame } from "lucide-react"
-import { useUser } from "@/context/user-context"
-import { getClientSideSupabase } from "@/lib/supabase"
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Flame } from "lucide-react";
+import { useUser } from "@/context/user-context";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 export function BriefingStreakBadge() {
-  const [streak, setStreak] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const { currentUser } = useUser()
+  const [streak, setStreak] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const { currentUser } = useUser();
 
   useEffect(() => {
     const fetchStreak = async () => {
       if (!currentUser) {
-        setIsLoading(false)
-        return
+        setIsLoading(false);
+        return;
       }
 
       try {
-        const supabase = getClientSideSupabase()
+        const supabase = getClientSideSupabase();
 
         // This is a placeholder - you would need to implement the actual streak calculation
         // in your database, possibly via a function like get_user_briefing_streak
@@ -27,38 +27,38 @@ export function BriefingStreakBadge() {
           .from("user_briefing_stats")
           .select("streak")
           .eq("user_id", currentUser.id)
-          .single()
+          .single();
 
         if (error) {
-          console.error("Error fetching streak:", error)
-          return
+          console.error("Error fetching streak:", error);
+          return;
         }
 
         if (data) {
-          setStreak(data.streak || 0)
+          setStreak(data.streak || 0);
         }
       } catch (error) {
-        console.error("Exception in fetchStreak:", error)
+        console.error("Exception in fetchStreak:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchStreak()
-  }, [currentUser])
+    fetchStreak();
+  }, [currentUser]);
 
   if (isLoading || !currentUser || streak === 0) {
-    return null
+    return null;
   }
 
   // Determine badge color based on streak length
-  let badgeColor = "bg-blue-500"
+  let badgeColor = "bg-blue-500";
   if (streak >= 30) {
-    badgeColor = "bg-purple-600"
+    badgeColor = "bg-purple-600";
   } else if (streak >= 14) {
-    badgeColor = "bg-red-500"
+    badgeColor = "bg-red-500";
   } else if (streak >= 7) {
-    badgeColor = "bg-orange-500"
+    badgeColor = "bg-orange-500";
   }
 
   return (
@@ -91,5 +91,5 @@ export function BriefingStreakBadge() {
       </motion.div>
       {streak} day streak
     </motion.div>
-  )
+  );
 }

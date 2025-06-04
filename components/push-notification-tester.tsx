@@ -1,29 +1,38 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Textarea } from "@/components/ui/textarea"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CheckCircle, XCircle } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle, XCircle } from "lucide-react";
 
 export function PushNotificationTester() {
-  const [userId, setUserId] = useState("")
-  const [title, setTitle] = useState("")
-  const [message, setMessage] = useState("")
-  const [type, setType] = useState("system")
-  const [actionUrl, setActionUrl] = useState("/")
-  const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
+  const [userId, setUserId] = useState("");
+  const [title, setTitle] = useState("");
+  const [message, setMessage] = useState("");
+  const [type, setType] = useState("system");
+  const [actionUrl, setActionUrl] = useState("/");
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<{
+    success: boolean;
+    message: string;
+  } | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setResult(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setResult(null);
 
     try {
       const response = await fetch("/api/notifications/test-push", {
@@ -38,30 +47,31 @@ export function PushNotificationTester() {
           type,
           actionUrl,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
         setResult({
           success: true,
           message: "Push notification sent successfully!",
-        })
+        });
       } else {
         setResult({
           success: false,
           message: data.message || "Failed to send push notification",
-        })
+        });
       }
-    } catch (error) {
+    } catch (_error) {
+      console.error("Failed to register:", _error);
       setResult({
         success: false,
         message: "An error occurred while sending the push notification",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -70,7 +80,11 @@ export function PushNotificationTester() {
           variant={result.success ? "default" : "destructive"}
           className={result.success ? "bg-green-50 border-green-200" : ""}
         >
-          {result.success ? <CheckCircle className="h-4 w-4 text-green-500" /> : <XCircle className="h-4 w-4" />}
+          {result.success ? (
+            <CheckCircle className="h-4 w-4 text-green-500" />
+          ) : (
+            <XCircle className="h-4 w-4" />
+          )}
           <AlertTitle>{result.success ? "Success" : "Error"}</AlertTitle>
           <AlertDescription>{result.message}</AlertDescription>
         </Alert>
@@ -138,5 +152,5 @@ export function PushNotificationTester() {
         {isLoading ? "Sending..." : "Send Test Notification"}
       </Button>
     </form>
-  )
+  );
 }

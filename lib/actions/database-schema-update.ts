@@ -1,4 +1,4 @@
-export async function databaseSchemaUpdate(params: any) {
+export async function databaseSchemaUpdate(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/database-schema-update`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function databaseSchemaUpdate(params: any) {
     console.error(`Error in databaseSchemaUpdate:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

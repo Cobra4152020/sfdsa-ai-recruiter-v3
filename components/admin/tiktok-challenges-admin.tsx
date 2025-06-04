@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { TrendingUp, Users, Video } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { TrendingUp, Users, Video } from "lucide-react";
 
 interface TikTokChallenge {
-  id: string
-  title: string
-  participants: number
-  views: number
-  status: "active" | "completed"
-  hashtag: string
-  endDate: string
+  id: string;
+  title: string;
+  participants: number;
+  views: number;
+  status: "active" | "completed";
+  hashtag: string;
+  endDate: string;
 }
 
 interface TikTokChallengesAdminProps {
-  challenges?: TikTokChallenge[]
+  challenges?: TikTokChallenge[];
 }
 
 const defaultChallenges: TikTokChallenge[] = [
@@ -27,7 +27,7 @@ const defaultChallenges: TikTokChallenge[] = [
     views: 12500,
     status: "active" as const,
     hashtag: "SFDeputyLife",
-    endDate: "2024-04-01"
+    endDate: "2024-04-01",
   },
   {
     id: "2",
@@ -36,7 +36,7 @@ const defaultChallenges: TikTokChallenge[] = [
     views: 8200,
     status: "active" as const,
     hashtag: "SFDeputyTraining",
-    endDate: "2024-04-15"
+    endDate: "2024-04-15",
   },
   {
     id: "3",
@@ -45,13 +45,19 @@ const defaultChallenges: TikTokChallenge[] = [
     views: 18900,
     status: "completed" as const,
     hashtag: "SFDeputyCommunity",
-    endDate: "2024-03-15"
-  }
-]
+    endDate: "2024-03-15",
+  },
+];
 
-export function TikTokChallengesAdmin({ challenges = defaultChallenges }: TikTokChallengesAdminProps) {
-  const activeChallenges = challenges.filter((challenge) => challenge.status === "active")
-  const completedChallenges = challenges.filter((challenge) => challenge.status === "completed")
+export function TikTokChallengesAdmin({
+  challenges = defaultChallenges,
+}: TikTokChallengesAdminProps) {
+  const activeChallenges = challenges.filter(
+    (challenge) => challenge.status === "active",
+  );
+  const completedChallenges = challenges.filter(
+    (challenge) => challenge.status === "completed",
+  );
 
   return (
     <div className="space-y-4">
@@ -74,13 +80,19 @@ export function TikTokChallengesAdmin({ challenges = defaultChallenges }: TikTok
                         <Video className="h-4 w-4 text-[#0A3C1F]" />
                         <span className="font-medium">{challenge.title}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">#{challenge.hashtag}</p>
-                      <p className="text-sm text-muted-foreground">Ends: {challenge.endDate}</p>
+                      <p className="text-sm text-muted-foreground">
+                        #{challenge.hashtag}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Ends: {challenge.endDate}
+                      </p>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4 text-[#0A3C1F]" />
-                        <span className="text-sm">{challenge.participants}</span>
+                        <span className="text-sm">
+                          {challenge.participants}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <TrendingUp className="h-4 w-4 text-[#0A3C1F]" />
@@ -114,13 +126,19 @@ export function TikTokChallengesAdmin({ challenges = defaultChallenges }: TikTok
                         <Video className="h-4 w-4 text-gray-500" />
                         <span className="font-medium">{challenge.title}</span>
                       </div>
-                      <p className="text-sm text-muted-foreground">#{challenge.hashtag}</p>
-                      <p className="text-sm text-muted-foreground">Ended: {challenge.endDate}</p>
+                      <p className="text-sm text-muted-foreground">
+                        #{challenge.hashtag}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        Ended: {challenge.endDate}
+                      </p>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4 text-gray-500" />
-                        <span className="text-sm">{challenge.participants}</span>
+                        <span className="text-sm">
+                          {challenge.participants}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1">
                         <TrendingUp className="h-4 w-4 text-gray-500" />
@@ -135,5 +153,5 @@ export function TikTokChallengesAdmin({ challenges = defaultChallenges }: TikTok
         </ScrollArea>
       </div>
     </div>
-  )
-} 
+  );
+}

@@ -1,7 +1,7 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Shield, Home, Search, ArrowLeft } from "lucide-react"
-import { PageWrapper } from "@/components/page-wrapper"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Shield, Home, Search, ArrowLeft } from "lucide-react";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function NotFound() {
   return (
@@ -17,9 +17,14 @@ export default function NotFound() {
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-4">Page Not Found</h1>
+          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-4">
+            Page Not Found
+          </h1>
 
-          <p className="text-gray-600 mb-8">The page you're looking for doesn't exist or has been moved.</p>
+          <p className="text-gray-600 mb-8">
+            The page you&apos;re looking for doesn&apos;t exist or has been
+            moved.
+          </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
@@ -48,5 +53,5 @@ export default function NotFound() {
         </div>
       </main>
     </PageWrapper>
-  )
+  );
 }

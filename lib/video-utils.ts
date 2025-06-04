@@ -1,178 +1,193 @@
-import { Canvas, loadImage, CanvasRenderingContext2D as NodeCanvasRenderingContext2D, Image as NodeImage } from "canvas"
-import fs from "fs"
-import path from "path"
-import { spawn } from "child_process"
-import { v4 as uuidv4 } from "uuid"
-import os from "os"
-import { videoTheme } from "./video-theme"
+import {
+  Canvas,
+  loadImage,
+  CanvasRenderingContext2D as NodeCanvasRenderingContext2D,
+  Image as NodeImage,
+} from "canvas";
+import fs from "fs";
+import path from "path";
+import { spawn } from "child_process";
+import { v4 as uuidv4 } from "uuid";
+import os from "os";
+import { videoTheme } from "./video-theme";
 
 // Declare module for uuid
-declare module 'uuid' {
+declare module "uuid" {
   export function v4(): string;
 }
 
 // Type for our canvas context that includes only the methods we use
 type CustomCanvasContext = Pick<
   CanvasRenderingContext2D,
-  | 'clearRect'
-  | 'fillStyle'
-  | 'fillRect'
-  | 'createLinearGradient'
-  | 'save'
-  | 'restore'
-  | 'translate'
-  | 'rotate'
-  | 'drawImage'
-  | 'globalAlpha'
-  | 'globalCompositeOperation'
-  | 'beginPath'
-  | 'arc'
-  | 'fill'
-  | 'font'
-  | 'textAlign'
-  | 'shadowColor'
-  | 'shadowBlur'
-  | 'shadowOffsetX'
-  | 'shadowOffsetY'
-  | 'measureText'
-  | 'fillText'
+  | "clearRect"
+  | "fillStyle"
+  | "fillRect"
+  | "createLinearGradient"
+  | "save"
+  | "restore"
+  | "translate"
+  | "rotate"
+  | "drawImage"
+  | "globalAlpha"
+  | "globalCompositeOperation"
+  | "beginPath"
+  | "arc"
+  | "fill"
+  | "font"
+  | "textAlign"
+  | "shadowColor"
+  | "shadowBlur"
+  | "shadowOffsetX"
+  | "shadowOffsetY"
+  | "measureText"
+  | "fillText"
 >;
 
 export interface VideoFrame {
   background?: {
-    color?: string
+    color?: string;
     gradient?: {
       stops: Array<{
-        position: number
-        color: string
-      }>
-    }
-  }
+        position: number;
+        color: string;
+      }>;
+    };
+  };
   images?: Array<{
-    path: string
-    x?: number
-    y?: number
-    width?: number
-    height?: number
-    opacity?: number
-    centered?: boolean
-    scale?: number
-    rotation?: number
-  }>
+    path: string;
+    x?: number;
+    y?: number;
+    width?: number;
+    height?: number;
+    opacity?: number;
+    centered?: boolean;
+    scale?: number;
+    rotation?: number;
+  }>;
   texts?: Array<{
-    text: string
-    x?: number
-    y: number
-    fontSize?: number
-    fontFamily?: string
-    fontWeight?: string
-    color?: string
-    align?: CanvasTextAlign
-    opacity?: number
-    maxWidth?: number
-    lineHeight?: number
+    text: string;
+    x?: number;
+    y: number;
+    fontSize?: number;
+    fontFamily?: string;
+    fontWeight?: string;
+    color?: string;
+    align?: CanvasTextAlign;
+    opacity?: number;
+    maxWidth?: number;
+    lineHeight?: number;
     shadow?: {
-      color?: string
-      blur?: number
-      offsetX?: number
-      offsetY?: number
-    }
-  }>
+      color?: string;
+      blur?: number;
+      offsetX?: number;
+      offsetY?: number;
+    };
+  }>;
   effects?: {
     shine?: {
-      x: number
-      y: number
-      width: number
-      height: number
-      opacity?: number
-    }
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+      opacity?: number;
+    };
     particles?: {
-      color?: string
+      color?: string;
       items: Array<{
-        x: number
-        y: number
-        size: number
-      }>
-    }
-  }
+        x: number;
+        y: number;
+        size: number;
+      }>;
+    };
+  };
 }
 
 export interface VideoConfig {
-  width: number
-  height: number
-  fps: number
-  duration: number
-  outputPath: string
-  tempDir?: string
-  ffmpegPath?: string
+  width: number;
+  height: number;
+  fps: number;
+  duration: number;
+  outputPath: string;
+  tempDir?: string;
+  ffmpegPath?: string;
   watermark?: {
-    text: string
-    position: "top-left" | "top-right" | "bottom-left" | "bottom-right"
-    fontSize?: number
-    color?: string
-    padding?: number
-  }
+    text: string;
+    position: "top-left" | "top-right" | "bottom-left" | "bottom-right";
+    fontSize?: number;
+    color?: string;
+    padding?: number;
+  };
   audio?: {
-    path: string
-    volume?: number
-    fadeIn?: number
-    fadeOut?: number
-  }
+    path: string;
+    volume?: number;
+    fadeIn?: number;
+    fadeOut?: number;
+  };
 }
 
 /**
  * Generates a video from a sequence of frames
  */
-export async function generateVideo(frames: VideoFrame[], config: VideoConfig): Promise<string> {
-  const { width, height, fps, duration, outputPath } = config
-  const tempDir = config.tempDir || path.join(os.tmpdir(), `tiktok-${uuidv4()}`)
+export async function generateVideo(
+  frames: VideoFrame[],
+  config: VideoConfig,
+): Promise<string> {
+  const { width, height, fps, duration, outputPath } = config;
+  const tempDir =
+    config.tempDir || path.join(os.tmpdir(), `tiktok-${uuidv4()}`);
 
   // Create temp directory if it doesn't exist
   if (!fs.existsSync(tempDir)) {
-    fs.mkdirSync(tempDir, { recursive: true })
+    fs.mkdirSync(tempDir, { recursive: true });
   }
 
   // Calculate total frames based on duration and fps
-  const totalFrames = Math.ceil(duration * fps)
+  const totalFrames = Math.ceil(duration * fps);
 
   // Create canvas
-  const canvas = new Canvas(width, height)
-  const ctx = canvas.getContext("2d")
+  const canvas = new Canvas(width, height);
+  const ctx = canvas.getContext("2d");
 
-  console.log(`Generating ${totalFrames} frames...`)
+  console.log(`Generating ${totalFrames} frames...`);
 
   // Generate frames
   for (let i = 0; i < totalFrames; i++) {
     // Calculate progress (0 to 1)
-    const progress = i / totalFrames
+    const progress = i / totalFrames;
 
     // Find the appropriate frame from our animation frames
     // This maps our animation frames to the video timeline
-    const frameIndex = Math.min(Math.floor(progress * frames.length), frames.length - 1)
+    const frameIndex = Math.min(
+      Math.floor(progress * frames.length),
+      frames.length - 1,
+    );
 
     // Draw the frame
-    await drawVideoFrame(ctx, frames[frameIndex], width, height)
+    await drawVideoFrame(ctx, frames[frameIndex], width, height);
 
     // Add watermark if specified
     if (config.watermark) {
-      addWatermark(ctx, width, height, config.watermark)
+      addWatermark(ctx, width, height, config.watermark);
     }
 
     // Save frame as PNG
-    const frameFilePath = path.join(tempDir, `frame-${i.toString().padStart(6, "0")}.png`)
-    const buffer = canvas.toBuffer("image/png")
-    fs.writeFileSync(frameFilePath, buffer.toString('binary'))
+    const frameFilePath = path.join(
+      tempDir,
+      `frame-${i.toString().padStart(6, "0")}.png`,
+    );
+    const buffer = canvas.toBuffer("image/png");
+    fs.writeFileSync(frameFilePath, buffer.toString("binary"));
   }
 
-  console.log("Frames generated, creating video...")
+  console.log("Frames generated, creating video...");
 
   // Use FFmpeg to create video from frames
-  await createVideoFromFrames(tempDir, outputPath, fps, config)
+  await createVideoFromFrames(tempDir, outputPath, fps, config);
 
   // Clean up temp directory
-  fs.rmSync(tempDir, { recursive: true, force: true })
+  fs.rmSync(tempDir, { recursive: true, force: true });
 
-  return outputPath
+  return outputPath;
 }
 
 /**
@@ -185,22 +200,22 @@ async function drawVideoFrame(
   height: number,
 ): Promise<void> {
   // Clear canvas
-  ctx.clearRect(0, 0, width, height)
+  ctx.clearRect(0, 0, width, height);
 
   // Draw background
   if (frame.background) {
     if (typeof frame.background === "string") {
       // Solid color
-      ctx.fillStyle = frame.background
-      ctx.fillRect(0, 0, width, height)
+      ctx.fillStyle = frame.background;
+      ctx.fillRect(0, 0, width, height);
     } else if (frame.background.gradient) {
       // Gradient
-      const gradient = ctx.createLinearGradient(0, 0, 0, height)
+      const gradient = ctx.createLinearGradient(0, 0, 0, height);
       frame.background.gradient.stops.forEach((stop) => {
-        gradient.addColorStop(stop.position, stop.color)
-      })
-      ctx.fillStyle = gradient
-      ctx.fillRect(0, 0, width, height)
+        gradient.addColorStop(stop.position, stop.color);
+      });
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, width, height);
     }
   }
 
@@ -208,44 +223,50 @@ async function drawVideoFrame(
   if (frame.images) {
     for (const imageConfig of frame.images) {
       try {
-        const image = await loadImage(imageConfig.path)
+        const image = await loadImage(imageConfig.path);
 
         // Calculate position
-        let x = imageConfig.x || 0
-        let y = imageConfig.y || 0
+        let x = imageConfig.x || 0;
+        let y = imageConfig.y || 0;
 
         // Handle center positioning
         if (imageConfig.centered) {
-          x = width / 2 - (imageConfig.width || image.width) / 2
-          y = imageConfig.y || 0
+          x = width / 2 - (imageConfig.width || image.width) / 2;
+          y = imageConfig.y || 0;
         }
 
         // Calculate scale if provided
-        const scaledWidth = imageConfig.width || image.width
-        const scaledHeight = imageConfig.height || image.height
+        const scaledWidth = imageConfig.width || image.width;
+        const scaledHeight = imageConfig.height || image.height;
 
         // Apply opacity
         if (imageConfig.opacity !== undefined) {
-          ctx.globalAlpha = imageConfig.opacity
+          ctx.globalAlpha = imageConfig.opacity;
         }
 
         // Apply rotation if specified
         if (imageConfig.rotation) {
-          ctx.save()
+          ctx.save();
           // Rotate around the center of the image
-          ctx.translate(x + scaledWidth / 2, y + scaledHeight / 2)
-          ctx.rotate((imageConfig.rotation * Math.PI) / 180)
-          ctx.drawImage(image, -scaledWidth / 2, -scaledHeight / 2, scaledWidth, scaledHeight)
-          ctx.restore()
+          ctx.translate(x + scaledWidth / 2, y + scaledHeight / 2);
+          ctx.rotate((imageConfig.rotation * Math.PI) / 180);
+          ctx.drawImage(
+            image,
+            -scaledWidth / 2,
+            -scaledHeight / 2,
+            scaledWidth,
+            scaledHeight,
+          );
+          ctx.restore();
         } else {
           // Draw the image
-          ctx.drawImage(image, x, y, scaledWidth, scaledHeight)
+          ctx.drawImage(image, x, y, scaledWidth, scaledHeight);
         }
 
         // Reset opacity
-        ctx.globalAlpha = 1
+        ctx.globalAlpha = 1;
       } catch (error) {
-        console.error(`Error loading image ${imageConfig.path}:`, error)
+        console.error(`Error loading image ${imageConfig.path}:`, error);
       }
     }
   }
@@ -253,7 +274,7 @@ async function drawVideoFrame(
   // Draw texts
   if (frame.texts) {
     for (const textConfig of frame.texts) {
-      drawText(ctx, textConfig, width)
+      drawText(ctx, textConfig, width);
     }
   }
 
@@ -261,29 +282,37 @@ async function drawVideoFrame(
   if (frame.effects) {
     // Shine effect
     if (frame.effects.shine) {
-      const shine = frame.effects.shine
-      const gradient = ctx.createLinearGradient(shine.x, shine.y, shine.x + shine.width, shine.y + shine.height)
+      const shine = frame.effects.shine;
+      const gradient = ctx.createLinearGradient(
+        shine.x,
+        shine.y,
+        shine.x + shine.width,
+        shine.y + shine.height,
+      );
 
-      gradient.addColorStop(0, "rgba(255, 255, 255, 0)")
-      gradient.addColorStop(0.5, `rgba(255, 255, 255, ${shine.opacity || 0.7})`)
-      gradient.addColorStop(1, "rgba(255, 255, 255, 0)")
+      gradient.addColorStop(0, "rgba(255, 255, 255, 0)");
+      gradient.addColorStop(
+        0.5,
+        `rgba(255, 255, 255, ${shine.opacity || 0.7})`,
+      );
+      gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
 
-      ctx.save()
-      ctx.globalCompositeOperation = "lighter"
-      ctx.fillStyle = gradient
-      ctx.fillRect(shine.x, shine.y, shine.width, shine.height)
-      ctx.restore()
+      ctx.save();
+      ctx.globalCompositeOperation = "lighter";
+      ctx.fillStyle = gradient;
+      ctx.fillRect(shine.x, shine.y, shine.width, shine.height);
+      ctx.restore();
     }
 
     // Particles
     if (frame.effects.particles) {
-      const particles = frame.effects.particles
-      ctx.fillStyle = particles.color || "#FFD700"
+      const particles = frame.effects.particles;
+      ctx.fillStyle = particles.color || "#FFD700";
 
       for (const particle of particles.items) {
-        ctx.beginPath()
-        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2)
-        ctx.fill()
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
       }
     }
   }
@@ -294,66 +323,66 @@ async function drawVideoFrame(
  */
 function drawText(
   ctx: NodeCanvasRenderingContext2D,
-  textConfig: NonNullable<VideoFrame['texts']>[number],
-  canvasWidth: number
+  textConfig: NonNullable<VideoFrame["texts"]>[number],
+  canvasWidth: number,
 ): void {
-  ctx.save()
+  ctx.save();
 
   // Set text properties
-  const fontSize = textConfig.fontSize || 30
-  ctx.font = `${textConfig.fontWeight || "normal"} ${fontSize}px ${textConfig.fontFamily || "Arial"}`
-  ctx.fillStyle = textConfig.color || "white"
-  ctx.textAlign = textConfig.align || "center"
+  const fontSize = textConfig.fontSize || 30;
+  ctx.font = `${textConfig.fontWeight || "normal"} ${fontSize}px ${textConfig.fontFamily || "Arial"}`;
+  ctx.fillStyle = textConfig.color || "white";
+  ctx.textAlign = textConfig.align || "center";
 
   // Apply opacity
   if (textConfig.opacity !== undefined) {
-    ctx.globalAlpha = textConfig.opacity
+    ctx.globalAlpha = textConfig.opacity;
   }
 
   // Apply shadow if specified
   if (textConfig.shadow) {
-    ctx.shadowColor = textConfig.shadow.color || "rgba(0, 0, 0, 0.5)"
-    ctx.shadowBlur = textConfig.shadow.blur || 5
-    ctx.shadowOffsetX = textConfig.shadow.offsetX || 2
-    ctx.shadowOffsetY = textConfig.shadow.offsetY || 2
+    ctx.shadowColor = textConfig.shadow.color || "rgba(0, 0, 0, 0.5)";
+    ctx.shadowBlur = textConfig.shadow.blur || 5;
+    ctx.shadowOffsetX = textConfig.shadow.offsetX || 2;
+    ctx.shadowOffsetY = textConfig.shadow.offsetY || 2;
   }
 
   // Position text
-  const x = textConfig.x || canvasWidth / 2
-  const y = textConfig.y || 0
+  const x = textConfig.x || canvasWidth / 2;
+  const y = textConfig.y || 0;
 
   // Handle text wrapping
   if (textConfig.maxWidth && textConfig.text) {
-    const words = textConfig.text.split(" ")
-    let line = ""
-    const lines = []
+    const words = textConfig.text.split(" ");
+    let line = "";
+    const lines = [];
 
     for (let i = 0; i < words.length; i++) {
-      const testLine = line + words[i] + " "
-      const metrics = ctx.measureText(testLine)
+      const testLine = line + words[i] + " ";
+      const metrics = ctx.measureText(testLine);
 
       if (metrics.width > textConfig.maxWidth && i > 0) {
-        lines.push(line)
-        line = words[i] + " "
+        lines.push(line);
+        line = words[i] + " ";
       } else {
-        line = testLine
+        line = testLine;
       }
     }
 
-    lines.push(line)
+    lines.push(line);
 
     // Draw each line
-    const lineHeight = textConfig.lineHeight || fontSize * 1.2
+    const lineHeight = textConfig.lineHeight || fontSize * 1.2;
 
     lines.forEach((line, index) => {
-      ctx.fillText(line.trim(), x, y + index * lineHeight)
-    })
+      ctx.fillText(line.trim(), x, y + index * lineHeight);
+    });
   } else if (textConfig.text) {
     // Draw single line text
-    ctx.fillText(textConfig.text, x, y)
+    ctx.fillText(textConfig.text, x, y);
   }
 
-  ctx.restore()
+  ctx.restore();
 }
 
 /**
@@ -363,40 +392,40 @@ function addWatermark(
   ctx: NodeCanvasRenderingContext2D,
   width: number,
   height: number,
-  watermark: NonNullable<VideoConfig['watermark']>,
+  watermark: NonNullable<VideoConfig["watermark"]>,
 ): void {
-  if (!watermark) return
+  if (!watermark) return;
 
-  const fontSize = watermark.fontSize || 24
-  const padding = watermark.padding || 20
-  const color = watermark.color || "rgba(255, 255, 255, 0.7)"
+  const fontSize = watermark.fontSize || 24;
+  const padding = watermark.padding || 20;
+  const color = watermark.color || "rgba(255, 255, 255, 0.7)";
 
-  ctx.save()
-  ctx.font = `${fontSize}px Arial`
-  ctx.fillStyle = color
+  ctx.save();
+  ctx.font = `${fontSize}px Arial`;
+  ctx.fillStyle = color;
 
-  const textWidth = ctx.measureText(watermark.text).width
+  const textWidth = ctx.measureText(watermark.text).width;
 
-  let x = padding
-  let y = padding + fontSize
+  let x = padding;
+  let y = padding + fontSize;
 
   switch (watermark.position) {
     case "top-right":
-      x = width - textWidth - padding
-      y = padding + fontSize
-      break
+      x = width - textWidth - padding;
+      y = padding + fontSize;
+      break;
     case "bottom-left":
-      x = padding
-      y = height - padding
-      break
+      x = padding;
+      y = height - padding;
+      break;
     case "bottom-right":
-      x = width - textWidth - padding
-      y = height - padding
-      break
+      x = width - textWidth - padding;
+      y = height - padding;
+      break;
   }
 
-  ctx.fillText(watermark.text, x, y)
-  ctx.restore()
+  ctx.fillText(watermark.text, x, y);
+  ctx.restore();
 }
 
 /**
@@ -409,8 +438,8 @@ async function createVideoFromFrames(
   config: VideoConfig,
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const ffmpegPath = config.ffmpegPath || "ffmpeg"
-    const framePattern = path.join(framesDir, "frame-%06d.png")
+    const ffmpegPath = config.ffmpegPath || "ffmpeg";
+    const framePattern = path.join(framesDir, "frame-%06d.png");
 
     const args = [
       "-y", // Overwrite output file if it exists
@@ -418,30 +447,39 @@ async function createVideoFromFrames(
       fps.toString(),
       "-i",
       framePattern,
-    ]
+    ];
 
     // Add audio if specified
     if (config.audio?.path) {
-      args.push("-i", config.audio.path)
+      args.push("-i", config.audio.path);
 
       // Set volume if specified
       if (config.audio.volume !== undefined) {
-        args.push("-filter_complex", `[1:a]volume=${config.audio.volume}[a]`, "-map", "0:v", "-map", "[a]")
+        args.push(
+          "-filter_complex",
+          `[1:a]volume=${config.audio.volume}[a]`,
+          "-map",
+          "0:v",
+          "-map",
+          "[a]",
+        );
       }
 
       // Add fade in/out if specified
       if (config.audio.fadeIn || config.audio.fadeOut) {
-        const fadeFilters = []
+        const fadeFilters = [];
         if (config.audio.fadeIn) {
-          fadeFilters.push(`afade=t=in:st=0:d=${config.audio.fadeIn}`)
+          fadeFilters.push(`afade=t=in:st=0:d=${config.audio.fadeIn}`);
         }
         if (config.audio.fadeOut) {
-          const fadeOutStart = config.duration - (config.audio.fadeOut || 0)
-          fadeFilters.push(`afade=t=out:st=${fadeOutStart}:d=${config.audio.fadeOut}`)
+          const fadeOutStart = config.duration - (config.audio.fadeOut || 0);
+          fadeFilters.push(
+            `afade=t=out:st=${fadeOutStart}:d=${config.audio.fadeOut}`,
+          );
         }
 
         if (fadeFilters.length > 0) {
-          args.push("-af", fadeFilters.join(","))
+          args.push("-af", fadeFilters.join(","));
         }
       }
     }
@@ -457,33 +495,33 @@ async function createVideoFromFrames(
       "-preset",
       "medium", // Encoding speed/quality tradeoff
       outputPath,
-    )
+    );
 
-    console.log(`Running FFmpeg command: ${ffmpegPath} ${args.join(" ")}`)
+    console.log(`Running FFmpeg command: ${ffmpegPath} ${args.join(" ")}`);
 
-    const ffmpeg = spawn(ffmpegPath, args)
+    const ffmpeg = spawn(ffmpegPath, args);
 
     ffmpeg.stdout.on("data", (data) => {
-      console.log(`FFmpeg stdout: ${data}`)
-    })
+      console.log(`FFmpeg stdout: ${data}`);
+    });
 
     ffmpeg.stderr.on("data", (data) => {
-      console.log(`FFmpeg stderr: ${data}`)
-    })
+      console.log(`FFmpeg stderr: ${data}`);
+    });
 
     ffmpeg.on("close", (code) => {
       if (code === 0) {
-        console.log(`Video created successfully: ${outputPath}`)
-        resolve()
+        console.log(`Video created successfully: ${outputPath}`);
+        resolve();
       } else {
-        reject(new Error(`FFmpeg process exited with code ${code}`))
+        reject(new Error(`FFmpeg process exited with code ${code}`));
       }
-    })
+    });
 
     ffmpeg.on("error", (err) => {
-      reject(err)
-    })
-  })
+      reject(err);
+    });
+  });
 }
 
 /**
@@ -496,57 +534,60 @@ export function generateBadgeTikTokFrames(
   logoPath: string,
   totalFrames = 90, // 3 seconds at 30fps
 ): VideoFrame[] {
-  const frames: VideoFrame[] = []
+  const frames: VideoFrame[] = [];
 
   // Create animation sequence
   for (let i = 0; i < totalFrames; i++) {
-    const progress = i / (totalFrames - 1)
+    const progress = i / (totalFrames - 1);
 
     // Background transitions
     const background = {
       gradient: {
         stops: [
-          { position: 0, color: videoTheme.colors.background.gradient[0].color },
+          {
+            position: 0,
+            color: videoTheme.colors.background.gradient[0].color,
+          },
           { position: 1, color: `rgba(10, 60, 31, ${0.5 + progress * 0.3})` },
         ],
       },
-    }
+    };
 
     // Logo animation (first 1 second)
-    const logoOpacity = i < 15 ? i / 15 : i > 75 ? 1 - (i - 75) / 15 : 1
+    const logoOpacity = i < 15 ? i / 15 : i > 75 ? 1 - (i - 75) / 15 : 1;
 
     // Badge animation (appears after logo, with bounce effect)
-    let badgeScale = 0
-    let badgeRotation = 0
+    let badgeScale = 0;
+    let badgeRotation = 0;
 
     if (i < 15) {
       // Not visible yet
-      badgeScale = 0
+      badgeScale = 0;
     } else if (i < 30) {
       // Grow with bounce
-      const bounceProgress = (i - 15) / 15
-      badgeScale = Math.min(1.2 * Math.sin((bounceProgress * Math.PI) / 2), 1)
-      badgeRotation = 15 * (1 - bounceProgress)
+      const bounceProgress = (i - 15) / 15;
+      badgeScale = Math.min(1.2 * Math.sin((bounceProgress * Math.PI) / 2), 1);
+      badgeRotation = 15 * (1 - bounceProgress);
     } else if (i < 45) {
       // Settle with slight bounce
-      const bounceProgress = (i - 30) / 15
-      badgeScale = 1 + 0.1 * Math.sin(bounceProgress * Math.PI)
-      badgeRotation = 0
+      const bounceProgress = (i - 30) / 15;
+      badgeScale = 1 + 0.1 * Math.sin(bounceProgress * Math.PI);
+      badgeRotation = 0;
     } else {
       // Stable
-      badgeScale = 1
+      badgeScale = 1;
     }
 
     // Text animations
-    const titleOpacity = i < 30 ? 0 : i < 45 ? (i - 30) / 15 : 1
-    const badgeNameOpacity = i < 45 ? 0 : i < 60 ? (i - 45) / 15 : 1
-    const descriptionOpacity = i < 60 ? 0 : (i - 60) / 15
+    const titleOpacity = i < 30 ? 0 : i < 45 ? (i - 30) / 15 : 1;
+    const badgeNameOpacity = i < 45 ? 0 : i < 60 ? (i - 45) / 15 : 1;
+    const descriptionOpacity = i < 60 ? 0 : (i - 60) / 15;
 
     // Shine effect that moves across the badge
-    const shinePosition = i < 45 ? -400 : ((i - 45) / 30) * 1200 - 400
+    const shinePosition = i < 45 ? -400 : ((i - 45) / 30) * 1200 - 400;
 
     // Particles that appear gradually
-    const particlesVisible = i > 60
+    const particlesVisible = i > 60;
 
     frames.push({
       background,
@@ -648,10 +689,10 @@ export function generateBadgeTikTokFrames(
             }
           : undefined,
       },
-    })
+    });
   }
 
-  return frames
+  return frames;
 }
 
 /**
@@ -664,54 +705,57 @@ export function generateNFTTikTokFrames(
   logoPath: string,
   totalFrames = 90, // 3 seconds at 30fps
 ): VideoFrame[] {
-  const frames: VideoFrame[] = []
+  const frames: VideoFrame[] = [];
 
   // Create animation sequence
   for (let i = 0; i < totalFrames; i++) {
-    const progress = i / (totalFrames - 1)
+    const progress = i / (totalFrames - 1);
 
     // Background transitions
     const background = {
       gradient: {
         stops: [
-          { position: 0, color: videoTheme.colors.background.gradient[0].color },
+          {
+            position: 0,
+            color: videoTheme.colors.background.gradient[0].color,
+          },
           { position: 1, color: `rgba(10, 60, 31, ${0.5 + progress * 0.3})` },
         ],
       },
-    }
+    };
 
     // Logo animation
-    const logoOpacity = i < 15 ? i / 15 : i > 75 ? 1 - (i - 75) / 15 : 1
+    const logoOpacity = i < 15 ? i / 15 : i > 75 ? 1 - (i - 75) / 15 : 1;
 
     // NFT image animation
-    let nftScale = 0
-    let nftRotation = 0
+    let nftScale = 0;
+    let nftRotation = 0;
 
     if (i < 15) {
       // Not visible yet
-      nftScale = 0
+      nftScale = 0;
     } else if (i < 30) {
       // Grow with bounce
-      const bounceProgress = (i - 15) / 15
-      nftScale = Math.min(1.2 * Math.sin((bounceProgress * Math.PI) / 2), 1)
-      nftRotation = 15 * (1 - bounceProgress)
+      const bounceProgress = (i - 15) / 15;
+      nftScale = Math.min(1.2 * Math.sin((bounceProgress * Math.PI) / 2), 1);
+      nftRotation = 15 * (1 - bounceProgress);
     } else if (i < 45) {
       // Settle with slight bounce
-      const bounceProgress = (i - 30) / 15
-      nftScale = 1 + 0.1 * Math.sin(bounceProgress * Math.PI)
-      nftRotation = 0
+      const bounceProgress = (i - 30) / 15;
+      nftScale = 1 + 0.1 * Math.sin(bounceProgress * Math.PI);
+      nftRotation = 0;
     } else {
       // Stable
-      nftScale = 1
+      nftScale = 1;
     }
 
     // Text animations
-    const titleOpacity = i < 30 ? 0 : i < 45 ? (i - 30) / 15 : 1
-    const nftNameOpacity = i < 45 ? 0 : i < 60 ? (i - 45) / 15 : 1
-    const descriptionOpacity = i < 60 ? 0 : (i - 60) / 15
+    const titleOpacity = i < 30 ? 0 : i < 45 ? (i - 30) / 15 : 1;
+    const nftNameOpacity = i < 45 ? 0 : i < 60 ? (i - 45) / 15 : 1;
+    const descriptionOpacity = i < 60 ? 0 : (i - 60) / 15;
 
     // Shine effect that moves across the NFT
-    const shinePosition = i < 45 ? -400 : ((i - 45) / 30) * 1200 - 400
+    const shinePosition = i < 45 ? -400 : ((i - 45) / 30) * 1200 - 400;
 
     frames.push({
       background,
@@ -802,19 +846,20 @@ export function generateNFTTikTokFrames(
                 opacity: videoTheme.effects.shine.opacity,
               }
             : undefined,
-        particles: i > 60
-          ? {
-              color: videoTheme.colors.particles.primary,
-              items: Array.from({ length: 20 }, () => ({
-                x: Math.random() * 1920,
-                y: Math.random() * 1080,
-                size: Math.random() * 4 + 2,
-              })),
-            }
-          : undefined,
+        particles:
+          i > 60
+            ? {
+                color: videoTheme.colors.particles.primary,
+                items: Array.from({ length: 20 }, () => ({
+                  x: Math.random() * 1920,
+                  y: Math.random() * 1080,
+                  size: Math.random() * 4 + 2,
+                })),
+              }
+            : undefined,
       },
-    })
+    });
   }
 
-  return frames
+  return frames;
 }

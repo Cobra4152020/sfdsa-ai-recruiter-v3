@@ -1,73 +1,116 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Switch } from "@/components/ui/switch"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
-import { type DonationPointRule, getDonationPointRules, updateDonationPointRule } from "@/lib/donation-points-service"
+import { useState, useEffect, useCallback } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { type DonationPointRule } from "@/lib/donation-points-service";
 
 export default function DonationPointsAdmin() {
-  const [rules, setRules] = useState<DonationPointRule[]>([])
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const { toast } = useToast()
+  const [rules, setRules] = useState<DonationPointRule[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const { toast } = useToast();
+
+  const loadRules = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/donation-points");
+      const result = await res.json();
+      if (result.success && result.rules) {
+        setRules(result.rules);
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to load donation point rules",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      console.error("Error loading donation point rules:", err);
+      toast({
+        title: "Error",
+        description: "Failed to load donation point rules",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  }, [toast]);
 
   useEffect(() => {
-    loadRules()
-  }, [])
+    loadRules();
+  }, [loadRules]);
 
-  const loadRules = async () => {
-    setLoading(true)
-    const result = await getDonationPointRules()
-    if (result.success && result.rules) {
-      setRules(result.rules)
-    } else {
-      toast({
-        title: "Error",
-        description: result.message || "Failed to load donation point rules",
-        variant: "destructive",
-      })
-    }
-    setLoading(false)
-  }
-
-  const handleRuleChange = (index: number, field: keyof DonationPointRule, value: any) => {
-    const updatedRules = [...rules]
-    updatedRules[index] = { ...updatedRules[index], [field]: value }
-    setRules(updatedRules)
-  }
+  const handleRuleChange = (
+    index: number,
+    field: keyof DonationPointRule,
+    value: string | number | boolean | null,
+  ) => {
+    const updatedRules = [...rules];
+    updatedRules[index] = { ...updatedRules[index], [field]: value };
+    setRules(updatedRules);
+  };
 
   const saveRule = async (rule: DonationPointRule) => {
-    setSaving(true)
-    const result = await updateDonationPointRule(rule.id, rule)
-    if (result.success) {
-      toast({
-        title: "Success",
-        description: "Donation point rule updated successfully",
-      })
-    } else {
+    setSaving(true);
+    try {
+      const res = await fetch(`/api/donation-points`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rule }),
+      });
+      const result = await res.json();
+      if (result.success) {
+        toast({
+          title: "Success",
+          description: "Donation point rule updated successfully",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: result.message || "Failed to update donation point rule",
+          variant: "destructive",
+        });
+      }
+    } catch (err) {
+      console.error("Error updating donation point rule:", err);
       toast({
         title: "Error",
-        description: result.message || "Failed to update donation point rule",
+        description: "Failed to update donation point rule",
         variant: "destructive",
-      })
+      });
     }
-    setSaving(false)
-  }
+    setSaving(false);
+  };
 
   return (
     <div className="container mx-auto py-8 px-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#0A3C1F]">Donation Points Configuration</h1>
-          <p className="text-gray-600">Manage how points are awarded for donations</p>
+          <h1 className="text-3xl font-bold text-[#0A3C1F]">
+            Donation Points Configuration
+          </h1>
+          <p className="text-gray-600">
+            Manage how points are awarded for donations
+          </p>
         </div>
-        <Button onClick={loadRules} variant="outline" className="mt-4 md:mt-0" disabled={loading}>
+        <Button
+          onClick={loadRules}
+          variant="outline"
+          className="mt-4 md:mt-0"
+          disabled={loading}
+        >
           {loading ? "Loading..." : "Refresh"}
         </Button>
       </div>
@@ -88,7 +131,9 @@ export default function DonationPointsAdmin() {
                     <CardTitle className="text-lg">{rule.name}</CardTitle>
                     <Switch
                       checked={rule.isActive}
-                      onCheckedChange={(checked) => handleRuleChange(index, "isActive", checked)}
+                      onCheckedChange={(checked) =>
+                        handleRuleChange(index, "isActive", checked)
+                      }
                     />
                   </div>
                   <CardDescription>
@@ -104,30 +149,46 @@ export default function DonationPointsAdmin() {
                       <Input
                         id={`name-${rule.id}`}
                         value={rule.name}
-                        onChange={(e) => handleRuleChange(index, "name", e.target.value)}
+                        onChange={(e) =>
+                          handleRuleChange(index, "name", e.target.value)
+                        }
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`description-${rule.id}`}>Description</Label>
+                      <Label htmlFor={`description-${rule.id}`}>
+                        Description
+                      </Label>
                       <Textarea
                         id={`description-${rule.id}`}
                         value={rule.description || ""}
-                        onChange={(e) => handleRuleChange(index, "description", e.target.value)}
+                        onChange={(e) =>
+                          handleRuleChange(index, "description", e.target.value)
+                        }
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`minAmount-${rule.id}`}>Minimum Amount ($)</Label>
+                      <Label htmlFor={`minAmount-${rule.id}`}>
+                        Minimum Amount ($)
+                      </Label>
                       <Input
                         id={`minAmount-${rule.id}`}
                         type="number"
                         min="0"
                         step="0.01"
                         value={rule.minAmount}
-                        onChange={(e) => handleRuleChange(index, "minAmount", Number.parseFloat(e.target.value))}
+                        onChange={(e) =>
+                          handleRuleChange(
+                            index,
+                            "minAmount",
+                            Number.parseFloat(e.target.value),
+                          )
+                        }
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`maxAmount-${rule.id}`}>Maximum Amount ($, leave empty for no limit)</Label>
+                      <Label htmlFor={`maxAmount-${rule.id}`}>
+                        Maximum Amount ($, leave empty for no limit)
+                      </Label>
                       <Input
                         id={`maxAmount-${rule.id}`}
                         type="number"
@@ -138,25 +199,35 @@ export default function DonationPointsAdmin() {
                           handleRuleChange(
                             index,
                             "maxAmount",
-                            e.target.value ? Number.parseFloat(e.target.value) : null,
+                            e.target.value
+                              ? Number.parseFloat(e.target.value)
+                              : null,
                           )
                         }
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`pointsPerDollar-${rule.id}`}>Points Per Dollar</Label>
+                      <Label htmlFor={`pointsPerDollar-${rule.id}`}>
+                        Points Per Dollar
+                      </Label>
                       <Input
                         id={`pointsPerDollar-${rule.id}`}
                         type="number"
                         min="1"
                         value={rule.pointsPerDollar}
                         onChange={(e) =>
-                          handleRuleChange(index, "pointsPerDollar", Number.parseInt(e.target.value, 10))
+                          handleRuleChange(
+                            index,
+                            "pointsPerDollar",
+                            Number.parseInt(e.target.value, 10),
+                          )
                         }
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor={`recurringMultiplier-${rule.id}`}>Recurring Donation Multiplier</Label>
+                      <Label htmlFor={`recurringMultiplier-${rule.id}`}>
+                        Recurring Donation Multiplier
+                      </Label>
                       <Input
                         id={`recurringMultiplier-${rule.id}`}
                         type="number"
@@ -164,7 +235,11 @@ export default function DonationPointsAdmin() {
                         step="0.1"
                         value={rule.recurringMultiplier}
                         onChange={(e) =>
-                          handleRuleChange(index, "recurringMultiplier", Number.parseFloat(e.target.value))
+                          handleRuleChange(
+                            index,
+                            "recurringMultiplier",
+                            Number.parseFloat(e.target.value),
+                          )
                         }
                       />
                     </div>
@@ -184,7 +259,9 @@ export default function DonationPointsAdmin() {
           <Card>
             <CardHeader>
               <CardTitle>Donation Campaigns</CardTitle>
-              <CardDescription>Create and manage donation campaigns with point multipliers</CardDescription>
+              <CardDescription>
+                Create and manage donation campaigns with point multipliers
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <p>Campaign management interface will be implemented here.</p>
@@ -196,7 +273,9 @@ export default function DonationPointsAdmin() {
           <Card>
             <CardHeader>
               <CardTitle>Donation Statistics</CardTitle>
-              <CardDescription>View statistics about donations and points awarded</CardDescription>
+              <CardDescription>
+                View statistics about donations and points awarded
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <p>Donation statistics dashboard will be implemented here.</p>
@@ -205,5 +284,5 @@ export default function DonationPointsAdmin() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

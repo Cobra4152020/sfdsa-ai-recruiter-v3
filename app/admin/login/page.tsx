@@ -1,13 +1,19 @@
-import { PageWrapper } from "@/components/page-wrapper"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { UnifiedLoginForm } from "@/components/unified-login-form"
-import { Shield } from "lucide-react"
-import type { Metadata } from "next"
+import { PageWrapper } from "@/components/page-wrapper";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { UnifiedLoginForm } from "@/components/unified-login-form";
+import { Shield } from "lucide-react";
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Admin Login | SF Deputy Sheriff's Association",
   description: "Secure login portal for SFDSA administrators",
-}
+};
 
 export default function AdminLoginPage() {
   return (
@@ -18,20 +24,31 @@ export default function AdminLoginPage() {
             <CardHeader className="space-y-1">
               <div className="flex items-center justify-center mb-4">
                 <Shield className="h-10 w-10 text-[#0A3C1F] mr-2" />
-                <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">Admin Login</CardTitle>
+                <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+                  Admin Login
+                </CardTitle>
               </div>
-              <CardDescription className="text-center">Secure access for SFDSA administrators</CardDescription>
+              <CardDescription className="text-center">
+                Secure access for SFDSA administrators
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <UnifiedLoginForm userType="admin" redirectTo="/admin/dashboard" showSocialLogin={false} />
+              <UnifiedLoginForm
+                userType="admin"
+                redirectTo="/admin/dashboard"
+                showSocialLogin={false}
+              />
               <div className="text-center text-sm text-muted-foreground">
                 <p>This access is for authorized administrators only.</p>
-                <p>If you need assistance, please contact the system administrator.</p>
+                <p>
+                  If you need assistance, please contact the system
+                  administrator.
+                </p>
               </div>
             </CardContent>
           </Card>
         </div>
       </div>
     </PageWrapper>
-  )
+  );
 }

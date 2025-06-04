@@ -1,17 +1,15 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
-import { Loader2, Mail, Phone, MapPin, CheckCircle, Send } from "lucide-react"
-import { PageWrapper } from "@/components/page-wrapper"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+import { Send, Mail, Phone, MapPin } from "lucide-react";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -20,58 +18,50 @@ export default function ContactPage() {
     subject: "",
     message: "",
     reason: "general",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const { toast } = useToast()
+  });
+  const { toast } = useToast();
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
-
-  const handleSelectChange = (value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      reason: value,
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
 
     try {
       // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
-      setIsSubmitted(true)
       toast({
         title: "Message sent successfully",
-        description: "We'll get back to you as soon as possible.",
-      })
-    } catch (error) {
+        description: "We&apos;ll get back to you as soon as possible.",
+      });
+    } catch {
       toast({
         title: "Error sending message",
         description: "Please try again later.",
         variant: "destructive",
-      })
-    } finally {
-      setIsSubmitting(false)
+      });
     }
-  }
+  };
 
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">Contact Us</h1>
+            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+              Contact Us
+            </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Have questions about the recruitment process? We're here to help.
+              Have questions about the recruitment process? We&apos;re here to
+              help.
             </p>
           </div>
 
@@ -156,7 +146,10 @@ export default function ContactPage() {
                       />
                     </div>
 
-                    <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                    <Button
+                      type="submit"
+                      className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                    >
                       <Send className="h-4 w-4 mr-2" />
                       Send Message
                     </Button>
@@ -176,7 +169,9 @@ export default function ContactPage() {
                       <Mail className="h-5 w-5 text-[#0A3C1F] mr-3 mt-0.5" />
                       <div>
                         <p className="font-medium">Email</p>
-                        <p className="text-sm text-gray-600">recruitment@sfgov.org</p>
+                        <p className="text-sm text-gray-600">
+                          recruitment@sfgov.org
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-start">
@@ -191,8 +186,10 @@ export default function ContactPage() {
                       <div>
                         <p className="font-medium">Address</p>
                         <p className="text-sm text-gray-600">
-                          San Francisco Sheriff's Department<br />
-                          850 Bryant Street<br />
+                          San Francisco Sheriff&apos;s Department
+                          <br />
+                          850 Bryant Street
+                          <br />
                           San Francisco, CA 94103
                         </p>
                       </div>
@@ -227,5 +224,5 @@ export default function ContactPage() {
         </div>
       </div>
     </PageWrapper>
-  )
+  );
 }

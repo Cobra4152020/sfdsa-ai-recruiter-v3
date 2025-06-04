@@ -1,41 +1,53 @@
-"use client"
-import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+"use client";
+import { Pie, PieChart, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 interface BadgeDistribution {
-  badge_id: string
-  badge_name: string
-  count: number
-  percentage: number
+  badge_id: string;
+  badge_name: string;
+  count: number;
+  percentage: number;
 }
 
 interface BadgeDistributionChartProps {
-  data: BadgeDistribution[]
-  isLoading: boolean
+  data: BadgeDistribution[];
+  isLoading: boolean;
 }
 
-export function BadgeDistributionChart({ data, isLoading }: BadgeDistributionChartProps) {
+export function BadgeDistributionChart({
+  data,
+  isLoading,
+}: BadgeDistributionChartProps) {
   if (isLoading) {
     return (
       <div className="w-full h-[400px] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0A3C1F]"></div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-[400px] flex flex-col items-center justify-center">
-        <p className="text-lg font-medium text-gray-500">No badge data available</p>
+        <p className="text-lg font-medium text-gray-500">
+          No badge data available
+        </p>
       </div>
-    )
+    );
   }
 
   // Only show top 10 badges in the chart
   const chartData = data.slice(0, 10).map((item) => ({
     name: item.badge_name,
     value: item.count,
-  }))
+  }));
 
   const COLORS = [
     "#3b82f6", // blue-500
@@ -48,7 +60,7 @@ export function BadgeDistributionChart({ data, isLoading }: BadgeDistributionCha
     "#84cc16", // lime-500
     "#14b8a6", // teal-500
     "#6366f1", // indigo-500
-  ]
+  ];
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -63,10 +75,15 @@ export function BadgeDistributionChart({ data, isLoading }: BadgeDistributionCha
               outerRadius={150}
               fill="#8884d8"
               dataKey="value"
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              label={({ name, percent }) =>
+                `${name} ${(percent * 100).toFixed(0)}%`
+              }
             >
               {chartData.map((entry, i) => (
-                <Cell key={`cell-${entry.name}`} fill={COLORS[i % COLORS.length]} />
+                <Cell
+                  key={`cell-${entry.name}`}
+                  fill={COLORS[i % COLORS.length]}
+                />
               ))}
             </Pie>
             <Tooltip formatter={(value) => [`${value} awards`, "Count"]} />
@@ -86,14 +103,18 @@ export function BadgeDistributionChart({ data, isLoading }: BadgeDistributionCha
           <TableBody>
             {data.map((badge) => (
               <TableRow key={badge.badge_id}>
-                <TableCell className="font-medium">{badge.badge_name}</TableCell>
+                <TableCell className="font-medium">
+                  {badge.badge_name}
+                </TableCell>
                 <TableCell className="text-right">{badge.count}</TableCell>
-                <TableCell className="text-right">{badge.percentage.toFixed(1)}%</TableCell>
+                <TableCell className="text-right">
+                  {badge.percentage.toFixed(1)}%
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

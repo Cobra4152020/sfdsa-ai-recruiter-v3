@@ -1,135 +1,160 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { getClientSideSupabase } from '@/lib/supabase/index'
-import { ApplicantTable } from "./applicant-table"
-import { ApplicantFilters } from "./applicant-filters"
-import { ApplicantStats } from "./applicant-stats"
-import { ApplicantDetailModal } from "./applicant-detail-modal"
-import { Button } from "@/components/ui/button"
-import { Download } from "lucide-react"
-import { exportToCSV } from "@/lib/export-utils"
+// import React, { useState, useEffect } from "react"; // Commented out unused React import
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Download } from "lucide-react";
+import { getClientSideSupabase } from "@/lib/supabase/index";
+import { ApplicantTable } from "./applicant-table";
+import { ApplicantFilters } from "./applicant-filters";
+import { ApplicantStats } from "./applicant-stats";
+import { ApplicantDetailModal } from "./applicant-detail-modal";
+import { exportToCSV } from "@/lib/export-utils";
 
 export type Applicant = {
-  id: string
-  first_name: string
-  last_name: string
-  email: string
-  phone: string
-  zip_code: string
-  referral_source: string
-  referral_code: string
-  tracking_number: string
-  application_status: string
-  created_at: string
-  updated_at: string
-}
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone: string;
+  zip_code: string;
+  referral_source: string;
+  referral_code: string;
+  tracking_number: string;
+  application_status: string;
+  created_at: string;
+  updated_at: string;
+};
 
 export type ApplicantFiltersType = {
-  status: string
-  referralSource: string
-  dateRange: [Date | null, Date | null]
-  searchTerm: string
-}
+  status: string;
+  referralSource: string;
+  dateRange: [Date | null, Date | null];
+  searchTerm: string;
+};
 
 export function ApplicantDashboard() {
-  const [applicants, setApplicants] = useState<Applicant[]>([])
-  const [filteredApplicants, setFilteredApplicants] = useState<Applicant[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(null)
+  const [applicants, setApplicants] = useState<Applicant[]>([]);
+  const [filteredApplicants, setFilteredApplicants] = useState<Applicant[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedApplicant, setSelectedApplicant] = useState<Applicant | null>(
+    null,
+  );
   const [filters, setFilters] = useState<ApplicantFiltersType>({
     status: "all",
     referralSource: "all",
     dateRange: [null, null],
     searchTerm: "",
-  })
+  });
 
   useEffect(() => {
-    fetchApplicants()
-  }, [])
+    fetchApplicants();
+  }, []);
 
   useEffect(() => {
-    applyFilters()
-  }, [filters, applicants])
+    applyFilters();
+  }, [filters, applicants]);
 
   async function fetchApplicants() {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const supabase = getClientSideSupabase()
-      const { data, error } = await supabase.from("applicants").select("*").order("created_at", { ascending: false })
+      const supabase = getClientSideSupabase();
+      const { data, error } = await supabase
+        .from("applicants")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      if (error) throw error
+      if (error) throw error;
 
-      setApplicants(data || [])
-      setFilteredApplicants(data || [])
+      setApplicants(data || []);
+      setFilteredApplicants(data || []);
     } catch (error) {
-      console.error("Error fetching applicants:", error)
+      console.error("Error fetching applicants:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
   function applyFilters() {
-    let result = [...applicants]
+    let result = [...applicants];
 
     // Filter by status
     if (filters.status !== "all") {
-      result = result.filter((a) => a.application_status === filters.status)
+      result = result.filter((a) => a.application_status === filters.status);
     }
 
     // Filter by referral source
     if (filters.referralSource !== "all") {
-      result = result.filter((a) => a.referral_source === filters.referralSource)
+      result = result.filter(
+        (a) => a.referral_source === filters.referralSource,
+      );
     }
 
     // Filter by date range
     if (filters.dateRange[0] && filters.dateRange[1]) {
-      const startDate = filters.dateRange[0]
-      const endDate = filters.dateRange[1]
+      const startDate = filters.dateRange[0];
+      const endDate = filters.dateRange[1];
 
       result = result.filter((a) => {
-        const createdAt = new Date(a.created_at)
-        return createdAt >= startDate && createdAt <= endDate
-      })
+        const createdAt = new Date(a.created_at);
+        return createdAt >= startDate && createdAt <= endDate;
+      });
     }
 
     // Filter by search term
     if (filters.searchTerm) {
-      const searchLower = filters.searchTerm.toLowerCase()
+      const searchLower = filters.searchTerm.toLowerCase();
       result = result.filter(
         (a) =>
           a.first_name.toLowerCase().includes(searchLower) ||
           a.last_name.toLowerCase().includes(searchLower) ||
           a.email.toLowerCase().includes(searchLower) ||
           a.tracking_number.toLowerCase().includes(searchLower),
-      )
+      );
     }
 
-    setFilteredApplicants(result)
+    setFilteredApplicants(result);
   }
 
   async function updateApplicantStatus(id: string, status: string) {
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { error } = await supabase
         .from("applicants")
-        .update({ application_status: status, updated_at: new Date().toISOString() })
-        .eq("id", id)
+        .update({
+          application_status: status,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
 
-      if (error) throw error
+      if (error) throw error;
 
       // Update local state
       setApplicants((prev) =>
-        prev.map((a) => (a.id === id ? { ...a, application_status: status, updated_at: new Date().toISOString() } : a)),
-      )
+        prev.map((a) =>
+          a.id === id
+            ? {
+                ...a,
+                application_status: status,
+                updated_at: new Date().toISOString(),
+              }
+            : a,
+        ),
+      );
 
       if (selectedApplicant?.id === id) {
         setSelectedApplicant((prev) =>
-          prev ? { ...prev, application_status: status, updated_at: new Date().toISOString() } : null,
-        )
+          prev
+            ? {
+                ...prev,
+                application_status: status,
+                updated_at: new Date().toISOString(),
+              }
+            : null,
+        );
       }
     } catch (error) {
-      console.error("Error updating applicant status:", error)
+      console.error("Error updating applicant status:", error);
     }
   }
 
@@ -145,9 +170,9 @@ export function ApplicantDashboard() {
       "Referral Code": a.referral_code || "N/A",
       Status: a.application_status,
       "Created At": new Date(a.created_at).toLocaleString(),
-    }))
+    }));
 
-    exportToCSV(data, "applicants_export")
+    exportToCSV(data, "applicants_export");
   }
 
   return (
@@ -164,7 +189,11 @@ export function ApplicantDashboard() {
         </Button>
       </div>
 
-      <ApplicantFilters filters={filters} setFilters={setFilters} applicants={applicants} />
+      <ApplicantFilters
+        filters={filters}
+        setFilters={setFilters}
+        applicants={applicants}
+      />
 
       <ApplicantTable
         applicants={filteredApplicants}
@@ -181,5 +210,5 @@ export function ApplicantDashboard() {
         />
       )}
     </div>
-  )
+  );
 }

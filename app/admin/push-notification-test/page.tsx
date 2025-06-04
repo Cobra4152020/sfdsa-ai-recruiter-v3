@@ -1,11 +1,17 @@
-import type { Metadata } from "next"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { PushNotificationTester } from "@/components/push-notification-tester"
+import type { Metadata } from "next";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { PushNotificationTester } from "@/components/push-notification-tester";
 
 export const metadata: Metadata = {
   title: "Push Notification Test",
   description: "Test push notifications",
-}
+};
 
 export default function PushNotificationTestPage() {
   return (
@@ -15,12 +21,14 @@ export default function PushNotificationTestPage() {
       <Card>
         <CardHeader>
           <CardTitle>Send Test Push Notification</CardTitle>
-          <CardDescription>Use this form to send a test push notification to a user</CardDescription>
+          <CardDescription>
+            Use this form to send a test push notification to a user
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <PushNotificationTester />
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

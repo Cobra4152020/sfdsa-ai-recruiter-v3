@@ -1,16 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { CheckCircle, Loader2, AlertCircle } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function RecruiterContactForm() {
   const [formState, setFormState] = useState({
@@ -19,18 +26,20 @@ export function RecruiterContactForm() {
     email: "",
     phone: "",
     message: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [successMessage, setSuccessMessage] = useState("")
-  const [errorMessage, setErrorMessage] = useState("")
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormState((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormState((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     // Validation
     if (!formState.firstName || !formState.lastName || !formState.email) {
@@ -38,13 +47,13 @@ export function RecruiterContactForm() {
         title: "Missing information",
         description: "Please fill in all required fields.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsSubmitting(true)
-    setErrorMessage("")
-    setSuccessMessage("")
+    setIsSubmitting(true);
+    setErrorMessage("");
+    setSuccessMessage("");
 
     try {
       // API call to send email
@@ -63,32 +72,34 @@ export function RecruiterContactForm() {
           // recruiterId: currentUser?.id,
           // recruiterName: currentUser?.name,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to send email")
+        throw new Error(data.message || "Failed to send email");
       }
 
       // Success
       setSuccessMessage(
         `Your message has been sent to ${formState.firstName} ${formState.lastName} from our official email address. We've also saved their information to your dashboard.`,
-      )
+      );
       setFormState({
         firstName: "",
         lastName: "",
         email: "",
         phone: "",
         message: "",
-      })
+      });
     } catch (error) {
-      console.error("Error sending email:", error)
-      setErrorMessage(error instanceof Error ? error.message : "An unexpected error occurred")
+      console.error("Error sending email:", error);
+      setErrorMessage(
+        error instanceof Error ? error.message : "An unexpected error occurred",
+      );
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div className="space-y-6">
@@ -96,8 +107,9 @@ export function RecruiterContactForm() {
         <CardHeader>
           <CardTitle>Contact Potential Recruits</CardTitle>
           <CardDescription>
-            Send a personalized email directly from our official email address (email@protectingsanfrancisco.com). The
-            recipient will be automatically added to your dashboard for easy follow-up.
+            Send a personalized email directly from our official email address
+            (email@protectingsanfrancisco.com). The recipient will be
+            automatically added to your dashboard for easy follow-up.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -105,15 +117,22 @@ export function RecruiterContactForm() {
             <Alert className="mb-6 bg-green-50 border-green-200">
               <CheckCircle className="h-4 w-4 text-green-600" />
               <AlertTitle className="text-green-800">Success!</AlertTitle>
-              <AlertDescription className="text-green-700">{successMessage}</AlertDescription>
+              <AlertDescription className="text-green-700">
+                {successMessage}
+              </AlertDescription>
             </Alert>
           )}
 
           {errorMessage && (
-            <Alert className="mb-6 bg-red-50 border-red-200" variant="destructive">
+            <Alert
+              className="mb-6 bg-red-50 border-red-200"
+              variant="destructive"
+            >
               <AlertCircle className="h-4 w-4 text-red-600" />
               <AlertTitle className="text-red-800">Error</AlertTitle>
-              <AlertDescription className="text-red-700">{errorMessage}</AlertDescription>
+              <AlertDescription className="text-red-700">
+                {errorMessage}
+              </AlertDescription>
             </Alert>
           )}
 
@@ -189,7 +208,11 @@ export function RecruiterContactForm() {
               />
             </div>
 
-            <Button type="submit" disabled={isSubmitting} className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -204,11 +227,14 @@ export function RecruiterContactForm() {
         <CardFooter className="bg-gray-50 dark:bg-gray-800/50 border-t px-6 py-4">
           <div className="text-sm text-gray-500 dark:text-gray-400">
             <p className="mb-2">
-              <strong>Note:</strong> The email will be sent from our official email address
-              (email@protectingsanfrancisco.com) with your name in the signature to ensure the recipient recognizes the
-              sender.
+              <strong>Note:</strong> The email will be sent from our official
+              email address (email@protectingsanfrancisco.com) with your name in
+              the signature to ensure the recipient recognizes the sender.
             </p>
-            <p>All information will be stored securely and used only for recruitment purposes.</p>
+            <p>
+              All information will be stored securely and used only for
+              recruitment purposes.
+            </p>
           </div>
         </CardFooter>
       </Card>
@@ -216,7 +242,9 @@ export function RecruiterContactForm() {
       <Card>
         <CardHeader>
           <CardTitle>Recent Contacts</CardTitle>
-          <CardDescription>A list of potential recruits you've recently contacted.</CardDescription>
+          <CardDescription>
+            A list of potential recruits you&apos;ve recently contacted.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -235,10 +263,16 @@ export function RecruiterContactForm() {
                   <td className="py-3 px-4">
                     <div className="font-medium">Emily Johnson</div>
                   </td>
-                  <td className="py-3 px-4 text-sm">emily.johnson@example.com</td>
-                  <td className="text-center py-3 px-4 text-sm">May 15, 2023</td>
+                  <td className="py-3 px-4 text-sm">
+                    emily.johnson@example.com
+                  </td>
+                  <td className="text-center py-3 px-4 text-sm">
+                    May 15, 2023
+                  </td>
                   <td className="text-center py-3 px-4">
-                    <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">Pending</span>
+                    <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">
+                      Pending
+                    </span>
                   </td>
                   <td className="text-center py-3 px-4">
                     <Button variant="outline" size="sm">
@@ -250,10 +284,16 @@ export function RecruiterContactForm() {
                   <td className="py-3 px-4">
                     <div className="font-medium">Michael Chen</div>
                   </td>
-                  <td className="py-3 px-4 text-sm">michael.chen@example.com</td>
-                  <td className="text-center py-3 px-4 text-sm">June 2, 2023</td>
+                  <td className="py-3 px-4 text-sm">
+                    michael.chen@example.com
+                  </td>
+                  <td className="text-center py-3 px-4 text-sm">
+                    June 2, 2023
+                  </td>
                   <td className="text-center py-3 px-4">
-                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Signed Up</span>
+                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">
+                      Signed Up
+                    </span>
                   </td>
                   <td className="text-center py-3 px-4">
                     <Button variant="outline" size="sm">
@@ -265,10 +305,16 @@ export function RecruiterContactForm() {
                   <td className="py-3 px-4">
                     <div className="font-medium">Sophia Rodriguez</div>
                   </td>
-                  <td className="py-3 px-4 text-sm">sophia.rodriguez@example.com</td>
-                  <td className="text-center py-3 px-4 text-sm">June 10, 2023</td>
+                  <td className="py-3 px-4 text-sm">
+                    sophia.rodriguez@example.com
+                  </td>
+                  <td className="text-center py-3 px-4 text-sm">
+                    June 10, 2023
+                  </td>
                   <td className="text-center py-3 px-4">
-                    <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">Responded</span>
+                    <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800">
+                      Responded
+                    </span>
                   </td>
                   <td className="text-center py-3 px-4">
                     <Button variant="outline" size="sm">
@@ -282,5 +328,5 @@ export function RecruiterContactForm() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

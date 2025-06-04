@@ -6,5 +6,5 @@ export function SkipToContent() {
     >
       Skip to content
     </a>
-  )
+  );
 }

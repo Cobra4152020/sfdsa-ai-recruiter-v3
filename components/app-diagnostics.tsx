@@ -1,34 +1,54 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import { testAllApiEndpoints } from "@/lib/api-test-utils"
-import { CheckCircle, XCircle, AlertTriangle, RefreshCw, Server, Link2, Database, Layers } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { testAllApiEndpoints } from "@/lib/api-test-utils";
+import {
+  CheckCircle,
+  XCircle,
+  AlertTriangle,
+  RefreshCw,
+  Server,
+  Link2,
+  Database,
+  Layers,
+} from "lucide-react";
 
 export function AppDiagnostics() {
   const [apiResults, setApiResults] = useState<
     Array<{
-      endpoint: string
-      success: boolean
-      status: number
-      message: string
+      endpoint: string;
+      success: boolean;
+      status: number;
+      message: string;
     }>
-  >([])
-  const [isTestingApi, setIsTestingApi] = useState(false)
+  >([]);
+  const [isTestingApi, setIsTestingApi] = useState(false);
   const [routeResults, setRouteResults] = useState<
     Array<{
-      route: string
-      exists: boolean
-      message: string
+      route: string;
+      exists: boolean;
+      message: string;
     }>
-  >([])
-  const [isTestingRoutes, setIsTestingRoutes] = useState(false)
-  const [envVars, setEnvVars] = useState<Record<string, boolean>>({})
-  const [browserInfo, setBrowserInfo] = useState<Record<string, string>>({})
+  >([]);
+  const [isTestingRoutes, setIsTestingRoutes] = useState(false);
+  const [envVars, setEnvVars] = useState<Record<string, boolean>>({});
+  const [browserInfo, setBrowserInfo] = useState<Record<string, string>>({});
 
   useEffect(() => {
     // Collect browser information
@@ -41,69 +61,85 @@ export function AppDiagnostics() {
       viewportWidth: `${window.innerWidth}px`,
       viewportHeight: `${window.innerHeight}px`,
       devicePixelRatio: window.devicePixelRatio.toString(),
-      colorScheme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light",
-    })
+      colorScheme: window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light",
+    });
 
     // Check environment variables
     setEnvVars({
       NEXT_PUBLIC_VERCEL_ENV: !!process.env.NEXT_PUBLIC_VERCEL_ENV,
       NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-      NEXT_PUBLIC_ENABLE_LEADERBOARD: !!process.env.NEXT_PUBLIC_ENABLE_LEADERBOARD,
+      NEXT_PUBLIC_SUPABASE_ANON_KEY:
+        !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      NEXT_PUBLIC_ENABLE_LEADERBOARD:
+        !!process.env.NEXT_PUBLIC_ENABLE_LEADERBOARD,
       NEXT_PUBLIC_ENABLE_BADGES: !!process.env.NEXT_PUBLIC_ENABLE_BADGES,
       NEXT_PUBLIC_ENABLE_POINTS: !!process.env.NEXT_PUBLIC_ENABLE_POINTS,
       NEXT_PUBLIC_ENABLE_DEBUG: !!process.env.NEXT_PUBLIC_ENABLE_DEBUG,
-    })
+    });
 
     // Run initial tests
-    testApis()
-    testRoutes()
-  }, [])
+    testApis();
+    testRoutes();
+  }, []);
 
   const testApis = async () => {
-    setIsTestingApi(true)
+    setIsTestingApi(true);
     try {
-      const results = await testAllApiEndpoints()
-      setApiResults(results)
+      const results = await testAllApiEndpoints();
+      setApiResults(results);
     } catch (error) {
-      console.error("Error testing APIs:", error)
+      console.error("Error testing APIs:", error);
     } finally {
-      setIsTestingApi(false)
+      setIsTestingApi(false);
     }
-  }
+  };
 
   const testRoutes = async () => {
-    setIsTestingRoutes(true)
-    const routes = ["/", "/awards", "/badges", "/trivia", "/profile/1", "/gi-bill", "/discounted-housing"]
+    setIsTestingRoutes(true);
+    const routes = [
+      "/",
+      "/awards",
+      "/badges",
+      "/trivia",
+      "/profile/1",
+      "/gi-bill",
+      "/discounted-housing",
+    ];
 
     const results = await Promise.all(
       routes.map(async (route) => {
         try {
-          const response = await fetch(route, { method: "HEAD" })
+          const response = await fetch(route, { method: "HEAD" });
           return {
             route,
             exists: response.ok,
-            message: response.ok ? "Route exists" : `Route error: ${response.status}`,
-          }
+            message: response.ok
+              ? "Route exists"
+              : `Route error: ${response.status}`,
+          };
         } catch (error) {
           return {
             route,
             exists: false,
             message: `Error checking route: ${error instanceof Error ? error.message : String(error)}`,
-          }
+          };
         }
       }),
-    )
+    );
 
-    setRouteResults(results)
-    setIsTestingRoutes(false)
-  }
+    setRouteResults(results);
+    setIsTestingRoutes(false);
+  };
 
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Application Diagnostics</CardTitle>
-        <CardDescription>Test and verify the application's functionality</CardDescription>
+        <CardDescription>
+          Test and verify the application&apos;s functionality
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="api">
@@ -119,14 +155,18 @@ export function AppDiagnostics() {
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">API Endpoint Tests</h3>
                 <Button onClick={testApis} disabled={isTestingApi} size="sm">
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isTestingApi ? "animate-spin" : ""}`} />
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${isTestingApi ? "animate-spin" : ""}`}
+                  />
                   {isTestingApi ? "Testing..." : "Run Tests"}
                 </Button>
               </div>
 
               <div className="space-y-2">
                 {apiResults.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500">No test results yet</div>
+                  <div className="text-center py-4 text-gray-500">
+                    No test results yet
+                  </div>
                 ) : (
                   apiResults.map((result, index) => (
                     <div
@@ -161,15 +201,23 @@ export function AppDiagnostics() {
             <div className="space-y-4">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Route Tests</h3>
-                <Button onClick={testRoutes} disabled={isTestingRoutes} size="sm">
-                  <RefreshCw className={`h-4 w-4 mr-2 ${isTestingRoutes ? "animate-spin" : ""}`} />
+                <Button
+                  onClick={testRoutes}
+                  disabled={isTestingRoutes}
+                  size="sm"
+                >
+                  <RefreshCw
+                    className={`h-4 w-4 mr-2 ${isTestingRoutes ? "animate-spin" : ""}`}
+                  />
                   {isTestingRoutes ? "Testing..." : "Run Tests"}
                 </Button>
               </div>
 
               <div className="space-y-2">
                 {routeResults.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500">No test results yet</div>
+                  <div className="text-center py-4 text-gray-500">
+                    No test results yet
+                  </div>
                 ) : (
                   routeResults.map((result, index) => (
                     <div
@@ -189,7 +237,9 @@ export function AppDiagnostics() {
                       </div>
                       <div className="flex-1">
                         <div className="font-medium">{result.route}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-300">{result.message}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-300">
+                          {result.message}
+                        </div>
                       </div>
                       <Button
                         variant="outline"
@@ -264,9 +314,12 @@ export function AppDiagnostics() {
                         </div>
                       </div>
                       <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                        <div className="text-xs text-gray-500">Viewport Size</div>
+                        <div className="text-xs text-gray-500">
+                          Viewport Size
+                        </div>
                         <div>
-                          {browserInfo.viewportWidth} × {browserInfo.viewportHeight}
+                          {browserInfo.viewportWidth} ×{" "}
+                          {browserInfo.viewportHeight}
                         </div>
                       </div>
                       <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
@@ -274,8 +327,12 @@ export function AppDiagnostics() {
                         <div>{browserInfo.devicePixelRatio}</div>
                       </div>
                       <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
-                        <div className="text-xs text-gray-500">Color Scheme</div>
-                        <div className="capitalize">{browserInfo.colorScheme}</div>
+                        <div className="text-xs text-gray-500">
+                          Color Scheme
+                        </div>
+                        <div className="capitalize">
+                          {browserInfo.colorScheme}
+                        </div>
                       </div>
                     </div>
                   </AccordionContent>
@@ -305,23 +362,27 @@ export function AppDiagnostics() {
           <div className="flex space-x-2">
             <Badge variant="outline" className="flex items-center">
               <Server className="h-3 w-3 mr-1" />
-              API: {apiResults.filter((r) => r.success).length}/{apiResults.length}
+              API: {apiResults.filter((r) => r.success).length}/
+              {apiResults.length}
             </Badge>
             <Badge variant="outline" className="flex items-center">
               <Link2 className="h-3 w-3 mr-1" />
-              Routes: {routeResults.filter((r) => r.exists).length}/{routeResults.length}
+              Routes: {routeResults.filter((r) => r.exists).length}/
+              {routeResults.length}
             </Badge>
             <Badge variant="outline" className="flex items-center">
               <Database className="h-3 w-3 mr-1" />
-              Env: {Object.values(envVars).filter(Boolean).length}/{Object.values(envVars).length}
+              Env: {Object.values(envVars).filter(Boolean).length}/
+              {Object.values(envVars).length}
             </Badge>
           </div>
           <Badge variant="outline" className="flex items-center">
             <Layers className="h-3 w-3 mr-1" />
-            Next.js {process.env.NEXT_PUBLIC_BUILD_ID ? "Production" : "Development"}
+            Next.js{" "}
+            {process.env.NEXT_PUBLIC_BUILD_ID ? "Production" : "Development"}
           </Badge>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

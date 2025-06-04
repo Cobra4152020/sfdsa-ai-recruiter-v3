@@ -1,31 +1,35 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { getClientSideSupabase } from "@/lib/supabase"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { getClientSideSupabase } from "@/lib/supabase";
 
-export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) {
-  const [isVolunteer, setIsVolunteer] = useState<boolean | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const router = useRouter()
+export function VolunteerAuthCheck({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const [isVolunteer, setIsVolunteer] = useState<boolean | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
-    let isMounted = true
-    const supabase = getClientSideSupabase()
+    let isMounted = true;
+    const supabase = getClientSideSupabase();
 
     async function checkVolunteerStatus() {
       try {
         const {
           data: { session },
-        } = await supabase.auth.getSession()
+        } = await supabase.auth.getSession();
 
         if (!session) {
           if (isMounted) {
-            router.push("/volunteer-login")
+            router.push("/volunteer-login");
           }
-          return
+          return;
         }
 
         // Check if user exists in volunteer.recruiters table
@@ -33,51 +37,54 @@ export function VolunteerAuthCheck({ children }: { children: React.ReactNode }) 
           .from("volunteer.recruiters")
           .select("id, is_active")
           .eq("id", session.user.id)
-          .single()
+          .single();
 
         if (volunteerError || !volunteerData) {
-          console.error("User not found in volunteer.recruiters:", volunteerError)
+          console.error(
+            "User not found in volunteer.recruiters:",
+            volunteerError,
+          );
           if (isMounted) {
-            router.push("/volunteer-login")
+            router.push("/volunteer-login");
           }
-          return
+          return;
         }
 
         // Check if volunteer is active
         if (!volunteerData.is_active) {
-          console.log("Volunteer account is not active")
+          console.log("Volunteer account is not active");
           if (isMounted) {
-            router.push("/volunteer-pending")
+            router.push("/volunteer-pending");
           }
-          return
+          return;
         }
 
         if (isMounted) {
-          setIsVolunteer(true)
-          setIsLoading(false)
+          setIsVolunteer(true);
+          setIsLoading(false);
         }
       } catch (error) {
-        console.error("Error checking volunteer status:", error)
+        console.error("Error checking volunteer status:", error);
         if (isMounted) {
-          router.push("/volunteer-login")
+          router.push("/volunteer-login");
         }
       }
     }
 
-    checkVolunteerStatus()
+    checkVolunteerStatus();
 
     return () => {
-      isMounted = false
-    }
-  }, [router])
+      isMounted = false;
+    };
+  }, [router]);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0A3C1F]"></div>
       </div>
-    )
+    );
   }
 
-  return isVolunteer ? <>{children}</> : null
+  return isVolunteer ? <>{children}</> : null;
 }

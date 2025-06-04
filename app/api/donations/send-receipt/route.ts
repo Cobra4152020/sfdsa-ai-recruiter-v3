@@ -1,22 +1,29 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from '@/app/lib/supabase/server'
-import { sendEmail } from "@/lib/email/send-email"
-import { donationReceiptTemplate } from "@/lib/email/templates/donation-receipt"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { sendEmail } from "@/lib/email/send-email";
+import { donationReceiptTemplate } from "@/lib/email/templates/donation-receipt";
 
 export async function POST(request: Request) {
   try {
-    const { email, amount, donationId, isRecurring } = await request.json()
+    const { email, amount, donationId, isRecurring } = await request.json();
 
     if (!email || !amount || !donationId) {
-      return NextResponse.json({ error: "Email, amount, and donationId are required" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Email, amount, and donationId are required" },
+        { status: 400 },
+      );
     }
 
     // Get donation details from database
-    const supabase = getServiceSupabase()
-    const { data: donation } = await supabase.from("donations").select("*").eq("payment_id", donationId).single()
+    const supabase = getServiceSupabase();
+    const { data: donation } = await supabase
+      .from("donations")
+      .select("*")
+      .eq("payment_id", donationId)
+      .single();
 
     // Send receipt email
     await sendEmail({
@@ -29,11 +36,14 @@ export async function POST(request: Request) {
         donationId,
         isRecurring,
       }),
-    })
+    });
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error sending receipt:", error)
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 })
+    console.error("Error sending receipt:", error);
+    return NextResponse.json(
+      { error: (error as Error).message },
+      { status: 500 },
+    );
   }
 }

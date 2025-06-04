@@ -1,72 +1,88 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import type { Session, SupabaseClient } from "@supabase/supabase-js";
+
+interface UserRole {
+  id: string;
+  user_id: string;
+  role: string;
+}
 
 export function AuthDebug() {
-  const [sessionData, setSessionData] = useState<any>(null)
-  const [userRoles, setUserRoles] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [supabase, setSupabase] = useState<any>(null)
+  const [sessionData, setSessionData] = useState<Session | null>(null);
+  const [userRoles, setUserRoles] = useState<UserRole[] | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
 
   useEffect(() => {
     const loadClientModules = async () => {
-      const { getClientSideSupabase } = await import("@/lib/supabase")
-      const supabaseInstance = getClientSideSupabase()
-      setSupabase(supabaseInstance)
-    }
-    loadClientModules()
-  }, [])
+      const { getClientSideSupabase } = await import("@/lib/supabase");
+      const supabaseInstance = getClientSideSupabase();
+      setSupabase(supabaseInstance);
+    };
+    loadClientModules();
+  }, []);
 
   async function checkSession() {
-    if (!supabase) return
+    if (!supabase) return;
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
       // Get session
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+      const { data: sessionDataResult, error: sessionError } =
+        await supabase.auth.getSession();
 
       if (sessionError) {
-        throw sessionError
+        throw sessionError;
       }
 
-      setSessionData(sessionData)
+      setSessionData(sessionDataResult.session);
 
       // If we have a session, check roles
-      if (sessionData.session) {
+      if (sessionDataResult.session) {
         const { data: rolesData, error: rolesError } = await supabase
           .from("user_roles")
           .select("*")
-          .eq("user_id", sessionData.session.user.id)
+          .eq("user_id", sessionDataResult.session.user.id);
 
         if (rolesError) {
-          throw rolesError
+          throw rolesError;
         }
 
-        setUserRoles(rolesData)
+        setUserRoles(rolesData);
       }
     } catch (err) {
-      console.error("Auth debug error:", err)
-      setError(err instanceof Error ? err.message : "Unknown error occurred")
+      console.error("Auth debug error:", err);
+      setError(err instanceof Error ? err.message : "Unknown error occurred");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   useEffect(() => {
     if (supabase) {
-      checkSession()
+      checkSession();
     }
-  }, [supabase])
+  }, [supabase]);
 
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle>Authentication Debug</CardTitle>
-        <CardDescription>Check your authentication status and roles</CardDescription>
+        <CardDescription>
+          Check your authentication status and roles
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {loading ? (
@@ -83,14 +99,18 @@ export function AuthDebug() {
             <div>
               <h3 className="font-medium mb-2">Session Status:</h3>
               <div className="bg-gray-50 p-3 rounded-md overflow-auto max-h-40">
-                <pre className="text-xs">{JSON.stringify(sessionData, null, 2)}</pre>
+                <pre className="text-xs">
+                  {JSON.stringify(sessionData, null, 2)}
+                </pre>
               </div>
             </div>
 
             <div>
               <h3 className="font-medium mb-2">User Roles:</h3>
               <div className="bg-gray-50 p-3 rounded-md overflow-auto max-h-40">
-                <pre className="text-xs">{JSON.stringify(userRoles, null, 2)}</pre>
+                <pre className="text-xs">
+                  {JSON.stringify(userRoles, null, 2)}
+                </pre>
               </div>
             </div>
 
@@ -103,5 +123,5 @@ export function AuthDebug() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

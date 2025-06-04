@@ -1,37 +1,45 @@
-import { Component, type ReactNode } from "react"
-import { AlertCircle, RefreshCw } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { logError } from "@/lib/error-monitoring"
+import { Component, type ReactNode } from "react";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { logError } from "@/lib/error-monitoring";
 
 interface Props {
-  children: ReactNode
-  fallback?: ReactNode
+  children: ReactNode;
+  fallback?: ReactNode;
 }
 
 interface State {
-  hasError: boolean
-  error: Error | null
+  hasError: boolean;
+  error: Error | null;
 }
 
 export class BadgeErrorBoundary extends Component<Props, State> {
   constructor(props: Props) {
-    super(props)
-    this.state = { hasError: false, error: null }
+    super(props);
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error: Error): State {
-    return { hasError: true, error }
+    return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
-    logError("Error in badge component", error, "BadgeErrorBoundary")
+  componentDidCatch(error: Error) {
+    console.error("Badge Error Boundary Caught:", error);
+    this.setState({ error });
+    logError("Error in badge component", error, "BadgeErrorBoundary");
   }
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return this.props.fallback
+        return this.props.fallback;
       }
 
       return (
@@ -48,7 +56,8 @@ export class BadgeErrorBoundary extends Component<Props, State> {
           <CardContent>
             <div className="space-y-4">
               <p className="text-sm text-red-600 dark:text-red-200">
-                {this.state.error?.message || "An unexpected error occurred. We've been notified and are working on fixing the issue."}
+                {this.state.error?.message ||
+                  "An unexpected error occurred. We've been notified and are working on fixing the issue."}
               </p>
               <Button
                 variant="outline"
@@ -61,9 +70,9 @@ export class BadgeErrorBoundary extends Component<Props, State> {
             </div>
           </CardContent>
         </Card>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
-} 
+}

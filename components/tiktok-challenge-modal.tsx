@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useRef } from "react"
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -10,50 +10,57 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-} from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { TikTokIcon } from "@/components/tiktok-icon"
-import { Upload, Video, AlertCircle, CheckCircle, Loader2 } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { TikTokIcon } from "@/components/tiktok-icon";
+import { Upload, Video, AlertCircle, CheckCircle, Loader2 } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
 
 interface TikTokChallengeModalProps {
   challenge: {
-    id: number
-    title: string
-    description: string
-    instructions: string
-    hashtags: string[]
-    pointsReward: number
+    id: number;
+    title: string;
+    description: string;
+    instructions: string;
+    hashtags: string[];
+    pointsReward: number;
     requirements?: {
-      minDuration?: number
-      maxDuration?: number
-      requiredElements?: string[]
-    }
-  }
-  userId: string
-  isOpen: boolean
-  onClose: () => void
+      minDuration?: number;
+      maxDuration?: number;
+      requiredElements?: string[];
+    };
+  };
+  userId: string;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: TikTokChallengeModalProps) {
-  const [step, setStep] = useState<"instructions" | "upload" | "submit" | "success">("instructions")
-  const [videoFile, setVideoFile] = useState<File | null>(null)
-  const [videoUrl, setVideoUrl] = useState<string>("")
-  const [isUploading, setIsUploading] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [tiktokUrl, setTiktokUrl] = useState<string>("")
-  const fileInputRef = useRef<HTMLInputElement>(null)
+export function TikTokChallengeModal({
+  challenge,
+  userId,
+  isOpen,
+  onClose,
+}: TikTokChallengeModalProps) {
+  const [step, setStep] = useState<
+    "instructions" | "upload" | "submit" | "success"
+  >("instructions");
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string>("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [tiktokUrl, setTiktokUrl] = useState<string>("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
+    const files = e.target.files;
 
     if (files && files.length > 0) {
-      const file = files[0]
+      const file = files[0];
 
       // Check if it's a video file
       if (!file.type.startsWith("video/")) {
@@ -61,20 +68,20 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
           title: "Invalid file type",
           description: "Please upload a video file.",
           variant: "destructive",
-        })
-        return
+        });
+        return;
       }
 
-      setVideoFile(file)
-      setVideoUrl(URL.createObjectURL(file))
+      setVideoFile(file);
+      setVideoUrl(URL.createObjectURL(file));
     }
-  }
+  };
 
   const handleUploadClick = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click()
+      fileInputRef.current.click();
     }
-  }
+  };
 
   const handleSubmit = async () => {
     if (!videoFile && !videoUrl) {
@@ -82,29 +89,29 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
         title: "Video required",
         description: "Please upload a video for your challenge submission.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     try {
       // In a real implementation, we would upload the video to storage
       // For this example, we'll just simulate the upload process
 
       // First, simulate video upload if we have a file
-      let finalVideoUrl = videoUrl
+      let finalVideoUrl = videoUrl;
 
       if (videoFile) {
-        setIsUploading(true)
+        setIsUploading(true);
 
         // Simulate upload delay
-        await new Promise((resolve) => setTimeout(resolve, 2000))
+        await new Promise((resolve) => setTimeout(resolve, 2000));
 
         // In a real implementation, this would be the URL from your storage service
-        finalVideoUrl = URL.createObjectURL(videoFile)
+        finalVideoUrl = URL.createObjectURL(videoFile);
 
-        setIsUploading(false)
+        setIsUploading(false);
       }
 
       // Now submit the challenge
@@ -125,31 +132,33 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
             submittedFrom: "web-interface",
           },
         }),
-      })
+      });
 
       if (!response.ok) {
-        throw new Error("Failed to submit challenge")
+        throw new Error("Failed to submit challenge");
       }
 
       // Show success state
-      setStep("success")
+      setStep("success");
 
       // Notify user
       toast({
         title: "Challenge submitted!",
-        description: "Your submission is being reviewed. We'll notify you when it's approved.",
-      })
+        description:
+          "Your submission is being reviewed. We'll notify you when it's approved.",
+      });
     } catch (error) {
-      console.error("Error submitting challenge:", error)
+      console.error("Error submitting challenge:", error);
       toast({
         title: "Submission failed",
-        description: "There was an error submitting your challenge. Please try again.",
+        description:
+          "There was an error submitting your challenge. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const renderContent = () => {
     switch (step) {
@@ -162,19 +171,24 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
                 {challenge.title}
               </DialogTitle>
               <DialogDescription>
-                Complete this TikTok challenge to earn {challenge.pointsReward} points!
+                Complete this TikTok challenge to earn {challenge.pointsReward}{" "}
+                points!
               </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 my-4">
               <div>
                 <h3 className="text-lg font-medium">Challenge Description</h3>
-                <p className="text-sm text-gray-600 mt-1">{challenge.description}</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {challenge.description}
+                </p>
               </div>
 
               <div>
                 <h3 className="text-lg font-medium">Instructions</h3>
-                <p className="text-sm text-gray-600 mt-1">{challenge.instructions}</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  {challenge.instructions}
+                </p>
               </div>
 
               <div>
@@ -193,14 +207,20 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
                   <h3 className="text-lg font-medium">Requirements</h3>
                   <ul className="list-disc list-inside text-sm text-gray-600 mt-1">
                     {challenge.requirements.minDuration && (
-                      <li>Minimum Duration: {challenge.requirements.minDuration} seconds</li>
+                      <li>
+                        Minimum Duration: {challenge.requirements.minDuration}{" "}
+                        seconds
+                      </li>
                     )}
                     {challenge.requirements.maxDuration && (
-                      <li>Maximum Duration: {challenge.requirements.maxDuration} seconds</li>
+                      <li>
+                        Maximum Duration: {challenge.requirements.maxDuration}{" "}
+                        seconds
+                      </li>
                     )}
-                    {challenge.requirements.requiredElements?.map((element, index) => (
-                      <li key={index}>{element}</li>
-                    ))}
+                    {challenge.requirements.requiredElements?.map(
+                      (element, index) => <li key={index}>{element}</li>,
+                    )}
                   </ul>
                 </div>
               )}
@@ -216,14 +236,17 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
               </Button>
             </DialogFooter>
           </>
-        )
+        );
 
       case "upload":
         return (
           <>
             <DialogHeader>
               <DialogTitle>Upload Your TikTok Challenge Video</DialogTitle>
-              <DialogDescription>Create and upload your video for the "{challenge.title}" challenge</DialogDescription>
+              <DialogDescription>
+                Create and upload your video for the &quot;{challenge.title}
+                &quot; challenge
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-6 my-4">
@@ -231,12 +254,24 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
                 className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer"
                 onClick={handleUploadClick}
               >
-                <input type="file" ref={fileInputRef} className="hidden" accept="video/*" onChange={handleFileChange} />
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  accept="video/*"
+                  onChange={handleFileChange}
+                />
 
                 {videoUrl ? (
                   <div className="space-y-4">
-                    <video src={videoUrl} className="max-h-[200px] mx-auto rounded-lg" controls />
-                    <p className="text-sm text-gray-600">Video selected. Click to change.</p>
+                    <video
+                      src={videoUrl}
+                      className="max-h-[200px] mx-auto rounded-lg"
+                      controls
+                    />
+                    <p className="text-sm text-gray-600">
+                      Video selected. Click to change.
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-2">
@@ -245,7 +280,9 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
                     </div>
                     <div>
                       <p className="text-sm font-medium">Upload your video</p>
-                      <p className="text-xs text-gray-500">Drag and drop or click to select</p>
+                      <p className="text-xs text-gray-500">
+                        Drag and drop or click to select
+                      </p>
                     </div>
                   </div>
                 )}
@@ -262,15 +299,16 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
                   />
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  If you already posted this challenge on TikTok, paste the URL here so we can track your performance!
+                  If you already posted this challenge on TikTok, paste the URL
+                  here so we can track your performance!
                 </p>
               </div>
 
               <Alert>
                 <Video className="h-4 w-4" />
                 <AlertDescription>
-                  Make sure your video includes all required elements and hashtags mentioned in the challenge
-                  instructions.
+                  Make sure your video includes all required elements and
+                  hashtags mentioned in the challenge instructions.
                 </AlertDescription>
               </Alert>
             </div>
@@ -279,19 +317,25 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
               <Button variant="outline" onClick={() => setStep("instructions")}>
                 Back
               </Button>
-              <Button onClick={() => setStep("submit")} disabled={!videoUrl && !tiktokUrl}>
+              <Button
+                onClick={() => setStep("submit")}
+                disabled={!videoUrl && !tiktokUrl}
+              >
                 Next
               </Button>
             </DialogFooter>
           </>
-        )
+        );
 
       case "submit":
         return (
           <>
             <DialogHeader>
               <DialogTitle>Submit Your Challenge</DialogTitle>
-              <DialogDescription>Review your submission for the "{challenge.title}" challenge</DialogDescription>
+              <DialogDescription>
+                Review your submission for the &quot;{challenge.title}&quot;
+                challenge
+              </DialogDescription>
             </DialogHeader>
 
             <div className="space-y-4 my-4">
@@ -299,7 +343,11 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
                 <div>
                   <Label>Preview</Label>
                   <div className="mt-1 border rounded-lg overflow-hidden">
-                    <video src={videoUrl} className="max-h-[200px] w-full" controls />
+                    <video
+                      src={videoUrl}
+                      className="max-h-[200px] w-full"
+                      controls
+                    />
                   </div>
                 </div>
               )}
@@ -327,8 +375,8 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
               <Alert>
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  By submitting this video, you confirm that you created this content and grant permission for it to be
-                  reviewed.
+                  By submitting this video, you confirm that you created this
+                  content and grant permission for it to be reviewed.
                 </AlertDescription>
               </Alert>
             </div>
@@ -337,7 +385,11 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
               <Button variant="outline" onClick={() => setStep("upload")}>
                 Back
               </Button>
-              <Button onClick={handleSubmit} disabled={isSubmitting || isUploading} className="relative">
+              <Button
+                onClick={handleSubmit}
+                disabled={isSubmitting || isUploading}
+                className="relative"
+              >
                 {isUploading || isSubmitting ? (
                   <>
                     <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -352,13 +404,15 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
               </Button>
             </DialogFooter>
           </>
-        )
+        );
 
       case "success":
         return (
           <>
             <DialogHeader>
-              <DialogTitle className="text-center">Submission Successful!</DialogTitle>
+              <DialogTitle className="text-center">
+                Submission Successful!
+              </DialogTitle>
               <DialogDescription className="text-center">
                 Your TikTok challenge has been submitted for review
               </DialogDescription>
@@ -372,7 +426,8 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
               <div className="text-center space-y-2">
                 <h3 className="font-medium text-lg">Thank You!</h3>
                 <p className="text-gray-600 text-sm">
-                  We will review your submission shortly. You'll receive a notification once it's approved.
+                  We will review your submission shortly. You&apos;ll receive a
+                  notification once it&apos;s approved.
                 </p>
               </div>
 
@@ -384,7 +439,9 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
 
                 <div className="flex justify-between text-sm">
                   <span className="text-gray-600">Potential Reward</span>
-                  <span className="font-medium">{challenge.pointsReward} points</span>
+                  <span className="font-medium">
+                    {challenge.pointsReward} points
+                  </span>
                 </div>
               </div>
             </div>
@@ -395,13 +452,13 @@ export function TikTokChallengeModal({ challenge, userId, isOpen, onClose }: Tik
               </Button>
             </DialogFooter>
           </>
-        )
+        );
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">{renderContent()}</DialogContent>
     </Dialog>
-  )
+  );
 }

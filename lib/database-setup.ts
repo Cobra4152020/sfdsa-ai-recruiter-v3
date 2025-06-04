@@ -1,16 +1,20 @@
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import fs from "fs"
-import { setupApplicantsTable } from "./database-setup-applicants"
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import fs from "fs";
+import { setupApplicantsTable } from "./database-setup-applicants";
 
 // Minimal withRetry utility for retrying async operations
-async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 500): Promise<T> {
+async function withRetry<T>(
+  fn: () => Promise<T>,
+  retries = 3,
+  delay = 500,
+): Promise<T> {
   let lastError;
   for (let i = 0; i < retries; i++) {
     try {
       return await fn();
     } catch (err) {
       lastError = err;
-      if (i < retries - 1) await new Promise(res => setTimeout(res, delay));
+      if (i < retries - 1) await new Promise((res) => setTimeout(res, delay));
     }
   }
   throw lastError;
@@ -21,19 +25,22 @@ async function withRetry<T>(fn: () => Promise<T>, retries = 3, delay = 500): Pro
  */
 export async function createColumnCheckFunction() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Check if the function already exists
-    const { data: functionExists, error: functionCheckError } = await supabase.rpc("function_exists", {
-      function_name: "check_columns",
-    })
+    const { data: functionExists, error: functionCheckError } =
+      await supabase.rpc("function_exists", {
+        function_name: "check_columns",
+      });
 
     if (functionCheckError || !functionExists) {
-      console.log("Creating check_columns function...")
+      console.log("Creating check_columns function...");
 
       // Create the function
-      const { error: createFunctionError } = await supabase.rpc("create_function", {
-        function_definition: `
+      const { error: createFunctionError } = await supabase.rpc(
+        "create_function",
+        {
+          function_definition: `
           CREATE OR REPLACE FUNCTION check_columns(table_name TEXT, column_names TEXT[])
           RETURNS BOOLEAN AS $$
           DECLARE
@@ -48,14 +55,18 @@ export async function createColumnCheckFunction() {
           END;
           $$ LANGUAGE plpgsql;
         `,
-      })
+        },
+      );
 
       if (createFunctionError) {
-        console.error("Error creating check_columns function:", createFunctionError)
+        console.error(
+          "Error creating check_columns function:",
+          createFunctionError,
+        );
       }
     }
   } catch (error) {
-    console.error("Error creating column check function:", error)
+    console.error("Error creating column check function:", error);
   }
 }
 
@@ -64,9 +75,12 @@ export async function createColumnCheckFunction() {
  */
 export async function setupDatabase() {
   // Skip database setup during build time on Vercel
-  if (process.env.VERCEL_ENV === 'production' && process.env.DISABLE_DB_DURING_BUILD === 'true') {
-    console.log('Skipping database setup during build on Vercel');
-    return { success: true, message: 'Database setup skipped during build' };
+  if (
+    process.env.VERCEL_ENV === "production" &&
+    process.env.DISABLE_DB_DURING_BUILD === "true"
+  ) {
+    console.log("Skipping database setup during build on Vercel");
+    return { success: true, message: "Database setup skipped during build" };
   }
 
   try {
@@ -84,30 +98,30 @@ export async function setupDatabase() {
       "create_user_function.sql",
       "update_badges_schema.sql",
       "create_performance_metrics_function.sql", // Ensure this migration runs
-    ]
+    ];
 
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Run migrations
     for (const migration of migrations) {
       await withRetry(async () => {
         const { error } = await supabase.rpc("exec_sql", {
           sql_query: fs.readFileSync(`./migrations/${migration}`, "utf8"),
-        })
+        });
         if (error) {
-          throw new Error(`Migration failed: ${migration} - ${error.message}`)
+          throw new Error(`Migration failed: ${migration} - ${error.message}`);
         }
-      })
+      });
     }
 
     // Setup applicants table
-    await setupApplicantsTable()
+    await setupApplicantsTable();
 
-    console.log("Database setup complete")
-    return { success: true }
+    console.log("Database setup complete");
+    return { success: true };
   } catch (error) {
-    console.error("Error setting up database:", error)
-    return { success: false, error }
+    console.error("Error setting up database:", error);
+    return { success: false, error };
   }
 }
 
@@ -116,27 +130,40 @@ export async function setupDatabase() {
  */
 export async function createPerformanceMetricsTable() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // First, try to create the function if it doesn't exist
     try {
-      const functionSql = fs.readFileSync("./migrations/create_performance_metrics_function.sql", "utf8")
-      await supabase.rpc("exec_sql", { sql_query: functionSql })
+      const functionSql = fs.readFileSync(
+        "./migrations/create_performance_metrics_function.sql",
+        "utf8",
+      );
+      await supabase.rpc("exec_sql", { sql_query: functionSql });
     } catch (functionError) {
-      console.log("Note: Could not create function via RPC, will try direct table creation")
+      // eslint-disable-line @typescript-eslint/no-unused-vars
+      console.log(
+        "Note: Could not create function via RPC, will try direct table creation",
+      );
     }
 
     // Try to call the function if it exists
     try {
       await withRetry(async () => {
-        const { error } = await supabase.rpc("create_performance_metrics_table")
+        const { error } = await supabase.rpc(
+          "create_performance_metrics_table",
+        );
         if (error) {
-          throw new Error(`Failed to create performance_metrics table via function: ${error.message}`)
+          throw new Error(
+            `Failed to create performance_metrics table via function: ${error.message}`,
+          );
         }
-      })
-      return true
+      });
+      return true;
     } catch (rpcError) {
-      console.log("Function call failed, falling back to direct SQL:", rpcError)
+      console.log(
+        "Function call failed, falling back to direct SQL:",
+        rpcError,
+      );
 
       // If the function doesn't exist or fails, create the table directly
       const createTableSQL = `
@@ -164,25 +191,29 @@ export async function createPerformanceMetricsTable() {
           END IF;
         END
         $$;
-      `
+      `;
 
-      const { error } = await supabase.rpc("exec_sql", { sql_query: createTableSQL })
+      const { error } = await supabase.rpc("exec_sql", {
+        sql_query: createTableSQL,
+      });
       if (error) {
-        throw new Error(`Failed to create performance_metrics table directly: ${error.message}`)
+        throw new Error(
+          `Failed to create performance_metrics table directly: ${error.message}`,
+        );
       }
-      return true
+      return true;
     }
   } catch (error) {
-    console.error("Error creating performance_metrics table:", error)
-    return false
+    console.error("Error creating performance_metrics table:", error);
+    return false;
   }
 }
 
 // Also modify any other database initialization functions to check for build environment
 export function shouldSkipDatabaseOps() {
   return (
-    process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === 'true' || 
-    process.env.DISABLE_DB_DURING_BUILD === 'true' ||
-    (process.env.VERCEL_ENV && process.env.NODE_ENV === 'production')
+    process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === "true" ||
+    process.env.DISABLE_DB_DURING_BUILD === "true" ||
+    (process.env.VERCEL_ENV && process.env.NODE_ENV === "production")
   );
 }

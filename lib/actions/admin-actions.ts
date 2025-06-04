@@ -1,4 +1,4 @@
-export async function adminActions(params: any) {
+export async function adminActions(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/admin-actions`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function adminActions(params: any) {
     console.error(`Error in adminActions:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

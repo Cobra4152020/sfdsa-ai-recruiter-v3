@@ -1,11 +1,9 @@
-import { getServiceSupabase } from '@/app/lib/supabase/server'
-
 interface StatusEmailParams {
-  email: string
-  firstName: string
-  lastName: string
-  status: string
-  trackingNumber: string
+  email: string;
+  firstName: string;
+  lastName: string;
+  status: string;
+  trackingNumber: string;
 }
 
 export async function sendApplicantStatusEmail({
@@ -29,16 +27,16 @@ export async function sendApplicantStatusEmail({
         status,
         trackingNumber,
       }),
-    })
+    });
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || "Failed to send email")
+      const errorData = await response.json();
+      throw new Error(errorData.message || "Failed to send email");
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error("Error sending applicant status email:", error)
-    throw error
+    console.error("Error sending applicant status email:", error);
+    throw error;
   }
 }

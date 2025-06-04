@@ -1,9 +1,9 @@
 interface NFTAwardedTemplateProps {
-  recipientName: string
-  nftName: string
-  nftDescription: string
-  nftImageUrl: string
-  nftViewUrl: string
+  recipientName: string;
+  nftName: string;
+  nftDescription: string;
+  nftImageUrl: string;
+  nftViewUrl: string;
 }
 
 export function nftAwarded({
@@ -104,5 +104,5 @@ export function nftAwarded({
       </div>
     </body>
     </html>
-  `
+  `;
 }

@@ -1,7 +1,7 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface BadgeLoadingProps {
-  variant?: "full" | "compact"
+  variant?: "full" | "compact";
 }
 
 export function BadgeLoading({ variant = "full" }: BadgeLoadingProps) {
@@ -14,7 +14,7 @@ export function BadgeLoading({ variant = "full" }: BadgeLoadingProps) {
           <Skeleton className="h-3 w-32" />
         </div>
       </div>
-    )
+    );
   }
 
   return (
@@ -22,7 +22,7 @@ export function BadgeLoading({ variant = "full" }: BadgeLoadingProps) {
       <div className="flex items-center justify-center">
         <div className="h-20 w-20 rounded-full bg-gray-200" />
       </div>
-      
+
       <div className="space-y-4">
         <Skeleton className="h-8 w-48 mx-auto" />
         <Skeleton className="h-4 w-64 mx-auto" />
@@ -48,5 +48,5 @@ export function BadgeLoading({ variant = "full" }: BadgeLoadingProps) {
         <Skeleton className="h-10 w-32" />
       </div>
     </div>
-  )
-} 
+  );
+}

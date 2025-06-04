@@ -1,4 +1,4 @@
-export async function publicAdminRecovery(params: any) {
+export async function publicAdminRecovery(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/public-admin-recovery`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function publicAdminRecovery(params: any) {
     console.error(`Error in publicAdminRecovery:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

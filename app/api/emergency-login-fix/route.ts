@@ -1,12 +1,12 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Fix the constraint
     const { error: constraintError } = await supabase.rpc("exec_sql", {
@@ -18,14 +18,18 @@ export async function GET(request: Request) {
         ALTER TABLE user_roles ADD CONSTRAINT user_roles_role_check 
         CHECK (role IN ('recruit', 'volunteer', 'admin'));
       `,
-    })
+    });
 
     if (constraintError) {
-      console.error("Error fixing constraint:", constraintError)
+      console.error("Error fixing constraint:", constraintError);
       return NextResponse.json(
-        { success: false, message: "Failed to fix constraint", error: constraintError },
+        {
+          success: false,
+          message: "Failed to fix constraint",
+          error: constraintError,
+        },
         { status: 500 },
-      )
+      );
     }
 
     // Create admin user if none exists
@@ -47,14 +51,18 @@ export async function GET(request: Request) {
           END IF;
         END $$;
       `,
-    })
+    });
 
     if (adminError) {
-      console.error("Error creating admin user:", adminError)
+      console.error("Error creating admin user:", adminError);
       return NextResponse.json(
-        { success: false, message: "Failed to create admin user", error: adminError },
+        {
+          success: false,
+          message: "Failed to create admin user",
+          error: adminError,
+        },
         { status: 500 },
-      )
+      );
     }
 
     // Fix any missing user_types entries
@@ -68,22 +76,29 @@ export async function GET(request: Request) {
         LEFT JOIN user_types ut ON ur.user_id = ut.user_id
         WHERE ut.user_id IS NULL;
       `,
-    })
+    });
 
     if (userTypesError) {
-      console.error("Error fixing user_types:", userTypesError)
+      console.error("Error fixing user_types:", userTypesError);
       return NextResponse.json(
-        { success: false, message: "Failed to fix user_types", error: userTypesError },
+        {
+          success: false,
+          message: "Failed to fix user_types",
+          error: userTypesError,
+        },
         { status: 500 },
-      )
+      );
     }
 
     return NextResponse.json({
       success: true,
       message: "Login issues fixed successfully. Try logging in now.",
-    })
+    });
   } catch (error) {
-    console.error("Unexpected error fixing login issues:", error)
-    return NextResponse.json({ success: false, message: "An unexpected error occurred", error }, { status: 500 })
+    console.error("Unexpected error fixing login issues:", error);
+    return NextResponse.json(
+      { success: false, message: "An unexpected error occurred", error },
+      { status: 500 },
+    );
   }
 }

@@ -1,5 +1,5 @@
 export function scrollToElement(elementId: string): void {
-  const element = document.getElementById(elementId)
+  const element = document.getElementById(elementId);
 
   if (element) {
     // Add a small delay to ensure any layout shifts have completed
@@ -7,7 +7,7 @@ export function scrollToElement(elementId: string): void {
       element.scrollIntoView({
         behavior: "smooth",
         block: "start",
-      })
-    }, 100)
+      });
+    }, 100);
   }
 }

@@ -1,57 +1,61 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { useToast } from "@/components/ui/use-toast"
-import { Mail, Lock, Eye, EyeOff, AlertCircle, InfoIcon } from "lucide-react"
-import { SocialLoginButtons } from "@/components/social-login-buttons"
+import type React from "react";
+import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useToast } from "@/components/ui/use-toast";
+import { Mail, Lock, Eye, EyeOff, AlertCircle, InfoIcon } from "lucide-react";
+import { SocialLoginButtons } from "@/components/social-login-buttons";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 interface UnifiedLoginFormProps {
-  userType?: "recruit" | "volunteer" | "admin"
-  redirectTo?: string
-  showSocialLogin?: boolean
+  userType?: "recruit" | "volunteer" | "admin";
+  redirectTo?: string;
+  showSocialLogin?: boolean;
 }
 
-export function UnifiedLoginForm({ 
+export function UnifiedLoginForm({
   userType = "recruit",
   redirectTo = "/dashboard",
-  showSocialLogin = true 
+  showSocialLogin = true,
 }: UnifiedLoginFormProps) {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const needsConfirmation = searchParams.get("needsConfirmation") === "true"
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const { toast } = useToast()
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const needsConfirmation = searchParams?.get("needsConfirmation") === "true";
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const supabase = getClientSideSupabase();
+      const {
+        data,
+        error: signInError,
+      } = // eslint-disable-line @typescript-eslint/no-unused-vars
+        await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
 
-      if (signInError) throw signInError
+      if (signInError) throw signInError;
 
       if (!data.user) {
-        throw new Error("No user returned from authentication")
+        throw new Error("No user returned from authentication");
       }
 
       // Get user type from user_types table
@@ -59,15 +63,15 @@ export function UnifiedLoginForm({
         .from("user_types")
         .select("user_type")
         .eq("user_id", data.user.id)
-        .single()
+        .single();
 
       if (userTypeError) {
-        throw new Error("Failed to get user type")
+        throw new Error("Failed to get user type");
       }
 
       // Verify user has correct role
       if (userTypeData.user_type !== userType) {
-        throw new Error(`Invalid credentials for ${userType} login`)
+        throw new Error(`Invalid credentials for ${userType} login`);
       }
 
       // For volunteers, check if they are active
@@ -76,10 +80,12 @@ export function UnifiedLoginForm({
           .from("volunteer.recruiters")
           .select("is_active")
           .eq("id", data.user.id)
-          .single()
+          .single();
 
         if (volunteerError || !volunteerData?.is_active) {
-          throw new Error("Your volunteer account is not active. Please contact support.")
+          throw new Error(
+            "Your volunteer account is not active. Please contact support.",
+          );
         }
       }
 
@@ -91,64 +97,66 @@ export function UnifiedLoginForm({
           email: data.user.email,
           method: "password",
         },
-      })
+      });
 
       toast({
         title: "Login successful",
         description: "Welcome back!",
-      })
+      });
 
       // Determine redirect URL based on user type
-      let finalRedirectUrl = redirectTo
+      let finalRedirectUrl = redirectTo;
       if (userType === "volunteer") {
-        finalRedirectUrl = "/volunteer-dashboard"
+        finalRedirectUrl = "/volunteer-dashboard";
       } else if (userType === "admin") {
-        finalRedirectUrl = "/admin/dashboard"
+        finalRedirectUrl = "/admin/dashboard";
       }
 
-      router.push(finalRedirectUrl)
+      router.push(finalRedirectUrl);
     } catch (error) {
-      console.error("Login error:", error)
-      setError(error instanceof Error ? error.message : "Failed to sign in")
+      console.error("Login error:", error);
+      setError(error instanceof Error ? error.message : "Failed to sign in");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleMagicLinkLogin = async () => {
     if (!email) {
-      setError("Please enter your email address")
-      return
+      setError("Please enter your email address");
+      return;
     }
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { data, error } = await supabase.auth.signInWithOtp({
+        // eslint-disable-line @typescript-eslint/no-unused-vars
         email,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback?userType=${userType}`,
         },
-      })
+      });
 
       if (error) {
-        throw error
+        throw error;
       }
 
       toast({
         title: "Magic link sent",
         description: "Check your email for a link to sign in",
-      })
+      });
     } catch (error) {
-      console.error("Magic link error:", error)
-      setError(error instanceof Error ? error.message : "Failed to send magic link")
+      console.error("Magic link error:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to send magic link",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -170,14 +178,19 @@ export function UnifiedLoginForm({
 
       {showSocialLogin && (
         <>
-          <SocialLoginButtons onLoginStart={() => setError(null)} className="mb-6" />
+          <SocialLoginButtons
+            onLoginStart={() => setError(null)}
+            className="mb-6"
+          />
 
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
             <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">Or continue with email</span>
+              <span className="bg-white px-2 text-gray-500">
+                Or continue with email
+              </span>
             </div>
           </div>
         </>
@@ -203,7 +216,10 @@ export function UnifiedLoginForm({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <Label htmlFor="password">Password</Label>
-            <Link href="/forgot-password" className="text-sm text-[#0A3C1F] hover:underline">
+            <Link
+              href="/forgot-password"
+              className="text-sm text-[#0A3C1F] hover:underline"
+            >
               Forgot password?
             </Link>
           </div>
@@ -226,19 +242,31 @@ export function UnifiedLoginForm({
               onClick={() => setShowPassword(!showPassword)}
               aria-label={showPassword ? "Hide password" : "Show password"}
             >
-              {showPassword ? <EyeOff className="h-4 w-4 text-gray-400" /> : <Eye className="h-4 w-4 text-gray-400" />}
+              {showPassword ? (
+                <EyeOff className="h-4 w-4 text-gray-400" />
+              ) : (
+                <Eye className="h-4 w-4 text-gray-400" />
+              )}
             </Button>
           </div>
         </div>
 
         <div className="flex items-center space-x-2">
-          <Checkbox id="remember" checked={rememberMe} onCheckedChange={(checked) => setRememberMe(!!checked)} />
+          <Checkbox
+            id="remember"
+            checked={rememberMe}
+            onCheckedChange={(checked) => setRememberMe(!!checked)}
+          />
           <Label htmlFor="remember" className="text-sm">
             Remember me
           </Label>
         </div>
 
-        <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" disabled={isLoading}>
+        <Button
+          type="submit"
+          className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+          disabled={isLoading}
+        >
           {isLoading ? (
             <span className="flex items-center">
               <span className="animate-spin mr-2">⟳</span>
@@ -273,17 +301,23 @@ export function UnifiedLoginForm({
         <div className="text-center space-y-2 mt-4">
           <p className="text-sm text-gray-600">
             Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-[#0A3C1F] hover:underline font-medium">
+            <Link
+              href="/register"
+              className="text-[#0A3C1F] hover:underline font-medium"
+            >
               Register as a Recruit
             </Link>
           </p>
           <p className="text-sm text-gray-600">
-            <Link href="/volunteer-login" className="text-[#0A3C1F] hover:underline">
+            <Link
+              href="/volunteer-login"
+              className="text-[#0A3C1F] hover:underline"
+            >
               Volunteer Recruiter Login
             </Link>
           </p>
         </div>
       )}
     </>
-  )
-} 
+  );
+}

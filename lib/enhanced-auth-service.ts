@@ -1,55 +1,61 @@
-import { getClientSideSupabase } from "@/lib/supabase"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { constructUrl } from "@/lib/url-utils"
-import { addParticipationPoints } from "@/lib/points-service"
-import type { Provider } from "@supabase/supabase-js"
+import { getClientSideSupabase } from "@/lib/supabase";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { constructUrl } from "@/lib/url-utils";
+import { addParticipationPoints } from "@/lib/points-service";
+import type { Provider } from "@supabase/supabase-js";
 
 // User types
-export type UserRole = "recruit" | "volunteer" | "admin"
+export type UserRole = "recruit" | "volunteer" | "admin";
 
 // Social provider types
-export type SocialProvider = "google" | "facebook" | "twitter" | "github" | "apple" | "linkedin"
+export type SocialProvider =
+  | "google"
+  | "facebook"
+  | "twitter"
+  | "github"
+  | "apple"
+  | "linkedin";
 
 // Login methods
-export type LoginMethod = "password" | "social" | "magic_link" | "sso"
+export type LoginMethod = "password" | "social" | "magic_link" | "sso";
 
 // Authentication result interface
 export interface AuthResult {
-  success: boolean
-  message: string
-  userId?: string
-  userRole?: UserRole
-  email?: string
-  name?: string
-  error?: any
-  redirectUrl?: string
-  isNewUser?: boolean
-  sessionToken?: string
+  success: boolean;
+  message: string;
+  userId?: string;
+  userRole?: UserRole;
+  email?: string;
+  name?: string;
+  error?: unknown;
+  redirectUrl?: string;
+  isNewUser?: boolean;
+  sessionToken?: string;
   performanceMetrics?: {
-    totalTimeMs: number
-    databaseTimeMs: number
-    tokenGenerationTimeMs: number
-    userFetchTimeMs: number
-  }
+    totalTimeMs: number;
+    databaseTimeMs: number;
+    tokenGenerationTimeMs: number;
+    userFetchTimeMs: number;
+  };
 }
 
 // User profile interface
 export interface UserProfile {
-  id: string
-  email: string
-  name?: string
-  firstName?: string
-  lastName?: string
-  userRole: UserRole
-  isActive?: boolean
-  avatarUrl?: string
-  createdAt?: string
-  providers?: SocialProvider[]
-  phoneNumber?: string
-  address?: string
-  preferences?: Record<string, any>
-  lastLoginAt?: string
-  loginCount?: number
+  id: string;
+  email: string;
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  userRole: UserRole;
+  isActive?: boolean;
+  avatarUrl?: string;
+  createdAt?: string;
+  providers?: SocialProvider[];
+  phoneNumber?: string;
+  address?: string;
+  preferences?: Record<string, unknown>;
+  lastLoginAt?: string;
+  loginCount?: number;
 }
 
 /**
@@ -63,18 +69,18 @@ export class EnhancedAuthService {
   async signInWithPassword(
     email: string,
     password: string,
-    options?: {
-      rememberMe?: boolean
-      captchaToken?: string
+    _options?: {
+      rememberMe?: boolean;
+      captchaToken?: string;
     },
   ): Promise<AuthResult> {
-    const startTime = performance.now()
-    let databaseTime = 0
-    let tokenGenTime = 0
-    let userFetchTime = 0
+    const startTime = performance.now();
+    let databaseTime = 0;
+    let tokenGenTime = 0;
+    let userFetchTime = 0;
 
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
 
       // Record login attempt for analytics
       await this.recordLoginAttempt({
@@ -82,15 +88,15 @@ export class EnhancedAuthService {
         method: "password",
         userAgent: this.getUserAgent(),
         ipAddress: "client-side", // Will be updated server-side
-      })
+      });
 
       // Authenticate with Supabase
-      const authStart = performance.now()
+      const authStart = performance.now();
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      })
-      tokenGenTime = performance.now() - authStart
+      });
+      tokenGenTime = performance.now() - authStart;
 
       if (error) {
         await this.recordLoginError({
@@ -98,7 +104,7 @@ export class EnhancedAuthService {
           errorType: "auth/invalid-credential",
           errorMessage: error.message,
           method: "password",
-        })
+        });
 
         return {
           success: false,
@@ -110,7 +116,7 @@ export class EnhancedAuthService {
             tokenGenerationTimeMs: tokenGenTime,
             userFetchTimeMs: userFetchTime,
           },
-        }
+        };
       }
 
       if (!data.user) {
@@ -123,13 +129,13 @@ export class EnhancedAuthService {
             tokenGenerationTimeMs: tokenGenTime,
             userFetchTimeMs: userFetchTime,
           },
-        }
+        };
       }
 
       // Get user type and profile
-      const fetchStart = performance.now()
-      const userProfile = await this.getUserProfile(data.user.id)
-      userFetchTime = performance.now() - fetchStart
+      const fetchStart = performance.now();
+      const userProfile = await this.getUserProfile(data.user.id);
+      userFetchTime = performance.now() - fetchStart;
 
       if (!userProfile) {
         return {
@@ -141,13 +147,13 @@ export class EnhancedAuthService {
             tokenGenerationTimeMs: tokenGenTime,
             userFetchTimeMs: userFetchTime,
           },
-        }
+        };
       }
 
       // Update last login timestamp
-      const updateStart = performance.now()
-      await this.updateLoginStatistics(data.user.id, userProfile.userRole)
-      databaseTime += performance.now() - updateStart
+      const updateStart = performance.now();
+      await this.updateLoginStatistics(data.user.id, userProfile.userRole);
+      databaseTime += performance.now() - updateStart;
 
       // Record successful login
       await this.recordSuccessfulLogin({
@@ -155,10 +161,10 @@ export class EnhancedAuthService {
         email,
         method: "password",
         userRole: userProfile.userRole,
-      })
+      });
 
       // Determine redirect URL based on user role
-      const redirectUrl = this.getRedirectUrlForUserRole(userProfile.userRole)
+      const redirectUrl = this.getRedirectUrlForUserRole(userProfile.userRole);
 
       // Check if volunteer is active
       if (userProfile.userRole === "volunteer" && !userProfile.isActive) {
@@ -176,7 +182,7 @@ export class EnhancedAuthService {
             tokenGenerationTimeMs: tokenGenTime,
             userFetchTimeMs: userFetchTime,
           },
-        }
+        };
       }
 
       return {
@@ -194,20 +200,26 @@ export class EnhancedAuthService {
           tokenGenerationTimeMs: tokenGenTime,
           userFetchTimeMs: userFetchTime,
         },
-      }
+      };
     } catch (error) {
-      console.error("Sign in error:", error)
+      console.error("Sign in error:", error);
 
       await this.recordLoginError({
         email,
         errorType: "auth/unexpected-error",
-        errorMessage: error instanceof Error ? error.message : "An unexpected error occurred",
+        errorMessage:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         method: "password",
-      })
+      });
 
       return {
         success: false,
-        message: error instanceof Error ? error.message : "An unexpected error occurred",
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         error,
         performanceMetrics: {
           totalTimeMs: performance.now() - startTime,
@@ -215,7 +227,7 @@ export class EnhancedAuthService {
           tokenGenerationTimeMs: tokenGenTime,
           userFetchTimeMs: userFetchTime,
         },
-      }
+      };
     }
   }
 
@@ -223,15 +235,15 @@ export class EnhancedAuthService {
    * Sign in with social provider
    */
   async signInWithSocialProvider(provider: Provider): Promise<AuthResult> {
-    const startTime = performance.now()
+    const startTime = performance.now();
 
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       await this.recordLoginAttempt({
         method: `social/${provider}`,
         userAgent: this.getUserAgent(),
         ipAddress: "client-side",
-      })
+      });
 
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider,
@@ -242,27 +254,27 @@ export class EnhancedAuthService {
             prompt: "consent",
           },
         },
-      })
+      });
 
       if (error) {
         await this.recordLoginError({
           errorType: "auth/social-provider-error",
           errorMessage: error.message,
           method: `social/${provider}`,
-        })
+        });
 
         return {
           success: false,
           message: error.message,
           error,
-        }
+        };
       }
 
       if (!data.url) {
         return {
           success: false,
           message: "Failed to generate authentication URL",
-        }
+        };
       }
 
       // Return success with the URL to redirect to
@@ -270,80 +282,97 @@ export class EnhancedAuthService {
         success: true,
         message: "Redirecting to provider...",
         redirectUrl: data.url,
-      }
+      };
     } catch (error) {
-      console.error("Social sign in error:", error)
+      console.error("Social sign in error:", error);
 
       await this.recordLoginError({
         errorType: "auth/unexpected-error",
-        errorMessage: error instanceof Error ? error.message : "An unexpected error occurred",
+        errorMessage:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         method: `social/${provider}`,
-      })
+      });
 
       return {
         success: false,
-        message: error instanceof Error ? error.message : "Failed to authenticate with provider",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to authenticate with provider",
         error,
-      }
+      };
     }
   }
 
   /**
    * Handle social auth callback
    */
-  async handleSocialAuthCallback(code: string, provider: string): Promise<AuthResult> {
-    const startTime = performance.now()
-    let databaseTime = 0
+  async handleSocialAuthCallback(
+    code: string,
+    provider: string,
+  ): Promise<AuthResult> {
+    const startTime = performance.now();
+    let databaseTime = 0;
 
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       // Exchange code for session
-      const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+      const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
       if (error || !data.user) {
         await this.recordLoginError({
           errorType: "auth/social-callback-error",
           errorMessage: error?.message || "Authentication failed",
           method: `social/${provider}`,
-        })
+        });
 
         return {
           success: false,
           message: error?.message || "Authentication failed",
           error,
-        }
+        };
       }
 
       // Check if user exists in our system
-      const dbStart = performance.now()
+      const dbStart = performance.now();
       const { data: userTypeData } = await supabase
         .from("user_types")
         .select("user_type")
         .eq("user_id", data.user.id)
-        .maybeSingle()
-      databaseTime = performance.now() - dbStart
+        .maybeSingle();
+      databaseTime = performance.now() - dbStart;
 
-      let isNewUser = false
-      let userRole: UserRole = "recruit" // Default to recruit for social logins
+      let isNewUser = false;
+      let userRole: UserRole = "recruit"; // Default to recruit for social logins
 
       if (!userTypeData) {
-        isNewUser = true
+        isNewUser = true;
 
         // Create new user profile for social login
-        const createStart = performance.now()
-        await this.createUserProfileFromSocialLogin(data.user, provider as SocialProvider)
-        databaseTime += performance.now() - createStart
+        const createStart = performance.now();
+        await this.createUserProfileFromSocialLogin(
+          data.user,
+          provider as SocialProvider,
+        );
+        databaseTime += performance.now() - createStart;
 
         // Award initial points for new users
-        await addParticipationPoints(data.user.id, 50, "sign_up", "Initial signup bonus via social login")
+        await addParticipationPoints(
+          data.user.id,
+          50,
+          "sign_up",
+          "Initial signup bonus via social login",
+        );
       } else {
-        userRole = userTypeData.user_type as UserRole
+        userRole = userTypeData.user_type as UserRole;
       }
 
       // Update last login timestamp
-      const updateStart = performance.now()
-      await this.updateLoginStatistics(data.user.id, userRole)
-      databaseTime += performance.now() - updateStart
+      const updateStart = performance.now();
+      await this.updateLoginStatistics(data.user.id, userRole);
+      databaseTime += performance.now() - updateStart;
 
       // Record successful login
       await this.recordSuccessfulLogin({
@@ -351,18 +380,21 @@ export class EnhancedAuthService {
         email: data.user.email || "",
         method: `social/${provider}`,
         userRole,
-      })
+      });
 
       // Get redirect URL based on user role
-      const redirectUrl = this.getRedirectUrlForUserRole(userRole)
+      const redirectUrl = this.getRedirectUrlForUserRole(userRole);
 
       return {
         success: true,
-        message: isNewUser ? "Account created successfully" : "Login successful",
+        message: isNewUser
+          ? "Account created successfully"
+          : "Login successful",
         userId: data.user.id,
         userRole,
         email: data.user.email,
-        name: data.user.user_metadata?.name || data.user.user_metadata?.full_name,
+        name:
+          data.user.user_metadata?.name || data.user.user_metadata?.full_name,
         redirectUrl,
         isNewUser,
         sessionToken: data.session?.access_token,
@@ -372,21 +404,27 @@ export class EnhancedAuthService {
           tokenGenerationTimeMs: 0,
           userFetchTimeMs: 0,
         },
-      }
+      };
     } catch (error) {
-      console.error("Social auth callback error:", error)
+      console.error("Social auth callback error:", error);
 
       await this.recordLoginError({
         errorType: "auth/unexpected-error",
-        errorMessage: error instanceof Error ? error.message : "An unexpected error occurred",
+        errorMessage:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         method: `social/${provider}`,
-      })
+      });
 
       return {
         success: false,
-        message: error instanceof Error ? error.message : "Failed to complete authentication",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to complete authentication",
         error,
-      }
+      };
     }
   }
 
@@ -394,88 +432,112 @@ export class EnhancedAuthService {
    * Create user profile from social login
    */
   private async createUserProfileFromSocialLogin(
-    user: any,
+    user: unknown,
     provider: SocialProvider,
-  ): Promise<{ success: boolean; error?: any }> {
+  ): Promise<{ success: boolean; error?: unknown }> {
     try {
-      const { id, email, user_metadata } = user
+      const u = user as {
+        id: string;
+        email: string;
+        user_metadata?: {
+          name?: string;
+          full_name?: string;
+          avatar_url?: string;
+          picture?: string;
+          sub?: string;
+          id?: string;
+        };
+      };
+      const { id, email, user_metadata } = u;
 
       if (!email) {
-        return { success: false, error: "Email is required" }
+        return { success: false, error: "Email is required" };
       }
 
       // Extract name from metadata
-      const name = user_metadata?.name || user_metadata?.full_name || email.split("@")[0]
-      const avatarUrl = user_metadata?.avatar_url || user_metadata?.picture
+      const name =
+        user_metadata?.name || user_metadata?.full_name || email.split("@")[0];
+      const avatarUrl = user_metadata?.avatar_url || user_metadata?.picture;
 
       // Create user in recruit.users table
-      const { error: insertError } = await getServiceSupabase().from("recruit.users").insert({
-        id,
-        email,
-        name,
-        avatar_url: avatarUrl,
-        social_provider: provider,
-        points: 50, // Initial points
-      })
+      const { error: insertError } = await getServiceSupabase()
+        .from("recruit.users")
+        .insert({
+          id,
+          email,
+          name,
+          avatar_url: avatarUrl,
+          social_provider: provider,
+          points: 50, // Initial points
+        });
 
       if (insertError) {
-        console.error("Error creating user profile:", insertError)
-        return { success: false, error: insertError }
+        console.error("Error creating user profile:", insertError);
+        return { success: false, error: insertError };
       }
 
       // Set user type
-      const { error: typeError } = await getServiceSupabase().from("user_types").insert({
-        user_id: id,
-        user_type: "recruit",
-        email,
-      })
+      const { error: typeError } = await getServiceSupabase()
+        .from("user_types")
+        .insert({
+          user_id: id,
+          user_type: "recruit",
+          email,
+        });
 
       if (typeError) {
-        console.error("Error setting user type:", typeError)
-        return { success: false, error: typeError }
+        console.error("Error setting user type:", typeError);
+        return { success: false, error: typeError };
       }
 
       // Create social provider entry
-      const { error: providerError } = await getServiceSupabase().from("user_social_providers").insert({
-        user_id: id,
-        provider,
-        provider_id: user_metadata?.sub || user_metadata?.id || id,
-        created_at: new Date().toISOString(),
-      })
+      const { error: providerError } = await getServiceSupabase()
+        .from("user_social_providers")
+        .insert({
+          user_id: id,
+          provider,
+          provider_id: user_metadata?.sub || user_metadata?.id || id,
+          created_at: new Date().toISOString(),
+        });
 
       if (providerError) {
-        console.error("Error creating social provider entry:", providerError)
+        console.error("Error creating social provider entry:", providerError);
       }
 
-      return { success: true }
+      return { success: true };
     } catch (error) {
-      console.error("Error creating user profile from social login:", error)
-      return { success: false, error }
+      console.error("Error creating user profile from social login:", error);
+      return { success: false, error };
     }
   }
 
   /**
    * Register a new recruit user
    */
-  async registerRecruit(email: string, password: string, name: string): Promise<AuthResult> {
-    const startTime = performance.now()
-    let databaseTime = 0
+  async registerRecruit(
+    email: string,
+    password: string,
+    name: string,
+  ): Promise<AuthResult> {
+    const startTime = performance.now();
+    let databaseTime = 0;
 
     try {
       // Check if email already exists
-      const checkStart = performance.now()
+      const checkStart = performance.now();
       const { data: existingUser } = await getServiceSupabase()
         .from("user_types")
         .select("user_id, user_type")
         .eq("email", email)
-        .maybeSingle()
-      databaseTime = performance.now() - checkStart
+        .maybeSingle();
+      databaseTime = performance.now() - checkStart;
 
       if (existingUser) {
         return {
           success: false,
-          message: "An account with this email already exists. Please sign in instead.",
-        }
+          message:
+            "An account with this email already exists. Please sign in instead.",
+        };
       }
 
       // Create user in Supabase Auth
@@ -487,7 +549,7 @@ export class EnhancedAuthService {
             name,
           },
         },
-      })
+      });
 
       if (error) {
         await this.recordLoginError({
@@ -495,66 +557,73 @@ export class EnhancedAuthService {
           errorType: "auth/signup-error",
           errorMessage: error.message,
           method: "password",
-        })
+        });
 
         return {
           success: false,
           message: error.message,
           error,
-        }
+        };
       }
 
       if (!data.user) {
         return {
           success: false,
           message: "Registration failed. Please try again.",
-        }
+        };
       }
 
       // Use the admin client to insert into recruit.users table (bypassing RLS)
-      const insertStart = performance.now()
-      const { error: insertError } = await getServiceSupabase().from("recruit.users").insert({
-        id: data.user.id,
-        email: data.user.email,
-        name: name || data.user.email?.split("@")[0] || "User",
-        points: 50, // Initial points
-      })
-      databaseTime += performance.now() - insertStart
+      const insertStart = performance.now();
+      const { error: insertError } = await getServiceSupabase()
+        .from("recruit.users")
+        .insert({
+          id: data.user.id,
+          email: data.user.email,
+          name: name || data.user.email?.split("@")[0] || "User",
+          points: 50, // Initial points
+        });
+      databaseTime += performance.now() - insertStart;
 
       if (insertError) {
-        console.error("Error creating recruit user:", insertError)
+        console.error("Error creating recruit user:", insertError);
         return {
           success: false,
-          message: "User created but profile setup failed. Please contact support.",
+          message:
+            "User created but profile setup failed. Please contact support.",
           error: insertError,
-        }
+        };
       }
 
       // Set user type using admin client
-      const typeStart = performance.now()
-      const { error: typeError } = await getServiceSupabase().from("user_types").insert({
-        user_id: data.user.id,
-        user_type: "recruit",
-        email: data.user.email,
-      })
-      databaseTime += performance.now() - typeStart
+      const typeStart = performance.now();
+      const { error: typeError } = await getServiceSupabase()
+        .from("user_types")
+        .insert({
+          user_id: data.user.id,
+          user_type: "recruit",
+          email: data.user.email,
+        });
+      databaseTime += performance.now() - typeStart;
 
       if (typeError) {
-        console.error("Error setting user type:", typeError)
+        console.error("Error setting user type:", typeError);
       }
 
       // Log the initial points
       try {
-        await getServiceSupabase().from("user_point_logs").insert([
-          {
-            user_id: data.user.id,
-            points: 50,
-            action: "Initial signup bonus",
-            created_at: new Date().toISOString(),
-          },
-        ])
+        await getServiceSupabase()
+          .from("user_point_logs")
+          .insert([
+            {
+              user_id: data.user.id,
+              points: 50,
+              action: "Initial signup bonus",
+              created_at: new Date().toISOString(),
+            },
+          ]);
       } catch (logError) {
-        console.error("Error logging initial points:", logError)
+        console.error("Error logging initial points:", logError);
       }
 
       // Record successful registration
@@ -564,7 +633,7 @@ export class EnhancedAuthService {
         method: "password",
         userRole: "recruit",
         isRegistration: true,
-      })
+      });
 
       return {
         success: true,
@@ -581,22 +650,28 @@ export class EnhancedAuthService {
           tokenGenerationTimeMs: 0,
           userFetchTimeMs: 0,
         },
-      }
+      };
     } catch (error) {
-      console.error("Registration error:", error)
+      console.error("Registration error:", error);
 
       await this.recordLoginError({
         email,
         errorType: "auth/unexpected-error",
-        errorMessage: error instanceof Error ? error.message : "An unexpected error occurred",
+        errorMessage:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         method: "password",
-      })
+      });
 
       return {
         success: false,
-        message: error instanceof Error ? error.message : "An unexpected error occurred",
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         error,
-      }
+      };
     }
   }
 
@@ -605,43 +680,43 @@ export class EnhancedAuthService {
    */
   async signOut(): Promise<AuthResult> {
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       // Get current user before signing out
-      const { data: userData } = await supabase.auth.getUser()
+      const { data: userData } = await supabase.auth.getUser();
 
-      const { error } = await supabase.auth.signOut()
+      const { error } = await supabase.auth.signOut();
 
       if (error) {
         return {
           success: false,
           message: error.message,
           error,
-        }
+        };
       }
 
       // Log the sign out if we had a user
       if (userData && userData.user) {
-        const client = createClient()
+        const client = createClient();
         await client.from("login_audit_logs").insert({
           user_id: userData.user.id,
           event_type: "sign_out",
           details: { email: userData.user.email },
           created_at: new Date().toISOString(),
-        })
+        });
       }
 
       return {
         success: true,
         message: "Signed out successfully",
         redirectUrl: "/",
-      }
+      };
     } catch (error) {
-      console.error("Sign out error:", error)
+      console.error("Sign out error:", error);
       return {
         success: false,
         message: error instanceof Error ? error.message : "Failed to sign out",
         error,
-      }
+      };
     }
   }
 
@@ -650,18 +725,18 @@ export class EnhancedAuthService {
    */
   async getSession() {
     try {
-      const supabase = getClientSideSupabase()
-      const { data, error } = await supabase.auth.getSession()
+      const supabase = getClientSideSupabase();
+      const { data, error } = await supabase.auth.getSession();
 
       if (error) {
-        console.error("Get session error:", error)
-        return null
+        console.error("Get session error:", error);
+        return null;
       }
 
-      return data.session
+      return data.session;
     } catch (error) {
-      console.error("Get session error:", error)
-      return null
+      console.error("Get session error:", error);
+      return null;
     }
   }
 
@@ -671,13 +746,13 @@ export class EnhancedAuthService {
   getRedirectUrlForUserRole(userRole: UserRole): string {
     switch (userRole) {
       case "recruit":
-        return "/dashboard"
+        return "/dashboard";
       case "volunteer":
-        return "/volunteer-dashboard"
+        return "/volunteer-dashboard";
       case "admin":
-        return "/admin/dashboard"
+        return "/admin/dashboard";
       default:
-        return "/"
+        return "/";
     }
   }
 
@@ -686,28 +761,29 @@ export class EnhancedAuthService {
    */
   async getUserProfile(userId: string): Promise<UserProfile | null> {
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       // Get user type
       const { data: userTypeData, error: userTypeError } = await supabase
         .from("user_types")
         .select("user_type")
         .eq("user_id", userId)
-        .single()
+        .single();
 
       if (userTypeError || !userTypeData) {
-        console.error("Error getting user type:", userTypeError)
-        return null
+        console.error("Error getting user type:", userTypeError);
+        return null;
       }
 
-      const userRole = userTypeData.user_type as UserRole
+      const userRole = userTypeData.user_type as UserRole;
 
       // Get linked social providers
       const { data: providerData } = await supabase
         .from("user_social_providers")
         .select("provider")
-        .eq("user_id", userId)
+        .eq("user_id", userId);
 
-      const providers = providerData?.map((item) => item.provider as SocialProvider) || []
+      const providers =
+        providerData?.map((item) => item.provider as SocialProvider) || [];
 
       // Get user profile based on user role
       if (userRole === "recruit") {
@@ -715,11 +791,11 @@ export class EnhancedAuthService {
           .from("recruit.users")
           .select("*")
           .eq("id", userId)
-          .single()
+          .single();
 
         if (recruitError || !recruitData) {
-          console.error("Error getting recruit profile:", recruitError)
-          return null
+          console.error("Error getting recruit profile:", recruitError);
+          return null;
         }
 
         return {
@@ -732,17 +808,17 @@ export class EnhancedAuthService {
           lastLoginAt: recruitData.last_login_at,
           loginCount: recruitData.login_count || 0,
           providers,
-        }
+        };
       } else if (userRole === "volunteer") {
         const { data: volunteerData, error: volunteerError } = await supabase
           .from("volunteer.recruiters")
           .select("*")
           .eq("id", userId)
-          .single()
+          .single();
 
         if (volunteerError || !volunteerData) {
-          console.error("Error getting volunteer profile:", volunteerError)
-          return null
+          console.error("Error getting volunteer profile:", volunteerError);
+          return null;
         }
 
         return {
@@ -758,21 +834,21 @@ export class EnhancedAuthService {
           lastLoginAt: volunteerData.last_login_at,
           loginCount: volunteerData.login_count || 0,
           providers,
-        }
+        };
       } else if (userRole === "admin") {
         const { data: adminData, error: adminError } = await supabase
           .from("admin.users")
           .select("*")
           .eq("id", userId)
-          .single()
+          .single();
 
         if (adminError || !adminData) {
           // Fallback to auth user data
-          const { data: userData } = await supabase.auth.getUser(userId)
+          const { data: userData } = await supabase.auth.getUser(userId);
 
           if (!userData.user) {
-            console.error("Error getting admin profile:", adminError)
-            return null
+            console.error("Error getting admin profile:", adminError);
+            return null;
           }
 
           return {
@@ -781,7 +857,7 @@ export class EnhancedAuthService {
             name: userData.user.user_metadata?.name || "Admin",
             userRole: "admin",
             providers,
-          }
+          };
         }
 
         return {
@@ -794,26 +870,30 @@ export class EnhancedAuthService {
           lastLoginAt: adminData.last_login_at,
           loginCount: adminData.login_count || 0,
           providers,
-        }
+        };
       }
 
-      return null
+      return null;
     } catch (error) {
-      console.error("Get user profile error:", error)
-      return null
+      console.error("Get user profile error:", error);
+      return null;
     }
   }
 
   /**
    * Update user's login statistics
    */
-  private async updateLoginStatistics(userId: string, userRole: UserRole): Promise<void> {
+  private async updateLoginStatistics(
+    userId: string,
+    userRole: UserRole,
+  ): Promise<void> {
     try {
-      const supabase = getClientSideSupabase()
-      const now = new Date().toISOString()
+      const supabase = getClientSideSupabase();
+      const now = new Date().toISOString();
 
       if (userRole === "recruit") {
-        await supabase.from("recruit.users")
+        await supabase
+          .from("recruit.users")
           .update({
             last_login_at: now,
             login_count: supabase.rpc("increment", {
@@ -823,9 +903,10 @@ export class EnhancedAuthService {
               amount: 1,
             }),
           })
-          .eq("id", userId)
+          .eq("id", userId);
       } else if (userRole === "volunteer") {
-        await supabase.from("volunteer.recruiters")
+        await supabase
+          .from("volunteer.recruiters")
           .update({
             last_login_at: now,
             login_count: supabase.rpc("increment", {
@@ -835,9 +916,10 @@ export class EnhancedAuthService {
               amount: 1,
             }),
           })
-          .eq("id", userId)
+          .eq("id", userId);
       } else if (userRole === "admin") {
-        await supabase.from("admin.users")
+        await supabase
+          .from("admin.users")
           .update({
             last_login_at: now,
             login_count: supabase.rpc("increment", {
@@ -847,10 +929,10 @@ export class EnhancedAuthService {
               amount: 1,
             }),
           })
-          .eq("id", userId)
+          .eq("id", userId);
       }
     } catch (error) {
-      console.error("Error updating login statistics:", error)
+      console.error("Error updating login statistics:", error);
     }
   }
 
@@ -858,14 +940,14 @@ export class EnhancedAuthService {
    * Log a login attempt
    */
   private async recordLoginAttempt(data: {
-    userId?: string
-    email?: string
-    method: string
-    userAgent?: string
-    ipAddress?: string
+    userId?: string;
+    email?: string;
+    method: string;
+    userAgent?: string;
+    ipAddress?: string;
   }): Promise<void> {
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { error } = await supabase.from("login_attempts").insert({
         user_id: data.userId,
         email: data.email,
@@ -873,9 +955,9 @@ export class EnhancedAuthService {
         user_agent: data.userAgent,
         ip_address: data.ipAddress,
         timestamp: new Date().toISOString(),
-      })
+      });
     } catch (error) {
-      console.error("Error recording login attempt:", error)
+      console.error("Error recording login attempt:", error);
     }
   }
 
@@ -883,14 +965,14 @@ export class EnhancedAuthService {
    * Log a successful login
    */
   private async recordSuccessfulLogin(data: {
-    userId: string
-    email: string
-    method: string
-    userRole: UserRole
-    isRegistration?: boolean
+    userId: string;
+    email: string;
+    method: string;
+    userRole: UserRole;
+    isRegistration?: boolean;
   }): Promise<void> {
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { error } = await supabase.from("login_history").insert({
         user_id: data.userId,
         email: data.email,
@@ -898,7 +980,7 @@ export class EnhancedAuthService {
         user_role: data.userRole,
         is_registration: data.isRegistration,
         timestamp: new Date().toISOString(),
-      })
+      });
 
       // Record metrics
       await supabase.from("login_metrics").insert({
@@ -906,9 +988,9 @@ export class EnhancedAuthService {
         login_method: data.method.split("/")[0] as LoginMethod,
         success: true,
         created_at: new Date().toISOString(),
-      })
+      });
     } catch (error) {
-      console.error("Error recording successful login:", error)
+      console.error("Error recording successful login:", error);
     }
   }
 
@@ -916,14 +998,14 @@ export class EnhancedAuthService {
    * Log a login error
    */
   private async recordLoginError(data: {
-    userId?: string
-    email?: string
-    errorType: string
-    errorMessage: string
-    method: string
+    userId?: string;
+    email?: string;
+    errorType: string;
+    errorMessage: string;
+    method: string;
   }): Promise<void> {
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { error } = await supabase.from("login_errors").insert({
         user_id: data.userId,
         email: data.email,
@@ -931,18 +1013,18 @@ export class EnhancedAuthService {
         error_message: data.errorMessage,
         method: data.method,
         timestamp: new Date().toISOString(),
-      })
+      });
 
       // Record metrics
-      const loginMethod = data.method.split("/")[0] as LoginMethod
+      const loginMethod = data.method.split("/")[0] as LoginMethod;
       await supabase.from("login_metrics").insert({
         user_role: data.userId ? "unknown" : "anonymous",
         login_method: loginMethod,
         success: false,
         created_at: new Date().toISOString(),
-      })
+      });
     } catch (error) {
-      console.error("Error recording login error:", error)
+      console.error("Error recording login error:", error);
     }
   }
 
@@ -951,10 +1033,10 @@ export class EnhancedAuthService {
    */
   private getUserAgent(): string {
     if (typeof navigator !== "undefined") {
-      return navigator.userAgent
+      return navigator.userAgent;
     }
-    return "server-side"
+    return "server-side";
   }
 }
 
-export const enhancedAuthService = new EnhancedAuthService()
+export const enhancedAuthService = new EnhancedAuthService();

@@ -3,10 +3,10 @@
  */
 
 export async function testApiEndpoint(endpoint: string): Promise<{
-  success: boolean
-  status: number
-  message: string
-  data?: any
+  success: boolean;
+  status: number;
+  message: string;
+  data?: unknown;
 }> {
   try {
     const response = await fetch(endpoint, {
@@ -14,19 +14,20 @@ export async function testApiEndpoint(endpoint: string): Promise<{
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    const status = response.status
-    let data
+    const status = response.status;
+    let data;
 
     try {
-      data = await response.json()
+      data = await response.json();
     } catch (e) {
+      console.error("Failed to parse JSON response:", e);
       return {
         success: false,
         status,
         message: "Failed to parse JSON response",
-      }
+      };
     }
 
     return {
@@ -34,22 +35,22 @@ export async function testApiEndpoint(endpoint: string): Promise<{
       status,
       message: response.ok ? "API endpoint is working" : `API error: ${status}`,
       data,
-    }
+    };
   } catch (error) {
     return {
       success: false,
       status: 0,
       message: `Network error: ${error instanceof Error ? error.message : String(error)}`,
-    }
+    };
   }
 }
 
 export async function testAllApiEndpoints(): Promise<
   Array<{
-    endpoint: string
-    success: boolean
-    status: number
-    message: string
+    endpoint: string;
+    success: boolean;
+    status: number;
+    message: string;
   }>
 > {
   const endpoints = [
@@ -59,19 +60,19 @@ export async function testAllApiEndpoints(): Promise<
     "/api/trivia/leaderboard",
     "/api/health/database",
     "/api/health/endpoints",
-  ]
+  ];
 
   const results = await Promise.all(
     endpoints.map(async (endpoint) => {
-      const result = await testApiEndpoint(endpoint)
+      const result = await testApiEndpoint(endpoint);
       return {
         endpoint,
         success: result.success,
         status: result.status,
         message: result.message,
-      }
+      };
     }),
-  )
+  );
 
-  return results
+  return results;
 }

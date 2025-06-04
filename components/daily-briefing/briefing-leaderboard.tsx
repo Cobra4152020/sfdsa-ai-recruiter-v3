@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trophy, Medal, User } from "lucide-react"
-import { createClient } from "@/lib/supabase"
-import { useUser } from "@/context/user-context"
+import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Trophy, Medal, User } from "lucide-react";
+import { createClient } from "@/lib/supabase";
+import { useUser } from "@/context/user-context";
 
 interface LeaderboardEntry {
-  user_id: string
-  username: string
-  avatar_url: string | null
-  attendance_count: number
-  share_count: number
-  total_points: number
+  user_id: string;
+  username: string;
+  avatar_url: string | null;
+  attendance_count: number;
+  share_count: number;
+  total_points: number;
 }
 
 const container = {
@@ -24,41 +24,47 @@ const container = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 const item = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100, damping: 15 } },
-}
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 100, damping: 15 },
+  },
+};
 
 export function BriefingLeaderboard() {
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const { currentUser } = useUser()
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const { currentUser } = useUser();
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const supabase = createClient()
+        const supabase = createClient();
 
         // Get leaderboard data
-        const { data, error } = await supabase.rpc("get_briefing_leaderboard").limit(10)
+        const { data, error } = await supabase
+          .rpc("get_briefing_leaderboard")
+          .limit(10);
 
         if (error) {
-          console.error("Error fetching leaderboard:", error)
-          return
+          console.error("Error fetching leaderboard:", error);
+          return;
         }
 
-        setLeaderboard(data || [])
+        setLeaderboard(data || []);
       } catch (error) {
-        console.error("Exception in fetchLeaderboard:", error)
+        console.error("Exception in fetchLeaderboard:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchLeaderboard()
-  }, [])
+    fetchLeaderboard();
+  }, []);
 
   if (isLoading) {
     return (
@@ -83,7 +89,7 @@ export function BriefingLeaderboard() {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -112,9 +118,15 @@ export function BriefingLeaderboard() {
               No data available yet. Be the first to join the leaderboard!
             </div>
           ) : (
-            <motion.div className="space-y-4" variants={container} initial="hidden" animate="show">
+            <motion.div
+              className="space-y-4"
+              variants={container}
+              initial="hidden"
+              animate="show"
+            >
               {leaderboard.map((entry, index) => {
-                const isCurrentUser = currentUser && entry.user_id === currentUser.id
+                const isCurrentUser =
+                  currentUser && entry.user_id === currentUser.id;
 
                 return (
                   <motion.div
@@ -132,7 +144,11 @@ export function BriefingLeaderboard() {
                         <motion.div
                           initial={{ rotate: -10, scale: 0.8 }}
                           animate={{ rotate: 0, scale: 1 }}
-                          transition={{ delay: 0.3 + index * 0.1, duration: 0.5, type: "spring" }}
+                          transition={{
+                            delay: 0.3 + index * 0.1,
+                            duration: 0.5,
+                            type: "spring",
+                          }}
                         >
                           <Medal className="h-6 w-6 text-[#FFD700]" />
                         </motion.div>
@@ -140,7 +156,11 @@ export function BriefingLeaderboard() {
                         <motion.div
                           initial={{ rotate: -10, scale: 0.8 }}
                           animate={{ rotate: 0, scale: 1 }}
-                          transition={{ delay: 0.3 + index * 0.1, duration: 0.5, type: "spring" }}
+                          transition={{
+                            delay: 0.3 + index * 0.1,
+                            duration: 0.5,
+                            type: "spring",
+                          }}
                         >
                           <Medal className="h-6 w-6 text-gray-400" />
                         </motion.div>
@@ -148,12 +168,18 @@ export function BriefingLeaderboard() {
                         <motion.div
                           initial={{ rotate: -10, scale: 0.8 }}
                           animate={{ rotate: 0, scale: 1 }}
-                          transition={{ delay: 0.3 + index * 0.1, duration: 0.5, type: "spring" }}
+                          transition={{
+                            delay: 0.3 + index * 0.1,
+                            duration: 0.5,
+                            type: "spring",
+                          }}
                         >
                           <Medal className="h-6 w-6 text-amber-700" />
                         </motion.div>
                       ) : (
-                        <span className="text-gray-500 dark:text-gray-400 font-medium">{index + 1}</span>
+                        <span className="text-gray-500 dark:text-gray-400 font-medium">
+                          {index + 1}
+                        </span>
                       )}
                     </div>
 
@@ -165,7 +191,10 @@ export function BriefingLeaderboard() {
                           className="h-10 w-10 rounded-full object-cover"
                           initial={{ scale: 0.8 }}
                           animate={{ scale: 1 }}
-                          transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
+                          transition={{
+                            delay: 0.4 + index * 0.1,
+                            duration: 0.5,
+                          }}
                         />
                       ) : (
                         <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
@@ -180,14 +209,19 @@ export function BriefingLeaderboard() {
                             className="ml-2 text-xs bg-[#0A3C1F] dark:bg-[#FFD700] text-white dark:text-[#0A3C1F] px-2 py-0.5 rounded-full"
                             initial={{ opacity: 0, scale: 0.5 }}
                             animate={{ opacity: 1, scale: 1 }}
-                            transition={{ delay: 0.5 + index * 0.1, duration: 0.5, type: "spring" }}
+                            transition={{
+                              delay: 0.5 + index * 0.1,
+                              duration: 0.5,
+                              type: "spring",
+                            }}
                           >
                             You
                           </motion.span>
                         )}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-400">
-                        {entry.attendance_count} briefings • {entry.share_count} shares
+                        {entry.attendance_count} briefings • {entry.share_count}{" "}
+                        shares
                       </div>
                     </div>
 
@@ -197,16 +231,20 @@ export function BriefingLeaderboard() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
                     >
-                      <div className="font-bold text-[#0A3C1F] dark:text-[#FFD700]">{entry.total_points}</div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">points</div>
+                      <div className="font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+                        {entry.total_points}
+                      </div>
+                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                        points
+                      </div>
                     </motion.div>
                   </motion.div>
-                )
+                );
               })}
             </motion.div>
           )}
         </CardContent>
       </Card>
     </motion.div>
-  )
+  );
 }

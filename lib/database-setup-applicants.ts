@@ -1,13 +1,13 @@
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 /**
  * Ensures the applicants table exists in the database
  */
 export async function setupApplicantsTable() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
-    console.log("Checking applicants table...")
+    console.log("Checking applicants table...");
 
     // Check if the applicants table exists
     const { data: tableExists, error: tableCheckError } = await supabase
@@ -15,10 +15,10 @@ export async function setupApplicantsTable() {
       .select("table_name")
       .eq("table_name", "applicants")
       .eq("table_schema", "public")
-      .single()
+      .single();
 
     if (tableCheckError || !tableExists) {
-      console.log("Creating applicants table...")
+      console.log("Creating applicants table...");
 
       // Create the applicants table
       await supabase.query(`
@@ -43,16 +43,16 @@ export async function setupApplicantsTable() {
         
         -- Create index on referral_code for tracking referrals
         CREATE INDEX IF NOT EXISTS applicants_referral_code_idx ON applicants(referral_code);
-      `)
+      `);
 
-      console.log("Applicants table created successfully")
+      console.log("Applicants table created successfully");
     } else {
-      console.log("Applicants table already exists")
+      console.log("Applicants table already exists");
     }
 
-    return { success: true }
+    return { success: true };
   } catch (error) {
-    console.error("Error setting up applicants table:", error)
-    return { success: false, error }
+    console.error("Error setting up applicants table:", error);
+    return { success: false, error };
   }
 }

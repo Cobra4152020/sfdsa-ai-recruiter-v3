@@ -1,21 +1,49 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
-import { ArrowLeft, Save } from "lucide-react"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/components/ui/use-toast";
+import { ArrowLeft, Save } from "lucide-react";
+import { getClientSideSupabase } from "@/lib/supabase";
+import { useUser } from "@/context/user-context";
+import type { SupabaseClient, User } from "@supabase/supabase-js";
+
+// Define a more specific type for user metadata if known, or use a generic object
+interface UserMetadata {
+  first_name?: string;
+  last_name?: string;
+  // Add other metadata fields as needed
+}
+
+// Extend the Supabase User type to include our specific user_metadata structure
+interface CurrentUserType extends User {
+  user_metadata: UserMetadata;
+}
 
 export default function EditProfilePage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -29,40 +57,41 @@ export default function EditProfilePage() {
     military_experience: "none",
     law_enforcement_experience: "none",
     education_level: "high_school",
-  })
+  });
 
-  const router = useRouter()
-  const { toast } = useToast()
-  const [supabase, setSupabase] = useState(null)
-  const [currentUser, setCurrentUser] = useState(null)
+  const router = useRouter();
+  const { toast } = useToast();
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
+  // Cast currentUser from useUser to our more specific type
+  const { currentUser, setCurrentUser: userContextSetCurrentUser } =
+    useUser() as {
+      currentUser: CurrentUserType | null;
+      setCurrentUser: (user: CurrentUserType | null) => void;
+    };
 
   useEffect(() => {
     const loadClientModules = async () => {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const { useUser } = require("@/context/user-context")
-      const supabaseInstance = getClientSideSupabase()
-      const { currentUser, setCurrentUser } = useUser()
-      setSupabase(supabaseInstance)
-      setCurrentUser(currentUser)
-    }
-    loadClientModules()
-  }, [])
+      const supabaseInstance = getClientSideSupabase();
+      setSupabase(supabaseInstance);
+    };
+    loadClientModules();
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (!supabase) return
+      if (!supabase) return;
       try {
         const {
           data: { session },
           error,
-        } = await supabase.auth.getSession()
+        } = await supabase.auth.getSession();
 
-        if (error) throw error
+        if (error) throw error;
 
         if (!session) {
           // Not authenticated, redirect to login
-          router.push("/login")
-          return
+          router.push("/login");
+          return;
         }
 
         // Fetch user profile
@@ -70,10 +99,10 @@ export default function EditProfilePage() {
           .from("user_profiles")
           .select("*")
           .eq("user_id", session.user.id)
-          .single()
+          .single();
 
         if (profileError && profileError.code !== "PGRST116") {
-          throw profileError
+          throw profileError;
         }
 
         if (profile) {
@@ -88,112 +117,140 @@ export default function EditProfilePage() {
             zip: profile.zip || "",
             bio: profile.bio || "",
             military_experience: profile.military_experience || "none",
-            law_enforcement_experience: profile.law_enforcement_experience || "none",
+            law_enforcement_experience:
+              profile.law_enforcement_experience || "none",
             education_level: profile.education_level || "high_school",
-          })
-        } else {
+          });
+        } else if (session?.user?.email) {
           setFormData({
             ...formData,
             first_name: session.user.user_metadata?.first_name || "",
             last_name: session.user.user_metadata?.last_name || "",
-            email: session.user.email || "",
-          })
+            email: session.user.email,
+          });
         }
       } catch (error) {
-        console.error("Auth check error:", error)
+        console.error("Auth check error:", error);
         toast({
           title: "Authentication error",
-          description: error instanceof Error ? error.message : "Failed to authenticate user",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Failed to authenticate user",
           variant: "destructive",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    checkAuth()
-  }, [router, toast, supabase])
+    checkAuth();
+  }, [router, toast, supabase, formData]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSelectChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSaving(true)
+    e.preventDefault();
+    setIsSaving(true);
+
+    if (!supabase) {
+      toast({
+        title: "Error",
+        description: "Supabase client is not initialized.",
+        variant: "destructive",
+      });
+      setIsSaving(false);
+      return;
+    }
 
     try {
       const {
         data: { session },
-      } = await supabase.auth.getSession()
+      } = await supabase.auth.getSession();
 
       if (!session) {
-        router.push("/login")
-        return
+        router.push("/login");
+        return;
       }
 
-      // Update user metadata
+      // Update user metadata in Supabase Auth
       const { error: metadataError } = await supabase.auth.updateUser({
         data: {
           first_name: formData.first_name,
           last_name: formData.last_name,
         },
-      })
+      });
 
-      if (metadataError) throw metadataError
+      if (metadataError) throw metadataError;
 
-      // Update profile in database
-      const { error: profileError } = await supabase.from("user_profiles").upsert({
-        user_id: session.user.id,
-        first_name: formData.first_name,
-        last_name: formData.last_name,
-        phone: formData.phone,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        zip: formData.zip,
-        bio: formData.bio,
-        military_experience: formData.military_experience,
-        law_enforcement_experience: formData.law_enforcement_experience,
-        education_level: formData.education_level,
-        updated_at: new Date().toISOString(),
-      })
-
-      if (profileError) throw profileError
-
-      // Update user context
-      if (setCurrentUser && currentUser) {
-        setCurrentUser({
-          ...currentUser,
-          name: `${formData.first_name} ${formData.last_name}`.trim(),
+      // Update profile in the public.user_profiles table
+      const { error: profileError } = await supabase
+        .from("user_profiles")
+        .upsert({
+          user_id: session.user.id,
           first_name: formData.first_name,
           last_name: formData.last_name,
-        })
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zip: formData.zip,
+          bio: formData.bio,
+          military_experience: formData.military_experience,
+          law_enforcement_experience: formData.law_enforcement_experience,
+          education_level: formData.education_level,
+          updated_at: new Date().toISOString(),
+        });
+
+      if (profileError) throw profileError;
+
+      // Update user context
+      if (userContextSetCurrentUser && currentUser) {
+        const updatedUserContext: CurrentUserType = {
+          ...currentUser,
+          user_metadata: {
+            ...currentUser.user_metadata, // Spread existing metadata
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+          },
+          // If your useUser hook or context expects a 'name' field directly, construct it
+          // This depends on how CurrentUserType and the context expect the name.
+          // For now, we assume 'name' isn't a direct field in CurrentUserType but constructed as needed elsewhere
+          // or handled by the context consumer.
+        };
+        // If 'name' is indeed a part of your context's user shape, ensure it's updated:
+        // (updatedUserContext as any).name = `${formData.first_name} ${formData.last_name}`.trim();
+        userContextSetCurrentUser(updatedUserContext);
       }
 
       toast({
         title: "Profile updated",
         description: "Your profile information has been saved successfully.",
-      })
+      });
 
       // Redirect back to profile view
-      router.push("/dashboard")
+      router.push("/dashboard");
     } catch (error) {
-      console.error("Profile update error:", error)
+      console.error("Profile update error:", error);
       toast({
         title: "Update failed",
-        description: error instanceof Error ? error.message : "Failed to update profile",
+        description:
+          error instanceof Error ? error.message : "Failed to update profile",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -201,13 +258,17 @@ export default function EditProfilePage() {
         <Skeleton className="h-8 w-64 mb-6" />
         <Skeleton className="h-[800px] w-full" />
       </main>
-    )
+    );
   }
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex items-center mb-6">
-        <Button variant="ghost" onClick={() => router.push("/dashboard")} className="mr-2">
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/dashboard")}
+          className="mr-2"
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
@@ -215,7 +276,9 @@ export default function EditProfilePage() {
       <Card>
         <CardHeader>
           <CardTitle>Edit Profile</CardTitle>
-          <CardDescription>Update your personal information and preferences.</CardDescription>
+          <CardDescription>
+            Update your personal information and preferences.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -243,28 +306,60 @@ export default function EditProfilePage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" name="email" value={formData.email} onChange={handleChange} required disabled />
+              <Input
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                disabled
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="phone">Phone</Label>
-              <Input id="phone" name="phone" value={formData.phone} onChange={handleChange} />
+              <Input
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="address">Address</Label>
-              <Input id="address" name="address" value={formData.address} onChange={handleChange} />
+              <Input
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+              />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="space-y-2">
                 <Label htmlFor="city">City</Label>
-                <Input id="city" name="city" value={formData.city} onChange={handleChange} />
+                <Input
+                  id="city"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="state">State</Label>
-                <Input id="state" name="state" value={formData.state} onChange={handleChange} />
+                <Input
+                  id="state"
+                  name="state"
+                  value={formData.state}
+                  onChange={handleChange}
+                />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="zip">ZIP Code</Label>
-                <Input id="zip" name="zip" value={formData.zip} onChange={handleChange} />
+                <Input
+                  id="zip"
+                  name="zip"
+                  value={formData.zip}
+                  onChange={handleChange}
+                />
               </div>
             </div>
             <div className="space-y-2">
@@ -283,7 +378,9 @@ export default function EditProfilePage() {
                 <Label htmlFor="military_experience">Military Experience</Label>
                 <Select
                   value={formData.military_experience}
-                  onValueChange={(value) => handleSelectChange("military_experience", value)}
+                  onValueChange={(value) =>
+                    handleSelectChange("military_experience", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select experience" />
@@ -292,15 +389,21 @@ export default function EditProfilePage() {
                     <SelectItem value="none">None</SelectItem>
                     <SelectItem value="active">Active Duty</SelectItem>
                     <SelectItem value="veteran">Veteran</SelectItem>
-                    <SelectItem value="reserve">Reserve/National Guard</SelectItem>
+                    <SelectItem value="reserve">
+                      Reserve/National Guard
+                    </SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="law_enforcement_experience">Law Enforcement Experience</Label>
+                <Label htmlFor="law_enforcement_experience">
+                  Law Enforcement Experience
+                </Label>
                 <Select
                   value={formData.law_enforcement_experience}
-                  onValueChange={(value) => handleSelectChange("law_enforcement_experience", value)}
+                  onValueChange={(value) =>
+                    handleSelectChange("law_enforcement_experience", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select experience" />
@@ -317,23 +420,34 @@ export default function EditProfilePage() {
                 <Label htmlFor="education_level">Education Level</Label>
                 <Select
                   value={formData.education_level}
-                  onValueChange={(value) => handleSelectChange("education_level", value)}
+                  onValueChange={(value) =>
+                    handleSelectChange("education_level", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select education" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="high_school">High School</SelectItem>
-                    <SelectItem value="associates">Associate's Degree</SelectItem>
-                    <SelectItem value="bachelors">Bachelor's Degree</SelectItem>
-                    <SelectItem value="masters">Master's Degree</SelectItem>
+                    <SelectItem value="associates">
+                      Associate&apos;s Degree
+                    </SelectItem>
+                    <SelectItem value="bachelors">
+                      Bachelor&apos;s Degree
+                    </SelectItem>
+                    <SelectItem value="masters">
+                      Master&apos;s Degree
+                    </SelectItem>
                     <SelectItem value="doctorate">Doctorate</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
             <CardFooter className="flex justify-end space-x-4">
-              <Button variant="outline" onClick={() => router.push("/dashboard")}>
+              <Button
+                variant="outline"
+                onClick={() => router.push("/dashboard")}
+              >
                 Cancel
               </Button>
               <Button type="submit" disabled={isSaving}>
@@ -345,5 +459,5 @@ export default function EditProfilePage() {
         </CardContent>
       </Card>
     </main>
-  )
+  );
 }

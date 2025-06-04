@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from '@/app/lib/supabase/server'
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
-export async function updateDatabaseSchema() {
+async function handleDatabaseSchemaUpdate() {
   try {
-    const supabaseAdmin = getServiceSupabase()
+    const supabaseAdmin = getServiceSupabase();
     const { data, error } = await supabaseAdmin.rpc("exec_sql", {
       sql: `
         -- Create user_types table if it doesn't exist
@@ -74,32 +74,41 @@ export async function updateDatabaseSchema() {
           updated_at TIMESTAMPTZ DEFAULT NOW()
         );
       `,
-    })
+    });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ success: true, data })
-  } catch (error: any) {
-    console.error("Error updating database schema:", error)
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ success: true, data });
+  } catch (error: unknown) {
+    console.error("Error updating database schema:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "An error occurred" },
+      { status: 500 },
+    );
   }
 }
 
-export const dynamic = 'force-static';
-export const revalidate = 3600; // Revalidate every hour;
+export const dynamic = "force-static";
+export const revalidate = 3600; // Revalidate every hour
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const result = await databaseSchemaUpdate(body);
-    return NextResponse.json(result);
+    await request.json(); // Parse body but don't use it
+    const result = await handleDatabaseSchemaUpdate();
+    return result;
   } catch (error) {
     console.error(`Error in databaseSchemaUpdate:`, error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      },
+      { status: 500 },
+    );
   }
 }

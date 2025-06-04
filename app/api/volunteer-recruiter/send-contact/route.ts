@@ -1,49 +1,71 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { sendEmail } from "@/lib/email/send-email"
-import { getSystemSetting } from "@/lib/system-settings"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { sendEmail } from "@/lib/email/send-email";
+import { getSystemSetting } from "@/lib/system-settings";
 
 export async function POST(request: Request) {
   try {
     // Get data from the request
-    const { firstName, lastName, email, phone, message, recruiterId, recruiterName } = await request.json()
+    const {
+      firstName,
+      lastName,
+      email,
+      phone,
+      message,
+      recruiterId,
+      recruiterName,
+    } = await request.json();
 
     // Validate required fields
     if (!firstName || !lastName || !email) {
-      return NextResponse.json({ success: false, message: "Missing required fields" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
     // Format personalized message
     const formattedMessage = message
       ? `\n\n${message}\n\n`
-      : `\n\nI would like to invite you to learn more about career opportunities with the San Francisco Sheriff's Department. We offer competitive salaries, excellent benefits, and meaningful work that makes a difference in our community.\n\n`
+      : `\n\nI would like to invite you to learn more about career opportunities with the San Francisco Sheriff's Department. We offer competitive salaries, excellent benefits, and meaningful work that makes a difference in our community.\n\n`;
 
     // Generate a unique tracking ID
-    const trackingId = `REC-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`
+    const trackingId = `REC-${Date.now()}-${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
 
     // Get the admin email from system settings
-    const adminEmail = await getSystemSetting("RECRUITMENT_EMAIL", "recruitment@sfdeputysheriff.com")
-    const fromEmail = await getSystemSetting("DEFAULT_REPLY_TO", "no-reply@sfdeputysheriff.com")
+    const adminEmail = await getSystemSetting(
+      "RECRUITMENT_EMAIL",
+      "recruitment@sfdeputysheriff.com",
+    );
+    const fromEmail = await getSystemSetting(
+      "DEFAULT_REPLY_TO",
+      "no-reply@sfdeputysheriff.com",
+    );
 
     // In a real implementation, we would save this to a database
-    const supabase = getServiceSupabase()
-    const { error: dbError } = await supabase.from("volunteer_referrals").insert({
-      recruiter_id: recruiterId || "system",
-      referral_email: email,
-      referral_name: `${firstName} ${lastName}`,
-      referral_phone: phone || null,
-      status: "contacted",
-      tracking_id: trackingId,
-      notes: message || "Initial contact from volunteer recruiter program",
-      created_at: new Date().toISOString(),
-    })
+    const supabase = getServiceSupabase();
+    const { error: dbError } = await supabase
+      .from("volunteer_referrals")
+      .insert({
+        recruiter_id: recruiterId || "system",
+        referral_email: email,
+        referral_name: `${firstName} ${lastName}`,
+        referral_phone: phone || null,
+        status: "contacted",
+        tracking_id: trackingId,
+        notes: message || "Initial contact from volunteer recruiter program",
+        created_at: new Date().toISOString(),
+      });
 
     if (dbError) {
-      console.error("Database error:", dbError)
-      return NextResponse.json({ success: false, message: "Failed to save contact information" }, { status: 500 })
+      console.error("Database error:", dbError);
+      return NextResponse.json(
+        { success: false, message: "Failed to save contact information" },
+        { status: 500 },
+      );
     }
 
     // Html email template
@@ -135,7 +157,7 @@ export async function POST(request: Request) {
         </div>
       </body>
       </html>
-    `
+    `;
 
     // Send email
     try {
@@ -145,7 +167,7 @@ export async function POST(request: Request) {
         html: htmlEmail,
         from: `SF Deputy Sheriff Recruitment <${fromEmail}>`,
         replyTo: adminEmail,
-      })
+      });
 
       // Forward the recruit information to the admin email
       await sendEmail({
@@ -160,19 +182,25 @@ export async function POST(request: Request) {
           ${recruiterId ? `<p><strong>Referred by:</strong> ${recruiterName} (ID: ${recruiterId})</p>` : ""}
           <p><strong>Notes:</strong> ${message || "No additional notes"}</p>
         `,
-      })
+      });
     } catch (emailError) {
-      console.error("Email error:", emailError)
-      return NextResponse.json({ success: false, message: "Failed to send email" }, { status: 500 })
+      console.error("Email error:", emailError);
+      return NextResponse.json(
+        { success: false, message: "Failed to send email" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
       success: true,
       message: "Contact email sent successfully",
       trackingId,
-    })
+    });
   } catch (error) {
-    console.error("Error in send-contact route:", error)
-    return NextResponse.json({ success: false, message: "Internal server error" }, { status: 500 })
+    console.error("Error in send-contact route:", error);
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 },
+    );
   }
 }

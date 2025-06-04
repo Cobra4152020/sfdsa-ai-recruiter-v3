@@ -1,43 +1,50 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { getClientSideSupabase } from "@/lib/supabase"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { getClientSideSupabase } from "@/lib/supabase";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
 export default function CreateBriefingPage() {
-  const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
-  const [theme, setTheme] = useState("")
-  const [loading, setLoading] = useState(false)
-  const { toast } = useToast()
-  const router = useRouter()
-  const supabase = getClientSideSupabase()
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [theme, setTheme] = useState("");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
+  const supabase = getClientSideSupabase();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
 
     if (!title || !content) {
       toast({
         title: "Missing fields",
         description: "Please fill in all required fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     try {
-      setLoading(true)
+      setLoading(true);
 
       // Get the current date in YYYY-MM-DD format
-      const today = new Date().toISOString().split("T")[0]
+      const today = new Date().toISOString().split("T")[0];
 
       // Insert the new briefing - this will respect RLS policies
       const { error } = await supabase.from("daily_briefings").insert({
@@ -45,48 +52,53 @@ export default function CreateBriefingPage() {
         content,
         theme: theme || "General",
         date: today,
-      })
+      });
 
       if (error) {
         if (error.code === "PGRST301") {
           toast({
             title: "Permission denied",
-            description: "You do not have permission to create briefings. Please contact an administrator.",
+            description:
+              "You do not have permission to create briefings. Please contact an administrator.",
             variant: "destructive",
-          })
+          });
         } else {
-          throw error
+          throw error;
         }
-        return
+        return;
       }
 
       toast({
         title: "Briefing created",
         description: "Your daily briefing has been created successfully",
-      })
+      });
 
       // Redirect to the dashboard
-      router.push("/admin/secure-dashboard")
+      router.push("/admin/secure-dashboard");
     } catch (err) {
-      console.error("Error creating briefing:", err)
+      console.error("Error creating briefing:", err);
       toast({
         title: "Error",
         description: "Failed to create the daily briefing",
         variant: "destructive",
-      })
+      });
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-8 text-[#0A3C1F]">Create Daily Briefing</h1>
+      <h1 className="text-3xl font-bold mb-8 text-[#0A3C1F]">
+        Create Daily Briefing
+      </h1>
 
       <Card className="max-w-2xl mx-auto">
         <CardHeader>
           <CardTitle>New Daily Briefing</CardTitle>
-          <CardDescription>Create a new daily briefing for deputies</CardDescription>
+          <CardDescription>
+            Create a new daily briefing for deputies
+          </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -131,5 +143,5 @@ export default function CreateBriefingPage() {
         </form>
       </Card>
     </div>
-  )
+  );
 }

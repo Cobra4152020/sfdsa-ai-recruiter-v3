@@ -1,16 +1,16 @@
-"use client"
+"use client";
 
-import { Button, type ButtonProps } from "@/components/ui/button"
-import { useRegistration } from "@/context/registration-context"
+import { Button, type ButtonProps } from "@/components/ui/button";
+import { useRegistration } from "@/context/registration-context";
 
 interface RegisterButtonProps extends ButtonProps {
-  applyNow?: boolean
-  referralCode?: string
-  userType?: "recruit" | "volunteer" | "admin"
-  initialTab?: "signin" | "signup" | "optin"
-  callbackUrl?: string
-  title?: string
-  description?: string
+  applyNow?: boolean;
+  referralCode?: string;
+  userType?: "recruit" | "volunteer" | "admin";
+  initialTab?: "signin" | "signup" | "optin";
+  callbackUrl?: string;
+  title?: string;
+  description?: string;
 }
 
 export function RegisterButton({
@@ -24,7 +24,7 @@ export function RegisterButton({
   description,
   ...props
 }: RegisterButtonProps) {
-  const { openRegistrationPopup } = useRegistration()
+  const { openRegistrationPopup } = useRegistration();
 
   const handleClick = () => {
     openRegistrationPopup({
@@ -35,12 +35,17 @@ export function RegisterButton({
       callbackUrl,
       title,
       description,
-    })
-  }
+    });
+  };
 
   return (
     <Button onClick={handleClick} {...props}>
-      {children || (applyNow ? "Apply Now" : userType === "volunteer" ? "Volunteer Sign Up" : "Register")}
+      {children ||
+        (applyNow
+          ? "Apply Now"
+          : userType === "volunteer"
+            ? "Volunteer Sign Up"
+            : "Register")}
     </Button>
-  )
+  );
 }

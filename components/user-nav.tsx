@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useUser } from "@/context/user-context"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
+import { useUser } from "@/context/user-context";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,32 +10,32 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { User, Settings, LogOut } from "lucide-react"
-import { useState, useEffect } from "react"
+} from "@/components/ui/dropdown-menu";
+import { User, Settings, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
 
 export function UserNav() {
-  const { currentUser, signOut } = useUser()
-  const router = useRouter()
-  const [mounted, setMounted] = useState(false)
+  const { currentUser, signOut } = useUser();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
       <Button variant="ghost" className="relative h-8 w-8 rounded-full">
         <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
       </Button>
-    )
+    );
   }
 
-  if (!currentUser) return null
+  if (!currentUser) return null;
 
   const handleNavigation = (href: string) => {
-    router.push(href)
-  }
+    router.push(href);
+  };
 
   return (
     <DropdownMenu>
@@ -49,7 +49,9 @@ export function UserNav() {
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{currentUser.name}</p>
+            <p className="text-sm font-medium leading-none">
+              {currentUser.name}
+            </p>
             <p className="text-xs leading-none text-muted-foreground">
               {currentUser.email}
             </p>
@@ -71,5 +73,5 @@ export function UserNav() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
-} 
+  );
+}

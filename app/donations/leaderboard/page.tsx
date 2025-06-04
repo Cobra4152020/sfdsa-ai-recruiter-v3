@@ -1,11 +1,12 @@
-import { PageWrapper } from "@/components/page-wrapper"
-import { DonationLeaderboard } from "@/components/donation-leaderboard"
-import { DonationPointsCalculator } from "@/components/donation-points-calculator"
+import { PageWrapper } from "@/components/page-wrapper";
+import { DonationLeaderboard } from "@/components/donation-leaderboard";
+import { DonationPointsCalculator } from "@/components/donation-points-calculator";
 
 export const metadata = {
   title: "Donation Leaderboard | SFDSA Recruitment",
-  description: "See the top donors supporting the San Francisco Deputy Sheriff's Association recruitment efforts",
-}
+  description:
+    "See the top donors supporting the San Francisco Deputy Sheriff's Association recruitment efforts",
+};
 
 export default function DonationLeaderboardPage() {
   return (
@@ -22,5 +23,5 @@ export default function DonationLeaderboardPage() {
         </div>
       </div>
     </PageWrapper>
-  )
+  );
 }

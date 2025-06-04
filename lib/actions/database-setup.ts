@@ -1,4 +1,4 @@
-export async function databaseSetup(params: any) {
+export async function databaseSetup(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/database-setup`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function databaseSetup(params: any) {
     console.error(`Error in databaseSetup:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

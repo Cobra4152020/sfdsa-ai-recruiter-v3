@@ -1,14 +1,14 @@
 interface InterestedTemplateProps {
-  firstName: string
-  lastName: string
-  trackingNumber: string
-  dashboardUrl: string
-  applicationUrl: string
+  firstName: string;
+  lastName: string;
+  trackingNumber: string;
+  dashboardUrl: string;
+  applicationUrl: string;
 }
 
 export function interested({
   firstName,
-  lastName,
+  lastName, // eslint-disable-line @typescript-eslint/no-unused-vars
   trackingNumber,
   dashboardUrl,
   applicationUrl = "https://careers.sf.gov/interest/public-safety/sheriff/",
@@ -126,5 +126,5 @@ export function interested({
       </div>
     </body>
     </html>
-  `
+  `;
 }

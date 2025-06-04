@@ -2,8 +2,8 @@
  * Add a cache busting parameter to a URL
  */
 export function addCacheBustingParam(url: string): string {
-  const separator = url.includes("?") ? "&" : "?"
-  return `${url}${separator}_=${Date.now()}`
+  const separator = url.includes("?") ? "&" : "?";
+  return `${url}${separator}_=${Date.now()}`;
 }
 
 /**
@@ -14,4 +14,4 @@ export const API_CACHE_HEADERS = {
   "Surrogate-Control": "no-store",
   Pragma: "no-cache",
   Expires: "0",
-}
+};

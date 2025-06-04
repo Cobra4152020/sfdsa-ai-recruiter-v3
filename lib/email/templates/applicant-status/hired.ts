@@ -1,17 +1,15 @@
-import { emailTheme } from '../../theme';
+import { emailTheme } from "../../theme";
 
 interface HiredTemplateProps {
-  firstName: string
-  lastName: string
-  trackingNumber: string
-  dashboardUrl: string
-  startDate?: string
-  orientationDate?: string
+  firstName: string;
+  trackingNumber: string;
+  dashboardUrl: string;
+  startDate?: string;
+  orientationDate?: string;
 }
 
 export function hired({
   firstName,
-  lastName,
   trackingNumber,
   dashboardUrl,
   startDate = "to be determined",
@@ -145,5 +143,5 @@ export function hired({
       </div>
     </body>
     </html>
-  `
+  `;
 }

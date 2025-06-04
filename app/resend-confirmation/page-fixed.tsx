@@ -1,44 +1,50 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle, Mail, ArrowLeft } from "lucide-react"
-import { AuthStatusIndicator } from "@/components/auth-status-indicator"
-import Link from "next/link"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { ImprovedHeader } from "@/components/improved-header";
+import { ImprovedFooter } from "@/components/improved-footer";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle, Mail, ArrowLeft } from "lucide-react";
+import { AuthStatusIndicator } from "@/components/auth-status-indicator";
+import Link from "next/link";
 
 export default function ResendConfirmationPage() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [status, setStatus] = useState<"idle" | "success" | "error">("idle")
-  const [message, setMessage] = useState("")
-  const [showStatus, setShowStatus] = useState(false)
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState("");
+  const [showStatus, setShowStatus] = useState(false);
 
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setEmail(e.target.value)
-    setShowStatus(false)
-  }
+    setEmail(e.target.value);
+    setShowStatus(false);
+  };
 
   const handleCheckStatus = () => {
-    if (!email) return
-    setShowStatus(true)
-  }
+    if (!email) return;
+    setShowStatus(true);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!email) return
+    e.preventDefault();
+    if (!email) return;
 
-    setIsSubmitting(true)
-    setStatus("idle")
-    setMessage("")
+    setIsSubmitting(true);
+    setStatus("idle");
+    setMessage("");
 
     try {
       const response = await fetch("/api/resend-volunteer-confirmation", {
@@ -47,24 +53,27 @@ export default function ResendConfirmationPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success) {
-        setStatus("success")
-        setMessage(data.message || "Confirmation email has been resent. Please check your inbox.")
+        setStatus("success");
+        setMessage(
+          data.message ||
+            "Confirmation email has been resent. Please check your inbox.",
+        );
       } else {
-        setStatus("error")
-        setMessage(data.message || "Failed to resend confirmation email.")
+        setStatus("error");
+        setMessage(data.message || "Failed to resend confirmation email.");
       }
-    } catch (error) {
-      setStatus("error")
-      setMessage("An unexpected error occurred. Please try again later.")
+    } catch {
+      setStatus("error");
+      setMessage("An unexpected error occurred. Please try again later.");
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <>
@@ -81,7 +90,9 @@ export default function ResendConfirmationPage() {
 
           <Card>
             <CardHeader className="space-y-1">
-              <CardTitle className="text-2xl font-bold text-center">Resend Confirmation Email</CardTitle>
+              <CardTitle className="text-2xl font-bold text-center">
+                Resend Confirmation Email
+              </CardTitle>
               <CardDescription className="text-center">
                 Enter your email address to receive a new confirmation link
               </CardDescription>
@@ -90,7 +101,9 @@ export default function ResendConfirmationPage() {
               {status === "success" && (
                 <Alert className="mb-6 bg-green-50 border-green-200">
                   <CheckCircle className="h-4 w-4 text-green-600" />
-                  <AlertDescription className="text-green-700">{message}</AlertDescription>
+                  <AlertDescription className="text-green-700">
+                    {message}
+                  </AlertDescription>
                 </Alert>
               )}
 
@@ -120,7 +133,13 @@ export default function ResendConfirmationPage() {
                   </div>
 
                   {!showStatus && email && (
-                    <Button type="button" variant="outline" size="sm" className="mt-1" onClick={handleCheckStatus}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="mt-1"
+                      onClick={handleCheckStatus}
+                    >
                       Check account status
                     </Button>
                   )}
@@ -161,5 +180,5 @@ export default function ResendConfirmationPage() {
       </main>
       <ImprovedFooter />
     </>
-  )
+  );
 }

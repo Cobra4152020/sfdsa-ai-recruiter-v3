@@ -1,77 +1,78 @@
 "use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/components/ui/use-toast"
-import { getClientSideSupabase } from "@/lib/supabase"
-import { Mail, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react"
-import { constructUrl } from "@/lib/url-utils"
+import type React from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getClientSideSupabase } from "@/lib/supabase";
+import { Mail, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react";
+import { constructUrl } from "@/lib/url-utils";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/supabase";
 
 export default function ForgotPasswordClient() {
-  const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
-  const [supabase, setSupabase] = useState<any>(null)
-
-  const router = useRouter()
-  const { toast } = useToast()
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
+  const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(
+    null,
+  );
 
   useEffect(() => {
-    setSupabase(getClientSideSupabase())
-  }, [])
+    setSupabase(getClientSideSupabase());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
-    setSuccess(false)
+    e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    setSuccess(false);
 
     if (!supabase) {
-      setError("Supabase client not ready")
-      setIsLoading(false)
-      return
+      setError("Supabase client not ready");
+      setIsLoading(false);
+      return;
     }
 
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: constructUrl("/reset-password"),
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
-      setSuccess(true)
-      toast({
-        title: "Reset email sent",
-        description: "Check your email for a password reset link",
-      })
+      setSuccess(true);
     } catch (error) {
-      console.error("Password reset error:", error)
-      setError(error instanceof Error ? error.message : "Failed to send reset email")
-      toast({
-        title: "Reset failed",
-        description: error instanceof Error ? error.message : "Failed to send reset email",
-        variant: "destructive",
-      })
+      console.error("Password reset error:", error);
+      setError(
+        error instanceof Error ? error.message : "Failed to send reset email",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <main className="container mx-auto px-4 py-12">
       <div className="max-w-md mx-auto">
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">Reset your password</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+              Reset your password
+            </CardTitle>
             <CardDescription className="text-center">
-              Enter your email and we'll send you a reset link
+              Enter your email and we&apos;ll send you a reset link
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -88,7 +89,8 @@ export default function ForgotPasswordClient() {
                 <div>
                   <p className="font-medium">Reset email sent!</p>
                   <p className="text-sm mt-1">
-                    Check your email for a password reset link. The link will expire in 24 hours.
+                    Check your email for a password reset link. The link will
+                    expire in 24 hours.
                   </p>
                 </div>
               </div>
@@ -110,7 +112,11 @@ export default function ForgotPasswordClient() {
                       />
                     </div>
                   </div>
-                  <Button type="submit" className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                    disabled={isLoading}
+                  >
                     {isLoading ? (
                       <span className="flex items-center">
                         <span className="animate-spin mr-2">⟳</span>
@@ -125,7 +131,10 @@ export default function ForgotPasswordClient() {
             )}
           </CardContent>
           <CardFooter className="flex justify-center">
-            <Link href="/login" className="text-sm text-[#0A3C1F] hover:underline flex items-center">
+            <Link
+              href="/login"
+              className="text-sm text-[#0A3C1F] hover:underline flex items-center"
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to login
             </Link>
@@ -133,5 +142,5 @@ export default function ForgotPasswordClient() {
         </Card>
       </div>
     </main>
-  )
-} 
+  );
+}

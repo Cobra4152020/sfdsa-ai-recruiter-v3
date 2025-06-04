@@ -1,86 +1,90 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { X } from "lucide-react"
-import { useAuthModal } from "@/context/auth-modal-context"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { OptInForm } from "@/components/opt-in-form"
-import { useToast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
-import { useUser } from "@/context/user-context"
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { useAuthModal } from "@/context/auth-modal-context";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { OptInForm } from "@/components/opt-in-form";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 export function UnifiedAuthModal() {
-  const { isOpen, modalType, userType, referralCode, closeModal } = useAuthModal()
-  const [activeTab, setActiveTab] = useState<"signin" | "signup" | "optin">("signin")
-  const [showOptIn, setShowOptIn] = useState(false)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const { toast } = useToast()
-  const router = useRouter()
+  const { isOpen, modalType, referralCode, closeModal } = useAuthModal();
+  const [activeTab, setActiveTab] = useState<"signin" | "signup" | "optin">(
+    "signin",
+  );
+  const [showOptIn, setShowOptIn] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
-      setActiveTab(modalType)
-      setShowOptIn(modalType === "optin")
+      setActiveTab(modalType);
+      setShowOptIn(modalType === "optin");
     }
-  }, [isOpen, modalType])
+  }, [isOpen, modalType]);
 
   // Return a placeholder during server-side rendering
   if (!mounted) {
-    return null
+    return null;
   }
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
+      const supabase = getClientSideSupabase();
+      const data = await supabase.auth.signInWithPassword(email, password); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-      if (error) throw error
+      if (data.error) throw data.error;
 
       toast({
         title: "Success",
         description: "Successfully signed in!",
-      })
+      });
 
-      closeModal()
-      router.refresh()
+      closeModal();
+      router.refresh();
     } catch (error) {
-      console.error("Sign in error:", error)
+      console.error("Sign in error:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to sign in",
+        description:
+          error instanceof Error ? error.message : "Failed to sign in",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { data, error } = await supabase.auth.signUp({
+        // eslint-disable-line @typescript-eslint/no-unused-vars
         email,
         password,
         options: {
@@ -90,36 +94,44 @@ export function UnifiedAuthModal() {
             full_name: `${firstName} ${lastName}`.trim(),
           },
         },
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: "Please check your email to verify your account.",
-      })
+      });
 
-      setActiveTab("signin")
+      setActiveTab("signin");
     } catch (error) {
-      console.error("Sign up error:", error)
+      console.error("Sign up error:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to sign up",
+        description:
+          error instanceof Error ? error.message : "Failed to sign up",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   // Handle the opt-in form close
   const handleOptInClose = () => {
-    closeModal()
-  }
+    closeModal();
+  };
 
   // If showing the opt-in form, render it directly
   if (showOptIn) {
-    return <OptInForm onClose={handleOptInClose} isApplying={true} isOpen={isOpen} referralCode={referralCode} />
+    return (
+      <OptInForm
+        onClose={handleOptInClose}
+        isApplying={true}
+        isOpen={isOpen}
+        referralCode={referralCode}
+      />
+    );
   }
 
   // Otherwise render the auth tabs
@@ -128,15 +140,29 @@ export function UnifiedAuthModal() {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader className="flex justify-between items-center">
           <DialogTitle className="text-xl">
-            {activeTab === "signin" ? "Sign In" : activeTab === "signup" ? "Create Account" : "Apply Now"}
+            {activeTab === "signin"
+              ? "Sign In"
+              : activeTab === "signup"
+                ? "Create Account"
+                : "Apply Now"}
           </DialogTitle>
-          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={closeModal}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 rounded-full"
+            onClick={closeModal}
+          >
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </Button>
         </DialogHeader>
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) =>
+            setActiveTab(value as "signin" | "signup" | "optin")
+          }
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -144,7 +170,9 @@ export function UnifiedAuthModal() {
           <TabsContent value="signin">
             <form onSubmit={handleSignIn} className="space-y-4 py-4">
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Sign in to your account using your email and password.</p>
+                <p className="text-sm text-muted-foreground">
+                  Sign in to your account using your email and password.
+                </p>
               </div>
               <div className="space-y-4">
                 <div className="grid w-full items-center gap-1.5">
@@ -175,20 +203,20 @@ export function UnifiedAuthModal() {
                     required
                   />
                 </div>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
                   disabled={isLoading}
                 >
                   {isLoading ? "Signing in..." : "Sign In"}
                 </Button>
                 <div className="text-center">
-                  <button 
+                  <button
                     type="button"
-                    className="text-sm text-[#0A3C1F] hover:underline" 
+                    className="text-sm text-[#0A3C1F] hover:underline"
                     onClick={() => setActiveTab("signup")}
                   >
-                    Don't have an account? Sign up
+                    Don&apos;t have an account? Sign up
                   </button>
                 </div>
               </div>
@@ -197,7 +225,9 @@ export function UnifiedAuthModal() {
           <TabsContent value="signup">
             <form onSubmit={handleSignUp} className="space-y-4 py-4">
               <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Create a new account to join our community.</p>
+                <p className="text-sm text-muted-foreground">
+                  Create a new account to join our community.
+                </p>
               </div>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
@@ -245,7 +275,10 @@ export function UnifiedAuthModal() {
                   />
                 </div>
                 <div className="grid w-full items-center gap-1.5">
-                  <label htmlFor="signup-password" className="text-sm font-medium">
+                  <label
+                    htmlFor="signup-password"
+                    className="text-sm font-medium"
+                  >
                     Password
                   </label>
                   <input
@@ -258,8 +291,8 @@ export function UnifiedAuthModal() {
                     required
                   />
                 </div>
-                <Button 
-                  type="submit" 
+                <Button
+                  type="submit"
                   className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
                   disabled={isLoading}
                 >
@@ -281,5 +314,5 @@ export function UnifiedAuthModal() {
         </Tabs>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

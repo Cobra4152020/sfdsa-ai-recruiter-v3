@@ -1,13 +1,18 @@
-import { emailTheme } from '../../theme';
+import { emailTheme } from "../../theme";
 
 interface PendingTemplateProps {
-  firstName: string
-  lastName: string
-  trackingNumber: string
-  dashboardUrl: string
+  firstName: string;
+  lastName: string;
+  trackingNumber: string;
+  dashboardUrl: string;
 }
 
-export function pending({ firstName, lastName, trackingNumber, dashboardUrl }: PendingTemplateProps): string {
+export function pending({
+  firstName,
+  lastName, // eslint-disable-line @typescript-eslint/no-unused-vars
+  trackingNumber,
+  dashboardUrl,
+}: PendingTemplateProps): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -110,5 +115,5 @@ export function pending({ firstName, lastName, trackingNumber, dashboardUrl }: P
       </div>
     </body>
     </html>
-  `
+  `;
 }

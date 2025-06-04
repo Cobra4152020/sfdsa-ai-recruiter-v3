@@ -1,24 +1,32 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { reportPerformanceMetric, getRating } from "@/lib/performance-monitoring"
+import { useEffect } from "react";
+import {
+  reportPerformanceMetric,
+  getRating,
+} from "@/lib/performance-monitoring";
 
-export default function PerformanceMonitor() {
+export default function PerformanceMonitor({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   useEffect(() => {
     // Only run in the browser
-    if (typeof window === "undefined") return
+    if (typeof window === "undefined") return;
 
     // Only run in production or when explicitly enabled
     const isEnabled =
-      process.env.NODE_ENV === "production" || process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === "true"
+      process.env.NODE_ENV === "production" ||
+      process.env.NEXT_PUBLIC_ENABLE_PERFORMANCE_MONITORING === "true";
 
-    if (!isEnabled) return
+    if (!isEnabled) return;
 
     // Function to report web vitals
     const reportWebVitals = async () => {
       try {
         // Dynamically import web-vitals to reduce bundle size
-        const webVitals = await import("web-vitals")
+        const webVitals = await import("web-vitals");
 
         // Report Core Web Vitals
         webVitals.onCLS((metric) => {
@@ -31,11 +39,11 @@ export default function PerformanceMonitor() {
               id: metric.id,
               path: window.location.pathname,
               timestamp: Date.now(),
-            })
+            });
           } catch (error) {
-            console.warn("Error reporting CLS:", error)
+            console.warn("Error reporting CLS:", error);
           }
-        })
+        });
 
         webVitals.onFCP((metric) => {
           try {
@@ -47,11 +55,11 @@ export default function PerformanceMonitor() {
               id: metric.id,
               path: window.location.pathname,
               timestamp: Date.now(),
-            })
+            });
           } catch (error) {
-            console.warn("Error reporting FCP:", error)
+            console.warn("Error reporting FCP:", error);
           }
-        })
+        });
 
         webVitals.onLCP((metric) => {
           try {
@@ -63,11 +71,11 @@ export default function PerformanceMonitor() {
               id: metric.id,
               path: window.location.pathname,
               timestamp: Date.now(),
-            })
+            });
           } catch (error) {
-            console.warn("Error reporting LCP:", error)
+            console.warn("Error reporting LCP:", error);
           }
-        })
+        });
 
         webVitals.onTTFB((metric) => {
           try {
@@ -79,11 +87,11 @@ export default function PerformanceMonitor() {
               id: metric.id,
               path: window.location.pathname,
               timestamp: Date.now(),
-            })
+            });
           } catch (error) {
-            console.warn("Error reporting TTFB:", error)
+            console.warn("Error reporting TTFB:", error);
           }
-        })
+        });
 
         // Try to report FID, but it might not be available in all browsers
         try {
@@ -98,14 +106,14 @@ export default function PerformanceMonitor() {
                   id: metric.id,
                   path: window.location.pathname,
                   timestamp: Date.now(),
-                })
+                });
               } catch (error) {
-                console.warn("Error reporting FID:", error)
+                console.warn("Error reporting FID:", error);
               }
-            })
+            });
           }
         } catch (error) {
-          console.warn("FID measurement not available:", error)
+          console.warn("FID measurement not available:", error);
         }
 
         // Try to report INP, but it might not be available in all browsers
@@ -121,29 +129,29 @@ export default function PerformanceMonitor() {
                   id: metric.id,
                   path: window.location.pathname,
                   timestamp: Date.now(),
-                })
+                });
               } catch (error) {
-                console.warn("Error reporting INP:", error)
+                console.warn("Error reporting INP:", error);
               }
-            })
+            });
           }
         } catch (error) {
-          console.warn("INP measurement not available:", error)
+          console.warn("INP measurement not available:", error);
         }
       } catch (error) {
-        console.warn("Error loading web-vitals:", error)
+        console.warn("Error loading web-vitals:", error);
       }
-    }
+    };
 
     // Report web vitals
-    reportWebVitals()
+    reportWebVitals();
 
     // Clean up function
     return () => {
       // No cleanup needed
-    }
-  }, [])
+    };
+  }, []);
 
-  // This component doesn't render anything
-  return null
+  // This component doesn't render anything itself, but renders its children
+  return <>{children}</>;
 }

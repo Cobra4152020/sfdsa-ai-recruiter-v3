@@ -1,14 +1,21 @@
-import Link from "next/link"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { GameLayout } from "@/components/game-layout"
-import { ArrowRight, Calendar } from "lucide-react"
+import Link from "next/link";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { GameLayout } from "@/components/game-layout";
+import { ArrowRight, Calendar } from "lucide-react";
 
 export default function GamesPage() {
   const games = [
     // Word Constructor game removed
     // Future games can be added here
-  ]
+  ];
 
   return (
     <GameLayout
@@ -20,7 +27,9 @@ export default function GamesPage() {
           <Link href="/daily-briefing" className="group">
             <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
               <CardHeader className="bg-[#0A3C1F] dark:bg-[#121212] text-white p-4">
-                <CardTitle className="text-xl text-[#FFD700]">Sgt. Ken's Daily Briefing</CardTitle>
+                <CardTitle className="text-xl text-[#FFD700]">
+                  Sgt. Ken&apos;s Daily Briefing
+                </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <div className="aspect-video bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
@@ -31,9 +40,12 @@ export default function GamesPage() {
               </CardContent>
               <CardFooter className="p-4 bg-white dark:bg-gray-800">
                 <div>
-                  <h3 className="font-medium text-[#0A3C1F] dark:text-[#FFD700] mb-1">Daily Motivation & Points</h3>
+                  <h3 className="font-medium text-[#0A3C1F] dark:text-[#FFD700] mb-1">
+                    Daily Motivation & Points
+                  </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Get your daily dose of motivation from Sgt. Ken and earn points by sharing with others.
+                    Get your daily dose of motivation from Sgt. Ken and earn
+                    points by sharing with others.
                   </p>
                 </div>
               </CardFooter>
@@ -50,7 +62,10 @@ export default function GamesPage() {
                 <CardDescription>{game.description}</CardDescription>
               </CardHeader>
               <CardFooter className="mt-auto pt-4">
-                <Button asChild className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                <Button
+                  asChild
+                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                >
                   <Link href={game.href}>
                     Play Now
                     <ArrowRight className="ml-2 h-4 w-4" />
@@ -64,11 +79,15 @@ export default function GamesPage() {
         <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
           <h3 className="text-xl font-semibold mb-2">New Games Coming Soon!</h3>
           <p className="text-gray-600 mb-6">
-            We're developing exciting new games to help you earn participation points.
+            We&apos;re developing exciting new games to help you earn
+            participation points.
             <br />
             Check back soon or try our trivia games in the meantime!
           </p>
-          <Button asChild className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+          <Button
+            asChild
+            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+          >
             <Link href="/trivia">
               Play Trivia
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -80,8 +99,9 @@ export default function GamesPage() {
       <div className="mt-8 p-4 bg-[#0A3C1F]/5 rounded-lg border border-[#0A3C1F]/20">
         <h3 className="text-lg font-semibold mb-2">Earning Points</h3>
         <p className="mb-4">
-          Playing games is a great way to earn participation points and increase your standing in the recruitment
-          process. Here's how game points work:
+          Playing games is a great way to earn participation points and increase
+          your standing in the recruitment process. Here&apos;s how game points
+          work:
         </p>
         <ul className="list-disc pl-5 space-y-2">
           <li>Game scores are converted to participation points</li>
@@ -94,5 +114,5 @@ export default function GamesPage() {
         </ul>
       </div>
     </GameLayout>
-  )
+  );
 }

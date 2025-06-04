@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useToast } from "@/components/ui/use-toast"
+import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface PointTier {
-  name: string
-  points: number
-  rewards: string[]
+  name: string;
+  points: number;
+  rewards: string[];
 }
 
 export function useUserPoints(userId?: string) {
-  const [points, setPoints] = useState(0)
-  const [nextTier, setNextTier] = useState<PointTier | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const { toast } = useToast()
+  const [points, setPoints] = useState(0);
+  const [nextTier, setNextTier] = useState<PointTier | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const pointTiers: PointTier[] = [
     {
@@ -37,17 +37,17 @@ export function useUserPoints(userId?: string) {
       points: 10000,
       rewards: ["Platinum Badge", "Direct Contact with Recruiters"],
     },
-  ]
+  ];
 
   const fetchUserPoints = async () => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       if (!userId) {
-        setPoints(0)
-        setNextTier(pointTiers[0])
-        return
+        setPoints(0);
+        setNextTier(pointTiers[0]);
+        return;
       }
 
       // In a real app, this would be an API call
@@ -55,33 +55,35 @@ export function useUserPoints(userId?: string) {
       // const data = await response.json()
 
       // For demo purposes, generate a random number of points
-      const mockPoints = Math.floor(Math.random() * 7500)
+      const mockPoints = Math.floor(Math.random() * 7500);
 
-      setPoints(mockPoints)
+      setPoints(mockPoints);
 
       // Determine next tier
-      const currentTierIndex = pointTiers.findIndex((tier) => tier.points > mockPoints)
+      const currentTierIndex = pointTiers.findIndex(
+        (tier) => tier.points > mockPoints,
+      );
       if (currentTierIndex !== -1) {
-        setNextTier(pointTiers[currentTierIndex])
+        setNextTier(pointTiers[currentTierIndex]);
       } else {
-        setNextTier(null) // User has reached the highest tier
+        setNextTier(null); // User has reached the highest tier
       }
     } catch (err) {
-      console.error("Error fetching user points:", err)
-      setError("Failed to load points data")
+      console.error("Error fetching user points:", err);
+      setError("Failed to load points data");
       toast({
         title: "Error",
         description: "Failed to load your points data. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchUserPoints()
-  }, [userId])
+    fetchUserPoints();
+  }, [userId]);
 
   return {
     points,
@@ -89,5 +91,5 @@ export function useUserPoints(userId?: string) {
     isLoading,
     error,
     refetch: fetchUserPoints,
-  }
+  };
 }

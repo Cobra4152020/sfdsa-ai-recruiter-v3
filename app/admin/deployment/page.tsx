@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { DeploymentStatus } from "@/components/deployment-status"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Textarea } from "@/components/ui/textarea"
-import { Database, Trash, Download } from "lucide-react"
+import { useState } from "react";
+import { DeploymentStatus } from "@/components/deployment-status";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
+import { Database, Trash, Download } from "lucide-react";
 
 export default function DeploymentPage() {
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const [refreshResult, setRefreshResult] = useState<string | null>(null)
-  const [isClearing, setIsClearing] = useState(false)
-  const [clearResult, setClearResult] = useState<string | null>(null)
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshResult, setRefreshResult] = useState<string | null>(null);
+  const [isClearing, setIsClearing] = useState(false);
+  const [clearResult, setClearResult] = useState<string | null>(null);
 
   const refreshLeaderboardView = async () => {
-    setIsRefreshing(true)
-    setRefreshResult(null)
+    setIsRefreshing(true);
+    setRefreshResult(null);
 
     try {
       const response = await fetch("/api/admin/refresh-leaderboard", {
@@ -24,58 +24,59 @@ export default function DeploymentPage() {
         headers: {
           "Content-Type": "application/json",
         },
-      })
+      });
 
-      const data = await response.json()
-      setRefreshResult(JSON.stringify(data, null, 2))
+      const data = await response.json();
+      setRefreshResult(JSON.stringify(data, null, 2));
     } catch (error) {
-      setRefreshResult(`Error: ${error}`)
+      setRefreshResult(`Error: ${error}`);
     } finally {
-      setIsRefreshing(false)
+      setIsRefreshing(false);
     }
-  }
+  };
 
   const clearBrowserCache = async () => {
-    setIsClearing(true)
-    setClearResult(null)
+    setIsClearing(true);
+    setClearResult(null);
 
     try {
       // Clear application cache if available
       if ("caches" in window) {
-        const cacheNames = await window.caches.keys()
-        await Promise.all(cacheNames.map((name) => window.caches.delete(name)))
-        setClearResult("Browser cache cleared successfully")
+        const cacheNames = await window.caches.keys();
+        await Promise.all(cacheNames.map((name) => window.caches.delete(name)));
+        setClearResult("Browser cache cleared successfully");
       } else {
-        setClearResult("Cache API not available in this browser")
+        setClearResult("Cache API not available in this browser");
       }
     } catch (error) {
-      setClearResult(`Error: ${error}`)
+      setClearResult(`Error: ${error}`);
     } finally {
-      setIsClearing(false)
+      setIsClearing(false);
     }
-  }
+  };
 
   const downloadEnvironment = () => {
     const envData = {
       NEXT_PUBLIC_VERCEL_ENV: process.env.NEXT_PUBLIC_VERCEL_ENV,
       NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
-      NEXT_PUBLIC_ENABLE_LEADERBOARD: process.env.NEXT_PUBLIC_ENABLE_LEADERBOARD,
+      NEXT_PUBLIC_ENABLE_LEADERBOARD:
+        process.env.NEXT_PUBLIC_ENABLE_LEADERBOARD,
       NEXT_PUBLIC_ENABLE_BADGES: process.env.NEXT_PUBLIC_ENABLE_BADGES,
       NEXT_PUBLIC_ENABLE_POINTS: process.env.NEXT_PUBLIC_ENABLE_POINTS,
       NEXT_PUBLIC_ENABLE_DEBUG: process.env.NEXT_PUBLIC_ENABLE_DEBUG,
       NEXT_PUBLIC_BUILD_ID: process.env.NEXT_PUBLIC_BUILD_ID,
       NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
       timestamp: new Date().toISOString(),
-    }
+    };
 
-    const dataStr = JSON.stringify(envData, null, 2)
-    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`
+    const dataStr = JSON.stringify(envData, null, 2);
+    const dataUri = `data:application/json;charset=utf-8,${encodeURIComponent(dataStr)}`;
 
-    const linkElement = document.createElement("a")
-    linkElement.setAttribute("href", dataUri)
-    linkElement.setAttribute("download", `environment-${Date.now()}.json`)
-    linkElement.click()
-  }
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", `environment-${Date.now()}.json`);
+    linkElement.click();
+  };
 
   return (
     <div className="container mx-auto py-10">
@@ -90,15 +91,32 @@ export default function DeploymentPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Button onClick={refreshLeaderboardView} disabled={isRefreshing} className="w-full">
-                <Database className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+              <Button
+                onClick={refreshLeaderboardView}
+                disabled={isRefreshing}
+                className="w-full"
+              >
+                <Database
+                  className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`}
+                />
                 Refresh Leaderboard Data
               </Button>
-              {refreshResult && <Textarea value={refreshResult} readOnly className="mt-2 font-mono text-xs h-32" />}
+              {refreshResult && (
+                <Textarea
+                  value={refreshResult}
+                  readOnly
+                  className="mt-2 font-mono text-xs h-32"
+                />
+              )}
             </div>
 
             <div>
-              <Button onClick={clearBrowserCache} disabled={isClearing} variant="outline" className="w-full">
+              <Button
+                onClick={clearBrowserCache}
+                disabled={isClearing}
+                variant="outline"
+                className="w-full"
+              >
                 <Trash className="h-4 w-4 mr-2" />
                 Clear Browser Cache
               </Button>
@@ -106,7 +124,11 @@ export default function DeploymentPage() {
             </div>
 
             <div>
-              <Button onClick={downloadEnvironment} variant="outline" className="w-full">
+              <Button
+                onClick={downloadEnvironment}
+                variant="outline"
+                className="w-full"
+              >
                 <Download className="h-4 w-4 mr-2" />
                 Download Environment Info
               </Button>
@@ -117,7 +139,9 @@ export default function DeploymentPage() {
 
       <Tabs defaultValue="troubleshooting">
         <TabsList className="mb-4">
-          <TabsTrigger value="troubleshooting">Troubleshooting Guide</TabsTrigger>
+          <TabsTrigger value="troubleshooting">
+            Troubleshooting Guide
+          </TabsTrigger>
           <TabsTrigger value="deployment">Deployment Checklist</TabsTrigger>
         </TabsList>
 
@@ -131,46 +155,53 @@ export default function DeploymentPage() {
                 <h3 className="text-lg font-medium mb-2">Common Issues</h3>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>
-                    <strong>Blank or loading screens:</strong> Check browser console for JavaScript errors. Verify that
-                    all API endpoints are returning valid responses.
+                    <strong>Blank or loading screens:</strong> Check browser
+                    console for JavaScript errors. Verify that all API endpoints
+                    are returning valid responses.
                   </li>
                   <li>
-                    <strong>Missing data:</strong> Verify database connection and that required tables exist. Check that
-                    the leaderboard view is properly refreshed.
+                    <strong>Missing data:</strong> Verify database connection
+                    and that required tables exist. Check that the leaderboard
+                    view is properly refreshed.
                   </li>
                   <li>
-                    <strong>Stale data:</strong> Use the "Refresh Leaderboard Data" button to force a refresh of the
+                    <strong>Stale data:</strong> Use the &quot;Refresh
+                    Leaderboard Data&quot; button to force a refresh of the
                     materialized views.
                   </li>
                   <li>
-                    <strong>Browser caching:</strong> Use the "Clear Browser Cache" button or press Ctrl+F5 to force a
-                    full refresh.
+                    <strong>Browser caching:</strong> Use the &quot;Clear
+                    Browser Cache&quot; button or press Ctrl+F5 to force a full
+                    refresh.
                   </li>
                   <li>
-                    <strong>Environment variables:</strong> Verify that all required environment variables are set
-                    correctly.
+                    <strong>Environment variables:</strong> Verify that all
+                    required environment variables are set correctly.
                   </li>
                 </ul>
               </div>
 
               <div>
-                <h3 className="text-lg font-medium mb-2">Vercel Deployment Issues</h3>
+                <h3 className="text-lg font-medium mb-2">
+                  Vercel Deployment Issues
+                </h3>
                 <ul className="list-disc pl-5 space-y-2">
                   <li>
-                    <strong>Environment variables not applied:</strong> Check Vercel dashboard to ensure all environment
-                    variables are set correctly.
+                    <strong>Environment variables not applied:</strong> Check
+                    Vercel dashboard to ensure all environment variables are set
+                    correctly.
                   </li>
                   <li>
-                    <strong>Build failures:</strong> Check Vercel build logs for errors. Ensure all dependencies are
-                    installed correctly.
+                    <strong>Build failures:</strong> Check Vercel build logs for
+                    errors. Ensure all dependencies are installed correctly.
                   </li>
                   <li>
-                    <strong>Preview deployments:</strong> Test changes in preview deployments before deploying to
-                    production.
+                    <strong>Preview deployments:</strong> Test changes in
+                    preview deployments before deploying to production.
                   </li>
                   <li>
-                    <strong>Deployment cache:</strong> Consider triggering a fresh deployment if changes are not
-                    reflected.
+                    <strong>Deployment cache:</strong> Consider triggering a
+                    fresh deployment if changes are not reflected.
                   </li>
                 </ul>
               </div>
@@ -201,5 +232,5 @@ export default function DeploymentPage() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

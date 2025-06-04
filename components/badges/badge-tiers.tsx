@@ -1,28 +1,28 @@
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { Star, ChevronRight } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import type { BadgeTier } from '@/types/badge'
-import { Progress } from '@/components/ui/progress'
+import { useMemo } from "react";
+import { motion } from "framer-motion";
+import { Star, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { BadgeTier } from "@/types/badge";
+import { Progress } from "@/components/ui/progress";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card'
+} from "@/components/ui/card";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@/components/ui/tooltip'
+} from "@/components/ui/tooltip";
 
 interface BadgeTiersProps {
-  tiers: BadgeTier[]
-  currentTier: number
-  currentXP: number
-  className?: string
+  tiers: BadgeTier[];
+  currentTier: number;
+  currentXP: number;
+  className?: string;
 }
 
 export function BadgeTiers({
@@ -32,18 +32,21 @@ export function BadgeTiers({
   className,
 }: BadgeTiersProps) {
   const nextTier = useMemo(() => {
-    return tiers.find(tier => tier.tierLevel > currentTier)
-  }, [tiers, currentTier])
+    return tiers.find((tier) => tier.tierLevel > currentTier);
+  }, [tiers, currentTier]);
 
   const progressToNextTier = useMemo(() => {
-    if (!nextTier) return 100
-    const currentTierXP = tiers.find(t => t.tierLevel === currentTier)?.xpRequired || 0
-    const progress = ((currentXP - currentTierXP) / (nextTier.xpRequired - currentTierXP)) * 100
-    return Math.min(Math.max(progress, 0), 100)
-  }, [tiers, currentTier, currentXP, nextTier])
+    if (!nextTier) return 100;
+    const currentTierXP =
+      tiers.find((t) => t.tierLevel === currentTier)?.xpRequired || 0;
+    const progress =
+      ((currentXP - currentTierXP) / (nextTier.xpRequired - currentTierXP)) *
+      100;
+    return Math.min(Math.max(progress, 0), 100);
+  }, [tiers, currentTier, currentXP, nextTier]);
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Current Progress */}
       <Card>
         <CardHeader>
@@ -51,7 +54,7 @@ export function BadgeTiers({
           <CardDescription>
             {nextTier
               ? `${Math.round(progressToNextTier)}% progress to Tier ${nextTier.tierLevel}`
-              : 'Maximum tier reached!'}
+              : "Maximum tier reached!"}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -69,9 +72,7 @@ export function BadgeTiers({
       <Card>
         <CardHeader>
           <CardTitle>Tier Progression</CardTitle>
-          <CardDescription>
-            Your journey through badge tiers
-          </CardDescription>
+          <CardDescription>Your journey through badge tiers</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="relative">
@@ -81,8 +82,8 @@ export function BadgeTiers({
             {/* Tier Points */}
             <div className="relative grid grid-cols-5 gap-4">
               {tiers.map((tier, index) => {
-                const isCompleted = currentTier >= tier.tierLevel
-                const isCurrent = currentTier === tier.tierLevel
+                const isCompleted = currentTier >= tier.tierLevel;
+                const isCurrent = currentTier === tier.tierLevel;
 
                 return (
                   <TooltipProvider key={tier.id}>
@@ -93,10 +94,10 @@ export function BadgeTiers({
                             initial={{ scale: 0.8 }}
                             animate={{ scale: isCurrent ? 1.1 : 1 }}
                             className={cn(
-                              'relative z-10 flex items-center justify-center w-10 h-10 rounded-full transition-colors duration-200',
+                              "relative z-10 flex items-center justify-center w-10 h-10 rounded-full transition-colors duration-200",
                               isCompleted
-                                ? 'bg-primary text-primary-foreground'
-                                : 'bg-muted text-muted-foreground'
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted text-muted-foreground",
                             )}
                           >
                             <Star className="h-5 w-5" />
@@ -129,12 +130,12 @@ export function BadgeTiers({
                       </TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-                )
+                );
               })}
             </div>
           </div>
         </CardContent>
       </Card>
     </div>
-  )
-} 
+  );
+}

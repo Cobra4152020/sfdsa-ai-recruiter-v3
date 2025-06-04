@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { createBrowserClient } from '@supabase/ssr'
-import { PushNotificationPermission } from "@/components/push-notification-permission"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Switch } from "@/components/ui/switch"
-import { Label } from "@/components/ui/label"
+import { useEffect, useState } from "react";
+import { createBrowserClient } from "@supabase/ssr";
+
+interface Notification {
+  id: string;
+  message: string;
+  created_at: string;
+}
 
 export default function NotificationPreferencesPage() {
-  const router = useRouter()
-  const [notifications, setNotifications] = useState<any[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const supabase = createBrowserClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  );
 
   useEffect(() => {
     const fetchNotifications = async () => {
       try {
         const { data, error } = await supabase
-          .from('notifications')
-          .select('*')
-          .order('created_at', { ascending: false })
+          .from("notifications")
+          .select("*")
+          .order("created_at", { ascending: false });
 
-        if (error) throw error
-        setNotifications(data || [])
+        if (error) throw error;
+        setNotifications(data || []);
       } catch (error) {
-        console.error('Error fetching notifications:', error)
+        console.error("Error fetching notifications:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchNotifications()
-  }, [supabase])
+    fetchNotifications();
+  }, [supabase]);
 
   if (isLoading) {
-    return <div>Loading...</div>
+    return <div>Loading...</div>;
   }
 
   return (
@@ -60,5 +60,5 @@ export default function NotificationPreferencesPage() {
         ))}
       </div>
     </div>
-  )
+  );
 }

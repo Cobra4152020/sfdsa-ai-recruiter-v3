@@ -1,7 +1,7 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour
 
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 interface EmailConfig {
   provider: string;
@@ -39,19 +39,19 @@ const mockEmailDiagnostics: EmailDiagnostics = {
     templateDirectory: "/templates/email",
     maxRetries: 3,
     rateLimitPerMinute: 100,
-    isConfigured: true
+    isConfigured: true,
   },
   status: {
     isHealthy: true,
     lastCheck: new Date().toISOString(),
-    errors: []
+    errors: [],
   },
   metrics: {
     totalSent: 1250,
     deliveryRate: 98.5,
     bounceRate: 1.2,
-    averageSendTime: 245 // milliseconds
-  }
+    averageSendTime: 245, // milliseconds
+  },
 };
 
 export async function GET() {
@@ -59,17 +59,17 @@ export async function GET() {
     return NextResponse.json({
       success: true,
       diagnostics: mockEmailDiagnostics,
-      source: 'static'
-    })
+      source: "static",
+    });
   } catch (error) {
-    console.error("Error in email diagnostics API:", error)
+    console.error("Error in email diagnostics API:", error);
     return NextResponse.json(
       {
         success: false,
         message: error instanceof Error ? error.message : "Unknown error",
-        source: 'error'
+        source: "error",
       },
-      { status: 500 }
-    )
+      { status: 500 },
+    );
   }
 }

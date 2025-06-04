@@ -1,6 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Shield } from "lucide-react"
-import { VolunteerLoginForm } from "@/components/volunteer-login-form"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Shield } from "lucide-react";
+import { VolunteerLoginFormClient } from "@/components/volunteer-login-form-client";
 
 export default function VolunteerLoginPage() {
   return (
@@ -19,14 +25,16 @@ export default function VolunteerLoginPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <VolunteerLoginForm />
+            <VolunteerLoginFormClient />
           </CardContent>
         </Card>
 
         <div className="mt-8 bg-gray-50 rounded-lg p-4 border border-gray-200">
-          <h3 className="text-sm font-medium text-gray-700 mb-2">Why become a Volunteer Recruiter?</h3>
+          <h3 className="text-sm font-medium text-gray-700 mb-2">
+            Why become a Volunteer Recruiter?
+          </h3>
           <ul className="text-sm text-gray-600 space-y-1 list-disc pl-5">
-            <li>Help build a stronger Sheriff's Department</li>
+            <li>Help build a stronger Sheriff&apos;s Department</li>
             <li>Earn points and rewards for successful referrals</li>
             <li>Access to exclusive recruitment resources</li>
             <li>Make a difference in your community</li>
@@ -34,5 +42,5 @@ export default function VolunteerLoginPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }

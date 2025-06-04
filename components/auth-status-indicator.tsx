@@ -1,19 +1,21 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide-react"
+import { useState, useEffect } from "react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 
 interface AuthStatusIndicatorProps {
-  email: string
+  email: string;
 }
 
 export function AuthStatusIndicator({ email }: AuthStatusIndicatorProps) {
-  const [status, setStatus] = useState<"loading" | "exists" | "not_found" | "error">("loading")
-  const [message, setMessage] = useState<string>("")
+  const [status, setStatus] = useState<
+    "loading" | "exists" | "not_found" | "error"
+  >("loading");
+  const [message, setMessage] = useState<string>("");
 
   useEffect(() => {
-    if (!email) return
+    if (!email) return;
 
     const checkStatus = async () => {
       try {
@@ -23,41 +25,44 @@ export function AuthStatusIndicator({ email }: AuthStatusIndicatorProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ email }),
-        })
+        });
 
         if (!response.ok) {
-          throw new Error("Failed to check auth status")
+          throw new Error("Failed to check auth status");
         }
 
-        const data = await response.json()
-        const result = data.result
+        const data = await response.json();
+        const result = data.result;
 
         if (result.authUserExists || result.userProfileExists) {
-          setStatus("exists")
+          setStatus("exists");
 
           if (result.discrepancies.length > 0) {
             setMessage(
               "Account found but has some inconsistencies. We'll try to fix these when you resend the confirmation.",
-            )
+            );
           } else if (result.isEmailConfirmed) {
-            setMessage("Your email is already confirmed. You can log in to your account.")
+            setMessage(
+              "Your email is already confirmed. You can log in to your account.",
+            );
           } else {
-            setMessage("Account found. You can resend the confirmation email.")
+            setMessage("Account found. You can resend the confirmation email.");
           }
         } else {
-          setStatus("not_found")
-          setMessage("No account found with this email address.")
+          setStatus("not_found");
+          setMessage("No account found with this email address.");
         }
-      } catch (error) {
-        setStatus("error")
-        setMessage("Failed to check account status. Please try again.")
+      } catch (_error) {
+        // eslint-disable-line @typescript-eslint/no-unused-vars
+        setStatus("error");
+        setMessage("Failed to check account status. Please try again.");
       }
-    }
+    };
 
-    checkStatus()
-  }, [email])
+    checkStatus();
+  }, [email]);
 
-  if (!email) return null
+  if (!email) return null;
 
   return (
     <div className="mt-4">
@@ -71,14 +76,18 @@ export function AuthStatusIndicator({ email }: AuthStatusIndicatorProps) {
       {status === "exists" && (
         <Alert className="bg-blue-50 border-blue-200">
           <CheckCircle className="h-4 w-4 text-blue-600" />
-          <AlertDescription className="text-blue-700">{message}</AlertDescription>
+          <AlertDescription className="text-blue-700">
+            {message}
+          </AlertDescription>
         </Alert>
       )}
 
       {status === "not_found" && (
         <Alert className="bg-amber-50 border-amber-200">
           <XCircle className="h-4 w-4 text-amber-600" />
-          <AlertDescription className="text-amber-700">{message}</AlertDescription>
+          <AlertDescription className="text-amber-700">
+            {message}
+          </AlertDescription>
         </Alert>
       )}
 
@@ -89,5 +98,5 @@ export function AuthStatusIndicator({ email }: AuthStatusIndicatorProps) {
         </Alert>
       )}
     </div>
-  )
+  );
 }

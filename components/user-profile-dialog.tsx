@@ -1,61 +1,108 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { User, Trophy, Medal, Award, Calendar } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { User, Trophy, Medal, Award, Calendar } from "lucide-react";
+import Image from "next/image";
 
-interface UserProfileDialogProps {
-  userId: string
-  isOpen?: boolean
-  onClose?: () => void
-  currentUserId?: string
+interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  avatar?: string;
+  role: string;
+  has_applied: boolean;
+  badge_count: number;
+  nft_count: number;
+  created_at: string;
+  bio?: string;
+  badges: {
+    id: string;
+    name: string;
+    badge_type: string;
+    color: string;
+    icon: string;
+  }[];
+  nft_awards: {
+    id: string;
+    name: string;
+    image_url: string;
+    description: string;
+  }[];
+  metadata?: Record<string, unknown>;
 }
 
-export function UserProfileDialog({ userId, isOpen: externalIsOpen, onClose, currentUserId }: UserProfileDialogProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [profile, setProfile] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+interface UserStats {
+  totalPoints: number;
+  rank: number;
+  achievements: number;
+  metadata?: Record<string, unknown>;
+}
+
+interface UserProfileDialogProps {
+  userId: string;
+  isOpen?: boolean;
+  onClose?: () => void;
+  currentUserId?: string;
+}
+
+export function UserProfileDialog({
+  userId,
+  isOpen: externalIsOpen,
+  onClose,
+  currentUserId,
+}: UserProfileDialogProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [userStats, setUserStats] = useState<UserStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Sync with external open state if provided
   useEffect(() => {
     if (externalIsOpen !== undefined) {
-      setIsOpen(externalIsOpen)
+      setIsOpen(externalIsOpen);
     }
-  }, [externalIsOpen])
+  }, [externalIsOpen]);
 
   // Handle dialog close
   const handleOpenChange = (open: boolean) => {
-    setIsOpen(open)
+    setIsOpen(open);
     if (!open && onClose) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   // Fetch user profile when dialog opens
   useEffect(() => {
     if (isOpen && userId) {
-      setIsLoading(true)
-      setError(null)
+      setIsLoading(true);
+      setError(null);
 
       // Simulate API call with mock data
       setTimeout(() => {
         try {
-          const mockProfile = generateMockProfile(userId, currentUserId)
-          setProfile(mockProfile)
-          setIsLoading(false)
+          const mockProfile = generateMockProfile(userId, currentUserId);
+          setUserProfile(mockProfile.userProfile);
+          setUserStats(mockProfile.userStats);
+          setIsLoading(false);
         } catch (err) {
-          console.error("Error fetching profile:", err)
-          setError("Failed to load user profile")
-          setIsLoading(false)
+          console.error("Error fetching profile:", err);
+          setError("Failed to load user profile");
+          setIsLoading(false);
         }
-      }, 1000)
+      }, 1000);
     }
-  }, [isOpen, userId, currentUserId])
+  }, [isOpen, userId, currentUserId]);
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
@@ -89,23 +136,28 @@ export function UserProfileDialog({ userId, isOpen: externalIsOpen, onClose, cur
             <p>Failed to load user profile. Please try again.</p>
           </div>
         ) : (
-          profile && (
+          userProfile && (
             <div className="space-y-4">
               <div className="flex items-center">
-                <Avatar className="h-16 w-16 mr-4 border-2 border-[#0A3C1F]">
-                  <AvatarImage
-                    src={profile.avatar_url || `/placeholder.svg?height=64&width=64&query=user-${profile.id}`}
-                    alt={profile.name}
+                {userProfile.avatar && (
+                  <Image
+                    src={userProfile.avatar}
+                    alt={`${userProfile.name}'s avatar`}
+                    width={100}
+                    height={100}
+                    className="rounded-full"
                   />
-                  <AvatarFallback>{profile.name.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
+                )}
                 <div>
-                  <h2 className="text-2xl font-bold">{profile.name}</h2>
+                  <h2 className="text-2xl font-bold">{userProfile.name}</h2>
                   <div className="flex items-center mt-1 text-muted-foreground">
                     <Trophy className="h-4 w-4 mr-1" />
-                    <span>Rank #{profile.rank || "N/A"}</span>
-                    {profile.has_applied && (
-                      <Badge variant="outline" className="ml-2 bg-green-50 text-green-700 border-green-200">
+                    <span>Rank #{userStats?.rank || "N/A"}</span>
+                    {userProfile.has_applied && (
+                      <Badge
+                        variant="outline"
+                        className="ml-2 bg-green-50 text-green-700 border-green-200"
+                      >
                         Applied
                       </Badge>
                     )}
@@ -119,21 +171,27 @@ export function UserProfileDialog({ userId, isOpen: externalIsOpen, onClose, cur
                     <Trophy className="h-4 w-4 mr-1" />
                     Points
                   </div>
-                  <div className="text-2xl font-bold">{profile.participation_count?.toLocaleString() || 0}</div>
+                  <div className="text-2xl font-bold">
+                    {userStats?.totalPoints?.toLocaleString() || 0}
+                  </div>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1 flex items-center">
                     <Medal className="h-4 w-4 mr-1" />
                     Badges
                   </div>
-                  <div className="text-2xl font-bold">{profile.badge_count || 0}</div>
+                  <div className="text-2xl font-bold">
+                    {userProfile.badge_count || 0}
+                  </div>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1 flex items-center">
                     <Award className="h-4 w-4 mr-1" />
                     NFT Awards
                   </div>
-                  <div className="text-2xl font-bold">{profile.nft_count || 0}</div>
+                  <div className="text-2xl font-bold">
+                    {userProfile.nft_count || 0}
+                  </div>
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1 flex items-center">
@@ -141,34 +199,48 @@ export function UserProfileDialog({ userId, isOpen: externalIsOpen, onClose, cur
                     Joined
                   </div>
                   <div className="text-sm font-medium">
-                    {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : "N/A"}
+                    {userProfile.created_at
+                      ? new Date(userProfile.created_at).toLocaleDateString()
+                      : "N/A"}
                   </div>
                 </div>
               </div>
 
-              {profile.bio && (
+              {userProfile.bio && (
                 <div>
                   <h3 className="text-lg font-semibold mb-2">About</h3>
-                  <p className="text-muted-foreground">{profile.bio}</p>
+                  <p className="text-muted-foreground">{userProfile.bio}</p>
                 </div>
               )}
 
               <Tabs defaultValue="badges">
                 <TabsList className="grid grid-cols-2">
-                  <TabsTrigger value="badges">Badges ({profile.badge_count || 0})</TabsTrigger>
-                  <TabsTrigger value="nfts">NFT Awards ({profile.nft_count || 0})</TabsTrigger>
+                  <TabsTrigger value="badges">
+                    Badges ({userProfile.badge_count || 0})
+                  </TabsTrigger>
+                  <TabsTrigger value="nfts">
+                    NFT Awards ({userProfile.nft_count || 0})
+                  </TabsTrigger>
                 </TabsList>
                 <TabsContent value="badges" className="mt-4">
-                  {profile.badges && profile.badges.length > 0 ? (
+                  {userProfile.badges && userProfile.badges.length > 0 ? (
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
-                      {profile.badges.map((badge: any) => (
-                        <div key={badge.id} className="flex flex-col items-center text-center">
+                      {userProfile.badges.map((badge) => (
+                        <div
+                          key={badge.id}
+                          className="flex flex-col items-center text-center"
+                        >
                           <div
                             className={`rounded-full w-12 h-12 flex items-center justify-center mb-2 ${badge.color || "bg-blue-500"}`}
                           >
-                            <img
-                              src={badge.icon || "/placeholder.svg?height=32&width=32&query=badge"}
+                            <Image
+                              src={
+                                badge.icon ||
+                                "/placeholder.svg?height=32&width=32&query=badge"
+                              }
                               alt={badge.name}
+                              width={32}
+                              height={32}
                               className="w-8 h-8 object-contain"
                             />
                           </div>
@@ -183,20 +255,30 @@ export function UserProfileDialog({ userId, isOpen: externalIsOpen, onClose, cur
                   )}
                 </TabsContent>
                 <TabsContent value="nfts" className="mt-4">
-                  {profile.nft_awards && profile.nft_awards.length > 0 ? (
+                  {userProfile.nft_awards &&
+                  userProfile.nft_awards.length > 0 ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                      {profile.nft_awards.map((award: any) => (
-                        <div key={award.id} className="border rounded-lg overflow-hidden">
+                      {userProfile.nft_awards.map((award) => (
+                        <div
+                          key={award.id}
+                          className="border rounded-lg overflow-hidden"
+                        >
                           <div className="aspect-square relative">
-                            <img
-                              src={award.imageUrl || "/placeholder.svg?height=200&width=200&query=nft award"}
+                            <Image
+                              src={
+                                award.image_url ||
+                                "/placeholder.svg?height=200&width=200&query=nft award"
+                              }
                               alt={award.name}
-                              className="w-full h-full object-cover"
+                              fill
+                              className="object-cover"
                             />
                           </div>
                           <div className="p-3">
                             <h4 className="font-medium">{award.name}</h4>
-                            <p className="text-xs text-muted-foreground">{award.description}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {award.description}
+                            </p>
                           </div>
                         </div>
                       ))}
@@ -213,83 +295,49 @@ export function UserProfileDialog({ userId, isOpen: externalIsOpen, onClose, cur
         )}
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
 // Helper function to generate mock profile data
-function generateMockProfile(userId: string, currentUserId?: string) {
-  const isCurrentUser = userId === currentUserId
-  const id = userId
-  const name = `User ${id.split("-")[1] || id}`
-  const rank = Math.floor(Math.random() * 20) + 1
-  const participation_count = Math.floor(Math.random() * 1000) + 100
-  const badge_count = Math.floor(Math.random() * 8)
-  const nft_count = Math.floor(Math.random() * 3)
-  const has_applied = Math.random() > 0.7
-  const created_at = new Date(Date.now() - Math.floor(Math.random() * 10000000000)).toISOString()
-  const bio =
-    Math.random() > 0.3 ? `I'm ${name} and I'm interested in joining the San Francisco Sheriff's Department.` : ""
+function generateMockProfile(
+  userId: string,
+  currentUserId: string | undefined,
+) {
+  const isCurrentUser = userId === currentUserId;
+  const userProfile: UserProfile = {
+    id: userId,
+    name: isCurrentUser ? "You" : `User ${userId}`,
+    email: `user${userId}@example.com`,
+    avatar: `/placeholder.svg?height=64&width=64&query=user-${userId}`,
+    role: "Candidate",
+    has_applied: Math.random() > 0.5,
+    badge_count: Math.floor(Math.random() * 10),
+    nft_count: Math.floor(Math.random() * 5),
+    created_at: new Date(
+      Date.now() - Math.random() * 10000000000,
+    ).toISOString(),
+    bio: "Passionate about technology and innovation. Always eager to learn and grow.",
+    badges: Array.from({ length: 5 }, (_, i) => ({
+      id: `badge-${i + 1}`,
+      name: ["Gold Recruit", "Silver Explorer", "Bronze Participant"][i % 3],
+      badge_type: ["recruitment", "engagement", "participation"][i % 3],
+      color: ["#FFD700", "#C0C0C0", "#CD7F32"][i % 3],
+      icon: ["trophy", "star", "medal"][i % 3],
+    })),
+    nft_awards: Array.from({ length: 3 }, (_, i) => ({
+      id: `nft-${i + 1}`,
+      name: ["Gold Recruit", "Silver Explorer", "Bronze Participant"][i % 3],
+      image_url: `/placeholder.svg?height=200&width=200&query=nft award ${i + 1}`,
+      description:
+        "Awarded for exceptional engagement with the recruitment platform.",
+    })),
+  };
 
-  // Generate mock badges
-  const badges = Array.from({ length: badge_count }, (_, i) => ({
-    id: `badge-${i + 1}`,
-    name: [
-      "Participation",
-      "Quick Learner",
-      "Resource Explorer",
-      "Quiz Master",
-      "Application Started",
-      "Frequent Visitor",
-      "Deep Diver",
-      "Community Connector",
-    ][i % 8],
-    badge_type: [
-      "written",
-      "oral",
-      "physical",
-      "polygraph",
-      "psychological",
-      "full",
-      "chat-participation",
-      "application-started",
-    ][i % 8],
-    color: [
-      "bg-blue-500",
-      "bg-green-500",
-      "bg-purple-500",
-      "bg-yellow-500",
-      "bg-red-500",
-      "bg-indigo-500",
-      "bg-pink-500",
-      "bg-orange-500",
-    ][i % 8],
-    icon: `/placeholder.svg?height=32&width=32&query=badge ${i + 1}`,
-  }))
+  const userStats: UserStats = {
+    totalPoints: Math.floor(Math.random() * 1000),
+    rank: Math.floor(Math.random() * 100),
+    achievements: Math.floor(Math.random() * 20),
+  };
 
-  // Generate mock NFT awards
-  const nft_awards = Array.from({ length: nft_count }, (_, i) => ({
-    id: `nft-${i + 1}`,
-    name: ["Gold Recruit", "Silver Explorer", "Bronze Participant"][i % 3],
-    description: "Awarded for exceptional engagement with the recruitment platform.",
-    imageUrl: `/placeholder.svg?height=200&width=200&query=nft award ${i + 1}`,
-    token_id: `token-${i + 1}`,
-    contract_address: "0x1234567890abcdef",
-    awarded_at: new Date(Date.now() - Math.floor(Math.random() * 5000000000)).toISOString(),
-  }))
-
-  return {
-    id,
-    name,
-    rank,
-    participation_count,
-    badge_count,
-    nft_count,
-    has_applied,
-    created_at,
-    bio,
-    badges,
-    nft_awards,
-    avatar_url: `/placeholder.svg?height=64&width=64&query=user ${id}`,
-    is_current_user: isCurrentUser,
-  }
+  return { userProfile, userStats };
 }

@@ -1,74 +1,91 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useToast } from "@/components/ui/use-toast"
-import { Loader2, CheckCircle, XCircle } from "lucide-react"
-import { logError } from "@/lib/error-monitoring"
+import { useState, useCallback } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { logError } from "@/lib/error-monitoring";
 
 interface FormTestResult {
-  success: boolean
-  message: string
+  success: boolean;
+  message: string;
   data?: {
-    message?: string
-    error?: string
-    [key: string]: unknown
-  }
-  timestamp: string
+    message?: string;
+    error?: string;
+    [key: string]: unknown;
+  };
+  timestamp: string;
 }
 
 interface TestData {
-  name: string
-  email: string
-  password: string
+  name: string;
+  email: string;
+  password: string;
 }
 
 interface ApiResponse {
-  message?: string
-  error?: string
-  [key: string]: unknown
+  message?: string;
+  error?: string;
+  [key: string]: unknown;
 }
 
 export function FormTest() {
-  const [email, setEmail] = useState("")
-  const [name, setName] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [results, setResults] = useState<FormTestResult[]>([])
-  const { toast } = useToast()
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [results, setResults] = useState<FormTestResult[]>([]);
+  const { toast } = useToast();
 
-  const testEndpoint = useCallback(async (endpoint: string, data: TestData, method = "POST"): Promise<FormTestResult> => {
-    try {
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      })
+  const testEndpoint = useCallback(
+    async (
+      endpoint: string,
+      data: TestData,
+      method = "POST",
+    ): Promise<FormTestResult> => {
+      try {
+        const response = await fetch(endpoint, {
+          method,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
 
-      const responseData = await response.json() as ApiResponse
+        const responseData = (await response.json()) as ApiResponse;
 
-      return {
-        success: response.ok,
-        message: response.ok
-          ? `${endpoint} - Success (${response.status})`
-          : `${endpoint} - Failed (${response.status}): ${responseData.message || "Unknown error"}`,
-        data: responseData,
-        timestamp: new Date().toISOString(),
+        return {
+          success: response.ok,
+          message: response.ok
+            ? `${endpoint} - Success (${response.status})`
+            : `${endpoint} - Failed (${response.status}): ${responseData.message || "Unknown error"}`,
+          data: responseData,
+          timestamp: new Date().toISOString(),
+        };
+      } catch (error) {
+        logError(
+          `Error testing endpoint ${endpoint}`,
+          error instanceof Error ? error : new Error(String(error)),
+          "FormTest",
+        );
+        return {
+          success: false,
+          message: `${endpoint} - Error: ${error instanceof Error ? error.message : String(error)}`,
+          timestamp: new Date().toISOString(),
+        };
       }
-    } catch (error) {
-      logError(`Error testing endpoint ${endpoint}`, error instanceof Error ? error : new Error(String(error)), "FormTest")
-      return {
-        success: false,
-        message: `${endpoint} - Error: ${error instanceof Error ? error.message : String(error)}`,
-        timestamp: new Date().toISOString(),
-      }
-    }
-  }, [])
+    },
+    [],
+  );
 
   const handleTestAuth = useCallback(async () => {
     if (!email || !name) {
@@ -76,12 +93,12 @@ export function FormTest() {
         title: "Missing fields",
         description: "Please fill in both name and email fields",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setIsLoading(true)
-    setResults([])
+    setIsLoading(true);
+    setResults([]);
 
     try {
       // Test registration endpoint
@@ -89,45 +106,59 @@ export function FormTest() {
         name,
         email: `test_${Date.now()}@example.com`,
         password: "Test123!@#",
-      }
+      };
 
-      const registerResult = await testEndpoint("/api/auth/register", testData)
-      setResults((prev) => [...prev, registerResult])
+      const registerResult = await testEndpoint("/api/auth/register", testData);
+      setResults((prev) => [...prev, registerResult]);
 
       // Test other endpoints as needed
       // ...
 
-      const successCount = results.filter((r) => r.success).length
-      const totalCount = results.length
+      const successCount = results.filter((r) => r.success).length;
+      const totalCount = results.length;
 
       toast({
         title: "Tests completed",
         description: `${successCount} of ${totalCount} tests passed`,
         variant: successCount === totalCount ? "default" : "destructive",
-      })
+      });
     } catch (error) {
-      logError("Error running form tests", error instanceof Error ? error : new Error(String(error)), "FormTest")
+      logError(
+        "Error running form tests",
+        error instanceof Error ? error : new Error(String(error)),
+        "FormTest",
+      );
       toast({
         title: "Test error",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [email, name, results, testEndpoint, toast])
+  }, [email, name, results, testEndpoint, toast]);
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Form Submission Test</CardTitle>
-        <CardDescription>Test form submissions and API endpoints</CardDescription>
+        <CardDescription>
+          Test form submissions and API endpoints
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Name</Label>
-            <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Test User" />
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Test User"
+            />
           </div>
 
           <div className="space-y-2">
@@ -143,10 +174,16 @@ export function FormTest() {
 
           <div className="flex items-center space-x-2">
             <Checkbox id="test-mode" defaultChecked />
-            <Label htmlFor="test-mode">Use test mode (no permanent changes)</Label>
+            <Label htmlFor="test-mode">
+              Use test mode (no permanent changes)
+            </Label>
           </div>
 
-          <Button onClick={handleTestAuth} disabled={isLoading} className="w-full">
+          <Button
+            onClick={handleTestAuth}
+            disabled={isLoading}
+            className="w-full"
+          >
             {isLoading ? (
               <>
                 <Loader2 className="h-4 w-4 mr-2 animate-spin" />
@@ -194,5 +231,5 @@ export function FormTest() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

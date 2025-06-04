@@ -1,28 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Share2 } from "lucide-react"
-import { AchievementShareDialog } from "./achievement-share-dialog"
-import { useUser } from "@/context/user-context"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Share2 } from "lucide-react";
+import { AchievementShareDialog } from "./achievement-share-dialog";
+import { useUser } from "@/context/user-context";
 
 interface LeaderboardShareButtonProps {
-  position: number
-  points: number
-  className?: string
+  position: number;
+  points: number;
+  className?: string;
 }
 
-export function LeaderboardShareButton({ position, points, className }: LeaderboardShareButtonProps) {
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
-  const { currentUser } = useUser()
+export function LeaderboardShareButton({
+  position,
+  points,
+  className,
+}: LeaderboardShareButtonProps) {
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const { currentUser } = useUser();
 
-  if (!currentUser) return null
+  if (!currentUser) return null;
 
-  const positionText = getPositionText(position)
+  const positionText = getPositionText(position);
 
   return (
     <>
-      <Button variant="outline" size="sm" className={className} onClick={() => setIsShareDialogOpen(true)}>
+      <Button
+        variant="outline"
+        size="sm"
+        className={className}
+        onClick={() => setIsShareDialogOpen(true)}
+      >
         <Share2 className="h-4 w-4 mr-1" />
         Share
       </Button>
@@ -37,12 +46,12 @@ export function LeaderboardShareButton({ position, points, className }: Leaderbo
         }}
       />
     </>
-  )
+  );
 }
 
 function getPositionText(position: number): string {
-  if (position === 1) return "1st"
-  if (position === 2) return "2nd"
-  if (position === 3) return "3rd"
-  return `${position}th`
+  if (position === 1) return "1st";
+  if (position === 2) return "2nd";
+  if (position === 3) return "3rd";
+  return `${position}th`;
 }

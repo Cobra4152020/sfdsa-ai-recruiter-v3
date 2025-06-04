@@ -1,14 +1,21 @@
-"use client"
+"use client";
 
-import { ShieldLogo } from "@/components/shield-logo"
+import { ShieldLogo } from "@/components/shield-logo";
+import { useEffect } from "react";
 
 export default function GlobalError({
   error,
   reset,
 }: {
-  error: Error & { digest?: string }
-  reset: () => void
+  error: Error & { digest?: string };
+  reset: () => void;
 }) {
+  useEffect(() => {
+    // Log the error to an error reporting service
+    // console.error(_error); // _error is not defined, should be error
+    console.error(error); // Log the actual error prop
+  }, [error]);
+
   return (
     <html>
       <body>
@@ -31,7 +38,7 @@ export default function GlobalError({
                 Try again
               </button>
               <button
-                onClick={() => window.location.href = "/"}
+                onClick={() => (window.location.href = "/")}
                 className="ml-4 px-4 py-2 border border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10 dark:border-[#FFD700] dark:text-[#FFD700] dark:hover:bg-[#FFD700]/10 rounded"
               >
                 Return home
@@ -41,5 +48,5 @@ export default function GlobalError({
         </div>
       </body>
     </html>
-  )
-} 
+  );
+}

@@ -1,24 +1,36 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { ExternalLink, Share2 } from "lucide-react"
-import Image from "next/image"
-import { AchievementShareDialog } from "./achievement-share-dialog"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { ExternalLink, Share2 } from "lucide-react";
+import Image from "next/image";
+import { AchievementShareDialog } from "./achievement-share-dialog";
 
 interface NFTAwardCardProps {
-  id: string
-  name: string
-  description: string
-  imageUrl: string
-  tokenId?: string
-  contractAddress?: string
-  awardedAt?: string
-  pointsAtAward?: number
-  blockchainExplorerUrl?: string
-  className?: string
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  tokenId?: string;
+  contractAddress?: string;
+  awardedAt?: string;
+  pointsAtAward?: number;
+  blockchainExplorerUrl?: string;
+  className?: string;
 }
 
 export function NFTAwardCard({
@@ -33,9 +45,9 @@ export function NFTAwardCard({
   blockchainExplorerUrl,
   className,
 }: NFTAwardCardProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
-  const isAwarded = !!awardedAt
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+  const isAwarded = !!awardedAt;
 
   const formattedDate = awardedAt
     ? new Date(awardedAt).toLocaleDateString("en-US", {
@@ -43,11 +55,13 @@ export function NFTAwardCard({
         month: "long",
         day: "numeric",
       })
-    : null
+    : null;
 
   return (
     <>
-      <Card className={`overflow-hidden ${className} ${!isAwarded ? "opacity-50" : ""}`}>
+      <Card
+        className={`overflow-hidden ${className} ${!isAwarded ? "opacity-50" : ""}`}
+      >
         <CardHeader className="p-4 bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 text-white">
           <CardTitle className="text-lg">{name}</CardTitle>
         </CardHeader>
@@ -61,15 +75,30 @@ export function NFTAwardCard({
               sizes="(max-width: 768px) 100vw, 300px"
             />
           </div>
-          <p className="text-sm text-center text-muted-foreground">{description}</p>
-          {isAwarded && formattedDate && <p className="text-xs text-center mt-2">Awarded on {formattedDate}</p>}
+          <p className="text-sm text-center text-muted-foreground">
+            {description}
+          </p>
+          {isAwarded && formattedDate && (
+            <p className="text-xs text-center mt-2">
+              Awarded on {formattedDate}
+            </p>
+          )}
         </CardContent>
         <CardFooter className="p-4 pt-0 flex justify-center gap-2">
-          <Button variant="outline" size="sm" onClick={() => setIsDialogOpen(true)} disabled={!isAwarded}>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsDialogOpen(true)}
+            disabled={!isAwarded}
+          >
             View Details
           </Button>
           {isAwarded && (
-            <Button variant="outline" size="sm" onClick={() => setIsShareDialogOpen(true)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setIsShareDialogOpen(true)}
+            >
               <Share2 className="h-4 w-4 mr-1" />
               Share
             </Button>
@@ -116,12 +145,20 @@ export function NFTAwardCard({
                 {contractAddress && (
                   <div className="flex justify-between">
                     <span className="font-medium">Contract:</span>
-                    <span className="font-mono text-xs truncate max-w-[180px]">{contractAddress}</span>
+                    <span className="font-mono text-xs truncate max-w-[180px]">
+                      {contractAddress}
+                    </span>
                   </div>
                 )}
                 {blockchainExplorerUrl && (
                   <div className="mt-4 flex justify-center">
-                    <Button variant="outline" size="sm" onClick={() => window.open(blockchainExplorerUrl, "_blank")}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        window.open(blockchainExplorerUrl, "_blank")
+                      }
+                    >
                       <ExternalLink className="h-4 w-4 mr-2" />
                       View on Blockchain
                     </Button>
@@ -149,5 +186,5 @@ export function NFTAwardCard({
         />
       )}
     </>
-  )
+  );
 }

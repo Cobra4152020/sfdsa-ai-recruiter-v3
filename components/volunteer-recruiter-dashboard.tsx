@@ -1,18 +1,24 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
-import { useUser } from "@/context/user-context"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
 import {
   Users,
   UserPlus,
@@ -27,31 +33,105 @@ import {
   CheckCircle,
   Copy,
   FileText,
-} from "lucide-react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts"
+} from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+} from "recharts";
 
 interface VolunteerRecruiterDashboardProps {
-  className?: string
+  className?: string;
 }
 
-export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDashboardProps) {
-  const { currentUser } = useUser()
-  const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState("overview")
-  const [isLoading, setIsLoading] = useState(true)
-  const [dashboardData, setDashboardData] = useState<any>(null)
-  const [referralCode, setReferralCode] = useState(
-    "SFSHERIFF-" + Math.random().toString(36).substring(2, 8).toUpperCase(),
-  )
-  const [referralMessage, setReferralMessage] = useState("")
+interface Referral {
+  id: string;
+  name: string;
+  email: string;
+  status: string;
+  date: string;
+  progress: number;
+  points: number;
+}
+
+interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  progress: number;
+  earned: boolean;
+  image: string;
+}
+
+interface NFT {
+  id: string;
+  name: string;
+  description: string;
+  progress: number;
+  threshold: number;
+  current: number;
+  image: string;
+}
+
+interface Event {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  description: string;
+  status: string;
+}
+
+interface PointsHistoryEntry {
+  date: string;
+  points: number;
+}
+
+interface ReferralStats {
+  totalReferrals: number;
+  pendingReferrals: number;
+  activeReferrals: number;
+  successfulReferrals: number;
+  conversionRate: number;
+  totalPoints: number;
+  badgesEarned: number;
+  nftsEarned: number;
+}
+
+interface VolunteerRecruiterDashboardData {
+  referrals: Referral[];
+  pointsHistory: PointsHistoryEntry[];
+  badges: Badge[];
+  nfts: NFT[];
+  events: Event[];
+  stats: ReferralStats;
+}
+
+export function VolunteerRecruiterDashboard({
+  className,
+}: VolunteerRecruiterDashboardProps) {
+  // const { currentUser } = useUser(); // Commented out unused variable
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashboardData, setDashboardData] =
+    useState<VolunteerRecruiterDashboardData | null>(null);
+  const [referralCode, setReferralCode] = useState("VR2024-DEMO"); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [referralMessage, setReferralMessage] = useState("");
 
   useEffect(() => {
     const fetchDashboardData = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         // In a real implementation, this would be an API call
         // For now, we'll use mock data
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         const mockReferrals = [
           {
@@ -99,16 +179,16 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             progress: 100,
             points: 500,
           },
-        ]
+        ];
 
         const mockPointsHistory = Array.from({ length: 30 }, (_, i) => {
-          const date = new Date()
-          date.setDate(date.getDate() - 29 + i)
+          const date = new Date();
+          date.setDate(date.getDate() - 29 + i);
           return {
             date: date.toISOString().split("T")[0],
             points: Math.floor(Math.random() * 100) + 50,
-          }
-        })
+          };
+        });
 
         const mockBadges = [
           {
@@ -143,7 +223,7 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             earned: false,
             image: "/chat-icon.png",
           },
-        ]
+        ];
 
         const mockNFTs = [
           {
@@ -173,7 +253,7 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             current: 2,
             image: "/generic-badge.png",
           },
-        ]
+        ];
 
         const mockEvents = [
           {
@@ -181,7 +261,8 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             title: "Virtual Recruitment Info Session",
             date: "2023-06-15T18:00:00",
             location: "Zoom",
-            description: "Present information about the Sheriff's Department to potential recruits",
+            description:
+              "Present information about the Sheriff's Department to potential recruits",
             status: "upcoming",
           },
           {
@@ -189,7 +270,8 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             title: "Community Job Fair",
             date: "2023-06-22T10:00:00",
             location: "Mission District Community Center",
-            description: "Staff a booth at the community job fair to attract potential recruits",
+            description:
+              "Staff a booth at the community job fair to attract potential recruits",
             status: "upcoming",
           },
           {
@@ -197,10 +279,11 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             title: "College Campus Visit",
             date: "2023-07-05T13:00:00",
             location: "City College of San Francisco",
-            description: "Speak to criminal justice students about career opportunities",
+            description:
+              "Speak to criminal justice students about career opportunities",
             status: "upcoming",
           },
-        ]
+        ];
 
         const mockReferralStats = {
           totalReferrals: 12,
@@ -211,7 +294,7 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
           totalPoints: 825,
           badgesEarned: 1,
           nftsEarned: 0,
-        }
+        };
 
         setDashboardData({
           referrals: mockReferrals,
@@ -220,25 +303,25 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
           nfts: mockNFTs,
           events: mockEvents,
           stats: mockReferralStats,
-        })
+        });
       } catch (error) {
-        console.error("Error fetching dashboard data:", error)
+        console.error("Error fetching dashboard data:", error);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchDashboardData()
-  }, [])
+    fetchDashboardData();
+  }, []);
 
   const handleCopyReferralCode = () => {
-    navigator.clipboard.writeText(referralCode)
+    navigator.clipboard.writeText(referralCode);
     toast({
       title: "Referral code copied!",
       description: "The referral code has been copied to your clipboard.",
       duration: 3000,
-    })
-  }
+    });
+  };
 
   const handleSendReferral = () => {
     if (!referralMessage.trim()) {
@@ -246,18 +329,18 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
         title: "Message required",
         description: "Please enter a message to send with your referral.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     toast({
       title: "Referral sent!",
       description: "Your referral invitation has been sent successfully.",
       duration: 3000,
-    })
+    });
 
-    setReferralMessage("")
-  }
+    setReferralMessage("");
+  };
 
   if (isLoading) {
     return (
@@ -266,14 +349,20 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
         </div>
       </div>
-    )
+    );
+  }
+
+  if (!dashboardData) {
+    return <div className={className}>No dashboard data available.</div>;
   }
 
   return (
     <div className={className}>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">Volunteer Recruiter Dashboard</h2>
+          <h2 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+            Volunteer Recruiter Dashboard
+          </h2>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="referrals">Referrals</TabsTrigger>
@@ -287,19 +376,29 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Referrals</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Referrals
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.stats.totalReferrals}</div>
-                <div className="text-xs text-muted-foreground mt-1">+2 this month</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.stats.totalReferrals}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  +2 this month
+                </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Successful Referrals</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Successful Referrals
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.stats.successfulReferrals}</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.stats.successfulReferrals}
+                </div>
                 <div className="text-xs text-muted-foreground mt-1">
                   Conversion: {dashboardData.stats.conversionRate}%
                 </div>
@@ -307,20 +406,32 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Points</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Points
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.stats.totalPoints}</div>
-                <div className="text-xs text-muted-foreground mt-1">+125 this week</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.stats.totalPoints}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  +125 this week
+                </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Rewards Earned</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Rewards Earned
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.stats.badgesEarned} Badges</div>
-                <div className="text-xs text-muted-foreground mt-1">{dashboardData.stats.nftsEarned} NFTs</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData.stats.badgesEarned} Badges
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {dashboardData.stats.nftsEarned} NFTs
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -329,7 +440,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
           <Card>
             <CardHeader>
               <CardTitle>Points History</CardTitle>
-              <CardDescription>Your recruitment points over the last 30 days</CardDescription>
+              <CardDescription>
+                Your recruitment points over the last 30 days
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
@@ -347,7 +460,13 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <XAxis dataKey="date" />
                     <YAxis />
                     <Tooltip />
-                    <Area type="monotone" dataKey="points" stroke="#0A3C1F" fill="#0A3C1F" fillOpacity={0.2} />
+                    <Area
+                      type="monotone"
+                      dataKey="points"
+                      stroke="#0A3C1F"
+                      fill="#0A3C1F"
+                      fillOpacity={0.2}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -359,12 +478,20 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             <Card>
               <CardHeader>
                 <CardTitle>Your Referral Code</CardTitle>
-                <CardDescription>Share this code with potential recruits</CardDescription>
+                <CardDescription>
+                  Share this code with potential recruits
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="bg-[#0A3C1F]/5 p-4 rounded-lg flex items-center justify-between mb-4">
-                  <code className="text-lg font-mono font-bold text-[#0A3C1F]">{referralCode}</code>
-                  <Button variant="outline" size="sm" onClick={handleCopyReferralCode}>
+                  <code className="text-lg font-mono font-bold text-[#0A3C1F]">
+                    {referralCode}
+                  </code>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleCopyReferralCode}
+                  >
                     <Copy className="h-4 w-4 mr-2" />
                     Copy
                   </Button>
@@ -382,7 +509,10 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                   </div>
                   <div className="flex space-x-2">
                     <Input placeholder="Enter email address" type="email" />
-                    <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" onClick={handleSendReferral}>
+                    <Button
+                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                      onClick={handleSendReferral}
+                    >
                       <Mail className="h-4 w-4 mr-2" />
                       Send
                     </Button>
@@ -413,8 +543,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     </div>
                     <div>
                       <h4 className="font-medium">New Referral</h4>
-                      <p className="text-sm text-muted-foreground">Sarah Johnson has been referred</p>
-                      <p className="text-xs text-muted-foreground mt-1">Today at 4:20 PM</p>
+                      <p className="text-sm text-muted-foreground">
+                        Sarah Johnson has been referred
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Today at 4:20 PM
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -423,8 +557,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     </div>
                     <div>
                       <h4 className="font-medium">Referral Progress</h4>
-                      <p className="text-sm text-muted-foreground">Maria Rodriguez completed her interview</p>
-                      <p className="text-xs text-muted-foreground mt-1">Yesterday at 2:15 PM</p>
+                      <p className="text-sm text-muted-foreground">
+                        Maria Rodriguez completed her interview
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Yesterday at 2:15 PM
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -433,8 +571,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     </div>
                     <div>
                       <h4 className="font-medium">Badge Earned</h4>
-                      <p className="text-sm text-muted-foreground">You earned the "Recruitment Starter" badge</p>
-                      <p className="text-xs text-muted-foreground mt-1">May 15, 2023 at 10:30 AM</p>
+                      <p className="text-sm text-muted-foreground">
+                        You earned the &quot;Recruitment Starter&quot; Badge
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        May 15, 2023 at 10:30 AM
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-4">
@@ -443,8 +585,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     </div>
                     <div>
                       <h4 className="font-medium">Upcoming Event</h4>
-                      <p className="text-sm text-muted-foreground">Virtual Recruitment Info Session on June 15</p>
-                      <p className="text-xs text-muted-foreground mt-1">2 weeks from now</p>
+                      <p className="text-sm text-muted-foreground">
+                        Virtual Recruitment Info Session on June 15
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        2 weeks from now
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -457,11 +603,13 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
           <Card>
             <CardHeader>
               <CardTitle>Your Referrals</CardTitle>
-              <CardDescription>Track the progress of your referred candidates</CardDescription>
+              <CardDescription>
+                Track the progress of your referred candidates
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {dashboardData.referrals.map((referral: any) => (
+                {dashboardData.referrals.map((referral: Referral) => (
                   <div
                     key={referral.id}
                     className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
@@ -469,9 +617,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4">
                       <div>
                         <h4 className="font-medium">{referral.name}</h4>
-                        <div className="text-sm text-muted-foreground">{referral.email}</div>
+                        <div className="text-sm text-muted-foreground">
+                          {referral.email}
+                        </div>
                         <div className="text-xs text-muted-foreground">
-                          Referred on {new Date(referral.date).toLocaleDateString()}
+                          Referred on{" "}
+                          {new Date(referral.date).toLocaleDateString()}
                         </div>
                       </div>
                       <div className="mt-2 sm:mt-0">
@@ -513,7 +664,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <div className="flex justify-between items-center mt-4">
                       <div className="text-sm">
                         <span className="font-medium">Points earned:</span>{" "}
-                        <span className="text-[#0A3C1F] font-bold">{referral.points}</span>
+                        <span className="text-[#0A3C1F] font-bold">
+                          {referral.points}
+                        </span>
                       </div>
                       <div className="flex space-x-2">
                         <Button variant="outline" size="sm">
@@ -542,9 +695,21 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
                       data={[
-                        { name: "Pending", value: dashboardData.stats.pendingReferrals, fill: "#9CA3AF" },
-                        { name: "Active", value: dashboardData.stats.activeReferrals, fill: "#3B82F6" },
-                        { name: "Successful", value: dashboardData.stats.successfulReferrals, fill: "#10B981" },
+                        {
+                          name: "Pending",
+                          value: dashboardData.stats.pendingReferrals,
+                          fill: "#9CA3AF",
+                        },
+                        {
+                          name: "Active",
+                          value: dashboardData.stats.activeReferrals,
+                          fill: "#3B82F6",
+                        },
+                        {
+                          name: "Successful",
+                          value: dashboardData.stats.successfulReferrals,
+                          fill: "#10B981",
+                        },
                       ]}
                       margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
                     >
@@ -559,18 +724,31 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
 
                 <div className="grid grid-cols-3 gap-4 mt-6">
                   <div className="text-center">
-                    <div className="text-2xl font-bold">{dashboardData.stats.conversionRate}%</div>
-                    <div className="text-sm text-muted-foreground">Conversion Rate</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-2xl font-bold">{dashboardData.stats.totalPoints}</div>
-                    <div className="text-sm text-muted-foreground">Total Points</div>
+                    <div className="text-2xl font-bold">
+                      {dashboardData.stats.conversionRate}%
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Conversion Rate
+                    </div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold">
-                      {Math.round(dashboardData.stats.totalPoints / dashboardData.stats.totalReferrals)}
+                      {dashboardData.stats.totalPoints}
                     </div>
-                    <div className="text-sm text-muted-foreground">Avg. Points/Referral</div>
+                    <div className="text-sm text-muted-foreground">
+                      Total Points
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold">
+                      {Math.round(
+                        dashboardData.stats.totalPoints /
+                          dashboardData.stats.totalReferrals,
+                      )}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      Avg. Points/Referral
+                    </div>
                   </div>
                 </div>
               </CardContent>
@@ -579,7 +757,10 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             <Card>
               <CardHeader>
                 <CardTitle>Make a New Referral</CardTitle>
-                <CardDescription>Refer someone to join the San Francisco Sheriff's Department</CardDescription>
+                <CardDescription>
+                  Refer someone to join the San Francisco Sheriff&apos;s
+                  Department
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form className="space-y-4">
@@ -589,11 +770,21 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="referral-email">Candidate Email</Label>
-                    <Input id="referral-email" type="email" placeholder="Enter email address" />
+                    <Input
+                      id="referral-email"
+                      type="email"
+                      placeholder="Enter email address"
+                    />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="referral-phone">Candidate Phone (Optional)</Label>
-                    <Input id="referral-phone" type="tel" placeholder="Enter phone number" />
+                    <Label htmlFor="referral-phone">
+                      Candidate Phone (Optional)
+                    </Label>
+                    <Input
+                      id="referral-phone"
+                      type="tel"
+                      placeholder="Enter phone number"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="referral-notes">Notes (Optional)</Label>
@@ -606,11 +797,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                   <Button
                     className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
                     onClick={(e) => {
-                      e.preventDefault()
+                      e.preventDefault();
                       toast({
                         title: "Referral submitted!",
-                        description: "Your referral has been submitted successfully.",
-                      })
+                        description:
+                          "Your referral has been submitted successfully.",
+                      });
                     }}
                   >
                     <UserPlus className="h-4 w-4 mr-2" />
@@ -627,15 +819,23 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             <Card>
               <CardHeader>
                 <CardTitle>Badges Progress</CardTitle>
-                <CardDescription>Track your progress towards earning badges</CardDescription>
+                <CardDescription>
+                  Track your progress towards earning badges
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {dashboardData.badges.map((badge: any) => (
+                  {dashboardData.badges.map((badge: Badge) => (
                     <div key={badge.id} className="flex items-start space-x-4">
                       <div className="relative">
                         <div className="w-12 h-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                          <img src={badge.image || "/placeholder.svg"} alt={badge.name} className="w-8 h-8" />
+                          <Image
+                            src={badge.image || "/placeholder.svg"}
+                            alt={badge.name}
+                            width={32}
+                            height={32}
+                            className="w-8 h-8"
+                          />
                         </div>
                         {badge.earned && (
                           <div className="absolute -bottom-1 -right-1 bg-green-500 rounded-full p-1">
@@ -647,10 +847,14 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                         <div className="flex items-center">
                           <h4 className="font-medium">{badge.name}</h4>
                           {badge.earned && (
-                            <Badge className="ml-2 bg-green-50 text-green-600 border-green-200">Earned</Badge>
+                            <Badge className="ml-2 bg-green-50 text-green-600 border-green-200">
+                              Earned
+                            </Badge>
                           )}
                         </div>
-                        <p className="text-sm text-muted-foreground">{badge.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {badge.description}
+                        </p>
                         <div className="mt-2">
                           <div className="flex justify-between text-xs mb-1">
                             <span>Progress</span>
@@ -668,22 +872,33 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             <Card>
               <CardHeader>
                 <CardTitle>NFT Awards Progress</CardTitle>
-                <CardDescription>Track your progress towards earning exclusive NFTs</CardDescription>
+                <CardDescription>
+                  Track your progress towards earning exclusive NFTs
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  {dashboardData.nfts.map((nft: any) => (
+                  {dashboardData.nfts.map((nft: NFT) => (
                     <div key={nft.id} className="flex items-start space-x-4">
                       <div className="w-12 h-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                        <img src={nft.image || "/placeholder.svg"} alt={nft.name} className="w-8 h-8" />
+                        <Image
+                          src={nft.image || "/placeholder.svg"}
+                          alt={nft.name}
+                          width={32}
+                          height={32}
+                          className="w-8 h-8"
+                        />
                       </div>
                       <div className="flex-1">
                         <h4 className="font-medium">{nft.name}</h4>
-                        <p className="text-sm text-muted-foreground">{nft.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {nft.description}
+                        </p>
                         <div className="mt-2">
                           <div className="flex justify-between text-xs mb-1">
                             <span>
-                              Progress: {nft.current} of {nft.threshold} referrals
+                              Progress: {nft.current} of {nft.threshold}{" "}
+                              referrals
                             </span>
                             <span>{nft.progress}%</span>
                           </div>
@@ -700,9 +915,10 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     About NFT Awards
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    NFT Awards are unique digital collectibles that recognize your contributions to the recruitment
-                    program. These blockchain-based tokens are yours to keep forever and can be displayed on your
-                    profile.
+                    NFT Awards are unique digital collectibles that recognize
+                    your contributions to the recruitment program. These
+                    blockchain-based tokens are yours to keep forever and can be
+                    displayed on your profile.
                   </p>
                   <Button
                     variant="link"
@@ -710,8 +926,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     onClick={() => {
                       toast({
                         title: "Coming Soon",
-                        description: "The NFT showcase feature will be available soon!",
-                      })
+                        description:
+                          "The NFT showcase feature will be available soon!",
+                      });
                     }}
                   >
                     Learn more about NFTs
@@ -724,7 +941,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
           <Card>
             <CardHeader>
               <CardTitle>Points Breakdown</CardTitle>
-              <CardDescription>How you've earned your recruitment points</CardDescription>
+              <CardDescription>
+                How you&apos;ve earned your recruitment points
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -733,7 +952,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <UserPlus className="h-5 w-5 mr-3 text-[#0A3C1F]" />
                     <div>
                       <h4 className="font-medium">Successful Referrals</h4>
-                      <p className="text-sm text-muted-foreground">Points earned when your referrals are hired</p>
+                      <p className="text-sm text-muted-foreground">
+                        Points earned when your referrals are hired
+                      </p>
                     </div>
                   </div>
                   <div className="text-xl font-bold">500</div>
@@ -743,7 +964,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <Users className="h-5 w-5 mr-3 text-[#0A3C1F]" />
                     <div>
                       <h4 className="font-medium">Active Referrals</h4>
-                      <p className="text-sm text-muted-foreground">Points earned for referrals in the hiring process</p>
+                      <p className="text-sm text-muted-foreground">
+                        Points earned for referrals in the hiring process
+                      </p>
                     </div>
                   </div>
                   <div className="text-xl font-bold">250</div>
@@ -753,7 +976,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <Share2 className="h-5 w-5 mr-3 text-[#0A3C1F]" />
                     <div>
                       <h4 className="font-medium">Social Sharing</h4>
-                      <p className="text-sm text-muted-foreground">Points earned for sharing recruitment content</p>
+                      <p className="text-sm text-muted-foreground">
+                        Points earned for sharing recruitment content
+                      </p>
                     </div>
                   </div>
                   <div className="text-xl font-bold">75</div>
@@ -769,7 +994,8 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                       <h4 className="font-medium">Refer Quality Candidates</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Earn 25 points when they apply, 50 points when they interview, and 150 points when hired.
+                      Earn 25 points when they apply, 50 points when they
+                      interview, and 150 points when hired.
                     </p>
                   </div>
                   <div className="p-3 border rounded-lg">
@@ -778,7 +1004,8 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                       <h4 className="font-medium">Share on Social Media</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Earn 5 points each time you share recruitment content on your social media platforms.
+                      Earn 5 points each time you share recruitment content on
+                      your social media platforms.
                     </p>
                   </div>
                   <div className="p-3 border rounded-lg">
@@ -787,7 +1014,8 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                       <h4 className="font-medium">Attend Recruitment Events</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Earn 25 points for each recruitment event you attend or help organize.
+                      Earn 25 points for each recruitment event you attend or
+                      help organize.
                     </p>
                   </div>
                   <div className="p-3 border rounded-lg">
@@ -796,7 +1024,8 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                       <h4 className="font-medium">Provide Testimonials</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
-                      Earn 20 points by providing a testimonial about your experience with the Sheriff's Department.
+                      Earn 20 points by providing a testimonial about your
+                      experience with the Sheriff&apos;s Department.
                     </p>
                   </div>
                 </div>
@@ -809,11 +1038,13 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
           <Card>
             <CardHeader>
               <CardTitle>Upcoming Recruitment Events</CardTitle>
-              <CardDescription>Events where you can help recruit new deputies</CardDescription>
+              <CardDescription>
+                Events where you can help recruit new deputies
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {dashboardData.events.map((event: any) => (
+                {dashboardData.events.map((event: Event) => (
                   <div
                     key={event.id}
                     className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
@@ -829,7 +1060,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                             variant="outline"
                             className="mt-1 sm:mt-0 bg-blue-50 text-blue-600 border-blue-200 self-start"
                           >
-                            {event.status === "upcoming" ? "Upcoming" : event.status}
+                            {event.status === "upcoming"
+                              ? "Upcoming"
+                              : event.status}
                           </Badge>
                         </div>
                         <div className="mt-2 space-y-1">
@@ -837,7 +1070,10 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                             <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
                             <span>
                               {new Date(event.date).toLocaleDateString()} at{" "}
-                              {new Date(event.date).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                              {new Date(event.date).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
                             </span>
                           </div>
                           <div className="flex items-center text-sm">
@@ -845,7 +1081,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                             <span>{event.location}</span>
                           </div>
                         </div>
-                        <p className="mt-3 text-sm text-muted-foreground">{event.description}</p>
+                        <p className="mt-3 text-sm text-muted-foreground">
+                          {event.description}
+                        </p>
                         <div className="mt-4 flex space-x-2">
                           <Button
                             variant="outline"
@@ -855,7 +1093,7 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                               toast({
                                 title: "RSVP Confirmed",
                                 description: `You've confirmed your attendance for ${event.title}.`,
-                              })
+                              });
                             }}
                           >
                             <CheckCircle className="h-4 w-4 mr-2" />
@@ -868,7 +1106,7 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                               toast({
                                 title: "Added to Calendar",
                                 description: `${event.title} has been added to your calendar.`,
-                              })
+                              });
                             }}
                           >
                             <Calendar className="h-4 w-4 mr-2" />
@@ -880,8 +1118,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                             onClick={() => {
                               toast({
                                 title: "Event Shared",
-                                description: "Event details have been copied to your clipboard.",
-                              })
+                                description:
+                                  "Event details have been copied to your clipboard.",
+                              });
                             }}
                           >
                             <Share2 className="h-4 w-4 mr-2" />
@@ -900,7 +1139,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             <Card>
               <CardHeader>
                 <CardTitle>Suggest an Event</CardTitle>
-                <CardDescription>Propose a recruitment event in your community</CardDescription>
+                <CardDescription>
+                  Propose a recruitment event in your community
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <form className="space-y-4">
@@ -910,7 +1151,10 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="event-location">Location</Label>
-                    <Input id="event-location" placeholder="Enter event location" />
+                    <Input
+                      id="event-location"
+                      placeholder="Enter event location"
+                    />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
@@ -933,11 +1177,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                   <Button
                     className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
                     onClick={(e) => {
-                      e.preventDefault()
+                      e.preventDefault();
                       toast({
                         title: "Event Suggested",
-                        description: "Your event suggestion has been submitted for review.",
-                      })
+                        description:
+                          "Your event suggestion has been submitted for review.",
+                      });
                     }}
                   >
                     Submit Event Suggestion
@@ -949,7 +1194,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
             <Card>
               <CardHeader>
                 <CardTitle>Event Resources</CardTitle>
-                <CardDescription>Materials to help you succeed at recruitment events</CardDescription>
+                <CardDescription>
+                  Materials to help you succeed at recruitment events
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -957,7 +1204,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <div className="flex items-center">
                       <FileText className="h-5 w-5 mr-3 text-[#0A3C1F]" />
                       <div>
-                        <h4 className="font-medium">Recruitment Talking Points</h4>
+                        <h4 className="font-medium">
+                          Recruitment Talking Points
+                        </h4>
                         <p className="text-sm text-muted-foreground">
                           Key information to share with potential recruits
                         </p>
@@ -971,8 +1220,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <div className="flex items-center">
                       <FileText className="h-5 w-5 mr-3 text-[#0A3C1F]" />
                       <div>
-                        <h4 className="font-medium">Recruitment Flyer Templates</h4>
-                        <p className="text-sm text-muted-foreground">Printable materials for events</p>
+                        <h4 className="font-medium">
+                          Recruitment Flyer Templates
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Printable materials for events
+                        </p>
                       </div>
                     </div>
                     <Button variant="outline" size="sm">
@@ -983,7 +1236,9 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <div className="flex items-center">
                       <FileText className="h-5 w-5 mr-3 text-[#0A3C1F]" />
                       <div>
-                        <h4 className="font-medium">Frequently Asked Questions</h4>
+                        <h4 className="font-medium">
+                          Frequently Asked Questions
+                        </h4>
                         <p className="text-sm text-muted-foreground">
                           Answers to common questions from potential recruits
                         </p>
@@ -997,8 +1252,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                     <div className="flex items-center">
                       <FileText className="h-5 w-5 mr-3 text-[#0A3C1F]" />
                       <div>
-                        <h4 className="font-medium">Event Best Practices Guide</h4>
-                        <p className="text-sm text-muted-foreground">Tips for successful recruitment events</p>
+                        <h4 className="font-medium">
+                          Event Best Practices Guide
+                        </h4>
+                        <p className="text-sm text-muted-foreground">
+                          Tips for successful recruitment events
+                        </p>
                       </div>
                     </div>
                     <Button variant="outline" size="sm">
@@ -1008,9 +1267,12 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                 </div>
 
                 <div className="mt-6">
-                  <h3 className="font-medium mb-3">Need Additional Resources?</h3>
+                  <h3 className="font-medium mb-3">
+                    Need Additional Resources?
+                  </h3>
                   <p className="text-sm text-muted-foreground mb-3">
-                    Contact the recruitment team if you need specific materials for an upcoming event.
+                    Contact the recruitment team if you need specific materials
+                    for an upcoming event.
                   </p>
                   <Button
                     variant="outline"
@@ -1019,7 +1281,7 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
                       toast({
                         title: "Contact Form",
                         description: "The contact form will be available soon.",
-                      })
+                      });
                     }}
                   >
                     <Mail className="h-4 w-4 mr-2" />
@@ -1032,7 +1294,7 @@ export function VolunteerRecruiterDashboard({ className }: VolunteerRecruiterDas
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
 
 function MapPin(props: React.SVGProps<SVGSVGElement>) {
@@ -1052,5 +1314,5 @@ function MapPin(props: React.SVGProps<SVGSVGElement>) {
       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
       <circle cx="12" cy="10" r="3" />
     </svg>
-  )
+  );
 }

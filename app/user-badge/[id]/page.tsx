@@ -1,13 +1,13 @@
-import type { Metadata } from "next"
-import UserBadgeClient from "./user-badge-client"
-import { AuthModalProvider } from "@/context/auth-modal-context"
-import { notFound } from "next/navigation"
-import { getBadgeById } from "@/lib/badge-utils"
+import type { Metadata } from "next";
+import UserBadgeClient from "./user-badge-client";
+import { AuthModalProvider } from "@/context/auth-modal-context";
+import { notFound } from "next/navigation";
+import { getBadgeById } from "@/lib/badge-utils";
 
 interface UserBadgePageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 // Pre-generate pages for common names and test cases
@@ -19,8 +19,8 @@ export async function generateStaticParams() {
     "Test-User",
     "Demo-User",
     "Sample-User",
-    "Recruit-Candidate"
-  ]
+    "Recruit-Candidate",
+  ];
 
   // Add badge types
   const badgeTypes = [
@@ -35,25 +35,27 @@ export async function generateStaticParams() {
     "application-completed",
     "first-response",
     "frequent-user",
-    "resource-downloader"
-  ]
+    "resource-downloader",
+  ];
 
   // Verify each badge exists before adding it
   const validBadgeTypes = await Promise.all(
     badgeTypes.map(async (type) => {
-      const badge = await getBadgeById(type)
-      return badge ? type : null
-    })
-  )
+      const badge = await getBadgeById(type);
+      return badge ? type : null;
+    }),
+  );
 
   return [...commonNames, ...validBadgeTypes.filter(Boolean)].map((id) => ({
     id: id as string,
-  }))
+  }));
 }
 
-export async function generateMetadata({ params }: UserBadgePageProps): Promise<Metadata> {
-  const decodedName = decodeURIComponent(params.id)
-  const badge = await getBadgeById(decodedName)
+export async function generateMetadata({
+  params,
+}: UserBadgePageProps): Promise<Metadata> {
+  const decodedName = decodeURIComponent(params.id);
+  const badge = await getBadgeById(decodedName);
 
   // If it's a badge ID, use badge metadata
   if (badge) {
@@ -78,46 +80,46 @@ export async function generateMetadata({ params }: UserBadgePageProps): Promise<
         description: badge.description,
         images: [badge.icon || "/generic-badge.png"],
       },
-    }
+    };
   }
 
   // Otherwise use user-specific metadata
   return {
-    title: `${decodedName}'s SF Deputy Sheriff Recruitment Badge`,
-    description: `${decodedName} is exploring a career with the San Francisco Sheriff's Office. Join them and discover opportunities in law enforcement!`,
+    title: `${decodedName}&apos;s SF Deputy Sheriff Recruitment Badge`,
+    description: `${decodedName} is exploring a career with the San Francisco Sheriff&apos;s Office. Join them and discover opportunities in law enforcement!`,
     openGraph: {
-      title: `${decodedName}'s SF Deputy Sheriff Recruitment Badge`,
-      description: `${decodedName} is exploring a career with the San Francisco Sheriff's Office. Join them and discover opportunities in law enforcement!`,
+      title: `${decodedName}&apos;s SF Deputy Sheriff Recruitment Badge`,
+      description: `${decodedName} is exploring a career with the San Francisco Sheriff&apos;s Office. Join them and discover opportunities in law enforcement!`,
       images: [
         {
           url: "/recruitment-badge.png",
           width: 1200,
           height: 1200,
-          alt: `${decodedName}'s SF Deputy Sheriff Recruitment Badge`,
+          alt: `${decodedName}&apos;s SF Deputy Sheriff Recruitment Badge`,
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
-      title: `${decodedName}'s SF Deputy Sheriff Recruitment Badge`,
-      description: `${decodedName} is exploring a career with the San Francisco Sheriff's Office. Join them and discover opportunities in law enforcement!`,
+      title: `${decodedName}&apos;s SF Deputy Sheriff Recruitment Badge`,
+      description: `${decodedName} is exploring a career with the San Francisco Sheriff&apos;s Office. Join them and discover opportunities in law enforcement!`,
       images: ["/recruitment-badge.png"],
     },
-  }
+  };
 }
 
 export default async function UserBadgePage({ params }: UserBadgePageProps) {
-  const decodedId = decodeURIComponent(params.id)
-  const badge = await getBadgeById(decodedId)
+  const decodedId = decodeURIComponent(params.id);
+  const badge = await getBadgeById(decodedId);
 
   // If neither a valid badge nor a valid username format, show 404
   if (!badge && !/^[a-zA-Z0-9-]+$/.test(decodedId)) {
-    notFound()
+    notFound();
   }
 
   return (
     <AuthModalProvider>
       <UserBadgeClient id={decodedId} badge={badge} />
     </AuthModalProvider>
-  )
+  );
 }

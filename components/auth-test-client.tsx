@@ -1,55 +1,56 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { getClientSideSupabase } from "@/lib/supabase"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { getClientSideSupabase } from "@/lib/supabase";
+import type { Session, User } from "@supabase/supabase-js";
 
 export function AuthTestClient() {
-  const [sessionData, setSessionData] = useState<any>(null)
-  const [userInfo, setUserInfo] = useState<any>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [sessionData, setSessionData] = useState<Session | null>(null);
+  const [userInfo, setUserInfo] = useState<User | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkSession()
-  }, [])
+    checkSession();
+  }, []);
 
   async function checkSession() {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const supabase = getClientSideSupabase()
-      const { data, error } = await supabase.auth.getSession()
+      const supabase = getClientSideSupabase();
+      const { data, error } = await supabase.auth.getSession();
 
-      if (error) throw error
+      if (error) throw error;
 
-      setSessionData(data.session)
+      setSessionData(data.session);
 
       if (data.session?.user) {
-        setUserInfo(data.session.user)
+        setUserInfo(data.session.user);
       }
     } catch (err) {
-      console.error("Session check error:", err)
-      setError(err instanceof Error ? err.message : "Failed to check session")
+      console.error("Session check error:", err);
+      setError(err instanceof Error ? err.message : "Failed to check session");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
   async function handleSignOut() {
     try {
-      setLoading(true)
-      const supabase = getClientSideSupabase()
-      const { error } = await supabase.auth.signOut()
-      if (error) throw error
-      setSessionData(null)
-      setUserInfo(null)
+      setLoading(true);
+      const supabase = getClientSideSupabase();
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setSessionData(null);
+      setUserInfo(null);
     } catch (err) {
-      console.error("Sign out error:", err)
-      setError(err instanceof Error ? err.message : "Failed to sign out")
+      console.error("Sign out error:", err);
+      setError(err instanceof Error ? err.message : "Failed to sign out");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -76,16 +77,21 @@ export function AuthTestClient() {
             <h3 className="font-medium mb-2">Session Status</h3>
             <p className="mb-2">
               {sessionData ? (
-                <span className="text-green-600 font-medium">✓ Authenticated</span>
+                <span className="text-green-600 font-medium">
+                  ✓ Authenticated
+                </span>
               ) : (
-                <span className="text-red-600 font-medium">✗ Not authenticated</span>
+                <span className="text-red-600 font-medium">
+                  ✗ Not authenticated
+                </span>
               )}
             </p>
 
-            {sessionData && (
+            {sessionData && sessionData.expires_at && (
               <div className="mt-4">
                 <p className="text-sm text-gray-500">
-                  Session expires at: {new Date(sessionData.expires_at * 1000).toLocaleString()}
+                  Session expires at:{" "}
+                  {new Date(sessionData.expires_at * 1000).toLocaleString()}
                 </p>
               </div>
             )}
@@ -109,7 +115,11 @@ export function AuthTestClient() {
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Last Sign In</p>
-                  <p>{userInfo.last_sign_in_at ? new Date(userInfo.last_sign_in_at).toLocaleString() : "N/A"}</p>
+                  <p>
+                    {userInfo.last_sign_in_at
+                      ? new Date(userInfo.last_sign_in_at).toLocaleString()
+                      : "N/A"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -127,7 +137,10 @@ export function AuthTestClient() {
             )}
 
             {!sessionData && (
-              <Button onClick={() => (window.location.href = "/login")} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+              <Button
+                onClick={() => (window.location.href = "/login")}
+                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+              >
                 Go to Login
               </Button>
             )}
@@ -135,5 +148,5 @@ export function AuthTestClient() {
         </>
       )}
     </>
-  )
+  );
 }

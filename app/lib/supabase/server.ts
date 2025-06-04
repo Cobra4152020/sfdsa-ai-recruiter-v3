@@ -1,14 +1,14 @@
 // This file must only be imported in server components or API routes.
-import { createServerClient } from '@supabase/ssr'
-import { createClient as createSupabaseClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
-import type { Database } from '@/types/supabase'
+import { createServerClient } from "@supabase/ssr";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { cookies } from "next/headers";
+import type { Database } from "@/types/supabase";
 
 /**
  * Get the Supabase client for server components
  */
 export async function createClient() {
-  const cookieStore = await cookies()
+  const cookieStore = await cookies();
 
   return createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -16,17 +16,25 @@ export async function createClient() {
     {
       cookies: {
         get(name: string) {
-          return cookieStore.get(name)?.value
+          return cookieStore.get(name)?.value;
         },
-        set(name: string, value: string, options: any) {
-          cookieStore.set({ name, value, ...options })
+        set(name: string, value: string, options: unknown) {
+          if (options && typeof options === "object") {
+            cookieStore.set({ name, value, ...(options as object) });
+          } else {
+            cookieStore.set({ name, value });
+          }
         },
-        remove(name: string, options: any) {
-          cookieStore.set({ name, value: '', ...options })
+        remove(name: string, options: unknown) {
+          if (options && typeof options === "object") {
+            cookieStore.set({ name, value: "", ...(options as object) });
+          } else {
+            cookieStore.set({ name, value: "" });
+          }
         },
       },
-    }
-  )
+    },
+  );
 }
 
 /**
@@ -41,6 +49,6 @@ export function getServiceSupabase() {
         persistSession: false,
         autoRefreshToken: false,
       },
-    }
-  )
-} 
+    },
+  );
+}

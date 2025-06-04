@@ -1,33 +1,38 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Award, Share2 } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { useUser } from "@/context/user-context"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Award, Share2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { useUser } from "@/context/user-context";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 interface TriviaBadge {
-  id: string
-  type: string
-  name: string
-  description: string
-  requirement: number
-  progress: number
-  earned: boolean
+  id: string;
+  type: string;
+  name: string;
+  description: string;
+  requirement: number;
+  progress: number;
+  earned: boolean;
 }
 
 interface TriviaBadgesProps {
-  gameId: string
-  gameName: string
+  gameId: string;
+  gameName: string;
   badgeTypes: {
-    participant: string
-    enthusiast: string
-    master: string
-  }
+    participant: string;
+    enthusiast: string;
+    master: string;
+  };
 }
 
-export function TriviaBadges({ gameId, gameName, badgeTypes }: TriviaBadgesProps) {
+export function TriviaBadges({
+  gameId,
+  gameName,
+  badgeTypes,
+}: TriviaBadgesProps) {
   const [badges, setBadges] = useState<TriviaBadge[]>([
     {
       id: badgeTypes.participant,
@@ -56,80 +61,88 @@ export function TriviaBadges({ gameId, gameName, badgeTypes }: TriviaBadgesProps
       progress: 0,
       earned: false,
     },
-  ])
+  ]);
 
-  const { currentUser, isLoggedIn } = useUser()
+  const { currentUser, isLoggedIn } = useUser();
 
   useEffect(() => {
     if (isLoggedIn && currentUser) {
-      fetchUserBadges()
+      fetchUserBadges();
     }
-  }, [isLoggedIn, currentUser])
+  }, [isLoggedIn, currentUser]);
 
   const fetchUserBadges = async () => {
     try {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
 
       // Get user's earned badges
       const { data: userBadges, error: badgesError } = await supabase
         .from("badges")
         .select("badge_type")
-        .eq("user_id", currentUser!.id)
+        .eq("user_id", currentUser!.id);
 
-      if (badgesError) throw badgesError
+      if (badgesError) throw badgesError;
 
       // Get user's trivia attempts for this specific game
       const { data: attempts, error: attemptsError } = await supabase
         .from("trivia_attempts")
         .select("*")
         .eq("user_id", currentUser!.id)
-        .eq("game_id", gameId)
+        .eq("game_id", gameId);
 
-      if (attemptsError) throw attemptsError
+      if (attemptsError) throw attemptsError;
 
       // Calculate progress for each badge
       const updatedBadges = badges.map((badge) => {
-        const isEarned = userBadges?.some((ub) => ub.badge_type === badge.type) || false
+        const isEarned =
+          userBadges?.some(
+            (ub: { badge_type: string }) => ub.badge_type === badge.type,
+          ) || false;
 
-        let progress = 0
+        let progress = 0;
         if (badge.type === badgeTypes.participant) {
-          progress = Math.min(attempts?.length || 0, 1)
+          progress = Math.min(attempts?.length || 0, 1);
         } else if (badge.type === badgeTypes.enthusiast) {
-          progress = Math.min(attempts?.length || 0, 5)
+          progress = Math.min(attempts?.length || 0, 5);
         } else if (badge.type === badgeTypes.master) {
-          const perfectScores = attempts?.filter((a) => a.score === a.total_questions).length || 0
-          progress = Math.min(perfectScores, 3)
+          const perfectScores =
+            attempts?.filter(
+              (a: { score: number; total_questions: number }) =>
+                a.score === a.total_questions,
+            ).length || 0;
+          progress = Math.min(perfectScores, 3);
         }
 
         return {
           ...badge,
           progress,
           earned: isEarned,
-        }
-      })
+        };
+      });
 
-      setBadges(updatedBadges)
+      setBadges(updatedBadges);
     } catch (error) {
-      console.error(`Error fetching user badges for ${gameId}:`, error)
+      console.error(`Error fetching user badges for ${gameId}:`, error);
     }
-  }
+  };
 
   const handleShare = (badge: TriviaBadge) => {
-    const shareText = `I earned the "${badge.name}" badge playing the ${gameName}! Test your knowledge too!`
-    const shareUrl = `${window.location.origin}/trivia/${gameId}`
+    const shareText = `I earned the "${badge.name}" badge playing the ${gameName}! Test your knowledge too!`;
+    const shareUrl = `${window.location.origin}/trivia/${gameId}`;
 
     // Open Twitter share dialog
     window.open(
       `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
       "_blank",
-    )
-  }
+    );
+  };
 
   return (
     <Card>
       <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold">{gameName} Badges</CardTitle>
+        <CardTitle className="text-lg font-semibold">
+          {gameName} Badges
+        </CardTitle>
       </CardHeader>
       <CardContent className="p-4">
         <div className="space-y-4">
@@ -145,14 +158,20 @@ export function TriviaBadges({ gameId, gameName, badgeTypes }: TriviaBadgesProps
               <div className="flex items-center">
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center mr-3 ${
-                    badge.earned ? "bg-[#FFD700]/20" : "bg-gray-200 dark:bg-gray-700"
+                    badge.earned
+                      ? "bg-[#FFD700]/20"
+                      : "bg-gray-200 dark:bg-gray-700"
                   }`}
                 >
-                  <Award className={`h-5 w-5 ${badge.earned ? "text-[#FFD700]" : "text-gray-500"}`} />
+                  <Award
+                    className={`h-5 w-5 ${badge.earned ? "text-[#FFD700]" : "text-gray-500"}`}
+                  />
                 </div>
                 <div className="flex-1">
                   <div className="font-medium">{badge.name}</div>
-                  <div className="text-xs text-gray-500">{badge.description}</div>
+                  <div className="text-xs text-gray-500">
+                    {badge.description}
+                  </div>
                 </div>
                 {badge.earned && (
                   <Button
@@ -173,9 +192,14 @@ export function TriviaBadges({ gameId, gameName, badgeTypes }: TriviaBadgesProps
                     <span>
                       Progress: {badge.progress}/{badge.requirement}
                     </span>
-                    <span>{Math.round((badge.progress / badge.requirement) * 100)}%</span>
+                    <span>
+                      {Math.round((badge.progress / badge.requirement) * 100)}%
+                    </span>
                   </div>
-                  <Progress value={(badge.progress / badge.requirement) * 100} className="h-2" />
+                  <Progress
+                    value={(badge.progress / badge.requirement) * 100}
+                    className="h-2"
+                  />
                 </div>
               )}
             </div>
@@ -183,7 +207,9 @@ export function TriviaBadges({ gameId, gameName, badgeTypes }: TriviaBadgesProps
 
           {!isLoggedIn && (
             <div className="bg-[#0A3C1F]/5 p-3 rounded-lg text-center">
-              <p className="text-sm text-gray-600 mb-2">Sign in to track your badge progress!</p>
+              <p className="text-sm text-gray-600 mb-2">
+                Sign in to track your badge progress!
+              </p>
               <Button
                 size="sm"
                 className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
@@ -196,5 +222,5 @@ export function TriviaBadges({ gameId, gameName, badgeTypes }: TriviaBadgesProps
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

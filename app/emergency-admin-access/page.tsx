@@ -1,16 +1,19 @@
-import Link from "next/link"
-import { PageWrapper } from "@/components/page-wrapper"
+import Link from "next/link";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function EmergencyAccess() {
   return (
     <PageWrapper>
       <div className="min-h-[calc(100vh-theme(spacing.16))] flex items-center justify-center bg-gray-100 p-4">
         <div className="bg-white p-8 rounded-lg shadow-lg max-w-lg w-full">
-          <h1 className="text-2xl font-bold text-center mb-6 text-green-800">Emergency Admin Options</h1>
+          <h1 className="text-2xl font-bold text-center mb-6 text-green-800">
+            Emergency Admin Options
+          </h1>
 
           <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
             <p className="text-yellow-700">
-              ⚠️ This page provides several options to access admin functionality without normal authentication.
+              ⚠️ This page provides several options to access admin
+              functionality without normal authentication.
             </p>
           </div>
 
@@ -38,11 +41,11 @@ export default function EmergencyAccess() {
           </div>
 
           <p className="text-gray-600 text-sm text-center">
-            If one method doesn't work, try another option. The Pure HTML option should work even if there are server-side
-            rendering issues.
+            If one method doesn&apos;t work, try another option. The Pure HTML
+            option should work even if there are server-side rendering issues.
           </p>
         </div>
       </div>
     </PageWrapper>
-  )
+  );
 }

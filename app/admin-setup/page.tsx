@@ -1,50 +1,45 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle, CheckCircle, Database } from "lucide-react"
-import { setupAdminRpc } from "@/lib/actions/setup-admin-rpc"
-import Link from "next/link"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, CheckCircle, Database } from "lucide-react";
+import { setupAdminRpc } from "@/lib/actions/setup-admin-rpc";
 
 export default function AdminSetupPage() {
-  const [email, setEmail] = useState("")
-  const [setupCode, setSetupCode] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState<string | null>(null)
-  const [userId, setUserId] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   const handleSetup = async () => {
-    if (!email || !setupCode) {
-      setError("Email and setup code are required")
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
-    setSuccess(null)
+    setIsLoading(true);
+    setError(null);
+    setSuccess(null);
 
     try {
-      const result = await setupAdminRpc({ email, setupCode })
+      const result = await setupAdminRpc({ email: "", setupCode: "" });
 
       if (result.success) {
-        setSuccess(result.message)
-        if (result.userId) {
-          setUserId(result.userId)
-        }
+        setSuccess(result.message);
       } else {
-        setError(result.message)
+        setError(result.message);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred")
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="container max-w-md py-10">
@@ -56,7 +51,9 @@ export default function AdminSetupPage() {
             </div>
           </div>
           <CardTitle className="text-center">Admin Database Setup</CardTitle>
-          <CardDescription className="text-center">Set up required SQL functions for the admin system</CardDescription>
+          <CardDescription className="text-center">
+            Set up required SQL functions for the admin system
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {success && (
@@ -76,8 +73,9 @@ export default function AdminSetupPage() {
           )}
 
           <p>
-            This will create the necessary SQL functions in your database to support admin operations. This is required
-            before you can use the emergency admin fix.
+            This will create the necessary SQL functions in your database to
+            support admin operations. This is required before you can use the
+            emergency admin fix.
           </p>
         </CardContent>
         <CardFooter>
@@ -89,12 +87,18 @@ export default function AdminSetupPage() {
 
       {success && (
         <div className="mt-4 text-center">
-          <p className="text-green-600 font-medium mb-2">Setup completed successfully!</p>
-          <Button variant="outline" onClick={() => (window.location.href = "/emergency-admin-fix")} className="mr-2">
+          <p className="text-green-600 font-medium mb-2">
+            Setup completed successfully!
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => (window.location.href = "/emergency-admin-fix")}
+            className="mr-2"
+          >
             Go to Emergency Admin Fix
           </Button>
         </div>
       )}
     </div>
-  )
+  );
 }

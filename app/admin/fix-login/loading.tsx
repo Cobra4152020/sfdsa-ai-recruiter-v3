@@ -1,4 +1,4 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function LoadingPage() {
   return (
@@ -22,5 +22,5 @@ export default function LoadingPage() {
         </div>
       </div>
     </main>
-  )
+  );
 }

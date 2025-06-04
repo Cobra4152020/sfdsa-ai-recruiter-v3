@@ -1,4 +1,4 @@
-export async function setupLoggingSystem(params: any) {
+export async function setupLoggingSystem(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/setup-logging-system`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function setupLoggingSystem(params: any) {
     console.error(`Error in setupLoggingSystem:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

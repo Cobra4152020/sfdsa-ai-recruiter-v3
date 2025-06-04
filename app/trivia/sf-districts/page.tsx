@@ -1,32 +1,35 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { PageWrapper } from "@/components/page-wrapper"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Trophy, Award } from "lucide-react"
-import { EnhancedTriviaGame } from "@/components/trivia/enhanced-trivia-game"
-import { TriviaLeaderboard } from "@/components/trivia/trivia-leaderboard"
-import { TriviaBadges } from "@/components/trivia/trivia-badges"
-import { ErrorBoundaryWrapper } from "@/components/error-boundary-wrapper"
+import { useState } from "react";
+import { PageWrapper } from "@/components/page-wrapper";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Trophy, Award } from "lucide-react";
+import { EnhancedTriviaGame } from "@/components/trivia/enhanced-trivia-game";
+import { TriviaLeaderboard } from "@/components/trivia/trivia-leaderboard";
+import { TriviaBadges } from "@/components/trivia/trivia-badges";
+import { ErrorBoundaryWrapper } from "@/components/error-boundary-wrapper";
 
-const gameId = "sf-districts"
-const gameName = "San Francisco Districts Trivia"
-const gameDescription = "Test your knowledge of San Francisco's diverse neighborhoods and districts."
+const gameId = "sf-districts";
+const gameName = "San Francisco Districts Trivia";
+const gameDescription =
+  "Test your knowledge of San Francisco&apos;s diverse neighborhoods and districts.";
 const badgeTypes = {
   participant: "sf-districts-participant",
   enthusiast: "sf-districts-enthusiast",
   master: "sf-districts-master",
-}
+};
 
 export default function SFDistrictsTriviaPage() {
-  const [activeTab, setActiveTab] = useState("play")
+  const [activeTab, setActiveTab] = useState("play");
 
   return (
     <PageWrapper>
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">{gameName}</h1>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">{gameDescription}</p>
+          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            {gameDescription}
+          </p>
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
@@ -67,11 +70,15 @@ export default function SFDistrictsTriviaPage() {
 
           <TabsContent value="badges">
             <ErrorBoundaryWrapper>
-              <TriviaBadges gameId={gameId} gameName={gameName} badgeTypes={badgeTypes} />
+              <TriviaBadges
+                gameId={gameId}
+                gameName={gameName}
+                badgeTypes={badgeTypes}
+              />
             </ErrorBoundaryWrapper>
           </TabsContent>
         </Tabs>
       </main>
     </PageWrapper>
-  )
+  );
 }

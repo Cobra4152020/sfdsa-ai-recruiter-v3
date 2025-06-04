@@ -1,45 +1,50 @@
-"use client"
+"use client";
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef } from "react";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 interface NotificationPollerProps {
-  userId: string
-  interval?: number // in milliseconds
+  userId: string;
+  interval?: number; // in milliseconds
 }
 
-export function NotificationPoller({ userId, interval = 30000 }: NotificationPollerProps) {
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
+export function NotificationPoller({
+  userId,
+  interval = 30000,
+}: NotificationPollerProps) {
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId) return;
 
     // Function to check for new notifications
     const checkNotifications = async () => {
       try {
         // Get the Supabase client
-        const { getClientSideSupabase } = require("@/lib/supabase")
-        const supabase = getClientSideSupabase()
+        const supabase = getClientSideSupabase();
 
         // Get pending notifications from the queue
         const { data: notifications, error } = await supabase
           .from("push_notification_queue")
-          .select(`
+          .select(
+            `
             id, 
             payload,
             push_subscriptions!inner(user_id)
-          `)
+          `,
+          )
           .eq("push_subscriptions.user_id", userId)
           .eq("status", "pending")
           .order("created_at", { ascending: true })
-          .limit(5)
+          .limit(5);
 
         if (error) {
-          console.warn("Error fetching notifications:", error)
-          return
+          console.warn("Error fetching notifications:", error);
+          return;
         }
 
         if (!notifications || notifications.length === 0) {
-          return
+          return;
         }
 
         // Process each notification
@@ -47,7 +52,7 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
           try {
             // Show the notification
             if (Notification && Notification.permission === "granted") {
-              const payload = notification.payload
+              const payload = notification.payload;
 
               // Display the notification
               new Notification(payload.title, {
@@ -58,7 +63,7 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
                 data: {
                   url: payload.actionUrl || "/",
                 },
-              })
+              });
 
               // Mark the notification as delivered
               await supabase
@@ -67,10 +72,10 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
                   status: "delivered",
                   processed_at: new Date().toISOString(),
                 })
-                .eq("id", notification.id)
+                .eq("id", notification.id);
             }
-          } catch (notifError) {
-            console.warn("Error processing notification:", notifError)
+          } catch (notifError: unknown) {
+            console.warn("Error processing notification:", notifError);
 
             // Mark the notification as failed
             await supabase
@@ -78,30 +83,33 @@ export function NotificationPoller({ userId, interval = 30000 }: NotificationPol
               .update({
                 status: "failed",
                 processed_at: new Date().toISOString(),
-                error: notifError.message,
+                error:
+                  notifError instanceof Error
+                    ? notifError.message
+                    : String(notifError),
               })
-              .eq("id", notification.id)
+              .eq("id", notification.id);
           }
         }
       } catch (error) {
-        console.warn("Error in notification poller:", error)
+        console.warn("Error in notification poller:", error);
       }
-    }
+    };
 
     // Check immediately on mount
-    checkNotifications()
+    checkNotifications();
 
     // Set up interval for checking
-    timerRef.current = setInterval(checkNotifications, interval)
+    timerRef.current = setInterval(checkNotifications, interval);
 
     // Clean up on unmount
     return () => {
       if (timerRef.current) {
-        clearInterval(timerRef.current)
+        clearInterval(timerRef.current);
       }
-    }
-  }, [userId, interval])
+    };
+  }, [userId, interval]);
 
   // This component doesn't render anything
-  return null
+  return null;
 }

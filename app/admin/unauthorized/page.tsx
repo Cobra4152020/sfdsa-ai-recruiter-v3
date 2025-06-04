@@ -1,7 +1,7 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { ShieldAlert } from "lucide-react"
-import { PageWrapper } from "@/components/page-wrapper"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ShieldAlert } from "lucide-react";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function UnauthorizedPage() {
   return (
@@ -12,11 +12,13 @@ export default function UnauthorizedPage() {
             <ShieldAlert className="h-12 w-12 text-red-600" />
           </div>
 
-          <h1 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">Access Denied</h1>
+          <h1 className="mt-6 text-3xl font-bold tracking-tight text-gray-900">
+            Access Denied
+          </h1>
 
           <p className="mt-3 text-gray-600">
-            You do not have permission to access the admin area. Please contact an administrator if you believe this is an
-            error.
+            You do not have permission to access the admin area. Please contact
+            an administrator if you believe this is an error.
           </p>
 
           <div className="mt-8">
@@ -27,5 +29,5 @@ export default function UnauthorizedPage() {
         </div>
       </div>
     </PageWrapper>
-  )
+  );
 }

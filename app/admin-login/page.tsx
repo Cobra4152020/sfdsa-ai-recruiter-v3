@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from "next/link";
 
 export default function AdminLoginBypass() {
   return (
@@ -7,8 +7,12 @@ export default function AdminLoginBypass() {
         <h1 className="text-2xl font-bold text-center mb-6">Admin Access</h1>
 
         <div className="text-center mb-6">
-          <p className="text-red-600 font-bold text-lg mb-2">⚠️ Authentication Bypassed ⚠️</p>
-          <p className="text-gray-600 mb-4">For development purposes only. Do not use in production.</p>
+          <p className="text-red-600 font-bold text-lg mb-2">
+            ⚠️ Authentication Bypassed ⚠️
+          </p>
+          <p className="text-gray-600 mb-4">
+            For development purposes only. Do not use in production.
+          </p>
         </div>
 
         <Link
@@ -19,5 +23,5 @@ export default function AdminLoginBypass() {
         </Link>
       </div>
     </div>
-  )
+  );
 }

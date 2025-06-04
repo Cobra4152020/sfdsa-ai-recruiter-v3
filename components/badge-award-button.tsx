@@ -1,24 +1,50 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Award } from "lucide-react"
-import { useBadgeSystem } from "@/hooks/use-badge-system"
-import { BadgeEarnedPopup } from "@/components/badge-earned-popup"
-import type { BadgeType } from "@/lib/badge-utils"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Award } from "lucide-react";
+import { useBadgeSystem } from "@/hooks/use-badge-system";
+import { BadgeEarnedPopup } from "@/components/badge-earned-popup";
+
+type BadgeType =
+  | "written"
+  | "oral"
+  | "physical"
+  | "polygraph"
+  | "psychological"
+  | "full"
+  | "chat-participation"
+  | "application-started"
+  | "application-completed"
+  | "first-response"
+  | "frequent-user"
+  | "resource-downloader";
 
 interface BadgeAwardButtonProps {
-  badgeType: BadgeType
-  badgeName?: string
-  badgeDescription?: string
-  participationPoints?: number
-  shareMessage?: string
-  buttonText?: string
-  variant?: "default" | "outline" | "secondary" | "ghost" | "link" | "destructive"
-  size?: "default" | "sm" | "lg" | "icon"
-  className?: string
-  onSuccess?: (badge: any, alreadyEarned: boolean) => void
-  onError?: (error: string) => void
+  badgeType: BadgeType;
+  badgeName?: string;
+  badgeDescription?: string;
+  participationPoints?: number;
+  shareMessage?: string;
+  buttonText?: string;
+  variant?:
+    | "default"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link"
+    | "destructive";
+  size?: "default" | "sm" | "lg" | "icon";
+  className?: string;
+  onSuccess?: (badge: EarnedBadge, alreadyEarned: boolean) => void;
+  onError?: (error: string) => void;
+}
+
+// Define a minimal Badge interface for earnedBadge
+interface EarnedBadge {
+  badge_type?: BadgeType;
+  name?: string;
+  description?: string;
 }
 
 export function BadgeAwardButton({
@@ -34,9 +60,9 @@ export function BadgeAwardButton({
   onSuccess,
   onError,
 }: BadgeAwardButtonProps) {
-  const { awardBadge, isAwarding, error } = useBadgeSystem()
-  const [showPopup, setShowPopup] = useState(false)
-  const [earnedBadge, setEarnedBadge] = useState<any>(null)
+  const { awardBadge, isAwarding } = useBadgeSystem();
+  const [showPopup, setShowPopup] = useState(false);
+  const [earnedBadge, setEarnedBadge] = useState<EarnedBadge | null>(null);
 
   const handleClick = async () => {
     const result = await awardBadge({
@@ -45,25 +71,31 @@ export function BadgeAwardButton({
       description: badgeDescription,
       participationPoints,
       shareMessage,
-    })
+    });
 
     if (result.success) {
       if (onSuccess) {
-        onSuccess(result.badge, !!result.alreadyEarned)
+        onSuccess(result.badge as EarnedBadge, !!result.alreadyEarned);
       }
 
       if (!result.alreadyEarned) {
-        setEarnedBadge(result.badge)
-        setShowPopup(true)
+        setEarnedBadge(result.badge as EarnedBadge);
+        setShowPopup(true);
       }
     } else if (onError) {
-      onError(result.message || "Failed to award badge")
+      onError(result.message || "Failed to award badge");
     }
-  }
+  };
 
   return (
     <>
-      <Button variant={variant} size={size} className={className} onClick={handleClick} disabled={isAwarding}>
+      <Button
+        variant={variant}
+        size={size}
+        className={className}
+        onClick={handleClick}
+        disabled={isAwarding}
+      >
         <Award className="mr-2 h-4 w-4" />
         {isAwarding ? "Awarding..." : buttonText}
       </Button>
@@ -77,5 +109,5 @@ export function BadgeAwardButton({
         />
       )}
     </>
-  )
+  );
 }

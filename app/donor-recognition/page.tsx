@@ -1,11 +1,12 @@
-import type { Metadata } from "next"
-import { DonorRecognitionWall } from "@/components/donor-recognition-wall"
-import { PageWrapper } from "@/components/page-wrapper"
+import type { Metadata } from "next";
+import { DonorRecognitionWall } from "@/components/donor-recognition-wall";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export const metadata: Metadata = {
   title: "Donor Recognition | Protecting San Francisco",
-  description: "Recognizing the generous supporters who make our mission possible.",
-}
+  description:
+    "Recognizing the generous supporters who make our mission possible.",
+};
 
 export default function DonorRecognitionPage() {
   return (
@@ -14,5 +15,5 @@ export default function DonorRecognitionPage() {
         <DonorRecognitionWall />
       </div>
     </PageWrapper>
-  )
+  );
 }

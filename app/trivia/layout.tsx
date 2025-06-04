@@ -6,4 +6,4 @@ export default function TriviaLayout({ children }: { children: ReactNode }) {
       <body>{children}</body>
     </html>
   );
-} 
+}

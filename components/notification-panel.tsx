@@ -1,100 +1,107 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { X } from "lucide-react"
-import { formatDistanceToNow } from "date-fns"
-import { useRouter } from "next/navigation"
-import { useExternalNavigation } from "@/hooks/use-external-navigation"
+import React, { useState, useEffect } from "react";
+// import { Bell, X, Check, Clock, User, MessageSquare } from "lucide-react"; // Commented out unused imports
+import { X } from "lucide-react"; // Only using X icon
+// import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; // Commented out unused imports
+// import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"; // Commented out unused imports
+// import { ScrollArea } from "@/components/ui/scroll-area"; // Commented out unused import
+// import { useExternalNavigation } from "@/hooks/use-external-navigation"; // Commented out unused import
+import { getClientSideSupabase } from "@/lib/supabase";
+import { formatDistanceToNow } from "date-fns";
+// import { Button } from "@/components/ui/button"; // Commented out unused import
+// import { NotificationItem } from "./notification-item"; // Commented out unused import
+// import type { Notification as NotificationType } from "@/lib/notification-service"; // Commented out unused import
 
 interface Notification {
-  id: number
-  title: string
-  message: string
-  created_at: string
-  is_read?: boolean
-  read?: boolean
-  image_url?: string
-  action_url?: string
+  id: number;
+  title: string;
+  message: string;
+  timestamp: string;
+  read: boolean;
+  type: "info" | "success" | "warning" | "error";
 }
 
 interface NotificationPanelProps {
-  userId: string
-  onClose: () => void
+  userId: string;
+  onClose: () => void;
 }
 
 export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
-  const { navigateTo } = useExternalNavigation()
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [loading, setLoading] = useState(true);
+  // const router = useRouter(); // Commented out unused variable
 
   useEffect(() => {
     const fetchNotifications = async () => {
       if (!userId) {
-        setLoading(false)
-        return
+        setLoading(false);
+        return;
       }
 
       try {
-        const { getClientSideSupabase } = require("@/lib/supabase")
-        const supabase = getClientSideSupabase()
+        const supabase = getClientSideSupabase();
         const query = supabase
           .from("notifications")
           .select("*")
           .eq("user_id", userId)
           .order("created_at", { ascending: false })
-          .limit(10)
+          .limit(10);
 
-        const { data, error } = await query
+        const { data, error } = await query;
 
         if (error) {
-          console.warn("Error fetching notifications:", error)
-          setNotifications([])
+          console.warn("Error fetching notifications:", error);
+          setNotifications([]);
         } else {
-          setNotifications(data || [])
+          setNotifications(data || []);
         }
       } catch (error) {
-        console.warn("Exception fetching notifications:", error)
-        setNotifications([])
+        console.warn("Exception fetching notifications:", error);
+        setNotifications([]);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchNotifications()
-  }, [userId])
+    fetchNotifications();
+  }, [userId]);
 
   const markAsRead = async (notificationId: number) => {
     try {
       // Try to update is_read column first
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
-      const result = await supabase.from("notifications").update({ is_read: true }).eq("id", notificationId)
+      const supabase = getClientSideSupabase();
+      const result = await supabase
+        .from("notifications")
+        .update({ is_read: true })
+        .eq("id", notificationId);
 
       if (result.error) {
         // If that fails, try with read column
-        await supabase.from("notifications").update({ read: true }).eq("id", notificationId)
+        await supabase
+          .from("notifications")
+          .update({ read: true })
+          .eq("id", notificationId);
       }
 
       // Update the local state
       setNotifications(
         notifications.map((notification) => {
           if (notification.id === notificationId) {
-            return { ...notification, is_read: true, read: true }
+            return { ...notification, is_read: true, read: true };
           }
-          return notification
+          return notification;
         }),
-      )
+      );
     } catch (error) {
-      console.warn("Error marking notification as read:", error)
+      console.warn("Error marking notification as read:", error);
     }
-  }
+  };
 
   const markAllAsRead = async () => {
     try {
       // Try to update is_read column first
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const result = await supabase
         .from("notifications")
         .update({ is_read: true })
@@ -102,7 +109,7 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
         .in(
           "id",
           notifications.filter((n) => !(n.is_read || n.read)).map((n) => n.id),
-        )
+        );
 
       if (result.error) {
         // If that fails, try with read column
@@ -112,8 +119,10 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
           .eq("user_id", userId)
           .in(
             "id",
-            notifications.filter((n) => !(n.is_read || n.read)).map((n) => n.id),
-          )
+            notifications
+              .filter((n) => !(n.is_read || n.read))
+              .map((n) => n.id),
+          );
       }
 
       // Update local state
@@ -123,23 +132,23 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
           is_read: true,
           read: true,
         })),
-      )
+      );
     } catch (error) {
-      console.warn("Error marking all notifications as read:", error)
+      console.warn("Error marking all notifications as read:", error);
     }
-  }
+  };
 
   const isUnread = (notification: Notification) => {
     // Check both possible column names
-    return !(notification.is_read || notification.read)
-  }
+    return !(notification.is_read || notification.read);
+  };
 
   const handleNotificationClick = async (notification: Notification) => {
-    await markAsRead(notification.id)
+    await markAsRead(notification.id);
     if (notification.action_url) {
-      navigateTo(notification.action_url)
+      navigateTo(notification.action_url);
     }
-  }
+  };
 
   return (
     <div className="absolute right-0 mt-2 w-80 md:w-96 bg-white rounded-md shadow-lg overflow-hidden z-50">
@@ -147,11 +156,17 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
         <h3 className="text-lg font-medium">Notifications</h3>
         <div className="flex">
           {notifications.some(isUnread) && (
-            <button onClick={markAllAsRead} className="text-xs text-blue-600 hover:text-blue-800 mr-4">
+            <button
+              onClick={markAllAsRead}
+              className="text-xs text-blue-600 hover:text-blue-800 mr-4"
+            >
               Mark all as read
             </button>
           )}
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -176,10 +191,14 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
                   <div className="flex justify-between">
                     <h4 className="font-medium">{notification.title}</h4>
                     <span className="text-xs text-gray-500">
-                      {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                      {formatDistanceToNow(new Date(notification.created_at), {
+                        addSuffix: true,
+                      })}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                  <p className="text-sm text-gray-600 mt-1">
+                    {notification.message}
+                  </p>
                 </div>
               </li>
             ))}
@@ -189,5 +208,5 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
         )}
       </div>
     </div>
-  )
+  );
 }

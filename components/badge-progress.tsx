@@ -1,21 +1,20 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Progress } from "@/components/ui/progress"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { AchievementBadge } from "@/components/achievement-badge"
-import { useUser } from "@/context/user-context"
-import type { BadgeType } from "@/lib/badge-utils"
+import { useState, useEffect } from "react";
+import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AchievementBadge } from "@/components/achievement-badge";
+import { useUser } from "@/context/user-context";
+import type { BadgeType } from "@/types/badge";
 
 interface BadgeProgressProps {
-  title?: string
-  badgeType: BadgeType
-  badgeName?: string
-  currentValue?: number
-  maxValue?: number
-  fetchUrl?: string
-  className?: string
-  progress: number
+  title?: string;
+  badgeType: BadgeType;
+  badgeName?: string;
+  currentValue?: number;
+  maxValue?: number;
+  fetchUrl?: string;
+  className?: string;
 }
 
 export function BadgeProgress({
@@ -26,49 +25,53 @@ export function BadgeProgress({
   maxValue = 10,
   fetchUrl,
   className,
-  progress,
 }: BadgeProgressProps) {
-  const { currentUser } = useUser()
-  const [currentValue, setCurrentValue] = useState(initialValue || 0)
-  const [isLoading, setIsLoading] = useState(!!fetchUrl)
-  const [error, setError] = useState<string | null>(null)
-  const [earned, setEarned] = useState(false)
+  const { currentUser } = useUser();
+  const [currentValue, setCurrentValue] = useState(initialValue || 0);
+  const [isLoading, setIsLoading] = useState(!!fetchUrl);
+  const [error, setError] = useState<string | null>(null);
+  const [earned, setEarned] = useState(false);
 
   useEffect(() => {
     if (initialValue !== undefined) {
-      setCurrentValue(initialValue)
-      setEarned(initialValue >= maxValue)
-      return
+      setCurrentValue(initialValue);
+      setEarned(initialValue >= maxValue);
+      return;
     }
 
     if (fetchUrl && currentUser?.id) {
       const fetchProgress = async () => {
-        setIsLoading(true)
-        setError(null)
+        setIsLoading(true);
+        setError(null);
 
         try {
-          const response = await fetch(fetchUrl.replace("[userId]", currentUser.id))
-          const data = await response.json()
+          const response = await fetch(
+            fetchUrl.replace("[userId]", currentUser.id),
+          );
+          const data = await response.json();
 
           if (!data.success) {
-            throw new Error(data.message || "Failed to fetch progress")
+            throw new Error(data.message || "Failed to fetch progress");
           }
 
-          setCurrentValue(data.progress || 0)
-          setEarned(data.earned || false)
+          setCurrentValue(data.progress || 0);
+          setEarned(data.earned || false);
         } catch (err) {
-          console.error("Error fetching badge progress:", err)
-          setError(err instanceof Error ? err.message : "Unknown error")
+          console.error("Error fetching badge progress:", err);
+          setError(err instanceof Error ? err.message : "Unknown error");
         } finally {
-          setIsLoading(false)
+          setIsLoading(false);
         }
-      }
+      };
 
-      fetchProgress()
+      fetchProgress();
     }
-  }, [fetchUrl, currentUser?.id, initialValue, maxValue])
+  }, [fetchUrl, currentUser?.id, initialValue, maxValue]);
 
-  const progressPercentage = Math.min(Math.round((currentValue / maxValue) * 100), 100)
+  const progressPercentage = Math.min(
+    Math.round((currentValue / maxValue) * 100),
+    100,
+  );
 
   return (
     <Card className={className}>
@@ -93,11 +96,13 @@ export function BadgeProgress({
             </div>
             <Progress value={progressPercentage} className="h-2" />
             <p className="text-xs text-muted-foreground mt-2">
-              {earned ? "Badge earned! 🎉" : `${progressPercentage}% complete - ${maxValue - currentValue} more to go`}
+              {earned
+                ? "Badge earned! 🎉"
+                : `${progressPercentage}% complete - ${maxValue - currentValue} more to go`}
             </p>
           </>
         )}
       </CardContent>
     </Card>
-  )
+  );
 }

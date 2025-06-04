@@ -1,6 +1,12 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   BarChart,
   Bar,
@@ -15,35 +21,37 @@ import {
   PolarAngleAxis,
   PolarRadiusAxis,
   Radar,
-} from "recharts"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+} from "recharts";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 interface ComparisonData {
   you: {
-    referrals: number
-    hires: number
-    conversionRate: number
-    avgTimeToHire: number
-  }
+    referrals: number;
+    hires: number;
+    conversionRate: number;
+    avgTimeToHire: number;
+  };
   topPerformer: {
-    referrals: number
-    hires: number
-    conversionRate: number
-    avgTimeToHire: number
-  }
+    referrals: number;
+    hires: number;
+    conversionRate: number;
+    avgTimeToHire: number;
+  };
   average: {
-    referrals: number
-    hires: number
-    conversionRate: number
-    avgTimeToHire: number
-  }
+    referrals: number;
+    hires: number;
+    conversionRate: number;
+    avgTimeToHire: number;
+  };
 }
 
 interface RecruiterComparisonChartProps {
-  data: ComparisonData
+  data: ComparisonData;
 }
 
-export function RecruiterComparisonChart({ data }: RecruiterComparisonChartProps) {
+export function RecruiterComparisonChart({
+  data,
+}: RecruiterComparisonChartProps) {
   // Transform data for bar chart
   const barChartData = [
     {
@@ -70,26 +78,42 @@ export function RecruiterComparisonChart({ data }: RecruiterComparisonChartProps
       "Top Performer": data.topPerformer.avgTimeToHire,
       Average: data.average.avgTimeToHire,
     },
-  ]
+  ];
 
   // Transform data for radar chart
   // Normalize values for radar chart (0-100 scale)
   const normalizeValue = (value: number, metric: string) => {
     if (metric === "Avg Time to Hire (days)") {
       // For time to hire, lower is better, so invert the scale
-      const max = Math.max(data.you.avgTimeToHire, data.topPerformer.avgTimeToHire, data.average.avgTimeToHire)
-      return 100 - (value / max) * 100
+      const max = Math.max(
+        data.you.avgTimeToHire,
+        data.topPerformer.avgTimeToHire,
+        data.average.avgTimeToHire,
+      );
+      return 100 - (value / max) * 100;
     } else {
       const max =
         metric === "Referrals"
-          ? Math.max(data.you.referrals, data.topPerformer.referrals, data.average.referrals)
+          ? Math.max(
+              data.you.referrals,
+              data.topPerformer.referrals,
+              data.average.referrals,
+            )
           : metric === "Hires"
-            ? Math.max(data.you.hires, data.topPerformer.hires, data.average.hires)
-            : Math.max(data.you.conversionRate, data.topPerformer.conversionRate, data.average.conversionRate)
+            ? Math.max(
+                data.you.hires,
+                data.topPerformer.hires,
+                data.average.hires,
+              )
+            : Math.max(
+                data.you.conversionRate,
+                data.topPerformer.conversionRate,
+                data.average.conversionRate,
+              );
 
-      return (value / max) * 100
+      return (value / max) * 100;
     }
-  }
+  };
 
   const radarChartData = [
     {
@@ -109,24 +133,38 @@ export function RecruiterComparisonChart({ data }: RecruiterComparisonChartProps
     {
       metric: "Conversion Rate",
       You: normalizeValue(data.you.conversionRate, "Conversion Rate (%)"),
-      "Top Performer": normalizeValue(data.topPerformer.conversionRate, "Conversion Rate (%)"),
-      Average: normalizeValue(data.average.conversionRate, "Conversion Rate (%)"),
+      "Top Performer": normalizeValue(
+        data.topPerformer.conversionRate,
+        "Conversion Rate (%)",
+      ),
+      Average: normalizeValue(
+        data.average.conversionRate,
+        "Conversion Rate (%)",
+      ),
       fullMark: 100,
     },
     {
       metric: "Time Efficiency",
       You: normalizeValue(data.you.avgTimeToHire, "Avg Time to Hire (days)"),
-      "Top Performer": normalizeValue(data.topPerformer.avgTimeToHire, "Avg Time to Hire (days)"),
-      Average: normalizeValue(data.average.avgTimeToHire, "Avg Time to Hire (days)"),
+      "Top Performer": normalizeValue(
+        data.topPerformer.avgTimeToHire,
+        "Avg Time to Hire (days)",
+      ),
+      Average: normalizeValue(
+        data.average.avgTimeToHire,
+        "Avg Time to Hire (days)",
+      ),
       fullMark: 100,
     },
-  ]
+  ];
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Performance Comparison</CardTitle>
-        <CardDescription>Compare your performance with other recruiters</CardDescription>
+        <CardDescription>
+          Compare your performance with other recruiters
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="bar">
@@ -152,13 +190,36 @@ export function RecruiterComparisonChart({ data }: RecruiterComparisonChartProps
 
           <TabsContent value="radar" className="h-[400px]">
             <ResponsiveContainer width="100%" height="100%">
-              <RadarChart cx="50%" cy="50%" outerRadius="80%" data={radarChartData}>
+              <RadarChart
+                cx="50%"
+                cy="50%"
+                outerRadius="80%"
+                data={radarChartData}
+              >
                 <PolarGrid />
                 <PolarAngleAxis dataKey="metric" />
                 <PolarRadiusAxis angle={30} domain={[0, 100]} />
-                <Radar name="You" dataKey="You" stroke="#0A3C1F" fill="#0A3C1F" fillOpacity={0.6} />
-                <Radar name="Top Performer" dataKey="Top Performer" stroke="#FFD700" fill="#FFD700" fillOpacity={0.6} />
-                <Radar name="Average" dataKey="Average" stroke="#9CA3AF" fill="#9CA3AF" fillOpacity={0.6} />
+                <Radar
+                  name="You"
+                  dataKey="You"
+                  stroke="#0A3C1F"
+                  fill="#0A3C1F"
+                  fillOpacity={0.6}
+                />
+                <Radar
+                  name="Top Performer"
+                  dataKey="Top Performer"
+                  stroke="#FFD700"
+                  fill="#FFD700"
+                  fillOpacity={0.6}
+                />
+                <Radar
+                  name="Average"
+                  dataKey="Average"
+                  stroke="#9CA3AF"
+                  fill="#9CA3AF"
+                  fillOpacity={0.6}
+                />
                 <Legend />
                 <Tooltip />
               </RadarChart>
@@ -167,5 +228,5 @@ export function RecruiterComparisonChart({ data }: RecruiterComparisonChartProps
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }

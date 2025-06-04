@@ -1,59 +1,101 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { Shield, Award, FileText, Bell, LogOut } from "lucide-react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import Link from "next/link"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Shield, Award, FileText, Bell, LogOut } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
+import type { User } from "@supabase/supabase-js";
+import Image from "next/image";
+
+interface Badge {
+  id: string;
+  badges?: {
+    image_url?: string;
+    name?: string;
+    description?: string;
+  };
+}
+
+interface Application {
+  id: string;
+  tracking_number?: string;
+  application_status?: string;
+  created_at?: string;
+}
+
+interface Notification {
+  id: string;
+  title?: string;
+  created_at?: string;
+  message?: string;
+  action_url?: string;
+  action_text?: string;
+}
+
+interface Stats {
+  points: number;
+  rank: number;
+  completedActivities: number;
+}
 
 export default function UserDashboard() {
-  const router = useRouter()
-  const [user, setUser] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [badges, setBadges] = useState([])
-  const [applications, setApplications] = useState([])
-  const [notifications, setNotifications] = useState([])
-  const [stats, setStats] = useState({
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [badges, setBadges] = useState<Badge[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [stats, setStats] = useState<Stats>({
     points: 0,
     rank: 0,
     completedActivities: 0,
-  })
+  });
 
   useEffect(() => {
     async function checkUser() {
-      setLoading(true)
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
+      setLoading(true);
+      const supabase = (await import("@/lib/supabase")).getClientSideSupabase();
       const {
         data: { session },
-      } = await supabase.auth.getSession()
+      } = await supabase.auth.getSession();
 
       if (!session) {
-        router.push("/login?redirect=/user-dashboard")
-        return
+        router.push("/login?redirect=/user-dashboard");
+        return;
       }
 
-      const { data: userData } = await supabase.auth.getUser()
-      setUser(userData.user)
+      const { data: userData } = await supabase.auth.getUser();
+      setUser(userData.user);
 
       // Fetch user badges
       const { data: badgeData } = await supabase
         .from("user_badges")
         .select("*, badges(*)")
-        .eq("user_id", userData.user?.id)
+        .eq("user_id", userData.user?.id);
 
       if (badgeData) {
-        setBadges(badgeData)
+        setBadges(badgeData);
       }
 
       // Fetch user applications
-      const { data: applicationData } = await supabase.from("applicants").select("*").eq("email", userData.user?.email)
+      const { data: applicationData } = await supabase
+        .from("applicants")
+        .select("*")
+        .eq("email", userData.user?.email);
 
       if (applicationData) {
-        setApplications(applicationData)
+        setApplications(applicationData);
       }
 
       // Fetch user notifications
@@ -62,10 +104,10 @@ export default function UserDashboard() {
         .select("*")
         .eq("user_id", userData.user?.id)
         .order("created_at", { ascending: false })
-        .limit(5)
+        .limit(5);
 
       if (notificationData) {
-        setNotifications(notificationData)
+        setNotifications(notificationData);
       }
 
       // Fetch user stats
@@ -73,41 +115,40 @@ export default function UserDashboard() {
         .from("user_points")
         .select("points")
         .eq("user_id", userData.user?.id)
-        .single()
+        .single();
 
       if (statsData) {
         // Get user rank
-        const { data: rankData, count } = await supabase
+        const { count } = await supabase
           .from("user_points")
           .select("*", { count: "exact" })
-          .gte("points", statsData.points)
+          .gte("points", statsData.points);
 
         // Get completed activities
         const { count: activitiesCount } = await supabase
           .from("user_activities")
           .select("*", { count: "exact" })
           .eq("user_id", userData.user?.id)
-          .eq("completed", true)
+          .eq("completed", true);
 
         setStats({
           points: statsData.points || 0,
           rank: count || 0,
           completedActivities: activitiesCount || 0,
-        })
+        });
       }
 
-      setLoading(false)
+      setLoading(false);
     }
 
-    checkUser()
-  }, [router])
+    checkUser();
+  }, [router]);
 
   const handleLogout = async () => {
-    const { getClientSideSupabase } = require("@/lib/supabase")
-    const supabase = getClientSideSupabase()
-    await supabase.auth.signOut()
-    router.push("/login")
-  }
+    const supabase = (await import("@/lib/supabase")).getClientSideSupabase();
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   if (loading) {
     return (
@@ -125,7 +166,7 @@ export default function UserDashboard() {
 
         <Skeleton className="h-96 w-full" />
       </div>
-    )
+    );
   }
 
   return (
@@ -135,10 +176,16 @@ export default function UserDashboard() {
           <h1 className="text-3xl font-bold text-[#0A3C1F]">
             Welcome, {user?.user_metadata?.full_name || user?.email}
           </h1>
-          <p className="text-gray-600">Manage your recruitment journey and track your progress</p>
+          <p className="text-gray-600">
+            Manage your recruitment journey and track your progress
+          </p>
         </div>
 
-        <Button onClick={handleLogout} variant="outline" className="flex items-center gap-2">
+        <Button
+          onClick={handleLogout}
+          variant="outline"
+          className="flex items-center gap-2"
+        >
           <LogOut className="h-4 w-4" />
           Sign Out
         </Button>
@@ -151,10 +198,15 @@ export default function UserDashboard() {
             <CardDescription>Your recruitment points</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-[#0A3C1F]">{stats.points}</div>
+            <div className="text-3xl font-bold text-[#0A3C1F]">
+              {stats.points}
+            </div>
           </CardContent>
           <CardFooter className="pt-0">
-            <Link href="/awards" className="text-sm text-[#0A3C1F] hover:underline">
+            <Link
+              href="/awards"
+              className="text-sm text-[#0A3C1F] hover:underline"
+            >
               View leaderboard
             </Link>
           </CardFooter>
@@ -166,10 +218,15 @@ export default function UserDashboard() {
             <CardDescription>Your position on the leaderboard</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-[#0A3C1F]">#{stats.rank}</div>
+            <div className="text-3xl font-bold text-[#0A3C1F]">
+              #{stats.rank}
+            </div>
           </CardContent>
           <CardFooter className="pt-0">
-            <Link href="/awards" className="text-sm text-[#0A3C1F] hover:underline">
+            <Link
+              href="/awards"
+              className="text-sm text-[#0A3C1F] hover:underline"
+            >
               View all recruits
             </Link>
           </CardFooter>
@@ -181,10 +238,15 @@ export default function UserDashboard() {
             <CardDescription>Completed recruitment activities</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-[#0A3C1F]">{stats.completedActivities}</div>
+            <div className="text-3xl font-bold text-[#0A3C1F]">
+              {stats.completedActivities}
+            </div>
           </CardContent>
           <CardFooter className="pt-0">
-            <Link href="/gamification" className="text-sm text-[#0A3C1F] hover:underline">
+            <Link
+              href="/gamification"
+              className="text-sm text-[#0A3C1F] hover:underline"
+            >
               Find more activities
             </Link>
           </CardFooter>
@@ -203,7 +265,9 @@ export default function UserDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Your Recruitment Journey</CardTitle>
-              <CardDescription>Track your progress toward becoming a Deputy Sheriff</CardDescription>
+              <CardDescription>
+                Track your progress toward becoming a Deputy Sheriff
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-8">
@@ -214,9 +278,15 @@ export default function UserDashboard() {
                   <div>
                     <h3 className="font-medium">Complete Your Profile</h3>
                     <p className="text-sm text-gray-500">
-                      Update your profile information to help us better understand your qualifications.
+                      Update your profile information to help us better
+                      understand your qualifications.
                     </p>
-                    <Button asChild className="mt-2" variant="outline" size="sm">
+                    <Button
+                      asChild
+                      className="mt-2"
+                      variant="outline"
+                      size="sm"
+                    >
                       <Link href="/profile/edit">Update Profile</Link>
                     </Button>
                   </div>
@@ -229,9 +299,15 @@ export default function UserDashboard() {
                   <div>
                     <h3 className="font-medium">Earn More Badges</h3>
                     <p className="text-sm text-gray-500">
-                      Complete activities and challenges to earn badges and increase your recruitment score.
+                      Complete activities and challenges to earn badges and
+                      increase your recruitment score.
                     </p>
-                    <Button asChild className="mt-2" variant="outline" size="sm">
+                    <Button
+                      asChild
+                      className="mt-2"
+                      variant="outline"
+                      size="sm"
+                    >
                       <Link href="/badges">View Badges</Link>
                     </Button>
                   </div>
@@ -244,11 +320,18 @@ export default function UserDashboard() {
                   <div>
                     <h3 className="font-medium">Submit Your Application</h3>
                     <p className="text-sm text-gray-500">
-                      Ready to take the next step? Submit your official application to the San Francisco Sheriff's
-                      Office.
+                      Ready to take the next step? Submit your official
+                      application to the San Francisco Sheriff&apos;s Office.
                     </p>
-                    <Button asChild className="mt-2" variant="outline" size="sm">
-                      <Link href="https://careers.sf.gov/interest/public-safety/sheriff/">Apply Now</Link>
+                    <Button
+                      asChild
+                      className="mt-2"
+                      variant="outline"
+                      size="sm"
+                    >
+                      <Link href="https://careers.sf.gov/interest/public-safety/sheriff/">
+                        Apply Now
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -261,22 +344,42 @@ export default function UserDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Your Earned Badges</CardTitle>
-              <CardDescription>Badges you've earned through your recruitment journey</CardDescription>
+              <CardDescription>
+                Badges you&apos;ve earned through your recruitment journey
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {badges.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {badges.map((badge: any) => (
-                    <div key={badge.id} className="flex flex-col items-center text-center">
+                  {badges.map((badge: Badge) => (
+                    <div
+                      key={badge.id}
+                      className="flex flex-col items-center text-center"
+                    >
                       <div className="w-20 h-20 bg-[#0A3C1F]/10 rounded-full flex items-center justify-center mb-2">
-                        <img
-                          src={badge.badges?.image_url || "/generic-badge.png"}
-                          alt={badge.badges?.name || "Badge"}
-                          className="w-16 h-16 object-contain"
+                        <Image
+                          src={
+                            badge.badges
+                              ? (badge.badges.image_url ?? "/generic-badge.png")
+                              : "/generic-badge.png"
+                          }
+                          alt={
+                            badge.badges
+                              ? (badge.badges.name ?? "Badge")
+                              : "Badge"
+                          }
+                          width={64}
+                          height={64}
+                          objectFit="contain"
+                          className="object-contain"
                         />
                       </div>
-                      <h3 className="font-medium text-sm">{badge.badges?.name || "Badge"}</h3>
-                      <p className="text-xs text-gray-500">{badge.badges?.description || "Achievement badge"}</p>
+                      <h3 className="font-medium text-sm">
+                        {badge.badges?.name || "Badge"}
+                      </h3>
+                      <p className="text-xs text-gray-500">
+                        {badge.badges?.description || "Achievement badge"}
+                      </p>
                     </div>
                   ))}
                 </div>
@@ -284,7 +387,9 @@ export default function UserDashboard() {
                 <div className="text-center py-8">
                   <Award className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                   <h3 className="font-medium text-gray-500">No badges yet</h3>
-                  <p className="text-sm text-gray-400 mb-4">Complete activities to earn your first badge</p>
+                  <p className="text-sm text-gray-400 mb-4">
+                    Complete activities to earn your first badge
+                  </p>
                   <Button asChild variant="outline">
                     <Link href="/gamification">Find Activities</Link>
                   </Button>
@@ -298,15 +403,19 @@ export default function UserDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Your Applications</CardTitle>
-              <CardDescription>Track the status of your applications</CardDescription>
+              <CardDescription>
+                Track the status of your applications
+              </CardDescription>
             </CardHeader>
             <CardContent>
               {applications.length > 0 ? (
                 <div className="space-y-4">
-                  {applications.map((app: any) => (
+                  {applications.map((app: Application) => (
                     <div key={app.id} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-medium">Application #{app.tracking_number}</h3>
+                        <h3 className="font-medium">
+                          Application #{app.tracking_number}
+                        </h3>
                         <span
                           className={`px-2 py-1 text-xs rounded-full ${
                             app.application_status === "hired"
@@ -316,15 +425,21 @@ export default function UserDashboard() {
                                 : "bg-blue-100 text-blue-800"
                           }`}
                         >
-                          {app.application_status?.charAt(0).toUpperCase() + app.application_status?.slice(1)}
+                          {(app.application_status ?? "Pending")
+                            .charAt(0)
+                            .toUpperCase() +
+                            (app.application_status ?? "Pending").slice(1)}
                         </span>
                       </div>
                       <p className="text-sm text-gray-500 mb-2">
-                        Submitted on {new Date(app.created_at).toLocaleDateString()}
+                        Submitted on{" "}
+                        {new Date(app.created_at || "").toLocaleDateString()}
                       </p>
                       <div className="flex justify-between items-center">
                         <Button asChild variant="outline" size="sm">
-                          <Link href={`/application/${app.id}`}>View Details</Link>
+                          <Link href={`/application/${app.id}`}>
+                            View Details
+                          </Link>
                         </Button>
                       </div>
                     </div>
@@ -333,12 +448,17 @@ export default function UserDashboard() {
               ) : (
                 <div className="text-center py-8">
                   <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="font-medium text-gray-500">No applications yet</h3>
+                  <h3 className="font-medium text-gray-500">
+                    No applications yet
+                  </h3>
                   <p className="text-sm text-gray-400 mb-4">
-                    Start your application to the San Francisco Sheriff's Office
+                    Start your application to the San Francisco Sheriff&apos;s
+                    Office
                   </p>
                   <Button asChild>
-                    <Link href="https://careers.sf.gov/interest/public-safety/sheriff/">Apply Now</Link>
+                    <Link href="https://careers.sf.gov/interest/public-safety/sheriff/">
+                      Apply Now
+                    </Link>
                   </Button>
                 </div>
               )}
@@ -355,18 +475,31 @@ export default function UserDashboard() {
             <CardContent>
               {notifications.length > 0 ? (
                 <div className="space-y-4">
-                  {notifications.map((notification: any) => (
-                    <div key={notification.id} className="border-b pb-4 last:border-b-0 last:pb-0">
+                  {notifications.map((notification: Notification) => (
+                    <div
+                      key={notification.id}
+                      className="border-b pb-4 last:border-b-0 last:pb-0"
+                    >
                       <div className="flex justify-between items-start mb-1">
                         <h3 className="font-medium">{notification.title}</h3>
                         <span className="text-xs text-gray-500">
-                          {new Date(notification.created_at).toLocaleDateString()}
+                          {new Date(
+                            notification.created_at || "",
+                          ).toLocaleDateString()}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">{notification.message}</p>
+                      <p className="text-sm text-gray-600">
+                        {notification.message ?? ""}
+                      </p>
                       {notification.action_url && (
-                        <Button asChild variant="link" className="p-0 h-auto text-[#0A3C1F]">
-                          <Link href={notification.action_url}>{notification.action_text || "View"}</Link>
+                        <Button
+                          asChild
+                          variant="link"
+                          className="p-0 h-auto text-[#0A3C1F]"
+                        >
+                          <Link href={notification.action_url!}>
+                            {notification.action_text || "View"}
+                          </Link>
                         </Button>
                       )}
                     </div>
@@ -375,8 +508,12 @@ export default function UserDashboard() {
               ) : (
                 <div className="text-center py-8">
                   <Bell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="font-medium text-gray-500">No notifications</h3>
-                  <p className="text-sm text-gray-400">You're all caught up!</p>
+                  <h3 className="font-medium text-gray-500">
+                    No notifications
+                  </h3>
+                  <p className="text-sm text-gray-400">
+                    You&apos;re all caught up!
+                  </p>
                 </div>
               )}
             </CardContent>
@@ -384,5 +521,5 @@ export default function UserDashboard() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

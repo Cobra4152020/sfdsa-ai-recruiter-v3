@@ -1,34 +1,25 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { AchievementBadge } from "./achievement-badge"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-
-type BadgeType =
-  | "written"
-  | "oral"
-  | "physical"
-  | "polygraph"
-  | "psychological"
-  | "full"
-  | "chat-participation"
-  | "application-started"
-  | "application-completed"
-  | "first-response"
-  | "frequent-user"
-  | "resource-downloader"
+import { useState } from "react";
+import { AchievementBadge } from "./achievement-badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface BadgeInfo {
-  type: BadgeType
-  name: string
-  description: string
-  category: "achievement" | "process" | "participation"
+  type: string;
+  name: string;
+  description: string;
+  category: "achievement" | "process" | "participation";
 }
 
 export function BadgeLegend() {
-  const [category, setCategory] = useState<"all" | "achievement" | "process" | "participation">("all")
+  const [category, setCategory] = useState<string>("all");
 
   const badges: BadgeInfo[] = [
     // Achievement Badges
@@ -108,12 +99,12 @@ export function BadgeLegend() {
       description: "Downloaded recruitment resources and materials",
       category: "participation",
     },
-  ]
+  ];
 
   const filteredBadges = badges.filter((badge) => {
-    if (category === "all") return true
-    return badge.category === category
-  })
+    if (category === "all") return true;
+    return badge.category === category;
+  });
 
   return (
     <Card className="border border-[#0A3C1F]/20 dark:border-[#FFD700]/20">
@@ -122,7 +113,11 @@ export function BadgeLegend() {
           <CardTitle className="flex items-center">
             <span className="mr-2">🏅</span> Badge Legend
           </CardTitle>
-          <Tabs defaultValue="all" value={category} onValueChange={(value) => setCategory(value as any)}>
+          <Tabs
+            defaultValue="all"
+            value={category}
+            onValueChange={(value: string) => setCategory(value)}
+          >
             <TabsList>
               <TabsTrigger value="all">All</TabsTrigger>
               <TabsTrigger value="achievement">Achievement</TabsTrigger>
@@ -139,7 +134,11 @@ export function BadgeLegend() {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <div className="flex flex-col items-center text-center p-2">
-                    <AchievementBadge type={badge.type} size="md" earned={false} />
+                    <AchievementBadge
+                      type={badge.type}
+                      size="md"
+                      earned={false}
+                    />
                     <h3 className="font-medium mt-2 text-sm">{badge.name}</h3>
                   </div>
                 </TooltipTrigger>
@@ -152,5 +151,5 @@ export function BadgeLegend() {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

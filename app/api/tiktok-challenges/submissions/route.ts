@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server"
-import { TikTokChallengeService } from "@/lib/tiktok-challenge-service"
+import { NextResponse } from "next/server";
+import { TikTokChallengeService } from "@/lib/tiktok-challenge-service";
 
-export const dynamic = 'force-static'
+export const dynamic = "force-static";
 
 interface StaticParam {
   challengeId?: string;
@@ -12,45 +12,60 @@ interface StaticParam {
 export function generateStaticParams() {
   // Get all challenge IDs
   const challengeIds = [1, 2, 3, 4, 5]; // Add your actual challenge IDs
-  
+
   // Get some sample user IDs
-  const userIds = ['user1', 'user2', 'user3']; // Add your sample user IDs
-  
+  const userIds = ["user1", "user2", "user3"]; // Add your sample user IDs
+
   const params: StaticParam[] = [];
-  
+
   // Add challenge-based params
-  challengeIds.forEach(id => {
+  challengeIds.forEach((id) => {
     params.push({ challengeId: id.toString() });
   });
-  
+
   // Add user-based params
-  userIds.forEach(id => {
+  userIds.forEach((id) => {
     params.push({ userId: id });
   });
-  
+
   return params;
 }
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json()
-    const { challengeId, userId, videoUrl, tiktokUrl, metadata } = body
+    const body = await req.json();
+    const { challengeId, userId, videoUrl, tiktokUrl, metadata } = body;
 
     if (!challengeId || !userId || !videoUrl) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
     // Submit challenge
-    const submission = await TikTokChallengeService.submitChallenge(challengeId, userId, videoUrl, tiktokUrl, metadata)
+    const submission = await TikTokChallengeService.submitChallenge(
+      challengeId,
+      userId,
+      videoUrl,
+      tiktokUrl,
+      metadata,
+    );
 
     if (!submission) {
-      return NextResponse.json({ error: "Failed to submit challenge" }, { status: 500 })
+      return NextResponse.json(
+        { error: "Failed to submit challenge" },
+        { status: 500 },
+      );
     }
 
-    return NextResponse.json({ submission })
+    return NextResponse.json({ submission });
   } catch (error) {
-    console.error("Error submitting TikTok challenge:", error)
-    return NextResponse.json({ error: "Failed to submit TikTok challenge" }, { status: 500 })
+    console.error("Error submitting TikTok challenge:", error);
+    return NextResponse.json(
+      { error: "Failed to submit TikTok challenge" },
+      { status: 500 },
+    );
   }
 }
 
@@ -67,8 +82,8 @@ const STATIC_SUBMISSIONS = [
     metadata: {
       views: 1000,
       likes: 100,
-      shares: 50
-    }
+      shares: 50,
+    },
   },
   {
     id: "2",
@@ -81,36 +96,39 @@ const STATIC_SUBMISSIONS = [
     metadata: {
       views: 500,
       likes: 50,
-      shares: 25
-    }
-  }
-]
+      shares: 25,
+    },
+  },
+];
 
 export async function GET(req: Request) {
   try {
-    const url = new URL(req.url)
-    const challengeId = url.searchParams.get("challengeId")
-    const userId = url.searchParams.get("userId")
+    const url = new URL(req.url);
+    const challengeId = url.searchParams.get("challengeId");
+    const userId = url.searchParams.get("userId");
 
-    let submissions = [...STATIC_SUBMISSIONS]
+    let submissions = [...STATIC_SUBMISSIONS];
 
     if (challengeId) {
       // Filter submissions for a challenge
-      submissions = submissions.filter(s => s.challengeId === challengeId)
+      submissions = submissions.filter((s) => s.challengeId === challengeId);
     } else if (userId) {
       // Filter submissions for a user
-      submissions = submissions.filter(s => s.userId === userId)
+      submissions = submissions.filter((s) => s.userId === userId);
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       submissions,
-      source: 'static'
-    })
+      source: "static",
+    });
   } catch (error) {
-    console.error("Error fetching TikTok challenge submissions:", error)
-    return NextResponse.json({ 
-      error: "Failed to fetch TikTok challenge submissions",
-      source: 'error'
-    }, { status: 500 })
+    console.error("Error fetching TikTok challenge submissions:", error);
+    return NextResponse.json(
+      {
+        error: "Failed to fetch TikTok challenge submissions",
+        source: "error",
+      },
+      { status: 500 },
+    );
   }
 }

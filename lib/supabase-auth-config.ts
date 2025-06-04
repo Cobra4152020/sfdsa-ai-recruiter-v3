@@ -1,69 +1,71 @@
-import { constructUrl } from "./url-utils"
+// import { constructUrl } from "./url-utils"; // Commented out unused import
 
 // Environment checks
-const STATIC_BUILD = process.env.NEXT_PUBLIC_STATIC_BUILD === 'true'
-const DISABLE_DATABASE_CHECKS = process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === 'true'
+// const STATIC_BUILD = process.env.NEXT_PUBLIC_STATIC_BUILD === "true"; // Commented out unused variable
+// const DISABLE_DATABASE_CHECKS = // Commented out unused variable
+//   process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === "true";
 
 // Hardcoded production URL to ensure consistency
-const SITE_URL = typeof window !== 'undefined' 
-  ? window.location.origin 
-  : process.env.NEXT_PUBLIC_SITE_URL || 'https://www.sfdeputysheriff.com'
+const SITE_URL =
+  typeof window !== "undefined"
+    ? window.location.origin
+    : process.env.NEXT_PUBLIC_SITE_URL || "https://www.sfdeputysheriff.com";
 
 // User types
-export type UserType = 'recruit' | 'volunteer' | 'admin'
+export type UserType = "recruit" | "volunteer" | "admin";
 
 // Auth config type
 interface AuthConfig {
   redirectUrls: {
-    base: string
-    login: string
-    resetPassword: string
-    emailVerification: string
-    signUp: string
-    volunteerSignUp: string
-    volunteerConfirm: string
-    callback: string
-  }
-  userTypePaths: Record<UserType, string>
+    base: string;
+    login: string;
+    resetPassword: string;
+    emailVerification: string;
+    signUp: string;
+    volunteerSignUp: string;
+    volunteerConfirm: string;
+    callback: string;
+  };
+  userTypePaths: Record<UserType, string>;
   storage: {
-    storageKey: string
-    storage: Storage | undefined
-  }
+    storageKey: string;
+    storage: Storage | undefined;
+  };
   schemas: {
-    public: string
-    recruit: string
-    volunteer: string
-    admin: string
-  }
+    public: string;
+    recruit: string;
+    volunteer: string;
+    admin: string;
+  };
   clientConfig: {
     auth: {
-      persistSession: boolean
-      autoRefreshToken: boolean
-      detectSessionInUrl: boolean
-      flowType: 'pkce'
-      storage: Storage | undefined
-      storageKey: string
-    }
+      persistSession: boolean;
+      autoRefreshToken: boolean;
+      detectSessionInUrl: boolean;
+      flowType: "pkce";
+      storage: Storage | undefined;
+      storageKey: string;
+    };
     db: {
-      schema: string
-    }
-  }
+      schema: string;
+    };
+  };
   serviceConfig: {
     auth: {
-      persistSession: boolean
-      autoRefreshToken: boolean
-    }
-  }
-  getRedirectUrl(action: keyof AuthConfig['redirectUrls']): string
-  getRedirectPathForUserType(userType: UserType): string
-  getRedirectUrlForUserType(userType: UserType): string
-  getCallbackUrl(provider?: string, userType?: UserType): string
-  getPasswordResetOptions(): { redirectTo: string }
-  getEmailVerificationOptions(): { redirectTo: string }
-  getSignUpOptions(isVolunteer?: boolean): { redirectTo: string }
-  getVolunteerConfirmOptions(): { redirectTo: string }
-  getSchemaForUserType(userType: UserType): string
-  getTableNameForUserType(userType: UserType): string
+      persistSession: boolean;
+      autoRefreshToken: boolean;
+    };
+  };
+  getRedirectUrl(action: keyof AuthConfig["redirectUrls"]): string;
+  getRedirectPathForUserType(userType: UserType): string;
+  getRedirectUrlForUserType(userType: UserType): string;
+  getCallbackUrl(provider?: string, userType?: UserType): string;
+  getPasswordResetOptions(): { redirectTo: string };
+  getEmailVerificationOptions(): { redirectTo: string };
+  getSignUpOptions(isVolunteer?: boolean): { redirectTo: string };
+  getVolunteerConfirmOptions(): { redirectTo: string };
+  getSchemaForUserType(userType: UserType): string;
+  getTableNameForUserType(userType: UserType): string;
 }
 
 /**
@@ -85,23 +87,23 @@ export const authConfig: AuthConfig = {
 
   // Default redirect paths by user type
   userTypePaths: {
-    recruit: '/dashboard',
-    volunteer: '/volunteer-dashboard',
-    admin: '/admin/dashboard',
+    recruit: "/dashboard",
+    volunteer: "/volunteer-dashboard",
+    admin: "/admin/dashboard",
   },
 
   // Auth storage configuration
   storage: {
-    storageKey: 'sfdsa_auth_token',
-    storage: typeof window !== 'undefined' ? window.localStorage : undefined,
+    storageKey: "sfdsa_auth_token",
+    storage: typeof window !== "undefined" ? window.localStorage : undefined,
   },
 
   // Database schema configuration
   schemas: {
-    public: 'public',
-    recruit: 'recruit',
-    volunteer: 'volunteer',
-    admin: 'admin',
+    public: "public",
+    recruit: "recruit",
+    volunteer: "volunteer",
+    admin: "admin",
   },
 
   // Auth client configuration
@@ -110,12 +112,12 @@ export const authConfig: AuthConfig = {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      flowType: 'pkce',
-      storage: typeof window !== 'undefined' ? window.localStorage : undefined,
-      storageKey: 'sfdsa_auth_token',
+      flowType: "pkce",
+      storage: typeof window !== "undefined" ? window.localStorage : undefined,
+      storageKey: "sfdsa_auth_token",
     },
     db: {
-      schema: 'public',
+      schema: "public",
     },
   },
 
@@ -130,40 +132,40 @@ export const authConfig: AuthConfig = {
   /**
    * Get redirect URL for a specific auth action
    */
-  getRedirectUrl(action: keyof AuthConfig['redirectUrls']): string {
-    return this.redirectUrls[action]
+  getRedirectUrl(action: keyof AuthConfig["redirectUrls"]): string {
+    return this.redirectUrls[action];
   },
 
   /**
    * Get redirect path for a user type
    */
   getRedirectPathForUserType(userType: UserType): string {
-    return this.userTypePaths[userType] || '/'
+    return this.userTypePaths[userType] || "/";
   },
 
   /**
    * Get full redirect URL for a user type
    */
   getRedirectUrlForUserType(userType: UserType): string {
-    return `${this.redirectUrls.base}${this.getRedirectPathForUserType(userType)}`
+    return `${this.redirectUrls.base}${this.getRedirectPathForUserType(userType)}`;
   },
 
   /**
    * Get callback URL with optional provider
    */
   getCallbackUrl(provider?: string, userType?: UserType): string {
-    let url = this.redirectUrls.callback
-    const params = new URLSearchParams()
-    
+    const url = this.redirectUrls.callback;
+    const params = new URLSearchParams();
+
     if (provider) {
-      params.set('provider', provider)
+      params.set("provider", provider);
     }
     if (userType) {
-      params.set('userType', userType)
+      params.set("userType", userType);
     }
 
-    const queryString = params.toString()
-    return queryString ? `${url}?${queryString}` : url
+    const queryString = params.toString();
+    return queryString ? `${url}?${queryString}` : url;
   },
 
   /**
@@ -172,7 +174,7 @@ export const authConfig: AuthConfig = {
   getPasswordResetOptions(): { redirectTo: string } {
     return {
       redirectTo: this.redirectUrls.resetPassword,
-    }
+    };
   },
 
   /**
@@ -181,7 +183,7 @@ export const authConfig: AuthConfig = {
   getEmailVerificationOptions(): { redirectTo: string } {
     return {
       redirectTo: this.redirectUrls.emailVerification,
-    }
+    };
   },
 
   /**
@@ -189,8 +191,10 @@ export const authConfig: AuthConfig = {
    */
   getSignUpOptions(isVolunteer = false): { redirectTo: string } {
     return {
-      redirectTo: isVolunteer ? this.redirectUrls.volunteerSignUp : this.redirectUrls.signUp,
-    }
+      redirectTo: isVolunteer
+        ? this.redirectUrls.volunteerSignUp
+        : this.redirectUrls.signUp,
+    };
   },
 
   /**
@@ -199,7 +203,7 @@ export const authConfig: AuthConfig = {
   getVolunteerConfirmOptions(): { redirectTo: string } {
     return {
       redirectTo: this.redirectUrls.volunteerConfirm,
-    }
+    };
   },
 
   /**
@@ -207,14 +211,14 @@ export const authConfig: AuthConfig = {
    */
   getSchemaForUserType(userType: UserType): string {
     switch (userType) {
-      case 'recruit':
-        return this.schemas.recruit
-      case 'volunteer':
-        return this.schemas.volunteer
-      case 'admin':
-        return this.schemas.admin
+      case "recruit":
+        return this.schemas.recruit;
+      case "volunteer":
+        return this.schemas.volunteer;
+      case "admin":
+        return this.schemas.admin;
       default:
-        return this.schemas.public
+        return this.schemas.public;
     }
   },
 
@@ -222,7 +226,9 @@ export const authConfig: AuthConfig = {
    * Get table name with schema for user type
    */
   getTableNameForUserType(userType: UserType): string {
-    const schema = this.getSchemaForUserType(userType)
-    return userType === 'volunteer' ? `${schema}.recruiters` : `${schema}.users`
+    const schema = this.getSchemaForUserType(userType);
+    return userType === "volunteer"
+      ? `${schema}.recruiters`
+      : `${schema}.users`;
   },
-}
+};

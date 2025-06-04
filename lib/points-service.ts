@@ -1,4 +1,4 @@
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function addParticipationPoints(
   userId: string,
@@ -7,7 +7,7 @@ export async function addParticipationPoints(
   description?: string,
 ) {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // First try to use the RPC function
     try {
@@ -16,16 +16,16 @@ export async function addParticipationPoints(
         points_param: points,
         activity_type_param: activityType,
         description_param: description || null,
-      })
+      });
 
       if (!error) {
-        return true
+        return true;
       }
 
       // If RPC fails, we'll fall through to the manual method
-      console.warn("RPC add_participation_points failed, using manual method")
+      console.warn("RPC add_participation_points failed, using manual method");
     } catch (rpcError) {
-      console.warn("RPC add_participation_points error:", rpcError)
+      console.warn("RPC add_participation_points error:", rpcError);
       // Continue to manual method
     }
 
@@ -41,34 +41,36 @@ export async function addParticipationPoints(
           amount: points,
         }),
       })
-      .eq("id", userId)
+      .eq("id", userId);
 
     if (updateError) {
-      console.error("Error updating participation count:", updateError)
-      return false
+      console.error("Error updating participation count:", updateError);
+      return false;
     }
 
     // 2. Log the points activity if participation_points table exists
     try {
-      const { error: insertError } = await supabase.from("participation_points").insert({
-        user_id: userId,
-        points,
-        activity_type: activityType,
-        description: description || null,
-      })
+      const { error: insertError } = await supabase
+        .from("participation_points")
+        .insert({
+          user_id: userId,
+          points,
+          activity_type: activityType,
+          description: description || null,
+        });
 
       if (insertError && insertError.code !== "42P01") {
         // Ignore if table doesn't exist
-        console.error("Error logging participation points:", insertError)
+        console.error("Error logging participation points:", insertError);
       }
     } catch (insertErr) {
       // Ignore errors here as the table might not exist
-      console.warn("Could not log to participation_points table:", insertErr)
+      console.warn("Could not log to participation_points table:", insertErr);
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error("Exception in addParticipationPoints:", error)
-    return false
+    console.error("Exception in addParticipationPoints:", error);
+    return false;
   }
 }

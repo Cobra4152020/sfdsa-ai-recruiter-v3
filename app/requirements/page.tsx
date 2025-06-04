@@ -1,12 +1,13 @@
-import type { Metadata } from "next"
-import { PageWrapper } from "@/components/page-wrapper"
-import { Card, CardContent } from "@/components/ui/card"
-import { CheckCircle2 } from "lucide-react"
+import type { Metadata } from "next";
+import { PageWrapper } from "@/components/page-wrapper";
+import { Card, CardContent } from "@/components/ui/card";
+import { CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "Deputy Sheriff Requirements | SFDSA Recruitment",
-  description: "Learn about the requirements and qualifications needed to become a San Francisco Deputy Sheriff.",
-}
+  description:
+    "Learn about the requirements and qualifications needed to become a San Francisco Deputy Sheriff.",
+};
 
 export default function RequirementsPage() {
   const requirements = [
@@ -15,7 +16,7 @@ export default function RequirementsPage() {
       items: [
         "Must be at least 18 years of age",
         "Must be a U.S. citizen or permanent resident alien who is eligible for and has applied for citizenship",
-        "Must possess a valid California Driver's License",
+        "Must possess a valid California Driver&apos;s License",
         "Must possess a high school diploma or equivalent (GED)",
         "Must have no felony convictions",
       ],
@@ -47,19 +48,22 @@ export default function RequirementsPage() {
         "Must be able to effectively communicate in English (written and verbal)",
         "Must be able to maintain professional demeanor and composure",
         "Must be willing to carry a firearm",
-        "Must complete required training at the Sheriff's Academy",
+        "Must complete required training at the Sheriff&apos;s Academy",
       ],
     },
-  ]
+  ];
 
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">Deputy Sheriff Requirements</h1>
+            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+              Deputy Sheriff Requirements
+            </h1>
             <p className="text-lg text-gray-600">
-              Learn about the qualifications and requirements needed to join the San Francisco Sheriff's Department.
+              Learn about the qualifications and requirements needed to join the
+              San Francisco Sheriff&apos;s Department.
             </p>
           </div>
 
@@ -67,7 +71,9 @@ export default function RequirementsPage() {
             {requirements.map((section) => (
               <Card key={section.category}>
                 <CardContent className="pt-6">
-                  <h2 className="text-2xl font-semibold text-[#0A3C1F] mb-4">{section.category}</h2>
+                  <h2 className="text-2xl font-semibold text-[#0A3C1F] mb-4">
+                    {section.category}
+                  </h2>
                   <ul className="space-y-3">
                     {section.items.map((item) => (
                       <li key={item} className="flex items-start">
@@ -82,10 +88,13 @@ export default function RequirementsPage() {
           </div>
 
           <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-blue-800 mb-3">Ready to Take the Next Step?</h2>
+            <h2 className="text-xl font-semibold text-blue-800 mb-3">
+              Ready to Take the Next Step?
+            </h2>
             <p className="text-blue-700 mb-4">
-              If you meet these requirements and are ready to begin your journey as a San Francisco Deputy Sheriff, we
-              encourage you to start the application process.
+              If you meet these requirements and are ready to begin your journey
+              as a San Francisco Deputy Sheriff, we encourage you to start the
+              application process.
             </p>
             <div className="flex gap-4">
               <a
@@ -105,5 +114,5 @@ export default function RequirementsPage() {
         </div>
       </div>
     </PageWrapper>
-  )
-} 
+  );
+}

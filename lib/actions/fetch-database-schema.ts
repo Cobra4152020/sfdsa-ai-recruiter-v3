@@ -1,4 +1,4 @@
-export async function fetchDatabaseSchema(params: any) {
+export async function fetchDatabaseSchema(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/fetch-database-schema`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function fetchDatabaseSchema(params: any) {
     console.error(`Error in fetchDatabaseSchema:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

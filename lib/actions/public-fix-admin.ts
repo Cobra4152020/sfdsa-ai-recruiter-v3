@@ -1,4 +1,4 @@
-export async function publicFixAdmin(params: any) {
+export async function publicFixAdmin(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/public-fix-admin`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function publicFixAdmin(params: any) {
     console.error(`Error in publicFixAdmin:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

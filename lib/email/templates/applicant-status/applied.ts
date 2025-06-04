@@ -1,16 +1,14 @@
-import { emailTheme } from '../../theme';
+import { emailTheme } from "../../theme";
 
 interface AppliedTemplateProps {
-  firstName: string
-  lastName: string
-  trackingNumber: string
-  dashboardUrl: string
-  examDate?: string
+  firstName: string;
+  trackingNumber: string;
+  dashboardUrl: string;
+  examDate?: string;
 }
 
 export function applied({
   firstName,
-  lastName,
   trackingNumber,
   dashboardUrl,
   examDate = "to be scheduled",
@@ -130,5 +128,5 @@ export function applied({
       </div>
     </body>
     </html>
-  `
+  `;
 }

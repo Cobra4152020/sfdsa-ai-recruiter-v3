@@ -1,49 +1,70 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { MousePointer, Eye, FileText, CheckCircle, MessageSquare, Calendar, UserCheck } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import {
+  MousePointer,
+  Eye,
+  FileText,
+  CheckCircle,
+  MessageSquare,
+  Calendar,
+  UserCheck,
+} from "lucide-react";
 
 interface FunnelData {
-  linkClicks: number
-  pageViews: number
-  formStarts: number
-  formCompletions: number
-  initialContacts: number
-  interviews: number
-  hires: number
+  linkClicks: number;
+  pageViews: number;
+  formStarts: number;
+  formCompletions: number;
+  initialContacts: number;
+  interviews: number;
+  hires: number;
 }
 
 interface RecruiterConversionFunnelProps {
-  data: FunnelData
+  data: FunnelData;
 }
 
-export function RecruiterConversionFunnel({ data }: RecruiterConversionFunnelProps) {
+export function RecruiterConversionFunnel({
+  data,
+}: RecruiterConversionFunnelProps) {
   // Calculate conversion rates between steps
   const calculateRate = (current: number, previous: number) => {
-    return previous === 0 ? 0 : (current / previous) * 100
-  }
+    return previous === 0 ? 0 : (current / previous) * 100;
+  };
 
   const rates = {
     pageViewRate: calculateRate(data.pageViews, data.linkClicks),
     formStartRate: calculateRate(data.formStarts, data.pageViews),
     formCompletionRate: calculateRate(data.formCompletions, data.formStarts),
-    initialContactRate: calculateRate(data.initialContacts, data.formCompletions),
+    initialContactRate: calculateRate(
+      data.initialContacts,
+      data.formCompletions,
+    ),
     interviewRate: calculateRate(data.interviews, data.initialContacts),
     hireRate: calculateRate(data.hires, data.interviews),
     overallRate: calculateRate(data.hires, data.linkClicks),
-  }
+  };
 
   // Calculate progress percentages relative to the first step
   const calculateProgress = (value: number) => {
-    return (value / data.linkClicks) * 100
-  }
+    return (value / data.linkClicks) * 100;
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Conversion Funnel</CardTitle>
-        <CardDescription>Track how potential recruits move through the hiring process</CardDescription>
+        <CardDescription>
+          Track how potential recruits move through the hiring process
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
@@ -73,10 +94,17 @@ export function RecruiterConversionFunnel({ data }: RecruiterConversionFunnelPro
               </div>
               <span className="font-bold">{data.pageViews}</span>
             </div>
-            <Progress value={calculateProgress(data.pageViews)} className="h-2" />
+            <Progress
+              value={calculateProgress(data.pageViews)}
+              className="h-2"
+            />
             <div className="flex justify-between">
-              <span className="text-xs text-gray-500">{rates.pageViewRate.toFixed(1)}% of clicks view the page</span>
-              <span className="text-xs text-gray-500">{calculateProgress(data.pageViews).toFixed(1)}%</span>
+              <span className="text-xs text-gray-500">
+                {rates.pageViewRate.toFixed(1)}% of clicks view the page
+              </span>
+              <span className="text-xs text-gray-500">
+                {calculateProgress(data.pageViews).toFixed(1)}%
+              </span>
             </div>
           </div>
 
@@ -90,12 +118,17 @@ export function RecruiterConversionFunnel({ data }: RecruiterConversionFunnelPro
               </div>
               <span className="font-bold">{data.formStarts}</span>
             </div>
-            <Progress value={calculateProgress(data.formStarts)} className="h-2" />
+            <Progress
+              value={calculateProgress(data.formStarts)}
+              className="h-2"
+            />
             <div className="flex justify-between">
               <span className="text-xs text-gray-500">
                 {rates.formStartRate.toFixed(1)}% of page viewers start the form
               </span>
-              <span className="text-xs text-gray-500">{calculateProgress(data.formStarts).toFixed(1)}%</span>
+              <span className="text-xs text-gray-500">
+                {calculateProgress(data.formStarts).toFixed(1)}%
+              </span>
             </div>
           </div>
 
@@ -109,12 +142,18 @@ export function RecruiterConversionFunnel({ data }: RecruiterConversionFunnelPro
               </div>
               <span className="font-bold">{data.formCompletions}</span>
             </div>
-            <Progress value={calculateProgress(data.formCompletions)} className="h-2" />
+            <Progress
+              value={calculateProgress(data.formCompletions)}
+              className="h-2"
+            />
             <div className="flex justify-between">
               <span className="text-xs text-gray-500">
-                {rates.formCompletionRate.toFixed(1)}% of form starts are completed
+                {rates.formCompletionRate.toFixed(1)}% of form starts are
+                completed
               </span>
-              <span className="text-xs text-gray-500">{calculateProgress(data.formCompletions).toFixed(1)}%</span>
+              <span className="text-xs text-gray-500">
+                {calculateProgress(data.formCompletions).toFixed(1)}%
+              </span>
             </div>
           </div>
 
@@ -128,12 +167,18 @@ export function RecruiterConversionFunnel({ data }: RecruiterConversionFunnelPro
               </div>
               <span className="font-bold">{data.initialContacts}</span>
             </div>
-            <Progress value={calculateProgress(data.initialContacts)} className="h-2" />
+            <Progress
+              value={calculateProgress(data.initialContacts)}
+              className="h-2"
+            />
             <div className="flex justify-between">
               <span className="text-xs text-gray-500">
-                {rates.initialContactRate.toFixed(1)}% of form completions are contacted
+                {rates.initialContactRate.toFixed(1)}% of form completions are
+                contacted
               </span>
-              <span className="text-xs text-gray-500">{calculateProgress(data.initialContacts).toFixed(1)}%</span>
+              <span className="text-xs text-gray-500">
+                {calculateProgress(data.initialContacts).toFixed(1)}%
+              </span>
             </div>
           </div>
 
@@ -147,12 +192,17 @@ export function RecruiterConversionFunnel({ data }: RecruiterConversionFunnelPro
               </div>
               <span className="font-bold">{data.interviews}</span>
             </div>
-            <Progress value={calculateProgress(data.interviews)} className="h-2" />
+            <Progress
+              value={calculateProgress(data.interviews)}
+              className="h-2"
+            />
             <div className="flex justify-between">
               <span className="text-xs text-gray-500">
                 {rates.interviewRate.toFixed(1)}% of contacts get interviews
               </span>
-              <span className="text-xs text-gray-500">{calculateProgress(data.interviews).toFixed(1)}%</span>
+              <span className="text-xs text-gray-500">
+                {calculateProgress(data.interviews).toFixed(1)}%
+              </span>
             </div>
           </div>
 
@@ -172,24 +222,34 @@ export function RecruiterConversionFunnel({ data }: RecruiterConversionFunnelPro
               indicatorClassName="bg-green-600"
             />
             <div className="flex justify-between">
-              <span className="text-xs text-gray-500">{rates.hireRate.toFixed(1)}% of interviews result in hires</span>
-              <span className="text-xs text-gray-500">{calculateProgress(data.hires).toFixed(1)}%</span>
+              <span className="text-xs text-gray-500">
+                {rates.hireRate.toFixed(1)}% of interviews result in hires
+              </span>
+              <span className="text-xs text-gray-500">
+                {calculateProgress(data.hires).toFixed(1)}%
+              </span>
             </div>
           </div>
 
           <div className="mt-6 p-4 bg-[#0A3C1F]/10 rounded-lg">
-            <h3 className="font-medium text-[#0A3C1F]">Overall Conversion Rate</h3>
+            <h3 className="font-medium text-[#0A3C1F]">
+              Overall Conversion Rate
+            </h3>
             <div className="flex items-center mt-2">
-              <div className="text-2xl font-bold text-[#0A3C1F]">{rates.overallRate.toFixed(1)}%</div>
-              <div className="ml-2 text-sm text-gray-600">of link clicks result in hires</div>
+              <div className="text-2xl font-bold text-[#0A3C1F]">
+                {rates.overallRate.toFixed(1)}%
+              </div>
+              <div className="ml-2 text-sm text-gray-600">
+                of link clicks result in hires
+              </div>
             </div>
             <p className="text-sm text-gray-600 mt-2">
-              The industry average is around 2-5%. Your conversion rate is {rates.overallRate > 5 ? "above" : "below"}{" "}
-              average.
+              The industry average is around 2-5%. Your conversion rate is{" "}
+              {rates.overallRate > 5 ? "above" : "below"} average.
             </p>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

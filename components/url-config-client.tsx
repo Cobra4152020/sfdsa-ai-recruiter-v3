@@ -1,34 +1,48 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+
+interface UrlConfigApiResponse {
+  isValid: boolean;
+  environment: string;
+  siteUrl: string;
+  envVars: Record<string, string | undefined>;
+  computedUrls: Record<string, string>;
+}
 
 export function URLConfigClient() {
-  const [configData, setConfigData] = useState<any>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [configData, setConfigData] = useState<UrlConfigApiResponse | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchConfig()
-  }, [])
+    fetchConfig();
+  }, []);
 
   async function fetchConfig() {
     try {
-      setLoading(true)
-      setError(null)
+      setLoading(true);
+      setError(null);
 
-      const response = await fetch("/api/check-site-url")
+      const response = await fetch("/api/check-site-url");
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      const data = await response.json()
-      setConfigData(data)
+      const data = await response.json();
+      setConfigData(data);
     } catch (err) {
-      console.error("Error fetching URL config:", err)
-      setError(err instanceof Error ? err.message : "Failed to fetch URL configuration")
+      console.error("Error fetching URL config:", err);
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch URL configuration",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -55,13 +69,23 @@ export function URLConfigClient() {
             <>
               <div className="bg-gray-50 p-4 rounded-md mb-4">
                 <h3 className="font-medium mb-2">Configuration Status</h3>
-                <p className={configData.isValid ? "text-green-600 font-medium" : "text-red-600 font-medium"}>
+                <p
+                  className={
+                    configData.isValid
+                      ? "text-green-600 font-medium"
+                      : "text-red-600 font-medium"
+                  }
+                >
                   {configData.isValid
                     ? "✓ URL configuration is valid"
                     : "✗ There are issues with your URL configuration"}
                 </p>
-                <p className="text-sm text-gray-500 mt-1">Environment: {configData.environment}</p>
-                <p className="text-sm text-gray-500">Site URL: {configData.siteUrl}</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Environment: {configData.environment}
+                </p>
+                <p className="text-sm text-gray-500">
+                  Site URL: {configData.siteUrl}
+                </p>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-md mb-4">
@@ -88,5 +112,5 @@ export function URLConfigClient() {
         </>
       )}
     </>
-  )
+  );
 }

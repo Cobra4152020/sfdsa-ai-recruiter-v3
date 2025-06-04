@@ -1,18 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "@/components/ui/use-toast";
 
 interface SystemSetting {
-  key: string
-  value: string
-  description: string
-  updated_at: string
+  key: string;
+  value: string;
+  description: string;
+  updated_at: string;
 }
 
 // Static mock data for export build
@@ -21,65 +28,65 @@ const STATIC_SETTINGS: SystemSetting[] = [
     key: "SITE_NAME",
     value: "SFDSA AI Recruiter",
     description: "The name of the site displayed in various locations",
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
   },
   {
     key: "CONTACT_EMAIL",
     value: "contact@sfdeputysheriff.com",
     description: "Primary contact email for the application",
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
   },
   {
     key: "MAINTENANCE_MODE",
     value: "false",
     description: "Toggle maintenance mode for the application",
-    updated_at: new Date().toISOString()
+    updated_at: new Date().toISOString(),
   },
   {
     key: "DAILY_BRIEFING_TIME",
     value: "09:00",
     description: "Time when daily briefings are published",
-    updated_at: new Date().toISOString()
-  }
+    updated_at: new Date().toISOString(),
+  },
 ];
 
 export default function SystemSettingsPage() {
-  const [settings, setSettings] = useState<SystemSetting[]>([])
-  const [loading, setLoading] = useState(true)
-  const [newKey, setNewKey] = useState("")
-  const [newValue, setNewValue] = useState("")
-  const [newDescription, setNewDescription] = useState("")
+  const [settings, setSettings] = useState<SystemSetting[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [newKey, setNewKey] = useState("");
+  const [newValue, setNewValue] = useState("");
+  const [newDescription, setNewDescription] = useState("");
 
   useEffect(() => {
-    fetchSettings()
-  }, [])
+    fetchSettings();
+  }, []);
 
   async function fetchSettings() {
     try {
-      setLoading(true)
-      
+      setLoading(true);
+
       // Use static data for export build
       if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
-        setSettings(STATIC_SETTINGS)
-        return
+        setSettings(STATIC_SETTINGS);
+        return;
       }
 
-      const response = await fetch("/api/admin/system-settings")
-      if (!response.ok) throw new Error("Failed to fetch settings")
+      const response = await fetch("/api/admin/system-settings");
+      if (!response.ok) throw new Error("Failed to fetch settings");
 
-      const data = await response.json()
-      setSettings(data.settings)
+      const data = await response.json();
+      setSettings(data.settings);
     } catch (error) {
-      console.error("Error fetching settings:", error)
+      console.error("Error fetching settings:", error);
       toast({
         title: "Error",
         description: "Failed to load system settings",
         variant: "destructive",
-      })
+      });
       // Fallback to static data on error
-      setSettings(STATIC_SETTINGS)
+      setSettings(STATIC_SETTINGS);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -87,12 +94,12 @@ export default function SystemSettingsPage() {
     try {
       // In export build, just update the state
       if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
-        setSettings(settings.map(s => s.key === setting.key ? setting : s))
+        setSettings(settings.map((s) => (s.key === setting.key ? setting : s)));
         toast({
           title: "Success",
           description: `Setting "${setting.key}" saved successfully (Demo Mode)`,
-        })
-        return
+        });
+        return;
       }
 
       const response = await fetch("/api/admin/system-settings", {
@@ -101,23 +108,23 @@ export default function SystemSettingsPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(setting),
-      })
+      });
 
-      if (!response.ok) throw new Error("Failed to save setting")
+      if (!response.ok) throw new Error("Failed to save setting");
 
       toast({
         title: "Success",
         description: `Setting "${setting.key}" saved successfully`,
-      })
+      });
 
-      fetchSettings()
+      fetchSettings();
     } catch (error) {
-      console.error("Error saving setting:", error)
+      console.error("Error saving setting:", error);
       toast({
         title: "Error",
         description: "Failed to save setting",
         variant: "destructive",
-      })
+      });
     }
   }
 
@@ -125,33 +132,33 @@ export default function SystemSettingsPage() {
     try {
       // In export build, just update the state
       if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
-        setSettings(settings.filter(s => s.key !== key))
+        setSettings(settings.filter((s) => s.key !== key));
         toast({
           title: "Success",
           description: `Setting "${key}" deleted successfully (Demo Mode)`,
-        })
-        return
+        });
+        return;
       }
 
       const response = await fetch(`/api/admin/system-settings?key=${key}`, {
         method: "DELETE",
-      })
+      });
 
-      if (!response.ok) throw new Error("Failed to delete setting")
+      if (!response.ok) throw new Error("Failed to delete setting");
 
       toast({
         title: "Success",
         description: `Setting "${key}" deleted successfully`,
-      })
+      });
 
-      fetchSettings()
+      fetchSettings();
     } catch (error) {
-      console.error("Error deleting setting:", error)
+      console.error("Error deleting setting:", error);
       toast({
         title: "Error",
         description: "Failed to delete setting",
         variant: "destructive",
-      })
+      });
     }
   }
 
@@ -161,8 +168,8 @@ export default function SystemSettingsPage() {
         title: "Error",
         description: "Key and value are required",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     const newSetting: SystemSetting = {
@@ -170,22 +177,22 @@ export default function SystemSettingsPage() {
       value: newValue,
       description: newDescription,
       updated_at: new Date().toISOString(),
-    }
+    };
 
     // In export build, just add to state
     if (process.env.NEXT_PUBLIC_GITHUB_PAGES === "true") {
-      setSettings([...settings, newSetting])
+      setSettings([...settings, newSetting]);
       toast({
         title: "Success",
         description: `Setting "${newKey}" added successfully (Demo Mode)`,
-      })
+      });
     } else {
-      saveSetting(newSetting)
+      saveSetting(newSetting);
     }
 
-    setNewKey("")
-    setNewValue("")
-    setNewDescription("")
+    setNewKey("");
+    setNewValue("");
+    setNewDescription("");
   }
 
   return (
@@ -197,7 +204,8 @@ export default function SystemSettingsPage() {
           <CardHeader>
             <CardTitle>Demo Mode</CardTitle>
             <CardDescription>
-              This is a demo version with mock data. Changes will not persist after page refresh.
+              This is a demo version with mock data. Changes will not persist
+              after page refresh.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -212,7 +220,12 @@ export default function SystemSettingsPage() {
           <div className="grid grid-cols-1 gap-4">
             <div className="space-y-2">
               <Label htmlFor="key">Key</Label>
-              <Input id="key" value={newKey} onChange={(e) => setNewKey(e.target.value)} placeholder="SETTING_KEY" />
+              <Input
+                id="key"
+                value={newKey}
+                onChange={(e) => setNewKey(e.target.value)}
+                placeholder="SETTING_KEY"
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="value">Value</Label>
@@ -251,7 +264,9 @@ export default function SystemSettingsPage() {
             <Card key={setting.key}>
               <CardHeader>
                 <CardTitle>{setting.key}</CardTitle>
-                <CardDescription>{setting.description || "No description"}</CardDescription>
+                <CardDescription>
+                  {setting.description || "No description"}
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
@@ -261,9 +276,11 @@ export default function SystemSettingsPage() {
                     value={setting.value}
                     onChange={(e) => {
                       const updatedSettings = settings.map((s) =>
-                        s.key === setting.key ? { ...s, value: e.target.value } : s,
-                      )
-                      setSettings(updatedSettings)
+                        s.key === setting.key
+                          ? { ...s, value: e.target.value }
+                          : s,
+                      );
+                      setSettings(updatedSettings);
                     }}
                   />
                 </div>
@@ -272,7 +289,10 @@ export default function SystemSettingsPage() {
                 </p>
               </CardContent>
               <CardFooter className="flex justify-between">
-                <Button variant="outline" onClick={() => deleteSetting(setting.key)}>
+                <Button
+                  variant="outline"
+                  onClick={() => deleteSetting(setting.key)}
+                >
                   Delete
                 </Button>
                 <Button onClick={() => saveSetting(setting)}>Save</Button>
@@ -282,5 +302,5 @@ export default function SystemSettingsPage() {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -1,30 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Award, Gift, Share2, Users, Trophy, Star } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import Link from "next/link"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Award, Gift, Share2, Users, Trophy, Star } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import Link from "next/link";
 
 interface ReferralTier {
-  count: number
-  reward: string
-  description: string
-  icon: React.ReactNode
-  achieved: boolean
+  count: number;
+  reward: string;
+  description: string;
+  icon: React.ReactNode;
+  achieved: boolean;
 }
 
 export function ReferralRewards() {
-  const { toast } = useToast()
-  const [showShareDialog, setShowShareDialog] = useState(false)
-  const [referralCount, setReferralCount] = useState(2) // Demo value
+  const { toast } = useToast();
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [referralCount] = useState(0);
 
   const referralTiers: ReferralTier[] = [
     {
@@ -62,26 +74,30 @@ export function ReferralRewards() {
       icon: <Gift className="h-5 w-5 text-[#0A3C1F]" />,
       achieved: referralCount >= 25,
     },
-  ]
+  ];
 
   // Find the next tier
-  const nextTier = referralTiers.find((tier) => !tier.achieved)
+  const nextTier = referralTiers.find((tier) => !tier.achieved);
 
   // Calculate progress to next tier
-  const progressToNextTier = nextTier ? Math.min(100, Math.round((referralCount / nextTier.count) * 100)) : 100
+  const progressToNextTier = nextTier
+    ? Math.min(100, Math.round((referralCount / nextTier.count) * 100))
+    : 100;
 
   const handleShare = () => {
-    setShowShareDialog(true)
-  }
+    setShowShareDialog(true);
+  };
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText("https://sfdsa-recruiter.com/join?ref=demo-user123")
+    navigator.clipboard.writeText(
+      "https://sfdsa-recruiter.com/join?ref=demo-user123",
+    );
     toast({
       title: "Link Copied!",
       description: "Referral link copied to clipboard",
       duration: 3000,
-    })
-  }
+    });
+  };
 
   return (
     <>
@@ -100,9 +116,14 @@ export function ReferralRewards() {
             <div className="flex justify-between items-center mb-4">
               <div>
                 <h3 className="text-lg font-medium">Your Referrals</h3>
-                <p className="text-sm text-gray-500">You've referred {referralCount} potential recruits</p>
+                <p className="text-sm text-gray-500">
+                  You&apos;ve referred {referralCount} potential recruits
+                </p>
               </div>
-              <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" onClick={handleShare}>
+              <Button
+                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                onClick={handleShare}
+              >
                 <Share2 className="mr-2 h-4 w-4" />
                 Share Your Link
               </Button>
@@ -118,7 +139,8 @@ export function ReferralRewards() {
                 </div>
                 <Progress value={progressToNextTier} className="h-2" />
                 <p className="text-xs text-gray-500 mt-1">
-                  Refer {nextTier.count - referralCount} more recruits to unlock {nextTier.reward}
+                  Refer {nextTier.count - referralCount} more recruits to unlock{" "}
+                  {nextTier.reward}
                 </p>
               </div>
             )}
@@ -139,23 +161,33 @@ export function ReferralRewards() {
                 <div
                   key={tier.count}
                   className={`p-4 border rounded-lg transition-all ${
-                    tier.achieved ? "bg-[#0A3C1F]/5 border-[#0A3C1F]/20" : "border-gray-200"
+                    tier.achieved
+                      ? "bg-[#0A3C1F]/5 border-[#0A3C1F]/20"
+                      : "border-gray-200"
                   }`}
                 >
                   <div className="flex items-center mb-2">
-                    <div className={`p-2 rounded-full ${tier.achieved ? "bg-[#0A3C1F]/10" : "bg-gray-100"}`}>
+                    <div
+                      className={`p-2 rounded-full ${tier.achieved ? "bg-[#0A3C1F]/10" : "bg-gray-100"}`}
+                    >
                       {tier.icon}
                     </div>
                     <div className="ml-3">
                       <h4 className="font-medium">{tier.reward}</h4>
-                      <p className="text-xs text-gray-500">{tier.description}</p>
+                      <p className="text-xs text-gray-500">
+                        {tier.description}
+                      </p>
                     </div>
                   </div>
 
                   <div className="flex justify-between items-center mt-2">
-                    <span className="text-sm font-medium">{tier.count} Referrals</span>
+                    <span className="text-sm font-medium">
+                      {tier.count} Referrals
+                    </span>
                     {tier.achieved ? (
-                      <Badge className="bg-[#0A3C1F] text-white">Unlocked</Badge>
+                      <Badge className="bg-[#0A3C1F] text-white">
+                        Unlocked
+                      </Badge>
                     ) : (
                       <Badge variant="outline" className="text-gray-500">
                         Locked
@@ -175,20 +207,37 @@ export function ReferralRewards() {
           <DialogHeader>
             <DialogTitle>Share Your Referral Link</DialogTitle>
             <DialogDescription>
-              Share this link with potential recruits and earn rewards when they sign up!
+              Share this link with potential recruits and earn rewards when they
+              sign up!
             </DialogDescription>
           </DialogHeader>
 
           <div className="grid grid-cols-2 gap-4 my-4">
-            <Button className="bg-[#1877F2] hover:bg-[#1877F2]/90">Facebook</Button>
-            <Button className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90">Twitter</Button>
-            <Button className="bg-[#0A66C2] hover:bg-[#0A66C2]/90">LinkedIn</Button>
-            <Button className="bg-[#25D366] hover:bg-[#25D366]/90">WhatsApp</Button>
+            <Button className="bg-[#1877F2] hover:bg-[#1877F2]/90">
+              Facebook
+            </Button>
+            <Button className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90">
+              Twitter
+            </Button>
+            <Button className="bg-[#0A66C2] hover:bg-[#0A66C2]/90">
+              LinkedIn
+            </Button>
+            <Button className="bg-[#25D366] hover:bg-[#25D366]/90">
+              WhatsApp
+            </Button>
           </div>
 
           <div className="relative mt-2">
-            <Input value="https://sfdsa-recruiter.com/join?ref=demo-user123" readOnly />
-            <Button className="absolute right-1 top-1 h-7" variant="outline" size="sm" onClick={handleCopyLink}>
+            <Input
+              value="https://sfdsa-recruiter.com/join?ref=demo-user123"
+              readOnly
+            />
+            <Button
+              className="absolute right-1 top-1 h-7"
+              variant="outline"
+              size="sm"
+              onClick={handleCopyLink}
+            >
               Copy
             </Button>
           </div>
@@ -199,11 +248,12 @@ export function ReferralRewards() {
               Referral Tip
             </h4>
             <p className="text-sm mt-1">
-              Personalize your message when sharing your link to increase the chances of your friends signing up!
+              Personalize your message when sharing your link to increase the
+              chances of your friends signing up!
             </p>
           </div>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

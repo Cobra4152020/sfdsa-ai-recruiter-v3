@@ -1,5 +1,5 @@
-import { SchemaDiagram } from "@/components/admin/schema-diagram"
-import { PageWrapper } from "@/components/page-wrapper"
+import { SchemaDiagram } from "@/components/admin/schema-diagram";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function DatabaseDiagramPage() {
   return (
@@ -9,5 +9,5 @@ export default function DatabaseDiagramPage() {
         <SchemaDiagram />
       </div>
     </PageWrapper>
-  )
+  );
 }

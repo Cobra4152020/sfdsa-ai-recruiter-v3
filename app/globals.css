@@ -5,10 +5,10 @@
 @layer base {
   :root {
     /* Sheriff's Department Colors */
-    --sheriff-green: #0A3C1F;
-    --sheriff-gold: #FFD700;
+    --sheriff-green: #0a3c1f;
+    --sheriff-gold: #ffd700;
     --sheriff-black: #121212;
-    --sheriff-tan: #F8F5EE;
+    --sheriff-tan: #f8f5ee;
 
     /* Light mode */
     --background: 39 44% 97%; /* sheriff's tan */
@@ -154,7 +154,8 @@ table {
   @apply w-full border-collapse;
 }
 
-th, td {
+th,
+td {
   @apply border border-gray-200 dark:border-gray-700 p-2;
 }
 
@@ -163,11 +164,15 @@ th {
 }
 
 /* Form element styles */
-input, textarea, select {
+input,
+textarea,
+select {
   @apply bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   @apply border-[#0A3C1F] dark:border-[#FFD700] ring-2 ring-[#0A3C1F]/20 dark:ring-[#FFD700]/20;
 }
 
@@ -178,7 +183,8 @@ button:not(.no-hover):hover {
 
 /* Custom animations */
 @keyframes pulse-yellow {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

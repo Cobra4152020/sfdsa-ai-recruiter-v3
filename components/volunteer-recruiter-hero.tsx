@@ -1,13 +1,22 @@
-import { Card, CardContent } from "@/components/ui/card"
-import { UsersRound, Trophy, LineChartIcon as ChartLine, Mail } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  UsersRound,
+  Trophy,
+  LineChartIcon as ChartLine,
+  Mail,
+} from "lucide-react";
 
 export function VolunteerRecruiterHero() {
   return (
     <div className="space-y-6">
       <div className="text-center max-w-3xl mx-auto space-y-4">
-        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#0A3C1F]">Volunteer Recruiter Portal</h1>
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#0A3C1F]">
+          Volunteer Recruiter Portal
+        </h1>
         <p className="text-lg text-gray-600 dark:text-gray-400">
-          Help us build the future of the San Francisco Sheriff's Department by referring quality candidates.
+          Help us build the future of the San Francisco Sheriff&apos;s
+          Department by referring quality candidates. Earn rewards while making
+          a difference.
         </p>
       </div>
 
@@ -48,7 +57,9 @@ export function VolunteerRecruiterHero() {
               </div>
             </div>
             <h3 className="text-lg font-medium mb-2">Track Performance</h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">Monitor your referrals and their progress.</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Monitor your referrals and their progress.
+            </p>
           </CardContent>
         </Card>
 
@@ -67,5 +78,5 @@ export function VolunteerRecruiterHero() {
         </Card>
       </div>
     </div>
-  )
+  );
 }

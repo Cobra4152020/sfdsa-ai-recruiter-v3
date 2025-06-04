@@ -1,8 +1,8 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
-import { useClientOnly } from "@/hooks/use-client-only"
-import { getWindowDimensions, isBrowser } from "@/lib/utils"
+import { useState, useEffect, useCallback } from "react";
+import { useClientOnly } from "@/hooks/use-client-only";
+import { getWindowDimensions, isBrowser } from "@/lib/utils";
 
 /**
  * Hook to detect if the current viewport is mobile
@@ -10,27 +10,36 @@ import { getWindowDimensions, isBrowser } from "@/lib/utils"
  * @returns boolean indicating if the current viewport is mobile
  */
 export function useMobile(breakpoint = 768) {
-  const memoizedGetWindowDimensions = useCallback(() => getWindowDimensions(), [])
-  const { innerWidth } = useClientOnly(memoizedGetWindowDimensions, { scrollY: 0, width: 0, height: 0, innerWidth: 0, innerHeight: 0 })
-  const [isMobile, setIsMobile] = useState(false)
+  const memoizedGetWindowDimensions = useCallback(
+    () => getWindowDimensions(),
+    [],
+  );
+  const { innerWidth } = useClientOnly(memoizedGetWindowDimensions, {
+    scrollY: 0,
+    width: 0,
+    height: 0,
+    innerWidth: 0,
+    innerHeight: 0,
+  });
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    if (!isBrowser()) return
+    if (!isBrowser()) return;
 
     // Function to check if window width is less than breakpoint
     const checkMobile = () => {
-      setIsMobile(innerWidth < breakpoint)
-    }
+      setIsMobile(innerWidth < breakpoint);
+    };
 
     // Check on mount and when innerWidth changes
-    checkMobile()
+    checkMobile();
 
     // Add event listener for window resize
-    window.addEventListener("resize", checkMobile)
+    window.addEventListener("resize", checkMobile);
 
     // Clean up event listener on unmount
-    return () => window.removeEventListener("resize", checkMobile)
-  }, [breakpoint, innerWidth])
+    return () => window.removeEventListener("resize", checkMobile);
+  }, [breakpoint, innerWidth]);
 
-  return isMobile
+  return isMobile;
 }

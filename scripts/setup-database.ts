@@ -1,56 +1,56 @@
 #!/usr/bin/env node
-import { createClient } from "@supabase/supabase-js"
-import type { Database } from "@/types/supabase"
-import * as dotenv from "dotenv"
-import path from "path"
-import fs from "fs"
+import { createClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/supabase";
+import * as dotenv from "dotenv";
+import path from "path";
+import fs from "fs";
 
 // Load environment variables from .env.local
-const envPath = path.resolve(process.cwd(), '.env.local')
-console.log("Looking for .env.local at:", envPath)
-console.log("File exists:", fs.existsSync(envPath))
+const envPath = path.resolve(process.cwd(), ".env.local");
+console.log("Looking for .env.local at:", envPath);
+console.log("File exists:", fs.existsSync(envPath));
 
 if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, 'utf8')
-  console.log("Environment file content available:", !!envContent)
-  dotenv.config({ path: envPath })
+  const envContent = fs.readFileSync(envPath, "utf8");
+  console.log("Environment file content available:", !!envContent);
+  dotenv.config({ path: envPath });
 }
 
 // Log all environment variables (redacted)
 console.log("Environment variables loaded:", {
   NEXT_PUBLIC_SUPABASE_URL: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
   SUPABASE_SERVICE_ROLE_KEY: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-})
+});
 
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      NEXT_PUBLIC_SUPABASE_URL: string
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: string
+      NEXT_PUBLIC_SUPABASE_URL: string;
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
     }
   }
 }
 
 export async function setupDatabase() {
   try {
-    console.log("Starting database setup...")
-    
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
-    
+    console.log("Starting database setup...");
+
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
     if (!supabaseUrl || !supabaseKey) {
       console.error("Environment variables loaded:", {
         url: !!supabaseUrl,
-        key: !!supabaseKey
-      })
-      throw new Error("Missing Supabase environment variables")
+        key: !!supabaseKey,
+      });
+      throw new Error("Missing Supabase environment variables");
     }
 
-    console.log("Connecting to Supabase...")
-    const supabase = createClient(supabaseUrl, supabaseKey)
+    console.log("Connecting to Supabase...");
+    const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Create tiktok_challenges table
-    console.log("Creating tiktok_challenges table...")
+    console.log("Creating tiktok_challenges table...");
     await supabase.rpc("exec_sql", {
       sql_query: `
         CREATE TABLE IF NOT EXISTS public.tiktok_challenges (
@@ -70,11 +70,11 @@ export async function setupDatabase() {
           created_at timestamptz DEFAULT now(),
           updated_at timestamptz DEFAULT now()
         );
-      `
-    })
+      `,
+    });
 
     // Create tiktok_challenge_submissions table
-    console.log("Creating tiktok_challenge_submissions table...")
+    console.log("Creating tiktok_challenge_submissions table...");
     await supabase.rpc("exec_sql", {
       sql_query: `
         CREATE TABLE IF NOT EXISTS public.tiktok_challenge_submissions (
@@ -100,11 +100,11 @@ export async function setupDatabase() {
         
         CREATE INDEX IF NOT EXISTS idx_challenge_submissions_challenge 
         ON public.tiktok_challenge_submissions(challenge_id);
-      `
-    })
+      `,
+    });
 
     // Create trivia_games table
-    console.log("Creating trivia_games table...")
+    console.log("Creating trivia_games table...");
     await supabase.rpc("exec_sql", {
       sql_query: `
         CREATE TABLE IF NOT EXISTS public.trivia_games (
@@ -113,11 +113,11 @@ export async function setupDatabase() {
           description text,
           image_url text
         );
-      `
-    })
+      `,
+    });
 
     // Create trivia_badges table
-    console.log("Creating trivia_badges table...")
+    console.log("Creating trivia_badges table...");
     await supabase.rpc("exec_sql", {
       sql_query: `
         CREATE TABLE IF NOT EXISTS public.trivia_badges (
@@ -132,15 +132,15 @@ export async function setupDatabase() {
         
         CREATE INDEX IF NOT EXISTS idx_trivia_badges_game 
         ON public.trivia_badges(game_id);
-      `
-    })
+      `,
+    });
 
-    console.log("Database setup completed successfully!")
-    return { success: true }
+    console.log("Database setup completed successfully!");
+    return { success: true };
   } catch (error) {
-    console.error("Error during database setup:", error)
-    return { success: false, error: String(error) }
+    console.error("Error during database setup:", error);
+    return { success: false, error: String(error) };
   }
 }
 
-setupDatabase() 
+setupDatabase();

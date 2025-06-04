@@ -1,62 +1,44 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PerformanceWidget } from "@/components/performance-widget"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
-import { HealthCheck } from "@/components/health-check"
+import { useState } from "react";
 import {
-  Users,
-  Award,
-  BarChart3,
-  Database,
-  Mail,
-  DollarSign,
-  Settings,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  RefreshCw,
-  UserCog,
-} from "lucide-react"
-import { mockAdminData } from "@/lib/mock-admin-data"
-import { DashboardStatsWrapper } from "@/components/admin/dashboard-stats-wrapper"
-import { TikTokChallengesWrapper } from "@/components/admin/tiktok-challenges-wrapper"
-import { RecentApplicantsWrapper } from "@/components/admin/recent-applicants-wrapper"
-import { LoginAuditDashboard } from "@/components/admin/login-audit-dashboard"
-
-interface SystemStatus {
-  database: { status: "ok" | "error" | "loading"; message: string }
-  email: { status: "ok" | "error" | "loading"; message: string }
-  auth: { status: "ok" | "error" | "loading"; message: string }
-  storage: { status: "ok" | "error" | "loading"; message: string }
-}
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { HealthCheck } from "@/components/health-check";
+import { RefreshCw } from "lucide-react";
+import { mockAdminData } from "@/lib/mock-admin-data";
+import { DashboardStatsWrapper } from "@/components/admin/dashboard-stats-wrapper";
+import { TikTokChallengesWrapper } from "@/components/admin/tiktok-challenges-wrapper";
+import { RecentApplicantsWrapper } from "@/components/admin/recent-applicants-wrapper";
+import { LoginAuditDashboard } from "@/components/admin/login-audit-dashboard";
 
 export default function AdminDashboard() {
-  const [systemStatus, setSystemStatus] = useState<SystemStatus>(mockAdminData.systemStatus)
-  const [isRefreshing, setIsRefreshing] = useState(false)
-  const { toast } = useToast()
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { toast } = useToast();
 
   const checkSystemStatus = async () => {
-    setIsRefreshing(true)
+    setIsRefreshing(true);
     // Simulated delay for demo
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    setIsRefreshing(false)
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    setIsRefreshing(false);
     toast({
       title: "System Status Updated",
       description: "All systems are operational",
-    })
-  }
+    });
+  };
 
   const mockStats = {
     totalApplicants: 150,
     qualifiedCandidates: 45,
     processingTime: "3.5 days",
-    conversionRate: "30%"
-  }
+    conversionRate: "30%",
+  };
 
   const mockChallenges = [
     {
@@ -66,7 +48,7 @@ export default function AdminDashboard() {
       views: 1500,
       status: "active" as const,
       hashtag: "SFDSAChallenge",
-      endDate: "2024-04-30"
+      endDate: "2024-04-30",
     },
     {
       id: "2",
@@ -75,9 +57,9 @@ export default function AdminDashboard() {
       views: 1200,
       status: "active" as const,
       hashtag: "ServeWithSFDSA",
-      endDate: "2024-05-15"
-    }
-  ]
+      endDate: "2024-05-15",
+    },
+  ];
 
   const mockApplicants = [
     {
@@ -87,7 +69,7 @@ export default function AdminDashboard() {
       position: "Deputy Sheriff",
       status: "pending" as const,
       appliedDate: "2024-03-20",
-      avatarUrl: ""
+      avatarUrl: "",
     },
     {
       id: "2",
@@ -96,9 +78,9 @@ export default function AdminDashboard() {
       position: "Deputy Sheriff",
       status: "approved" as const,
       appliedDate: "2024-03-19",
-      avatarUrl: ""
-    }
-  ]
+      avatarUrl: "",
+    },
+  ];
 
   const mockLoginEvents = [
     {
@@ -109,7 +91,7 @@ export default function AdminDashboard() {
       timestamp: "2024-03-20 14:30:00",
       ipAddress: "192.168.1.1",
       userAgent: "Chrome/120.0.0.0",
-      location: "San Francisco, CA"
+      location: "San Francisco, CA",
     },
     {
       id: "2",
@@ -119,9 +101,9 @@ export default function AdminDashboard() {
       timestamp: "2024-03-20 14:25:00",
       ipAddress: "192.168.1.2",
       userAgent: "Firefox/122.0",
-      location: "San Francisco, CA"
-    }
-  ]
+      location: "San Francisco, CA",
+    },
+  ];
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -130,7 +112,12 @@ export default function AdminDashboard() {
           <h1 className="text-3xl font-bold text-[#0A3C1F]">Admin Dashboard</h1>
           <p className="text-gray-600">Manage your recruitment platform</p>
         </div>
-        <Button onClick={checkSystemStatus} variant="outline" className="mt-4 md:mt-0" disabled={isRefreshing}>
+        <Button
+          onClick={checkSystemStatus}
+          variant="outline"
+          className="mt-4 md:mt-0"
+          disabled={isRefreshing}
+        >
           {isRefreshing ? (
             <>
               <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -150,7 +137,8 @@ export default function AdminDashboard() {
           <CardHeader>
             <CardTitle>Demo Mode</CardTitle>
             <CardDescription>
-              This is a demo version with mock data. Changes will not persist after page refresh.
+              This is a demo version with mock data. Changes will not persist
+              after page refresh.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -174,7 +162,9 @@ export default function AdminDashboard() {
           <Card>
             <CardHeader>
               <CardTitle>System Health</CardTitle>
-              <CardDescription>Current status of system components</CardDescription>
+              <CardDescription>
+                Current status of system components
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <HealthCheck data={mockAdminData.healthChecks} />
@@ -196,31 +186,43 @@ export default function AdminDashboard() {
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-green-500 rounded-full"
-                      style={{ width: `${mockAdminData.performance.cpu.usage}%` }}
+                      style={{
+                        width: `${mockAdminData.performance.cpu.usage}%`,
+                      }}
                     />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
                     <span>Memory Usage</span>
-                    <span>{mockAdminData.performance.memory.used}GB / {mockAdminData.performance.memory.total}GB</span>
+                    <span>
+                      {mockAdminData.performance.memory.used}GB /{" "}
+                      {mockAdminData.performance.memory.total}GB
+                    </span>
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-blue-500 rounded-full"
-                      style={{ width: `${(mockAdminData.performance.memory.used / mockAdminData.performance.memory.total) * 100}%` }}
+                      style={{
+                        width: `${(mockAdminData.performance.memory.used / mockAdminData.performance.memory.total) * 100}%`,
+                      }}
                     />
                   </div>
                 </div>
                 <div>
                   <div className="flex justify-between mb-2">
                     <span>Disk Usage</span>
-                    <span>{mockAdminData.performance.disk.used}GB / {mockAdminData.performance.disk.total}GB</span>
+                    <span>
+                      {mockAdminData.performance.disk.used}GB /{" "}
+                      {mockAdminData.performance.disk.total}GB
+                    </span>
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
                       className="h-full bg-yellow-500 rounded-full"
-                      style={{ width: `${(mockAdminData.performance.disk.used / mockAdminData.performance.disk.total) * 100}%` }}
+                      style={{
+                        width: `${(mockAdminData.performance.disk.used / mockAdminData.performance.disk.total) * 100}%`,
+                      }}
                     />
                   </div>
                 </div>
@@ -230,5 +232,5 @@ export default function AdminDashboard() {
         </div>
       </div>
     </div>
-  )
+  );
 }

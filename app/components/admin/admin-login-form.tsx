@@ -1,25 +1,33 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function AdminLoginForm() {
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     // Add authentication logic here
-    console.log("Login attempt:", { email })
-  }
+    console.log("Login attempt:", { email });
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Admin Login</CardTitle>
-        <CardDescription>Enter your credentials to access the admin dashboard.</CardDescription>
+        <CardDescription>
+          Enter your credentials to access the admin dashboard.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -47,5 +55,5 @@ export function AdminLoginForm() {
         </form>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

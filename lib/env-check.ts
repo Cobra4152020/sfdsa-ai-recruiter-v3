@@ -7,8 +7,9 @@ export function isSupabaseConfigured(): boolean {
     typeof process !== "undefined" &&
     process.env &&
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
-    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY)
-  )
+    (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      process.env.SUPABASE_SERVICE_ROLE_KEY)
+  );
 }
 
 /**
@@ -16,10 +17,14 @@ export function isSupabaseConfigured(): boolean {
  * @returns The Supabase URL or null if not available
  */
 export function getSupabaseUrl(): string | null {
-  if (typeof process !== "undefined" && process.env && process.env.NEXT_PUBLIC_SUPABASE_URL) {
-    return process.env.NEXT_PUBLIC_SUPABASE_URL
+  if (
+    typeof process !== "undefined" &&
+    process.env &&
+    process.env.NEXT_PUBLIC_SUPABASE_URL
+  ) {
+    return process.env.NEXT_PUBLIC_SUPABASE_URL;
   }
-  return null
+  return null;
 }
 
 /**
@@ -29,27 +34,33 @@ export function getSupabaseUrl(): string | null {
  */
 export function getSupabaseKey(preferServiceRole = true): string | null {
   if (typeof process === "undefined" || !process.env) {
-    return null
+    return null;
   }
 
   if (preferServiceRole && process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return process.env.SUPABASE_SERVICE_ROLE_KEY
+    return process.env.SUPABASE_SERVICE_ROLE_KEY;
   }
 
   if (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    return process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   }
 
-  return null
+  return null;
 }
 
 /**
  * Logs the availability of environment variables for debugging
  */
 export function logEnvironmentStatus(): void {
-  console.log("Environment variables status:")
-  console.log(`- NEXT_PUBLIC_SUPABASE_URL: ${process.env.NEXT_PUBLIC_SUPABASE_URL ? "Available" : "Missing"}`)
-  console.log(`- NEXT_PUBLIC_SUPABASE_ANON_KEY: ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "Available" : "Missing"}`)
-  console.log(`- SUPABASE_SERVICE_ROLE_KEY: ${process.env.SUPABASE_SERVICE_ROLE_KEY ? "Available" : "Missing"}`)
-  console.log(`- NODE_ENV: ${process.env.NODE_ENV}`)
+  console.log("Environment variables status:");
+  console.log(
+    `- NEXT_PUBLIC_SUPABASE_URL: ${process.env.NEXT_PUBLIC_SUPABASE_URL ? "Available" : "Missing"}`,
+  );
+  console.log(
+    `- NEXT_PUBLIC_SUPABASE_ANON_KEY: ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "Available" : "Missing"}`,
+  );
+  console.log(
+    `- SUPABASE_SERVICE_ROLE_KEY: ${process.env.SUPABASE_SERVICE_ROLE_KEY ? "Available" : "Missing"}`,
+  );
+  console.log(`- NODE_ENV: ${process.env.NODE_ENV}`);
 }

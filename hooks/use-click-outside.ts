@@ -1,29 +1,32 @@
-"use client"
+"use client";
 
-import { useEffect, type RefObject } from "react"
+import { useEffect, type RefObject } from "react";
 
-type Handler = (event: MouseEvent | TouchEvent) => void
+type Handler = (event: MouseEvent | TouchEvent) => void;
 
-export function useOnClickOutside<T extends HTMLElement = HTMLElement>(ref: RefObject<T>, handler: Handler): void {
+export function useOnClickOutside<T extends HTMLElement = HTMLElement>(
+  ref: RefObject<T>,
+  handler: Handler,
+): void {
   useEffect(() => {
     const listener = (event: MouseEvent | TouchEvent) => {
-      const el = ref?.current
+      const el = ref?.current;
       if (!el || el.contains(event.target as Node)) {
-        return
+        return;
       }
 
-      handler(event)
-    }
+      handler(event);
+    };
 
-    document.addEventListener("mousedown", listener)
-    document.addEventListener("touchstart", listener)
+    document.addEventListener("mousedown", listener);
+    document.addEventListener("touchstart", listener);
 
     return () => {
-      document.removeEventListener("mousedown", listener)
-      document.removeEventListener("touchstart", listener)
-    }
-  }, [ref, handler])
+      document.removeEventListener("mousedown", listener);
+      document.removeEventListener("touchstart", listener);
+    };
+  }, [ref, handler]);
 }
 
 // Add the missing export as an alias to maintain backward compatibility
-export const useClickOutside = useOnClickOutside
+export const useClickOutside = useOnClickOutside;

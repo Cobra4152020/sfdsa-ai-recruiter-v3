@@ -1,10 +1,10 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import type { BadgeType } from "@/lib/badge-utils"
-import { createNotification } from "@/lib/notification-service"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import type { BadgeType } from "@/lib/badge-utils";
+import { createNotification } from "@/lib/notification-service";
 
 /**
  * This API route provides a unified way to award badges and handle all related actions:
@@ -15,24 +15,37 @@ import { createNotification } from "@/lib/notification-service"
  */
 export async function POST(request: Request) {
   try {
-    const { userId, badgeType, badgeName, badgeDescription, participationPoints, shareMessage } = await request.json()
+    const {
+      userId,
+      badgeType,
+      badgeName,
+      badgeDescription,
+      participationPoints,
+      shareMessage,
+    } = await request.json();
 
     if (!userId || !badgeType) {
-      return NextResponse.json({ success: false, message: "User ID and badge type are required" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "User ID and badge type are required" },
+        { status: 400 },
+      );
     }
 
-    const serviceClient = getServiceSupabase()
+    const serviceClient = getServiceSupabase();
 
     // 1. Check if user exists
     const { data: user, error: userError } = await serviceClient
       .from("users")
       .select("id, name, email, participation_count")
       .eq("id", userId)
-      .single()
+      .single();
 
     if (userError || !user) {
-      console.error("Error fetching user:", userError)
-      return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
+      console.error("Error fetching user:", userError);
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 },
+      );
     }
 
     // 2. Check if user already has this badge
@@ -41,19 +54,22 @@ export async function POST(request: Request) {
       .select("id")
       .eq("user_id", userId)
       .eq("badge_type", badgeType)
-      .single()
+      .single();
 
     if (checkError && checkError.code !== "PGRST116") {
-      console.error("Error checking for existing badge:", checkError)
-      return NextResponse.json({ success: false, message: "Failed to check for existing badge" }, { status: 500 })
+      console.error("Error checking for existing badge:", checkError);
+      return NextResponse.json(
+        { success: false, message: "Failed to check for existing badge" },
+        { status: 500 },
+      );
     }
 
-    let badge
-    let alreadyEarned = false
+    let badge;
+    let alreadyEarned = false;
 
     if (existingBadge) {
-      badge = existingBadge
-      alreadyEarned = true
+      badge = existingBadge;
+      alreadyEarned = true;
     } else {
       // 3. Award the badge
       const { data, error } = await serviceClient
@@ -64,33 +80,37 @@ export async function POST(request: Request) {
             badge_type: badgeType,
           },
         ])
-        .select()
+        .select();
 
       if (error) {
-        console.error("Error adding badge:", error)
-        return NextResponse.json({ success: false, message: "Failed to add badge" }, { status: 500 })
+        console.error("Error adding badge:", error);
+        return NextResponse.json(
+          { success: false, message: "Failed to add badge" },
+          { status: 500 },
+        );
       }
 
-      badge = data[0]
+      badge = data[0];
 
       // 4. Update participation points if specified
       if (participationPoints && participationPoints > 0) {
-        const newCount = (user.participation_count || 0) + participationPoints
+        const newCount = (user.participation_count || 0) + participationPoints;
 
         const { error: updateError } = await serviceClient
           .from("users")
           .update({ participation_count: newCount })
-          .eq("id", userId)
+          .eq("id", userId);
 
         if (updateError) {
-          console.error("Error updating participation count:", updateError)
+          console.error("Error updating participation count:", updateError);
           // Continue with the process even if updating points fails
         }
       }
 
       // 5. Create a real-time notification for the badge award
-      const name = badgeName || getBadgeName(badgeType as BadgeType)
-      const description = badgeDescription || getBadgeDescription(badgeType as BadgeType)
+      const name = badgeName || getBadgeName(badgeType as BadgeType);
+      const description =
+        badgeDescription || getBadgeDescription(badgeType as BadgeType);
 
       await createNotification({
         user_id: userId,
@@ -103,17 +123,20 @@ export async function POST(request: Request) {
           badgeType,
           badgeName: name,
         },
-      })
+      });
     }
 
     // 6. Send notification email if badge was just earned
-    let notificationSent = false
+    let notificationSent = false;
 
     if (!alreadyEarned && user.email) {
       try {
-        const name = badgeName || getBadgeName(badgeType as BadgeType)
-        const description = badgeDescription || getBadgeDescription(badgeType as BadgeType)
-        const message = shareMessage || "Keep up the great work on your journey to joining the SF Sheriff's Office!"
+        const name = badgeName || getBadgeName(badgeType as BadgeType);
+        const description =
+          badgeDescription || getBadgeDescription(badgeType as BadgeType);
+        const message =
+          shareMessage ||
+          "Keep up the great work on your journey to joining the SF Sheriff's Office!";
 
         const notificationResponse = await fetch(
           `${process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"}/api/send-badge-notification`,
@@ -129,12 +152,12 @@ export async function POST(request: Request) {
               badgeShareMessage: message,
             }),
           },
-        )
+        );
 
-        const notificationData = await notificationResponse.json()
-        notificationSent = notificationData.success
+        const notificationData = await notificationResponse.json();
+        notificationSent = notificationData.success;
       } catch (notificationError) {
-        console.error("Error sending badge notification:", notificationError)
+        console.error("Error sending badge notification:", notificationError);
         // Continue with the process even if notification fails
       }
     }
@@ -144,14 +167,18 @@ export async function POST(request: Request) {
       badge: {
         ...badge,
         name: badgeName || getBadgeName(badgeType as BadgeType),
-        description: badgeDescription || getBadgeDescription(badgeType as BadgeType),
+        description:
+          badgeDescription || getBadgeDescription(badgeType as BadgeType),
       },
       alreadyEarned,
       notificationSent,
-    })
+    });
   } catch (error) {
-    console.error("Unexpected error:", error)
-    return NextResponse.json({ success: false, message: "An unexpected error occurred" }, { status: 500 })
+    console.error("Unexpected error:", error);
+    return NextResponse.json(
+      { success: false, message: "An unexpected error occurred" },
+      { status: 500 },
+    );
   }
 }
 
@@ -176,9 +203,9 @@ function getBadgeName(badgeType: BadgeType): string {
     "quick-learner": "Quick Learner",
     "persistent-explorer": "Persistent Explorer",
     "dedicated-applicant": "Dedicated Applicant",
-  }
+  };
 
-  return badgeNames[badgeType] || badgeType
+  return badgeNames[badgeType] || badgeType;
 }
 
 function getBadgeDescription(badgeType: BadgeType): string {
@@ -201,7 +228,7 @@ function getBadgeDescription(badgeType: BadgeType): string {
     "quick-learner": "Rapidly progresses through recruitment information",
     "persistent-explorer": "Returns regularly to learn more",
     "dedicated-applicant": "Applied and continues to engage",
-  }
+  };
 
-  return badgeDescriptions[badgeType] || `Earned the ${badgeType} badge`
+  return badgeDescriptions[badgeType] || `Earned the ${badgeType} badge`;
 }

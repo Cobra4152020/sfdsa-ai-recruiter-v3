@@ -1,25 +1,21 @@
 export function generateStaticParams() {
   return [
-    { id: 'test-user' },
-    { id: 'user1' },
-    { id: 'user2' },
-    { id: 'user3' }
+    { id: "test-user" },
+    { id: "user1" },
+    { id: "user2" },
+    { id: "user3" },
   ];
 }
 
 export function generateBadgeParams() {
-  return [
-    { id: 'written' },
-    { id: 'oral' },
-    { id: 'physical' }
-  ];
+  return [{ id: "written" }, { id: "oral" }, { id: "physical" }];
 }
 
 export function generateChallengeParams() {
   return [
-    { id: 'daily-trivia' },
-    { id: 'tiktok-challenge' },
-    { id: 'special-mission' }
+    { id: "daily-trivia" },
+    { id: "tiktok-challenge" },
+    { id: "special-mission" },
   ];
 }
 
@@ -27,5 +23,5 @@ export function generateChallengeParams() {
 export const staticPaths = {
   users: generateStaticParams(),
   badges: generateBadgeParams(),
-  challenges: generateChallengeParams()
-}; 
+  challenges: generateChallengeParams(),
+};

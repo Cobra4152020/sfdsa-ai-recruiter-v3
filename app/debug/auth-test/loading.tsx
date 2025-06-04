@@ -1,4 +1,10 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function AuthTestLoading() {
   return (
@@ -6,9 +12,12 @@ export default function AuthTestLoading() {
       <div className="max-w-3xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-[#0A3C1F]">Authentication Diagnostic Tool</CardTitle>
+            <CardTitle className="text-2xl font-bold text-[#0A3C1F]">
+              Authentication Diagnostic Tool
+            </CardTitle>
             <CardDescription>
-              Use this tool to check your authentication status and troubleshoot login issues
+              Use this tool to check your authentication status and troubleshoot
+              login issues
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
@@ -23,5 +32,5 @@ export default function AuthTestLoading() {
         </Card>
       </div>
     </main>
-  )
+  );
 }

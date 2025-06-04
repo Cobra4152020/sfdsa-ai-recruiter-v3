@@ -1,7 +1,7 @@
 /**
  * Utility functions for handling profile images consistently across the application
  */
-import { getImagePath } from "./image-path-utils"
+import { getImagePath } from "./image-path-utils";
 
 // Map user IDs to specific profile images
 const USER_IMAGE_MAP: Record<number, string> = {
@@ -9,7 +9,7 @@ const USER_IMAGE_MAP: Record<number, string> = {
   2: "female-law-enforcement-headshot.png",
   3: "asian-male-officer-headshot.png",
   4: "san-francisco-deputy-sheriff.png",
-}
+};
 
 /**
  * Get a profile image URL based on user ID
@@ -18,8 +18,8 @@ const USER_IMAGE_MAP: Record<number, string> = {
  */
 export function getProfileImageByUserId(userId: number): string {
   // Use the mapped image or fall back to a default based on user ID modulo
-  const imagePath = USER_IMAGE_MAP[userId] || `profile-${(userId % 4) + 1}.png`
-  return getImagePath(imagePath)
+  const imagePath = USER_IMAGE_MAP[userId] || `profile-${(userId % 4) + 1}.png`;
+  return getImagePath(imagePath);
 }
 
 /**
@@ -27,7 +27,7 @@ export function getProfileImageByUserId(userId: number): string {
  * @returns A fallback profile image URL
  */
 export function getFallbackProfileImage(): string {
-  return getImagePath("male-law-enforcement-headshot.png")
+  return getImagePath("male-law-enforcement-headshot.png");
 }
 
 /**
@@ -35,6 +35,6 @@ export function getFallbackProfileImage(): string {
  * @returns A random profile image URL
  */
 export function getRandomProfileImage(): string {
-  const images = Object.values(USER_IMAGE_MAP)
-  return getImagePath(images[Math.floor(Math.random() * images.length)])
+  const images = Object.values(USER_IMAGE_MAP);
+  return getImagePath(images[Math.floor(Math.random() * images.length)]);
 }

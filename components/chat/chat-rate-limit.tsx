@@ -1,5 +1,5 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Clock } from "lucide-react"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Clock } from "lucide-react";
 
 export function ChatRateLimit() {
   return (
@@ -7,8 +7,9 @@ export function ChatRateLimit() {
       <Clock className="h-4 w-4 text-yellow-600" />
       <AlertTitle className="text-yellow-800">Rate Limited</AlertTitle>
       <AlertDescription className="text-yellow-700">
-        You're sending messages too quickly. Please wait a moment before sending another message.
+        You&apos;re sending messages too quickly. Please wait a moment before
+        sending another message.
       </AlertDescription>
     </Alert>
-  )
-} 
+  );
+}

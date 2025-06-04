@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback } from "react";
 import {
   getNotifications,
   getUnreadCount,
@@ -9,50 +9,53 @@ import {
   deleteNotification,
   deleteAllNotifications,
   type Notification,
-} from "@/lib/notification-service"
+} from "@/lib/notification-service";
 
 export function useNotifications(userId?: string | null) {
-  const [notifications, setNotifications] = useState<Notification[]>([])
-  const [unreadCount, setUnreadCount] = useState(0)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<Error | null>(null)
-  const [isSubscribed, setIsSubscribed] = useState(false)
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const fetchNotifications = useCallback(async () => {
     if (!userId) {
-      setNotifications([])
-      setUnreadCount(0)
-      setLoading(false)
-      return
+      setNotifications([]);
+      setUnreadCount(0);
+      setLoading(false);
+      return;
     }
 
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      const [notificationsData, count] = await Promise.all([getNotifications(userId), getUnreadCount(userId)])
+      const [notificationsData, count] = await Promise.all([
+        getNotifications(userId),
+        getUnreadCount(userId),
+      ]);
 
-      setNotifications(notificationsData)
-      setUnreadCount(count)
+      setNotifications(notificationsData);
+      setUnreadCount(Number(count));
     } catch (err) {
-      console.error("Error in useNotifications:", err)
-      setError(err instanceof Error ? err : new Error(String(err)))
+      console.error("Error in useNotifications:", err);
+      setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [userId])
+  }, [userId]);
 
   // Initial fetch
   useEffect(() => {
-    fetchNotifications()
-  }, [fetchNotifications])
+    fetchNotifications();
+  }, [fetchNotifications]);
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!userId || isSubscribed) return
+    if (!userId || isSubscribed) return;
 
     // Subscribe to changes in the notifications table for this user
-    const { getClientSideSupabase } = require("@/lib/supabase")
+    const { getClientSideSupabase } = require("@/lib/supabase");
     const channel = getClientSideSupabase()
       .channel(`notifications:${userId}`)
       .on(
@@ -65,76 +68,80 @@ export function useNotifications(userId?: string | null) {
         },
         () => {
           // Refetch notifications when changes occur
-          fetchNotifications()
+          fetchNotifications();
         },
       )
-      .subscribe()
+      .subscribe();
 
-    setIsSubscribed(true)
+    setIsSubscribed(true);
 
     return () => {
-      getClientSideSupabase().removeChannel(channel)
-      setIsSubscribed(false)
-    }
-  }, [userId, isSubscribed, fetchNotifications])
+      getClientSideSupabase().removeChannel(channel);
+      setIsSubscribed(false);
+    };
+  }, [userId, isSubscribed, fetchNotifications]);
 
   const handleMarkAsRead = useCallback(
-    async (notificationId: string) => {
-      if (!userId) return false
+    async (notificationId: number) => {
+      if (!userId) return false;
 
-      const success = await markAsRead(notificationId)
+      const success = await markAsRead(notificationId);
       if (success) {
         setNotifications((prev) =>
           prev.map((notification) =>
-            notification.id === notificationId ? { ...notification, is_read: true } : notification,
+            notification.id === notificationId
+              ? { ...notification, is_read: true }
+              : notification,
           ),
-        )
-        setUnreadCount((prev) => Math.max(0, prev - 1))
+        );
+        setUnreadCount((prev) => Math.max(0, prev - 1));
       }
-      return success
+      return success;
     },
-    [userId],
-  )
+    [userId, setNotifications, setUnreadCount],
+  );
 
   const handleMarkAllAsRead = useCallback(async () => {
-    if (!userId) return false
+    if (!userId) return false;
 
-    const success = await markAllAsRead(userId)
+    const success = await markAllAsRead(userId);
     if (success) {
-      setNotifications((prev) => prev.map((notification) => ({ ...notification, is_read: true })))
-      setUnreadCount(0)
+      setNotifications((prev) =>
+        prev.map((notification) => ({ ...notification, is_read: true })),
+      );
+      setUnreadCount(0);
     }
-    return success
-  }, [userId])
+    return success;
+  }, [userId, setNotifications, setUnreadCount]);
 
   const handleDeleteNotification = useCallback(
-    async (notificationId: string) => {
-      if (!userId) return false
+    async (notificationId: number) => {
+      if (!userId) return false;
 
-      const notification = notifications.find((n) => n.id === notificationId)
-      const success = await deleteNotification(notificationId)
+      const notification = notifications.find((n) => n.id === notificationId);
+      const success = await deleteNotification(notificationId);
 
       if (success) {
-        setNotifications((prev) => prev.filter((n) => n.id !== notificationId))
+        setNotifications((prev) => prev.filter((n) => n.id !== notificationId));
         if (notification && !notification.is_read) {
-          setUnreadCount((prev) => Math.max(0, prev - 1))
+          setUnreadCount((prev) => Math.max(0, prev - 1));
         }
       }
-      return success
+      return success;
     },
-    [userId, notifications],
-  )
+    [userId, notifications, setNotifications, setUnreadCount],
+  );
 
   const handleDeleteAllNotifications = useCallback(async () => {
-    if (!userId) return false
+    if (!userId) return false;
 
-    const success = await deleteAllNotifications(userId)
+    const success = await deleteAllNotifications(userId);
     if (success) {
-      setNotifications([])
-      setUnreadCount(0)
+      setNotifications([]);
+      setUnreadCount(0);
     }
-    return success
-  }, [userId])
+    return success;
+  }, [userId, setNotifications, setUnreadCount]);
 
   return {
     notifications,
@@ -146,5 +153,5 @@ export function useNotifications(userId?: string | null) {
     deleteNotification: handleDeleteNotification,
     deleteAllNotifications: handleDeleteAllNotifications,
     refresh: fetchNotifications,
-  }
+  };
 }

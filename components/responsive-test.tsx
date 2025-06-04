@@ -1,20 +1,33 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { CheckCircle, XCircle, Smartphone, Tablet, Monitor, RefreshCw } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  CheckCircle,
+  XCircle,
+  Smartphone,
+  Tablet,
+  Monitor,
+  RefreshCw,
+} from "lucide-react";
 
 interface BreakpointTest {
-  name: string
-  width: number
-  icon: React.ReactNode
-  status: "pass" | "fail" | "untested"
-  issues?: string[]
+  name: string;
+  width: number;
+  icon: React.ReactNode;
+  status: "pass" | "fail" | "untested";
+  issues?: string[];
 }
 
 export function ResponsiveTest() {
@@ -37,23 +50,23 @@ export function ResponsiveTest() {
       icon: <Monitor className="h-5 w-5" />,
       status: "untested",
     },
-  ])
-  const [currentWidth, setCurrentWidth] = useState(0)
-  const [isTestRunning, setIsTestRunning] = useState(false)
+  ]);
+  const [currentWidth, setCurrentWidth] = useState(0);
+  const [isTestRunning, setIsTestRunning] = useState(false);
 
   useEffect(() => {
-    setCurrentWidth(window.innerWidth)
+    setCurrentWidth(window.innerWidth);
 
     const handleResize = () => {
-      setCurrentWidth(window.innerWidth)
-    }
+      setCurrentWidth(window.innerWidth);
+    };
 
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
-  }, [])
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const runResponsiveTests = () => {
-    setIsTestRunning(true)
+    setIsTestRunning(true);
 
     // Simulate testing at different breakpoints
     setTimeout(() => {
@@ -76,10 +89,10 @@ export function ResponsiveTest() {
           icon: <Monitor className="h-5 w-5" />,
           status: "pass",
         },
-      ])
-      setIsTestRunning(false)
-    }, 2000)
-  }
+      ]);
+      setIsTestRunning(false);
+    }, 2000);
+  };
 
   return (
     <Card>
@@ -87,10 +100,18 @@ export function ResponsiveTest() {
         <div className="flex justify-between items-center">
           <div>
             <CardTitle>Responsive Testing</CardTitle>
-            <CardDescription>Test application at different screen sizes</CardDescription>
+            <CardDescription>
+              Test application at different screen sizes
+            </CardDescription>
           </div>
-          <Button onClick={runResponsiveTests} disabled={isTestRunning} size="sm">
-            <RefreshCw className={`h-4 w-4 mr-2 ${isTestRunning ? "animate-spin" : ""}`} />
+          <Button
+            onClick={runResponsiveTests}
+            disabled={isTestRunning}
+            size="sm"
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${isTestRunning ? "animate-spin" : ""}`}
+            />
             {isTestRunning ? "Testing..." : "Run Tests"}
           </Button>
         </div>
@@ -104,7 +125,9 @@ export function ResponsiveTest() {
           <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
             <div
               className="h-full bg-[#0A3C1F] rounded-full"
-              style={{ width: `${Math.min((currentWidth / 1920) * 100, 100)}%` }}
+              style={{
+                width: `${Math.min((currentWidth / 1920) * 100, 100)}%`,
+              }}
             ></div>
           </div>
           <div className="flex justify-between text-xs text-gray-500 mt-1">
@@ -165,7 +188,9 @@ export function ResponsiveTest() {
                   <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
                   Navigation
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">Navigation collapses to hamburger menu on mobile screens</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  Navigation collapses to hamburger menu on mobile screens
+                </p>
               </div>
 
               <div className="p-4 rounded-lg border bg-green-50 border-green-200">
@@ -174,7 +199,8 @@ export function ResponsiveTest() {
                   Forms
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  Forms stack vertically and maintain proper spacing on all screen sizes
+                  Forms stack vertically and maintain proper spacing on all
+                  screen sizes
                 </p>
               </div>
 
@@ -183,7 +209,9 @@ export function ResponsiveTest() {
                   <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
                   Images
                 </h3>
-                <p className="text-sm text-gray-600 mt-1">Images are responsive and maintain proper aspect ratios</p>
+                <p className="text-sm text-gray-600 mt-1">
+                  Images are responsive and maintain proper aspect ratios
+                </p>
               </div>
 
               <div className="p-4 rounded-lg border bg-green-50 border-green-200">
@@ -200,5 +228,5 @@ export function ResponsiveTest() {
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }

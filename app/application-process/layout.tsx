@@ -1,9 +1,13 @@
 import type { ReactNode } from "react";
 
-export default function ApplicationProcessLayout({ children }: { children: ReactNode }) {
+export default function ApplicationProcessLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   return (
     <html lang="en">
       <body>{children}</body>
     </html>
   );
-} 
+}

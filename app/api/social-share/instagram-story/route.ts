@@ -1,23 +1,21 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { type NextRequest, NextResponse } from "next/server"
-import { trackEngagement } from "@/lib/analytics"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-
-// Flag to track if canvas is available
-let canvasSupport = false
+import { type NextRequest, NextResponse } from "next/server";
+import { trackEngagement } from "@/lib/analytics";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 // Try to load canvas-related modules, but don't fail if they're not available
 try {
   if (typeof window === "undefined") {
     // Just check if we can require the module, but don't actually use it yet
-    require.resolve("canvas")
-    canvasSupport = true
+    require.resolve("canvas");
   }
-} catch (error) {
-  console.warn("Canvas support not available:", error.message)
-  canvasSupport = false
+} catch (_error: unknown) {
+  console.warn(
+    "Canvas support not available:",
+    _error instanceof Error ? _error.message : String(_error),
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -30,10 +28,13 @@ export async function POST(request: NextRequest) {
       achievementDescription,
       imageUrl,
       animated = true,
-    } = await request.json()
+    } = await request.json();
 
     if (!userId || !achievementType || !achievementTitle) {
-      return NextResponse.json({ success: false, error: "Missing required parameters" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, error: "Missing required parameters" },
+        { status: 400 },
+      );
     }
 
     // Track this sharing attempt
@@ -43,13 +44,13 @@ export async function POST(request: NextRequest) {
       achievementId,
       achievementTitle,
       animated,
-    })
+    });
 
-    let supabase
+    let supabase;
     try {
-      supabase = getServiceSupabase()
-    } catch (error) {
-      supabase = null
+      supabase = getServiceSupabase();
+    } catch {
+      supabase = null;
     }
 
     if (supabase) {
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
         content_title: achievementTitle,
         points_awarded: 25, // Award points for Instagram sharing
         metadata: { animated },
-      })
+      });
     }
 
     // Always return a fallback response - we'll implement a client-side solution instead
@@ -73,10 +74,13 @@ export async function POST(request: NextRequest) {
       title: achievementTitle,
       description: achievementDescription || "",
       type: achievementType,
-    })
+    });
   } catch (error: unknown) {
-    const message = error instanceof Error ? error.message : String(error)
-    console.error("Error processing Instagram story share:", message)
-    return NextResponse.json({ success: false, error: "Failed to process share request" }, { status: 500 })
+    const message = error instanceof Error ? error.message : String(error);
+    console.error("Error processing Instagram story share:", message);
+    return NextResponse.json(
+      { success: false, error: "Failed to process share request" },
+      { status: 500 },
+    );
   }
 }

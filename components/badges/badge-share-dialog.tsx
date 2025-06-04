@@ -1,55 +1,60 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { BadgeWithProgress } from '@/types/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Facebook, Twitter, Linkedin, Link2, CheckCircle2 } from 'lucide-react'
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BadgeWithProgress } from "@/types/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Facebook, Twitter, Linkedin, Link2, CheckCircle2 } from "lucide-react";
 
 interface BadgeShareDialogProps {
-  badge: BadgeWithProgress | null
-  isOpen: boolean
-  onClose: () => void
+  badge: BadgeWithProgress | null;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 export function BadgeShareDialog({
   badge,
   isOpen,
-  onClose
+  onClose,
 }: BadgeShareDialogProps) {
-  const [activeTab, setActiveTab] = useState('social')
-  const [copied, setCopied] = useState(false)
-  const [shareUrl, setShareUrl] = useState('')
-  const [shareLinks, setShareLinks] = useState<Record<string, string>>({})
+  const [activeTab, setActiveTab] = useState("social");
+  const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
+  const [shareLinks, setShareLinks] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    if (typeof window !== 'undefined' && badge) {
-      const url = `${window.location.origin}/badges/${badge.id}`
-      const text = `I just earned the ${badge.name} badge! 🎉`
-      
-      setShareUrl(url)
+    if (typeof window !== "undefined" && badge) {
+      const url = `${window.location.origin}/badges/${badge.id}`;
+      const text = `I just earned the ${badge.name} badge! 🎉`;
+
+      setShareUrl(url);
       setShareLinks({
         twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`,
         facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`
-      })
+        linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+      });
     }
-  }, [badge])
+  }, [badge]);
 
-  if (!badge) return null
+  if (!badge) return null;
 
   const handleCopyLink = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     } catch (err) {
-      console.error('Failed to copy:', err)
+      console.error("Failed to copy:", err);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -105,11 +110,7 @@ export function BadgeShareDialog({
               </div>
 
               <div className="flex gap-2">
-                <Input
-                  value={shareUrl}
-                  readOnly
-                  className="flex-1"
-                />
+                <Input value={shareUrl} readOnly className="flex-1" />
                 <Button
                   variant="outline"
                   size="icon"
@@ -137,11 +138,15 @@ export function BadgeShareDialog({
               <div className="bg-gray-50 p-4 rounded-lg">
                 <pre className="text-sm overflow-x-auto">
                   {`<a href="${shareUrl}" target="_blank">
-  <img src="${typeof window !== 'undefined' ? window.location.origin : ''}/api/badge-image/${badge.id}" 
-       alt="${badge.name}" 
-       width="200" 
-       height="200" />
-</a>`}
+                    <img 
+                      src="${typeof window !== "undefined" ? window.location.origin : ""}/api/badge-image/${badge.id}"
+                      alt="${badge.name}"
+                      className="w-24 h-24 rounded-full border-2 border-primary/30 shadow-lg mx-auto mb-2"
+                      loading="lazy"
+                      decoding="async"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </a>`}
                 </pre>
               </div>
 
@@ -149,23 +154,27 @@ export function BadgeShareDialog({
                 variant="outline"
                 onClick={() => {
                   const embedCode = `<a href="${shareUrl}" target="_blank">
-  <img src="${typeof window !== 'undefined' ? window.location.origin : ''}/api/badge-image/${badge.id}" 
-       alt="${badge.name}" 
-       width="200" 
-       height="200" />
-</a>`
-                  navigator.clipboard.writeText(embedCode)
-                  setCopied(true)
-                  setTimeout(() => setCopied(false), 2000)
+                    <img 
+                      src="${typeof window !== "undefined" ? window.location.origin : ""}/api/badge-image/${badge.id}"
+                      alt="${badge.name}"
+                      className="w-24 h-24 rounded-full border-2 border-primary/30 shadow-lg mx-auto mb-2"
+                      loading="lazy"
+                      decoding="async"
+                      style={{ objectFit: "cover" }}
+                    />
+                  </a>`;
+                  navigator.clipboard.writeText(embedCode);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
                 }}
                 className="w-full"
               >
-                {copied ? 'Copied!' : 'Copy Embed Code'}
+                {copied ? "Copied!" : "Copy Embed Code"}
               </Button>
             </TabsContent>
           </Tabs>
         </div>
       </DialogContent>
     </Dialog>
-  )
-} 
+  );
+}

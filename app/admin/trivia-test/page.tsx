@@ -1,4 +1,4 @@
-import { TriviaApiTest } from "@/components/trivia-api-test"
+import { TriviaApiTest } from "@/components/trivia-api-test";
 
 export default function TriviaTestPage() {
   return (
@@ -6,5 +6,5 @@ export default function TriviaTestPage() {
       <h1 className="text-2xl font-bold mb-6">Trivia API Test</h1>
       <TriviaApiTest />
     </div>
-  )
+  );
 }

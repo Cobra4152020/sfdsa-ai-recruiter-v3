@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card";
 
 export function ChatWelcomeMessage() {
   return (
@@ -6,11 +6,11 @@ export function ChatWelcomeMessage() {
       <CardContent className="p-4">
         <div className="space-y-2">
           <h3 className="font-semibold text-[#0A3C1F]">
-            👋 Welcome! I'm Sgt. Ken
+            👋 Welcome! I&apos;m Sgt. Ken
           </h3>
           <p className="text-sm text-gray-600">
-            I'm here to help you learn about becoming a San Francisco Deputy Sheriff.
-            Feel free to ask me any questions about:
+            I&apos;m here to help you learn about becoming a San Francisco
+            Deputy Sheriff. Feel free to ask me any questions about:
           </p>
           <ul className="text-sm text-gray-600 list-disc list-inside space-y-1">
             <li>Requirements and qualifications</li>
@@ -23,5 +23,5 @@ export function ChatWelcomeMessage() {
         </div>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

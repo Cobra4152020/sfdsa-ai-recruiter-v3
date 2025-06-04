@@ -1,121 +1,131 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useUser } from "@/context/user-context"
-import { TikTokChallengeCard } from "@/components/tiktok-challenge-card"
-import { TikTokChallengeSubmissionViewer } from "@/components/tiktok-challenge-submission-viewer"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { PageWrapper } from "@/components/page-wrapper"
-import { TikTokIcon } from "@/components/tiktok-icon"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { CalendarDays, Search, Filter, Award } from "lucide-react"
-import { ChallengeLeaderboard } from "@/components/tiktok-challenge-leaderboard"
-import { toast } from "@/components/ui/use-toast"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Users, Trophy, Video, Share2 } from "lucide-react"
+import { useEffect, useState, useCallback } from "react";
+import { useUser } from "@/context/user-context";
+import { TikTokChallengeCard } from "@/components/tiktok-challenge-card";
+import { TikTokChallengeSubmissionViewer } from "@/components/tiktok-challenge-submission-viewer";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PageWrapper } from "@/components/page-wrapper";
+import { TikTokIcon } from "@/components/tiktok-icon";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { CalendarDays, Search, Filter, Award } from "lucide-react";
+import { ChallengeLeaderboard } from "@/components/tiktok-challenge-leaderboard";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Challenge {
-  id: number
-  title: string
-  description: string
-  startDate: Date
-  endDate: Date
-  pointsReward: number
-  badgeReward?: string
-  thumbnailUrl?: string
-  hashtags: string[]
-  status: string
-  completed?: boolean
-  submissionId?: number
-  submissionStatus?: string
+  id: number;
+  title: string;
+  description: string;
+  startDate: Date;
+  endDate: Date;
+  pointsReward: number;
+  badgeReward?: string;
+  thumbnailUrl?: string;
+  hashtags: string[];
+  status: string;
+  completed?: boolean;
+  submissionId?: number;
+  submissionStatus?: string;
 }
 
 export default function TikTokChallengesPage() {
-  const { currentUser } = useUser()
-  const [challenges, setChallenges] = useState<Challenge[]>([])
-  const [filteredChallenges, setFilteredChallenges] = useState<Challenge[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [filterStatus, setFilterStatus] = useState("all")
-  const [viewingSubmissionId, setViewingSubmissionId] = useState<number | null>(null)
-  const [activeTab, setActiveTab] = useState("challenges")
+  const { currentUser } = useUser();
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [filteredChallenges, setFilteredChallenges] = useState<Challenge[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [viewingSubmissionId, setViewingSubmissionId] = useState<number | null>(
+    null,
+  );
+  const [activeTab, setActiveTab] = useState("challenges");
 
-  useEffect(() => {
-    if (currentUser) {
-      fetchChallenges()
-    }
-  }, [currentUser])
-
-  useEffect(() => {
-    filterChallenges()
-  }, [challenges, searchQuery, filterStatus])
-
-  const fetchChallenges = async () => {
+  const fetchChallenges = useCallback(async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
 
-      const response = await fetch(`/api/tiktok-challenges?userId=${currentUser?.id}`)
+      const response = await fetch(
+        `/api/tiktok-challenges?userId=${currentUser?.id}`,
+      );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch challenges")
+        throw new Error("Failed to fetch challenges");
       }
 
-      const data = await response.json()
-      setChallenges(data.challenges || [])
+      const data = await response.json();
+      setChallenges(data.challenges || []);
     } catch (error) {
-      console.error("Error fetching challenges:", error)
-      toast({
-        title: "Error",
-        description: "Failed to load TikTok challenges. Please try again.",
-        variant: "destructive",
-      })
+      console.error("Error fetching challenges:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  }, [currentUser?.id]);
 
-  const filterChallenges = () => {
-    let filtered = [...challenges]
+  const filterChallenges = useCallback(() => {
+    let filtered = [...challenges];
 
     // Filter by search query
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
         (challenge) =>
           challenge.title.toLowerCase().includes(query) ||
           challenge.description.toLowerCase().includes(query) ||
           challenge.hashtags.some((tag) => tag.toLowerCase().includes(query)),
-      )
+      );
     }
 
     // Filter by status
     if (filterStatus !== "all") {
       switch (filterStatus) {
         case "active":
-          filtered = filtered.filter((challenge) => !challenge.completed && new Date(challenge.endDate) > new Date())
-          break
+          filtered = filtered.filter(
+            (challenge) =>
+              !challenge.completed && new Date(challenge.endDate) > new Date(),
+          );
+          break;
         case "completed":
-          filtered = filtered.filter((challenge) => challenge.completed)
-          break
+          filtered = filtered.filter((challenge) => challenge.completed);
+          break;
         case "pending":
-          filtered = filtered.filter((challenge) => challenge.submissionStatus === "pending")
-          break
+          filtered = filtered.filter(
+            (challenge) => challenge.submissionStatus === "pending",
+          );
+          break;
         case "expired":
-          filtered = filtered.filter((challenge) => !challenge.completed && new Date(challenge.endDate) <= new Date())
-          break
+          filtered = filtered.filter(
+            (challenge) =>
+              !challenge.completed && new Date(challenge.endDate) <= new Date(),
+          );
+          break;
       }
     }
 
-    setFilteredChallenges(filtered)
-  }
+    setFilteredChallenges(filtered);
+  }, [challenges, searchQuery, filterStatus]);
+
+  useEffect(() => {
+    if (currentUser) {
+      fetchChallenges();
+    }
+  }, [currentUser, fetchChallenges]);
+
+  useEffect(() => {
+    filterChallenges();
+  }, [filterChallenges]);
 
   const handleShowSubmission = (submissionId: number) => {
-    setViewingSubmissionId(submissionId)
-  }
+    setViewingSubmissionId(submissionId);
+  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -136,14 +146,16 @@ export default function TikTokChallengesPage() {
             </div>
           ))}
         </div>
-      )
+      );
     }
 
     if (filteredChallenges.length === 0) {
       return (
         <div className="text-center py-12">
           <TikTokIcon className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-          <h3 className="text-lg font-medium text-gray-900">No challenges found</h3>
+          <h3 className="text-lg font-medium text-gray-900">
+            No challenges found
+          </h3>
           <p className="text-gray-500 mt-1">
             {searchQuery || filterStatus !== "all"
               ? "Try adjusting your filters or search query"
@@ -155,15 +167,15 @@ export default function TikTokChallengesPage() {
               variant="outline"
               className="mt-4"
               onClick={() => {
-                setSearchQuery("")
-                setFilterStatus("all")
+                setSearchQuery("");
+                setFilterStatus("all");
               }}
             >
               Clear Filters
             </Button>
           )}
         </div>
-      )
+      );
     }
 
     return (
@@ -177,41 +189,8 @@ export default function TikTokChallengesPage() {
           />
         ))}
       </div>
-    )
-  }
-
-  const activeChallenges = [
-    {
-      id: "1",
-      title: "SFDA Dance Challenge",
-      description: "Show your moves in uniform! Share your best dance moves while representing SFDA.",
-      hashtag: "#SFDADance",
-      participants: 120,
-      views: 15000,
-      endDate: "2024-04-30",
-      points: 100
-    },
-    {
-      id: "2",
-      title: "Community Connection",
-      description: "Share a moment of positive community interaction while on duty.",
-      hashtag: "#SFDACommunity",
-      participants: 85,
-      views: 12000,
-      endDate: "2024-05-15",
-      points: 150
-    },
-    {
-      id: "3",
-      title: "Training Day",
-      description: "Share a glimpse of your training routine or preparation for the academy.",
-      hashtag: "#SFDATraining",
-      participants: 95,
-      views: 13500,
-      endDate: "2024-05-01",
-      points: 120
-    }
-  ]
+    );
+  };
 
   return (
     <PageWrapper>
@@ -224,7 +203,8 @@ export default function TikTokChallengesPage() {
                 TikTok Recruitment Challenges
               </h1>
               <p className="text-gray-600 mt-1">
-                Showcase your skills, earn points, and help recruit for the SF Sheriff's Department!
+                Showcase your skills, earn points, and help recruit for the SF
+                Sheriff&apos;s Department!
               </p>
             </div>
 
@@ -285,24 +265,29 @@ export default function TikTokChallengesPage() {
         </Tabs>
 
         <div className="mt-12 bg-gray-50 border rounded-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">How TikTok Challenges Work</h2>
+          <h2 className="text-xl font-semibold mb-4">
+            How TikTok Challenges Work
+          </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div>
               <h3 className="font-medium mb-2">1. Choose a Challenge</h3>
               <p className="text-gray-600">
-                Pick an active challenge that matches your skills and interests. Each challenge has specific requirements and rewards.
+                Pick an active challenge that matches your skills and interests.
+                Each challenge has specific requirements and rewards.
               </p>
             </div>
             <div>
               <h3 className="font-medium mb-2">2. Create & Share</h3>
               <p className="text-gray-600">
-                Create your TikTok video following the challenge guidelines. Use the specified hashtag when posting.
+                Create your TikTok video following the challenge guidelines. Use
+                the specified hashtag when posting.
               </p>
             </div>
             <div>
               <h3 className="font-medium mb-2">3. Earn Rewards</h3>
               <p className="text-gray-600">
-                Submit your video link to earn points. Top performers receive special badges and recognition.
+                Submit your video link to earn points. Top performers receive
+                special badges and recognition.
               </p>
             </div>
           </div>
@@ -317,5 +302,5 @@ export default function TikTokChallengesPage() {
         />
       )}
     </PageWrapper>
-  )
+  );
 }

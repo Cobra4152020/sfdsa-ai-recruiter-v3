@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,21 +11,21 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useAuth } from "@/hooks/use-auth"
-import { useAuthModal } from "@/context/auth-modal-context"
-import { LogOut, User, Settings, Award, ChevronDown } from "lucide-react"
+} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/hooks/use-auth";
+import { useAuthModal } from "@/context/auth-modal-context";
+import { LogOut, User, Settings, ChevronDown } from "lucide-react";
 
 export function UserAuthStatus() {
-  const { user, signOut } = useAuth()
-  const { openModal } = useAuthModal()
-  const router = useRouter()
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
+  const { user, signOut } = useAuth();
+  const { openModal } = useAuthModal();
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   if (!mounted) {
     return (
@@ -36,49 +36,63 @@ export function UserAuthStatus() {
           <div className="h-3 w-16 bg-gray-200 dark:bg-gray-700 animate-pulse rounded" />
         </div>
       </div>
-    )
+    );
   }
 
   if (!user) {
     return (
       <div className="flex items-center gap-2">
-        <Button variant="ghost" onClick={() => openModal("signin", "recruit")} className="text-sm">
+        <Button
+          variant="ghost"
+          onClick={() => openModal("signin", "recruit")}
+          className="text-sm"
+        >
           Sign In
         </Button>
-        <Button onClick={() => openModal("signup", "recruit")} className="text-sm">
+        <Button
+          onClick={() => openModal("signup", "recruit")}
+          className="text-sm"
+        >
           Sign Up
         </Button>
       </div>
-    )
+    );
   }
 
   const handleSignOut = async () => {
-    await signOut()
-    setIsMenuOpen(false)
-    router.push("/")
-  }
+    await signOut();
+    setIsMenuOpen(false);
+    router.push("/");
+  };
 
   const navigateTo = (path: string) => {
-    setIsMenuOpen(false)
-    router.push(path)
-  }
+    setIsMenuOpen(false);
+    router.push(path);
+  };
 
-  const userInitials = user.email ? user.email.substring(0, 2).toUpperCase() : "U"
-  const displayName = user.name || user.email || "User"
-  const userRole = user.userType || "recruit"
+  const userInitials = user.email
+    ? user.email.substring(0, 2).toUpperCase()
+    : "U";
+  const displayName = user.name || user.email || "User";
+  const userRole = user.userType || "recruit";
 
   return (
     <div className="flex items-center gap-2">
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="flex items-center gap-2 p-1 hover:bg-gray-100">
+          <Button
+            variant="ghost"
+            className="flex items-center gap-2 p-1 hover:bg-gray-100"
+          >
             <Avatar className="h-8 w-8">
               <AvatarImage src={user.avatarUrl || "/placeholder.svg"} />
               <AvatarFallback>{userInitials}</AvatarFallback>
             </Avatar>
             <div className="hidden md:flex flex-col items-start">
               <span className="text-sm font-medium">{displayName}</span>
-              <span className="text-xs text-gray-500 capitalize">{userRole}</span>
+              <span className="text-xs text-gray-500 capitalize">
+                {userRole}
+              </span>
             </div>
             <ChevronDown size={16} className="text-gray-500" />
           </Button>
@@ -110,7 +124,9 @@ export function UserAuthStatus() {
           {userRole === "volunteer" && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigateTo("/volunteer-dashboard")}>
+              <DropdownMenuItem
+                onClick={() => navigateTo("/volunteer-dashboard")}
+              >
                 <span>Volunteer Dashboard</span>
               </DropdownMenuItem>
             </>
@@ -123,5 +139,5 @@ export function UserAuthStatus() {
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
-  )
+  );
 }

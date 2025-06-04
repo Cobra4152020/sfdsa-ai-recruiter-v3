@@ -1,4 +1,4 @@
-export async function publicFixAdminAlt(params: any) {
+export async function publicFixAdminAlt(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/public-fix-admin-alt`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function publicFixAdminAlt(params: any) {
     console.error(`Error in publicFixAdminAlt:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

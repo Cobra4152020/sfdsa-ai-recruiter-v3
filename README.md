@@ -1,10 +1,13 @@
 # SFDSA AI Recruiter
+## License
+This project is proprietary. Unauthorized use, reproduction, or redistribution is strictly prohibited.
 
 An AI-powered recruitment platform for the San Francisco Deputy Sheriff's Association, featuring an interactive chat interface and gamified badge system.
 
 ## Features
 
 ### Chat Interface
+
 - Real-time messaging with AI assistant (Sgt. Ken)
 - Rich message formatting with Markdown support
 - File and image attachments
@@ -15,6 +18,7 @@ An AI-powered recruitment platform for the San Francisco Deputy Sheriff's Associ
 - Error handling and reconnection
 
 ### Badge System
+
 - Achievement tracking
 - Progress visualization
 - Requirement checklists
@@ -42,22 +46,26 @@ An AI-powered recruitment platform for the San Francisco Deputy Sheriff's Associ
 ## Getting Started
 
 1. Clone the repository:
+
 ```bash
 git clone https://github.com/your-org/sfdsa-ai-recruiter.git
 cd sfdsa-ai-recruiter
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
 
 3. Set up environment variables:
+
 ```bash
 cp .env.example .env.local
 ```
 
 4. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -67,11 +75,13 @@ npm run dev
 ## Testing
 
 Run the test suite:
+
 ```bash
 npm test
 ```
 
 Run tests with coverage:
+
 ```bash
 npm test -- --coverage
 ```
@@ -81,7 +91,9 @@ npm test -- --coverage
 ### Chat Components
 
 #### ChatMessage
+
 Displays individual chat messages with support for:
+
 - User/Assistant avatars
 - Markdown formatting
 - Image/file attachments
@@ -89,7 +101,9 @@ Displays individual chat messages with support for:
 - Timestamps
 
 #### ChatInput
+
 Message input component with:
+
 - Text input
 - File attachment
 - Send button
@@ -98,14 +112,18 @@ Message input component with:
 ### Badge Components
 
 #### AchievementBadge
+
 Displays achievement badges with:
+
 - Multiple sizes (sm, md, lg, xl)
 - Rarity levels
 - Points display
 - Earned/Unearned states
 
 #### BadgeProgress
+
 Shows progress towards badge completion:
+
 - Progress bar
 - Current/Max value
 - Loading states
@@ -121,4 +139,6 @@ Shows progress towards badge completion:
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+## License
+This project is proprietary. Unauthorized use, reproduction, or redistribution is strictly prohibited.
+ [LICENSE](LICENSE) file for details.

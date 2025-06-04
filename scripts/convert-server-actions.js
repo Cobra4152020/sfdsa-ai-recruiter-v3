@@ -1,8 +1,8 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 
-const actionsDir = path.join(process.cwd(), 'app', 'actions');
-const apiDir = path.join(process.cwd(), 'app', 'api', 'admin-actions');
+const actionsDir = path.join(process.cwd(), "app", "actions");
+const apiDir = path.join(process.cwd(), "app", "api", "admin-actions");
 
 // Create the admin-actions API directory if it doesn't exist
 if (!fs.existsSync(apiDir)) {
@@ -12,14 +12,16 @@ if (!fs.existsSync(apiDir)) {
 // Read all files in the actions directory
 const actionFiles = fs.readdirSync(actionsDir);
 
-actionFiles.forEach(file => {
-  if (!file.endsWith('.ts')) return;
+actionFiles.forEach((file) => {
+  if (!file.endsWith(".ts")) return;
 
-  const actionName = file.replace('.ts', '');
-  const camelCaseActionName = actionName.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
+  const actionName = file.replace(".ts", "");
+  const camelCaseActionName = actionName.replace(/-([a-z])/g, (g) =>
+    g[1].toUpperCase(),
+  );
   const actionPath = path.join(actionsDir, file);
   const apiPath = path.join(apiDir, actionName);
-  const routePath = path.join(apiPath, 'route.ts');
+  const routePath = path.join(apiPath, "route.ts");
 
   // Create the API route directory
   if (!fs.existsSync(apiPath)) {
@@ -27,15 +29,15 @@ actionFiles.forEach(file => {
   }
 
   // Read the action file
-  const actionContent = fs.readFileSync(actionPath, 'utf8');
+  const actionContent = fs.readFileSync(actionPath, "utf8");
 
   // Remove "use client" and "use server" directives, next/navigation imports, and revalidatePath usage
   const cleanedContent = actionContent
-    .replace(/"use client"|"use server"/g, '')
-    .replace(/import.*from ["']next\/navigation["'].*\n?/g, '')
-    .replace(/import.*from ["']next\/cache["'].*\n?/g, '')
-    .replace(/revalidatePath\(.*?\);?\n?/g, '')
-    .replace(/if \(revalidatePaths.*?\{[\s\S]*?\}\n?/g, '')
+    .replace(/"use client"|"use server"/g, "")
+    .replace(/import.*from ["']next\/navigation["'].*\n?/g, "")
+    .replace(/import.*from ["']next\/cache["'].*\n?/g, "")
+    .replace(/revalidatePath\(.*?\);?\n?/g, "")
+    .replace(/if \(revalidatePaths.*?\{[\s\S]*?\}\n?/g, "")
     .trim();
 
   // Create the API route
@@ -60,7 +62,12 @@ export async function POST(request: Request) {
 }`;
 
   // Create the client-side action wrapper
-  const clientActionPath = path.join(process.cwd(), 'lib', 'actions', `${actionName}.ts`);
+  const clientActionPath = path.join(
+    process.cwd(),
+    "lib",
+    "actions",
+    `${actionName}.ts`,
+  );
   const clientActionContent = `export async function ${camelCaseActionName}(params: any) {
   try {
     const response = await fetch(\`/api/admin-actions/${actionName}\`, {
@@ -94,4 +101,4 @@ export async function POST(request: Request) {
   console.log(`Converted ${file} to API route and created client wrapper`);
 });
 
-console.log('Done converting server actions to API routes'); 
+console.log("Done converting server actions to API routes");

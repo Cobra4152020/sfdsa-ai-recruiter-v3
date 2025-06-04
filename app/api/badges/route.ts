@@ -1,7 +1,7 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 // Use the badge types from your AchievementBadge component
 type BadgeType =
@@ -16,14 +16,14 @@ type BadgeType =
   | "application-completed"
   | "first-response"
   | "frequent-user"
-  | "resource-downloader"
+  | "resource-downloader";
 
 interface Badge {
-  id: string
-  badge_type: BadgeType
-  name: string
-  description: string
-  created_at: string
+  id: string;
+  badge_type: BadgeType;
+  name: string;
+  description: string;
+  created_at: string;
 }
 
 // Static badges data
@@ -112,14 +112,14 @@ const staticBadges: Badge[] = [
     description: "Downloaded recruitment resources and materials",
     created_at: "2024-01-12T00:00:00Z",
   },
-]
+];
 
 export async function GET() {
   return NextResponse.json({
     success: true,
     badges: staticBadges,
-    source: 'static'
-  })
+    source: "static",
+  });
 }
 
 // Note: POST endpoint removed as it cannot be static

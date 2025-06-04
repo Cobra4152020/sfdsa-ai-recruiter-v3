@@ -1,9 +1,12 @@
 interface VolunteerConfirmationTemplateProps {
-  recipientName: string
-  confirmationUrl: string
+  recipientName: string;
+  confirmationUrl: string;
 }
 
-export function volunteerConfirmation({ recipientName, confirmationUrl }: VolunteerConfirmationTemplateProps): string {
+export function volunteerConfirmation({
+  recipientName,
+  confirmationUrl,
+}: VolunteerConfirmationTemplateProps): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -93,5 +96,5 @@ export function volunteerConfirmation({ recipientName, confirmationUrl }: Volunt
       </div>
     </body>
     </html>
-  `
+  `;
 }

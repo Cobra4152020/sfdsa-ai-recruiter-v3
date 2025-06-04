@@ -1,7 +1,14 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Clock, CheckCircle, Mail } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Clock, CheckCircle, Mail } from "lucide-react";
 
 export default function VolunteerPendingPage() {
   return (
@@ -15,14 +22,16 @@ export default function VolunteerPendingPage() {
             Account Pending Verification
           </CardTitle>
           <CardDescription className="text-center">
-            Your volunteer recruiter account is pending verification by an administrator.
+            Your volunteer recruiter account is pending verification by an
+            administrator.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="bg-amber-50 border border-amber-200 rounded-md p-4">
             <p className="text-amber-800">
-              Thank you for registering as a volunteer recruiter. Your account is currently under review. This process
-              typically takes 1-2 business days.
+              Thank you for registering as a volunteer recruiter. Your account
+              is currently under review. This process typically takes 1-2
+              business days.
             </p>
           </div>
 
@@ -37,7 +46,9 @@ export default function VolunteerPendingPage() {
             </div>
             <div className="flex items-start space-x-2">
               <Mail className="h-5 w-5 text-gray-400 mt-0.5" />
-              <p className="text-sm">You will receive an email when your account is approved</p>
+              <p className="text-sm">
+                You will receive an email when your account is approved
+              </p>
             </div>
           </div>
         </CardContent>
@@ -57,5 +68,5 @@ export default function VolunteerPendingPage() {
         </CardFooter>
       </Card>
     </main>
-  )
+  );
 }

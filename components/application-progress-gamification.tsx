@@ -1,28 +1,34 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { CheckCircle, Award, Trophy, Share2, ArrowRight } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { useUser } from "@/context/user-context"
-import confetti from "canvas-confetti"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { CheckCircle, Award, Trophy, Share2, ArrowRight } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@/context/user-context";
+import confetti from "canvas-confetti";
+import { motion } from "framer-motion";
 
 interface ApplicationStep {
-  id: string
-  title: string
-  description: string
-  points: number
-  badgeAwarded?: string
-  completed: boolean
+  id: string;
+  title: string;
+  description: string;
+  points: number;
+  badgeAwarded?: string;
+  completed: boolean;
 }
 
 export function ApplicationProgressGamification() {
-  const { toast } = useToast()
-  const { currentUser, incrementParticipation } = useUser()
-  const [showConfetti, setShowConfetti] = useState(false)
+  const { toast } = useToast();
+  const {} = useUser();
   const [applicationSteps, setApplicationSteps] = useState<ApplicationStep[]>([
     {
       id: "profile",
@@ -77,34 +83,33 @@ export function ApplicationProgressGamification() {
       badgeAwarded: "Application Champion",
       completed: false,
     },
-  ])
+  ]);
 
   // Calculate progress percentage
-  const totalSteps = applicationSteps.length
-  const completedSteps = applicationSteps.filter((step) => step.completed).length
-  const progressPercentage = Math.round((completedSteps / totalSteps) * 100)
+  const totalSteps = applicationSteps.length;
+  const completedSteps = applicationSteps.filter(
+    (step) => step.completed,
+  ).length;
+  const progressPercentage = Math.round((completedSteps / totalSteps) * 100);
 
   // Calculate total points earned
   const totalPointsEarned = applicationSteps
     .filter((step) => step.completed)
-    .reduce((sum, step) => sum + step.points, 0)
+    .reduce((sum, step) => sum + step.points, 0);
 
   // Simulate completing a step
   const completeStep = async (stepId: string) => {
     // Find the step
-    const stepIndex = applicationSteps.findIndex((step) => step.id === stepId)
-    if (stepIndex === -1 || applicationSteps[stepIndex].completed) return
+    const stepIndex = applicationSteps.findIndex((step) => step.id === stepId);
+    if (stepIndex === -1 || applicationSteps[stepIndex].completed) return;
 
     // Update the step
-    const updatedSteps = [...applicationSteps]
-    updatedSteps[stepIndex].completed = true
-    setApplicationSteps(updatedSteps)
+    const updatedSteps = [...applicationSteps];
+    updatedSteps[stepIndex].completed = true;
+    setApplicationSteps(updatedSteps);
 
     // Show confetti for celebration
-    triggerConfetti()
-
-    // Award points
-    await incrementParticipation(applicationSteps[stepIndex].points)
+    triggerConfetti();
 
     // Show toast notification
     toast({
@@ -115,32 +120,30 @@ export function ApplicationProgressGamification() {
           : ""
       }`,
       duration: 5000,
-    })
-  }
+    });
+  };
 
   // For demo purposes, let's simulate some completed steps
   useEffect(() => {
     const simulateProgress = () => {
-      const updatedSteps = [...applicationSteps]
+      const updatedSteps = [...applicationSteps];
       // Mark first two steps as completed for demonstration
-      if (updatedSteps[0]) updatedSteps[0].completed = true
-      if (updatedSteps[1]) updatedSteps[1].completed = true
-      setApplicationSteps(updatedSteps)
-    }
+      if (updatedSteps[0]) updatedSteps[0].completed = true;
+      if (updatedSteps[1]) updatedSteps[1].completed = true;
+      setApplicationSteps(updatedSteps);
+    };
 
-    simulateProgress()
-  }, [])
+    simulateProgress();
+  }, []);
 
   const triggerConfetti = () => {
-    setShowConfetti(true)
     confetti({
       particleCount: 100,
       spread: 70,
       origin: { x: 0.5, y: 0.6 },
-      colors: ["#FFD700", "#0A3C1F", "#FFFFFF"]
-    })
-    setTimeout(() => setShowConfetti(false), 3000)
-  }
+      colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
+    });
+  };
 
   return (
     <Card className="w-full shadow-md">
@@ -149,25 +152,40 @@ export function ApplicationProgressGamification() {
           <Trophy className="mr-2 h-5 w-5 text-[#FFD700]" />
           Your Application Journey
         </CardTitle>
-        <CardDescription className="text-white/80">Complete each step to earn points and badges</CardDescription>
+        <CardDescription className="text-white/80">
+          Complete each step to earn points and badges
+        </CardDescription>
       </CardHeader>
       <CardContent className="p-6">
         <div className="mb-6">
           <div className="flex justify-between mb-2">
-            <span className="text-sm font-medium text-[#0A3C1F]">Application Progress</span>
-            <span className="text-sm font-medium text-[#0A3C1F]">{progressPercentage}%</span>
+            <span className="text-sm font-medium text-[#0A3C1F]">
+              Application Progress
+            </span>
+            <span className="text-sm font-medium text-[#0A3C1F]">
+              {progressPercentage}%
+            </span>
           </div>
-          <Progress value={progressPercentage} className="h-2 bg-[#0A3C1F]/10" />
+          <Progress
+            value={progressPercentage}
+            className="h-2 bg-[#0A3C1F]/10"
+          />
 
           <div className="mt-4 flex justify-between items-center">
             <div>
               <span className="text-sm text-[#0A3C1F]/70">Points Earned</span>
-              <div className="text-2xl font-bold text-[#0A3C1F]">{totalPointsEarned}</div>
+              <div className="text-2xl font-bold text-[#0A3C1F]">
+                {totalPointsEarned}
+              </div>
             </div>
             <div>
               <span className="text-sm text-[#0A3C1F]/70">Badges Earned</span>
               <div className="text-2xl font-bold text-[#0A3C1F]">
-                {applicationSteps.filter((step) => step.completed && step.badgeAwarded).length}
+                {
+                  applicationSteps.filter(
+                    (step) => step.completed && step.badgeAwarded,
+                  ).length
+                }
               </div>
             </div>
             <Button
@@ -176,8 +194,9 @@ export function ApplicationProgressGamification() {
               onClick={() => {
                 toast({
                   title: "Share Your Progress",
-                  description: "Share your application journey with friends and earn referral points!",
-                })
+                  description:
+                    "Share your application journey with friends and earn referral points!",
+                });
               }}
             >
               <Share2 className="mr-2 h-4 w-4" />
@@ -187,24 +206,30 @@ export function ApplicationProgressGamification() {
         </div>
 
         <div className="space-y-4">
-          {applicationSteps.map((step, index) => (
-            <div
+          {applicationSteps.map((step) => (
+            <motion.div
               key={step.id}
               className={`p-4 border rounded-lg transition-all ${
-                step.completed ? "bg-[#0A3C1F]/5 border-[#0A3C1F]/20" : "hover:border-[#0A3C1F]/20"
+                step.completed
+                  ? "bg-[#0A3C1F]/5 border-[#0A3C1F]/20"
+                  : "hover:border-[#0A3C1F]/20"
               }`}
             >
               <div className="flex items-start">
                 <div
                   className={`p-2 rounded-full ${
-                    step.completed ? "bg-[#0A3C1F] text-white" : "bg-[#0A3C1F]/10 text-[#0A3C1F]/40"
+                    step.completed
+                      ? "bg-[#0A3C1F] text-white"
+                      : "bg-[#0A3C1F]/10 text-[#0A3C1F]/40"
                   }`}
                 >
                   <CheckCircle className="h-5 w-5" />
                 </div>
                 <div className="ml-4 flex-1">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-semibold text-[#0A3C1F]">{step.title}</h3>
+                    <h3 className="font-semibold text-[#0A3C1F]">
+                      {step.title}
+                    </h3>
                     <div className="flex items-center space-x-2">
                       {step.badgeAwarded && (
                         <Badge
@@ -219,12 +244,16 @@ export function ApplicationProgressGamification() {
                           {step.badgeAwarded}
                         </Badge>
                       )}
-                      <span className={`text-sm ${step.completed ? "text-[#0A3C1F]" : "text-[#0A3C1F]/40"}`}>
+                      <span
+                        className={`text-sm ${step.completed ? "text-[#0A3C1F]" : "text-[#0A3C1F]/40"}`}
+                      >
                         {step.points} pts
                       </span>
                     </div>
                   </div>
-                  <p className={`mt-1 text-sm ${step.completed ? "text-[#0A3C1F]/70" : "text-[#0A3C1F]/40"}`}>
+                  <p
+                    className={`mt-1 text-sm ${step.completed ? "text-[#0A3C1F]/70" : "text-[#0A3C1F]/40"}`}
+                  >
                     {step.description}
                   </p>
                   {!step.completed && (
@@ -238,10 +267,10 @@ export function ApplicationProgressGamification() {
                   )}
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

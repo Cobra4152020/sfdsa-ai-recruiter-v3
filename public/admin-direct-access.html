@@ -1,423 +1,535 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Direct Database Access</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --primary-color: #0A3C1F;
-      --primary-hover: #0d4d27;
-      --accent-color: #FFD700;
-      --accent-hover: #e6c200;
-      --danger-color: #ef4444;
-      --danger-hover: #dc2626;
-      --success-color: #10b981;
-      --success-hover: #059669;
-    }
-    .btn {
-      display: inline-block;
-      padding: 0.75rem 1.5rem;
-      font-weight: bold;
-      text-align: center;
-      border-radius: 0.375rem;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-    .btn-primary {
-      background-color: var(--primary-color);
-      color: white;
-    }
-    .btn-primary:hover {
-      background-color: var(--primary-hover);
-    }
-    .btn-secondary {
-      background-color: var(--accent-color);
-      color: var(--primary-color);
-    }
-    .btn-secondary:hover {
-      background-color: var(--accent-hover);
-    }
-    .btn-success {
-      background-color: var(--success-color);
-      color: white;
-    }
-    .btn-success:hover {
-      background-color: var(--success-hover);
-    }
-    .btn-danger {
-      background-color: var(--danger-color);
-      color: white;
-    }
-    .btn-danger:hover {
-      background-color: var(--danger-hover);
-    }
-    pre {
-      background-color: var(--primary-color);
-      color: #f9fafb;
-      padding: 1rem;
-      border-radius: 0.375rem;
-      overflow-x: auto;
-    }
-    textarea {
-      width: 100%;
-      padding: 0.75rem;
-      border: 1px solid #d1d5db;
-      border-radius: 0.375rem;
-      min-height: 8rem;
-      font-family: monospace;
-    }
-    .active-tab {
-      color: var(--primary-color);
-      border-color: var(--primary-color);
-    }
-  </style>
-</head>
-<body class="bg-gray-100 font-sans">
-  <div class="max-w-4xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
-    <h1 class="text-3xl font-bold mb-2 text-center" style="color: var(--primary-color)">Direct Database Access</h1>
-    <p class="text-center text-red-600 mb-6">⚠️ Bypass Authentication ⚠️</p>
-    
-    <div class="mb-8">
-      <h2 class="text-xl font-bold mb-4">Database Connection</h2>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div>
-          <label for="supabase-url" class="block mb-1 font-semibold">Supabase URL:</label>
-          <input type="text" id="supabase-url" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="https://your-project.supabase.co">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Direct Database Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+      :root {
+        --primary-color: #0a3c1f;
+        --primary-hover: #0d4d27;
+        --accent-color: #ffd700;
+        --accent-hover: #e6c200;
+        --danger-color: #ef4444;
+        --danger-hover: #dc2626;
+        --success-color: #10b981;
+        --success-hover: #059669;
+      }
+      .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        font-weight: bold;
+        text-align: center;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+        cursor: pointer;
+      }
+      .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+      }
+      .btn-primary:hover {
+        background-color: var(--primary-hover);
+      }
+      .btn-secondary {
+        background-color: var(--accent-color);
+        color: var(--primary-color);
+      }
+      .btn-secondary:hover {
+        background-color: var(--accent-hover);
+      }
+      .btn-success {
+        background-color: var(--success-color);
+        color: white;
+      }
+      .btn-success:hover {
+        background-color: var(--success-hover);
+      }
+      .btn-danger {
+        background-color: var(--danger-color);
+        color: white;
+      }
+      .btn-danger:hover {
+        background-color: var(--danger-hover);
+      }
+      pre {
+        background-color: var(--primary-color);
+        color: #f9fafb;
+        padding: 1rem;
+        border-radius: 0.375rem;
+        overflow-x: auto;
+      }
+      textarea {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        min-height: 8rem;
+        font-family: monospace;
+      }
+      .active-tab {
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100 font-sans">
+    <div class="max-w-4xl mx-auto mt-10 bg-white p-6 rounded-lg shadow-lg">
+      <h1
+        class="text-3xl font-bold mb-2 text-center"
+        style="color: var(--primary-color)"
+      >
+        Direct Database Access
+      </h1>
+      <p class="text-center text-red-600 mb-6">⚠️ Bypass Authentication ⚠️</p>
+
+      <div class="mb-8">
+        <h2 class="text-xl font-bold mb-4">Database Connection</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label for="supabase-url" class="block mb-1 font-semibold"
+              >Supabase URL:</label
+            >
+            <input
+              type="text"
+              id="supabase-url"
+              class="w-full px-3 py-2 border border-gray-300 rounded"
+              placeholder="https://your-project.supabase.co"
+            />
+          </div>
+          <div>
+            <label for="supabase-key" class="block mb-1 font-semibold"
+              >Supabase Key:</label
+            >
+            <input
+              type="password"
+              id="supabase-key"
+              class="w-full px-3 py-2 border border-gray-300 rounded"
+              placeholder="your-supabase-key"
+            />
+          </div>
         </div>
-        <div>
-          <label for="supabase-key" class="block mb-1 font-semibold">Supabase Key:</label>
-          <input type="password" id="supabase-key" class="w-full px-3 py-2 border border-gray-300 rounded" placeholder="your-supabase-key">
+        <button id="connect-db" class="btn btn-primary">
+          Connect to Database
+        </button>
+        <div id="connection-status" class="mt-2 text-gray-600"></div>
+      </div>
+
+      <div id="admin-tools" class="hidden">
+        <div class="tabs border-b mb-6">
+          <div class="flex space-x-4">
+            <button
+              data-tab="sql-runner"
+              class="py-2 px-4 font-semibold border-b-2 active-tab"
+            >
+              SQL Runner
+            </button>
+            <button
+              data-tab="admin-actions"
+              class="py-2 px-4 font-semibold text-gray-500 hover:text-gray-700"
+            >
+              Admin Actions
+            </button>
+            <button
+              data-tab="fix-auth"
+              class="py-2 px-4 font-semibold text-gray-500 hover:text-gray-700"
+            >
+              Fix Authentication
+            </button>
+          </div>
+        </div>
+
+        <div id="sql-runner-tab" class="tab-content">
+          <h2 class="text-xl font-bold mb-4">SQL Runner</h2>
+          <div class="mb-4">
+            <textarea
+              id="sql-query"
+              placeholder="Enter your SQL query here...
+Example: SELECT * FROM user_roles LIMIT 10"
+            ></textarea>
+          </div>
+          <div class="mb-6">
+            <button id="run-query" class="btn btn-success">Run Query</button>
+          </div>
+          <div class="results">
+            <h3 class="font-bold mb-2">Results:</h3>
+            <pre id="query-results">Results will appear here...</pre>
+          </div>
+        </div>
+
+        <div id="admin-actions-tab" class="tab-content hidden">
+          <h2 class="text-xl font-bold mb-4">Admin Actions</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-white border rounded-lg p-4">
+              <h3 class="font-bold mb-2">Fix User Roles</h3>
+              <p class="text-sm text-gray-600 mb-4">
+                Create or fix the user_roles table structure
+              </p>
+              <button id="fix-user-roles" class="btn btn-secondary">
+                Run Fix
+              </button>
+              <div id="fix-user-roles-status" class="mt-2 text-sm"></div>
+            </div>
+            <div class="bg-white border rounded-lg p-4">
+              <h3 class="font-bold mb-2">Create Admin User</h3>
+              <p class="text-sm text-gray-600 mb-4">
+                Ensure your user has admin privileges
+              </p>
+              <input
+                type="text"
+                id="admin-email"
+                class="w-full px-3 py-2 border border-gray-300 rounded mb-2"
+                placeholder="Your email"
+              />
+              <button id="create-admin" class="btn btn-secondary">
+                Make Admin
+              </button>
+              <div id="create-admin-status" class="mt-2 text-sm"></div>
+            </div>
+            <div class="bg-white border rounded-lg p-4">
+              <h3 class="font-bold mb-2">Check Database Tables</h3>
+              <p class="text-sm text-gray-600 mb-4">
+                View all tables in your database
+              </p>
+              <button id="list-tables" class="btn btn-secondary">
+                List Tables
+              </button>
+              <div
+                id="list-tables-result"
+                class="mt-2 text-sm overflow-auto max-h-40"
+              ></div>
+            </div>
+            <div class="bg-white border rounded-lg p-4">
+              <h3 class="font-bold mb-2">Database Health</h3>
+              <p class="text-sm text-gray-600 mb-4">
+                Check your database connection health
+              </p>
+              <button id="check-health" class="btn btn-secondary">
+                Check Health
+              </button>
+              <div id="health-result" class="mt-2 text-sm"></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="fix-auth-tab" class="tab-content hidden">
+          <h2 class="text-xl font-bold mb-4">Fix Authentication</h2>
+          <div class="bg-white border rounded-lg p-6 mb-6">
+            <h3 class="font-bold mb-2">Repair Authentication System</h3>
+            <p class="text-gray-600 mb-4">
+              These actions will attempt to fix common authentication issues in
+              your database.
+            </p>
+
+            <div class="space-y-4">
+              <div>
+                <h4 class="font-semibold mb-1">Fix User Type Records</h4>
+                <p class="text-sm text-gray-600 mb-2">
+                  Ensure user records exist in the user_types table
+                </p>
+                <button id="fix-user-types" class="btn btn-secondary">
+                  Run Fix
+                </button>
+                <div id="fix-user-types-status" class="mt-1 text-sm"></div>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-1">Create Missing Tables</h4>
+                <p class="text-sm text-gray-600 mb-2">
+                  Create any missing authentication tables
+                </p>
+                <button id="create-auth-tables" class="btn btn-secondary">
+                  Create Tables
+                </button>
+                <div id="create-auth-tables-status" class="mt-1 text-sm"></div>
+              </div>
+
+              <div>
+                <h4 class="font-semibold mb-1">Set Admin Role</h4>
+                <p class="text-sm text-gray-600 mb-2">
+                  Set your user as an admin
+                </p>
+                <input
+                  type="text"
+                  id="admin-user-email"
+                  class="w-full px-3 py-2 border border-gray-300 rounded mb-2"
+                  placeholder="Your email"
+                />
+                <button id="set-admin-role" class="btn btn-secondary">
+                  Set Admin Role
+                </button>
+                <div id="set-admin-role-status" class="mt-1 text-sm"></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-      <button id="connect-db" class="btn btn-primary">Connect to Database</button>
-      <div id="connection-status" class="mt-2 text-gray-600"></div>
     </div>
 
-    <div id="admin-tools" class="hidden">
-      <div class="tabs border-b mb-6">
-        <div class="flex space-x-4">
-          <button data-tab="sql-runner" class="py-2 px-4 font-semibold border-b-2 active-tab">SQL Runner</button>
-          <button data-tab="admin-actions" class="py-2 px-4 font-semibold text-gray-500 hover:text-gray-700">Admin Actions</button>
-          <button data-tab="fix-auth" class="py-2 px-4 font-semibold text-gray-500 hover:text-gray-700">Fix Authentication</button>
-        </div>
-      </div>
+    <script>
+      // Global variables
+      let supabase = null;
 
-      <div id="sql-runner-tab" class="tab-content">
-        <h2 class="text-xl font-bold mb-4">SQL Runner</h2>
-        <div class="mb-4">
-          <textarea id="sql-query" placeholder="Enter your SQL query here...
-Example: SELECT * FROM user_roles LIMIT 10"></textarea>
-        </div>
-        <div class="mb-6">
-          <button id="run-query" class="btn btn-success">Run Query</button>
-        </div>
-        <div class="results">
-          <h3 class="font-bold mb-2">Results:</h3>
-          <pre id="query-results">Results will appear here...</pre>
-        </div>
-      </div>
+      // DOM Elements
+      const connectBtn = document.getElementById("connect-db");
+      const connectionStatus = document.getElementById("connection-status");
+      const adminTools = document.getElementById("admin-tools");
+      const sqlQuery = document.getElementById("sql-query");
+      const runQueryBtn = document.getElementById("run-query");
+      const queryResults = document.getElementById("query-results");
+      const tabButtons = document.querySelectorAll("[data-tab]");
+      const tabContents = document.querySelectorAll(".tab-content");
+      const fixUserRolesBtn = document.getElementById("fix-user-roles");
+      const fixUserRolesStatus = document.getElementById(
+        "fix-user-roles-status",
+      );
+      const createAdminBtn = document.getElementById("create-admin");
+      const createAdminStatus = document.getElementById("create-admin-status");
+      const adminEmail = document.getElementById("admin-email");
+      const listTablesBtn = document.getElementById("list-tables");
+      const listTablesResult = document.getElementById("list-tables-result");
+      const checkHealthBtn = document.getElementById("check-health");
+      const healthResult = document.getElementById("health-result");
+      const fixUserTypesBtn = document.getElementById("fix-user-types");
+      const fixUserTypesStatus = document.getElementById(
+        "fix-user-types-status",
+      );
+      const createAuthTablesBtn = document.getElementById("create-auth-tables");
+      const createAuthTablesStatus = document.getElementById(
+        "create-auth-tables-status",
+      );
+      const setAdminRoleBtn = document.getElementById("set-admin-role");
+      const setAdminRoleStatus = document.getElementById(
+        "set-admin-role-status",
+      );
+      const adminUserEmail = document.getElementById("admin-user-email");
 
-      <div id="admin-actions-tab" class="tab-content hidden">
-        <h2 class="text-xl font-bold mb-4">Admin Actions</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-white border rounded-lg p-4">
-            <h3 class="font-bold mb-2">Fix User Roles</h3>
-            <p class="text-sm text-gray-600 mb-4">Create or fix the user_roles table structure</p>
-            <button id="fix-user-roles" class="btn btn-secondary">Run Fix</button>
-            <div id="fix-user-roles-status" class="mt-2 text-sm"></div>
-          </div>
-          <div class="bg-white border rounded-lg p-4">
-            <h3 class="font-bold mb-2">Create Admin User</h3>
-            <p class="text-sm text-gray-600 mb-4">Ensure your user has admin privileges</p>
-            <input type="text" id="admin-email" class="w-full px-3 py-2 border border-gray-300 rounded mb-2" placeholder="Your email">
-            <button id="create-admin" class="btn btn-secondary">Make Admin</button>
-            <div id="create-admin-status" class="mt-2 text-sm"></div>
-          </div>
-          <div class="bg-white border rounded-lg p-4">
-            <h3 class="font-bold mb-2">Check Database Tables</h3>
-            <p class="text-sm text-gray-600 mb-4">View all tables in your database</p>
-            <button id="list-tables" class="btn btn-secondary">List Tables</button>
-            <div id="list-tables-result" class="mt-2 text-sm overflow-auto max-h-40"></div>
-          </div>
-          <div class="bg-white border rounded-lg p-4">
-            <h3 class="font-bold mb-2">Database Health</h3>
-            <p class="text-sm text-gray-600 mb-4">Check your database connection health</p>
-            <button id="check-health" class="btn btn-secondary">Check Health</button>
-            <div id="health-result" class="mt-2 text-sm"></div>
-          </div>
-        </div>
-      </div>
+      // Initialize event listeners
+      document.addEventListener("DOMContentLoaded", function () {
+        // Check for stored credentials
+        const storedUrl = localStorage.getItem("supabaseUrl");
+        const storedKey = localStorage.getItem("supabaseKey");
 
-      <div id="fix-auth-tab" class="tab-content hidden">
-        <h2 class="text-xl font-bold mb-4">Fix Authentication</h2>
-        <div class="bg-white border rounded-lg p-6 mb-6">
-          <h3 class="font-bold mb-2">Repair Authentication System</h3>
-          <p class="text-gray-600 mb-4">These actions will attempt to fix common authentication issues in your database.</p>
-          
-          <div class="space-y-4">
-            <div>
-              <h4 class="font-semibold mb-1">Fix User Type Records</h4>
-              <p class="text-sm text-gray-600 mb-2">Ensure user records exist in the user_types table</p>
-              <button id="fix-user-types" class="btn btn-secondary">Run Fix</button>
-              <div id="fix-user-types-status" class="mt-1 text-sm"></div>
-            </div>
-            
-            <div>
-              <h4 class="font-semibold mb-1">Create Missing Tables</h4>
-              <p class="text-sm text-gray-600 mb-2">Create any missing authentication tables</p>
-              <button id="create-auth-tables" class="btn btn-secondary">Create Tables</button>
-              <div id="create-auth-tables-status" class="mt-1 text-sm"></div>
-            </div>
-            
-            <div>
-              <h4 class="font-semibold mb-1">Set Admin Role</h4>
-              <p class="text-sm text-gray-600 mb-2">Set your user as an admin</p>
-              <input type="text" id="admin-user-email" class="w-full px-3 py-2 border border-gray-300 rounded mb-2" placeholder="Your email">
-              <button id="set-admin-role" class="btn btn-secondary">Set Admin Role</button>
-              <div id="set-admin-role-status" class="mt-1 text-sm"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    // Global variables
-    let supabase = null;
-    
-    // DOM Elements
-    const connectBtn = document.getElementById('connect-db');
-    const connectionStatus = document.getElementById('connection-status');
-    const adminTools = document.getElementById('admin-tools');
-    const sqlQuery = document.getElementById('sql-query');
-    const runQueryBtn = document.getElementById('run-query');
-    const queryResults = document.getElementById('query-results');
-    const tabButtons = document.querySelectorAll('[data-tab]');
-    const tabContents = document.querySelectorAll('.tab-content');
-    const fixUserRolesBtn = document.getElementById('fix-user-roles');
-    const fixUserRolesStatus = document.getElementById('fix-user-roles-status');
-    const createAdminBtn = document.getElementById('create-admin');
-    const createAdminStatus = document.getElementById('create-admin-status');
-    const adminEmail = document.getElementById('admin-email');
-    const listTablesBtn = document.getElementById('list-tables');
-    const listTablesResult = document.getElementById('list-tables-result');
-    const checkHealthBtn = document.getElementById('check-health');
-    const healthResult = document.getElementById('health-result');
-    const fixUserTypesBtn = document.getElementById('fix-user-types');
-    const fixUserTypesStatus = document.getElementById('fix-user-types-status');
-    const createAuthTablesBtn = document.getElementById('create-auth-tables');
-    const createAuthTablesStatus = document.getElementById('create-auth-tables-status');
-    const setAdminRoleBtn = document.getElementById('set-admin-role');
-    const setAdminRoleStatus = document.getElementById('set-admin-role-status');
-    const adminUserEmail = document.getElementById('admin-user-email');
-
-    // Initialize event listeners
-    document.addEventListener('DOMContentLoaded', function() {
-      // Check for stored credentials
-      const storedUrl = localStorage.getItem('supabaseUrl');
-      const storedKey = localStorage.getItem('supabaseKey');
-      
-      if (storedUrl && storedKey) {
-        document.getElementById('supabase-url').value = storedUrl;
-        document.getElementById('supabase-key').value = storedKey;
-      }
-      
-      // Tab switching
-      tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          // Remove active class from all buttons
-          tabButtons.forEach(btn => {
-            btn.classList.remove('active-tab');
-            btn.classList.add('text-gray-500');
-          });
-          
-          // Add active class to clicked button
-          button.classList.add('active-tab');
-          button.classList.remove('text-gray-500');
-          
-          // Hide all tab contents
-          tabContents.forEach(content => {
-            content.classList.add('hidden');
-          });
-          
-          // Show selected tab content
-          const tabId = button.getAttribute('data-tab');
-          document.getElementById(`${tabId}-tab`).classList.remove('hidden');
-        });
-      });
-      
-      // Connect to database
-      connectBtn.addEventListener('click', connectToDatabase);
-      
-      // Run SQL query
-      runQueryBtn.addEventListener('click', runSqlQuery);
-      
-      // Fix user roles
-      fixUserRolesBtn.addEventListener('click', fixUserRoles);
-      
-      // Create admin user
-      createAdminBtn.addEventListener('click', createAdminUser);
-      
-      // List tables
-      listTablesBtn.addEventListener('click', listTables);
-      
-      // Check health
-      checkHealthBtn.addEventListener('click', checkHealth);
-      
-      // Fix user types
-      fixUserTypesBtn.addEventListener('click', fixUserTypes);
-      
-      // Create auth tables
-      createAuthTablesBtn.addEventListener('click', createAuthTables);
-      
-      // Set admin role
-      setAdminRoleBtn.addEventListener('click', setAdminRole);
-    });
-
-    // Functions
-    async function connectToDatabase() {
-      const url = document.getElementById('supabase-url').value.trim();
-      const key = document.getElementById('supabase-key').value.trim();
-      
-      if (!url || !key) {
-        connectionStatus.textContent = 'Please enter both URL and key';
-        connectionStatus.className = 'mt-2 text-red-600';
-        return;
-      }
-      
-      connectionStatus.textContent = 'Connecting...';
-      connectionStatus.className = 'mt-2 text-blue-600';
-      
-      try {
-        // Create supabase client
-        supabase = window.supabase.createClient(url, key);
-        
-        // Test connection
-        const { data, error } = await supabase.from('user_roles').select('*').limit(1);
-        
-        if (error) {
-          // Try another table if user_roles doesn't exist
-          const { data: userData, error: userError } = await supabase.from('users').select('*').limit(1);
-          
-          if (userError) {
-            connectionStatus.textContent = 'Connected, but could not find users or user_roles tables. Connection may be limited.';
-            connectionStatus.className = 'mt-2 text-yellow-600';
-          } else {
-            connectionStatus.textContent = 'Connected successfully! User data found.';
-            connectionStatus.className = 'mt-2 text-green-600';
-          }
-        } else {
-          connectionStatus.textContent = 'Connected successfully! User roles found.';
-          connectionStatus.className = 'mt-2 text-green-600';
+        if (storedUrl && storedKey) {
+          document.getElementById("supabase-url").value = storedUrl;
+          document.getElementById("supabase-key").value = storedKey;
         }
-        
-        // Save credentials for convenience
-        localStorage.setItem('supabaseUrl', url);
-        localStorage.setItem('supabaseKey', key);
-        
-        // Show admin tools
-        adminTools.classList.remove('hidden');
-        
-      } catch (err) {
-        connectionStatus.textContent = 'Connection failed: ' + err.message;
-        connectionStatus.className = 'mt-2 text-red-600';
-      }
-    }
 
-    async function runSqlQuery() {
-      const query = sqlQuery.value.trim();
-      
-      if (!supabase) {
-        queryResults.textContent = 'Please connect to database first';
-        return;
+        // Tab switching
+        tabButtons.forEach((button) => {
+          button.addEventListener("click", () => {
+            // Remove active class from all buttons
+            tabButtons.forEach((btn) => {
+              btn.classList.remove("active-tab");
+              btn.classList.add("text-gray-500");
+            });
+
+            // Add active class to clicked button
+            button.classList.add("active-tab");
+            button.classList.remove("text-gray-500");
+
+            // Hide all tab contents
+            tabContents.forEach((content) => {
+              content.classList.add("hidden");
+            });
+
+            // Show selected tab content
+            const tabId = button.getAttribute("data-tab");
+            document.getElementById(`${tabId}-tab`).classList.remove("hidden");
+          });
+        });
+
+        // Connect to database
+        connectBtn.addEventListener("click", connectToDatabase);
+
+        // Run SQL query
+        runQueryBtn.addEventListener("click", runSqlQuery);
+
+        // Fix user roles
+        fixUserRolesBtn.addEventListener("click", fixUserRoles);
+
+        // Create admin user
+        createAdminBtn.addEventListener("click", createAdminUser);
+
+        // List tables
+        listTablesBtn.addEventListener("click", listTables);
+
+        // Check health
+        checkHealthBtn.addEventListener("click", checkHealth);
+
+        // Fix user types
+        fixUserTypesBtn.addEventListener("click", fixUserTypes);
+
+        // Create auth tables
+        createAuthTablesBtn.addEventListener("click", createAuthTables);
+
+        // Set admin role
+        setAdminRoleBtn.addEventListener("click", setAdminRole);
+      });
+
+      // Functions
+      async function connectToDatabase() {
+        const url = document.getElementById("supabase-url").value.trim();
+        const key = document.getElementById("supabase-key").value.trim();
+
+        if (!url || !key) {
+          connectionStatus.textContent = "Please enter both URL and key";
+          connectionStatus.className = "mt-2 text-red-600";
+          return;
+        }
+
+        connectionStatus.textContent = "Connecting...";
+        connectionStatus.className = "mt-2 text-blue-600";
+
+        try {
+          // Create supabase client
+          supabase = window.supabase.createClient(url, key);
+
+          // Test connection
+          const { data, error } = await supabase
+            .from("user_roles")
+            .select("*")
+            .limit(1);
+
+          if (error) {
+            // Try another table if user_roles doesn't exist
+            const { data: userData, error: userError } = await supabase
+              .from("users")
+              .select("*")
+              .limit(1);
+
+            if (userError) {
+              connectionStatus.textContent =
+                "Connected, but could not find users or user_roles tables. Connection may be limited.";
+              connectionStatus.className = "mt-2 text-yellow-600";
+            } else {
+              connectionStatus.textContent =
+                "Connected successfully! User data found.";
+              connectionStatus.className = "mt-2 text-green-600";
+            }
+          } else {
+            connectionStatus.textContent =
+              "Connected successfully! User roles found.";
+            connectionStatus.className = "mt-2 text-green-600";
+          }
+
+          // Save credentials for convenience
+          localStorage.setItem("supabaseUrl", url);
+          localStorage.setItem("supabaseKey", key);
+
+          // Show admin tools
+          adminTools.classList.remove("hidden");
+        } catch (err) {
+          connectionStatus.textContent = "Connection failed: " + err.message;
+          connectionStatus.className = "mt-2 text-red-600";
+        }
       }
-      
-      if (!query) {
-        queryResults.textContent = 'Please enter a SQL query';
-        return;
-      }
-      
-      queryResults.textContent = 'Running query...';
-      
-      try {
-        // Run the query
-        const { data, error } = await supabase.rpc('execute_sql', { sql_query: query });
-        
-        if (error) {
-          // Try direct Postgres query if RPC method isn't available
+
+      async function runSqlQuery() {
+        const query = sqlQuery.value.trim();
+
+        if (!supabase) {
+          queryResults.textContent = "Please connect to database first";
+          return;
+        }
+
+        if (!query) {
+          queryResults.textContent = "Please enter a SQL query";
+          return;
+        }
+
+        queryResults.textContent = "Running query...";
+
+        try {
+          // Run the query
+          const { data, error } = await supabase.rpc("execute_sql", {
+            sql_query: query,
+          });
+
+          if (error) {
+            // Try direct Postgres query if RPC method isn't available
+            try {
+              const directResult = await directPostgresQuery(query);
+              queryResults.textContent = JSON.stringify(directResult, null, 2);
+            } catch (directError) {
+              queryResults.textContent =
+                "Error: " +
+                error.message +
+                "\n\nDirect query also failed: " +
+                directError.message;
+            }
+          } else {
+            queryResults.textContent = JSON.stringify(data, null, 2);
+          }
+        } catch (err) {
+          // Try direct method
           try {
+            console.log("Trying direct query due to error:", err);
             const directResult = await directPostgresQuery(query);
             queryResults.textContent = JSON.stringify(directResult, null, 2);
           } catch (directError) {
-            queryResults.textContent = 'Error: ' + error.message + '\n\nDirect query also failed: ' + directError.message;
+            queryResults.textContent =
+              "Error: " +
+              err.message +
+              "\n\nDirect query also failed: " +
+              directError.message;
           }
-        } else {
-          queryResults.textContent = JSON.stringify(data, null, 2);
         }
-      } catch (err) {
-        // Try direct method
+      }
+
+      async function directPostgresQuery(query) {
+        // This is a fallback function that attempts to run SQL
+        // directly against the database when RPC isn't available
+        // It will only work for SELECT queries
+
+        if (!query.toLowerCase().trim().startsWith("select")) {
+          throw new Error("Direct queries only support SELECT statements");
+        }
+
+        const endpoint = `${document.getElementById("supabase-url").value}/rest/v1/`;
+        const apiKey = document.getElementById("supabase-key").value;
+
+        const response = await fetch(`${endpoint}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            apikey: apiKey,
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            query: query,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        return await response.json();
+      }
+
+      async function fixUserRoles() {
+        if (!supabase) {
+          fixUserRolesStatus.textContent = "Please connect to database first";
+          fixUserRolesStatus.className = "mt-2 text-red-600";
+          return;
+        }
+
+        fixUserRolesStatus.textContent = "Fixing user roles table...";
+        fixUserRolesStatus.className = "mt-2 text-blue-600";
+
         try {
-          console.log('Trying direct query due to error:', err);
-          const directResult = await directPostgresQuery(query);
-          queryResults.textContent = JSON.stringify(directResult, null, 2);
-        } catch (directError) {
-          queryResults.textContent = 'Error: ' + err.message + '\n\nDirect query also failed: ' + directError.message;
-        }
-      }
-    }
+          // Check if user_roles table exists
+          const { error: checkError } = await supabase
+            .from("user_roles")
+            .select("*")
+            .limit(1);
 
-    async function directPostgresQuery(query) {
-      // This is a fallback function that attempts to run SQL 
-      // directly against the database when RPC isn't available
-      // It will only work for SELECT queries
-      
-      if (!query.toLowerCase().trim().startsWith('select')) {
-        throw new Error('Direct queries only support SELECT statements');
-      }
-      
-      const endpoint = `${document.getElementById('supabase-url').value}/rest/v1/`;
-      const apiKey = document.getElementById('supabase-key').value;
-      
-      const response = await fetch(`${endpoint}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'apikey': apiKey,
-          'Authorization': `Bearer ${apiKey}`
-        },
-        body: JSON.stringify({
-          query: query
-        })
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      return await response.json();
-    }
-
-    async function fixUserRoles() {
-      if (!supabase) {
-        fixUserRolesStatus.textContent = 'Please connect to database first';
-        fixUserRolesStatus.className = 'mt-2 text-red-600';
-        return;
-      }
-      
-      fixUserRolesStatus.textContent = 'Fixing user roles table...';
-      fixUserRolesStatus.className = 'mt-2 text-blue-600';
-      
-      try {
-        // Check if user_roles table exists
-        const { error: checkError } = await supabase.from('user_roles').select('*').limit(1);
-        
-        if (checkError && checkError.code === '42P01') {
-          // Table doesn't exist, create it
-          const createTableQuery = `
+          if (checkError && checkError.code === "42P01") {
+            // Table doesn't exist, create it
+            const createTableQuery = `
             CREATE TABLE IF NOT EXISTS public.user_roles (
               id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
               user_id UUID NOT NULL,
@@ -426,170 +538,185 @@ Example: SELECT * FROM user_roles LIMIT 10"></textarea>
               UNIQUE(user_id)
             );
           `;
-          
-          const { data, error } = await supabase.rpc('execute_sql', { sql_query: createTableQuery });
-          
-          if (error) {
-            fixUserRolesStatus.textContent = 'Error creating table: ' + error.message;
-            fixUserRolesStatus.className = 'mt-2 text-red-600';
-            return;
-          }
-          
-          fixUserRolesStatus.textContent = 'Created user_roles table!';
-          fixUserRolesStatus.className = 'mt-2 text-green-600';
-        } else {
-          // Table exists, make sure it has the right structure
-          const alterTableQuery = `
+
+            const { data, error } = await supabase.rpc("execute_sql", {
+              sql_query: createTableQuery,
+            });
+
+            if (error) {
+              fixUserRolesStatus.textContent =
+                "Error creating table: " + error.message;
+              fixUserRolesStatus.className = "mt-2 text-red-600";
+              return;
+            }
+
+            fixUserRolesStatus.textContent = "Created user_roles table!";
+            fixUserRolesStatus.className = "mt-2 text-green-600";
+          } else {
+            // Table exists, make sure it has the right structure
+            const alterTableQuery = `
             ALTER TABLE IF EXISTS public.user_roles 
             ADD COLUMN IF NOT EXISTS role VARCHAR(255);
           `;
-          
-          const { data, error } = await supabase.rpc('execute_sql', { sql_query: alterTableQuery });
-          
-          if (error) {
-            fixUserRolesStatus.textContent = 'Error altering table: ' + error.message;
-            fixUserRolesStatus.className = 'mt-2 text-red-600';
-            return;
-          }
-          
-          fixUserRolesStatus.textContent = 'Fixed user_roles table structure!';
-          fixUserRolesStatus.className = 'mt-2 text-green-600';
-        }
-      } catch (err) {
-        fixUserRolesStatus.textContent = 'Error: ' + err.message;
-        fixUserRolesStatus.className = 'mt-2 text-red-600';
-      }
-    }
 
-    async function createAdminUser() {
-      if (!supabase) {
-        createAdminStatus.textContent = 'Please connect to database first';
-        createAdminStatus.className = 'mt-2 text-red-600';
-        return;
-      }
-      
-      const email = adminEmail.value.trim();
-      
-      if (!email) {
-        createAdminStatus.textContent = 'Please enter your email';
-        createAdminStatus.className = 'mt-2 text-red-600';
-        return;
-      }
-      
-      createAdminStatus.textContent = 'Creating admin user...';
-      createAdminStatus.className = 'mt-2 text-blue-600';
-      
-      try {
-        // Get user ID from email
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('email', email)
-          .single();
-        
-        if (userError) {
-          createAdminStatus.textContent = 'Error finding user: ' + userError.message;
-          createAdminStatus.className = 'mt-2 text-red-600';
-          return;
-        }
-        
-        if (!userData) {
-          createAdminStatus.textContent = 'User not found with that email';
-          createAdminStatus.className = 'mt-2 text-red-600';
-          return;
-        }
-        
-        // Check if user_roles table exists
-        const { error: checkError } = await supabase.from('user_roles').select('*').limit(1);
-        
-        if (checkError && checkError.code === '42P01') {
-          // Table doesn't exist, create it
-          await fixUserRoles();
-        }
-        
-        // Check if user already has a role
-        const { data: roleData, error: roleError } = await supabase
-          .from('user_roles')
-          .select('*')
-          .eq('user_id', userData.id)
-          .single();
-        
-        if (roleData) {
-          // Update existing role
-          const { error: updateError } = await supabase
-            .from('user_roles')
-            .update({ role: 'admin' })
-            .eq('user_id', userData.id);
-          
-          if (updateError) {
-            createAdminStatus.textContent = 'Error updating role: ' + updateError.message;
-            createAdminStatus.className = 'mt-2 text-red-600';
-            return;
-          }
-        } else {
-          // Insert new role
-          const { error: insertError } = await supabase
-            .from('user_roles')
-            .insert({ user_id: userData.id, role: 'admin' });
-          
-          if (insertError) {
-            createAdminStatus.textContent = 'Error inserting role: ' + insertError.message;
-            createAdminStatus.className = 'mt-2 text-red-600';
-            return;
-          }
-        }
-        
-        // Also update user_types table if it exists
-        try {
-          const { error: typeCheckError } = await supabase.from('user_types').select('*').limit(1);
-          
-          if (!typeCheckError) {
-            // Check if user already has a type
-            const { data: typeData, error: typeError } = await supabase
-              .from('user_types')
-              .select('*')
-              .eq('user_id', userData.id)
-              .single();
-            
-            if (typeData) {
-              // Update existing type
-              const { error: updateTypeError } = await supabase
-                .from('user_types')
-                .update({ user_type: 'admin' })
-                .eq('user_id', userData.id);
-            } else {
-              // Insert new type
-              const { error: insertTypeError } = await supabase
-                .from('user_types')
-                .insert({ user_id: userData.id, user_type: 'admin' });
+            const { data, error } = await supabase.rpc("execute_sql", {
+              sql_query: alterTableQuery,
+            });
+
+            if (error) {
+              fixUserRolesStatus.textContent =
+                "Error altering table: " + error.message;
+              fixUserRolesStatus.className = "mt-2 text-red-600";
+              return;
             }
+
+            fixUserRolesStatus.textContent =
+              "Fixed user_roles table structure!";
+            fixUserRolesStatus.className = "mt-2 text-green-600";
           }
         } catch (err) {
-          // Ignore errors with user_types table
-          console.error('Error updating user_types:', err);
+          fixUserRolesStatus.textContent = "Error: " + err.message;
+          fixUserRolesStatus.className = "mt-2 text-red-600";
         }
-        
-        createAdminStatus.textContent = 'User set as admin successfully!';
-        createAdminStatus.className = 'mt-2 text-green-600';
-        
-      } catch (err) {
-        createAdminStatus.textContent = 'Error: ' + err.message;
-        createAdminStatus.className = 'mt-2 text-red-600';
       }
-    }
 
-    async function listTables() {
-      if (!supabase) {
-        listTablesResult.textContent = 'Please connect to database first';
-        listTablesResult.className = 'mt-2 text-red-600 text-sm';
-        return;
+      async function createAdminUser() {
+        if (!supabase) {
+          createAdminStatus.textContent = "Please connect to database first";
+          createAdminStatus.className = "mt-2 text-red-600";
+          return;
+        }
+
+        const email = adminEmail.value.trim();
+
+        if (!email) {
+          createAdminStatus.textContent = "Please enter your email";
+          createAdminStatus.className = "mt-2 text-red-600";
+          return;
+        }
+
+        createAdminStatus.textContent = "Creating admin user...";
+        createAdminStatus.className = "mt-2 text-blue-600";
+
+        try {
+          // Get user ID from email
+          const { data: userData, error: userError } = await supabase
+            .from("users")
+            .select("id")
+            .eq("email", email)
+            .single();
+
+          if (userError) {
+            createAdminStatus.textContent =
+              "Error finding user: " + userError.message;
+            createAdminStatus.className = "mt-2 text-red-600";
+            return;
+          }
+
+          if (!userData) {
+            createAdminStatus.textContent = "User not found with that email";
+            createAdminStatus.className = "mt-2 text-red-600";
+            return;
+          }
+
+          // Check if user_roles table exists
+          const { error: checkError } = await supabase
+            .from("user_roles")
+            .select("*")
+            .limit(1);
+
+          if (checkError && checkError.code === "42P01") {
+            // Table doesn't exist, create it
+            await fixUserRoles();
+          }
+
+          // Check if user already has a role
+          const { data: roleData, error: roleError } = await supabase
+            .from("user_roles")
+            .select("*")
+            .eq("user_id", userData.id)
+            .single();
+
+          if (roleData) {
+            // Update existing role
+            const { error: updateError } = await supabase
+              .from("user_roles")
+              .update({ role: "admin" })
+              .eq("user_id", userData.id);
+
+            if (updateError) {
+              createAdminStatus.textContent =
+                "Error updating role: " + updateError.message;
+              createAdminStatus.className = "mt-2 text-red-600";
+              return;
+            }
+          } else {
+            // Insert new role
+            const { error: insertError } = await supabase
+              .from("user_roles")
+              .insert({ user_id: userData.id, role: "admin" });
+
+            if (insertError) {
+              createAdminStatus.textContent =
+                "Error inserting role: " + insertError.message;
+              createAdminStatus.className = "mt-2 text-red-600";
+              return;
+            }
+          }
+
+          // Also update user_types table if it exists
+          try {
+            const { error: typeCheckError } = await supabase
+              .from("user_types")
+              .select("*")
+              .limit(1);
+
+            if (!typeCheckError) {
+              // Check if user already has a type
+              const { data: typeData, error: typeError } = await supabase
+                .from("user_types")
+                .select("*")
+                .eq("user_id", userData.id)
+                .single();
+
+              if (typeData) {
+                // Update existing type
+                const { error: updateTypeError } = await supabase
+                  .from("user_types")
+                  .update({ user_type: "admin" })
+                  .eq("user_id", userData.id);
+              } else {
+                // Insert new type
+                const { error: insertTypeError } = await supabase
+                  .from("user_types")
+                  .insert({ user_id: userData.id, user_type: "admin" });
+              }
+            }
+          } catch (err) {
+            // Ignore errors with user_types table
+            console.error("Error updating user_types:", err);
+          }
+
+          createAdminStatus.textContent = "User set as admin successfully!";
+          createAdminStatus.className = "mt-2 text-green-600";
+        } catch (err) {
+          createAdminStatus.textContent = "Error: " + err.message;
+          createAdminStatus.className = "mt-2 text-red-600";
+        }
       }
-      
-      listTablesResult.textContent = 'Loading tables...';
-      listTablesResult.className = 'mt-2 text-blue-600 text-sm';
-      
-      try {
-        const query = `
+
+      async function listTables() {
+        if (!supabase) {
+          listTablesResult.textContent = "Please connect to database first";
+          listTablesResult.className = "mt-2 text-red-600 text-sm";
+          return;
+        }
+
+        listTablesResult.textContent = "Loading tables...";
+        listTablesResult.className = "mt-2 text-blue-600 text-sm";
+
+        try {
+          const query = `
           SELECT 
             table_name 
           FROM 
@@ -599,113 +726,113 @@ Example: SELECT * FROM user_roles LIMIT 10"></textarea>
           ORDER BY 
             table_name
         `;
-        
-        const { data, error } = await supabase.rpc('execute_sql', { sql_query: query });
-        
-        if (error) {
-          listTablesResult.textContent = 'Error listing tables: ' + error.message;
-          listTablesResult.className = 'mt-2 text-red-600 text-sm';
-          return;
-        }
-        
-        if (!data || data.length === 0) {
-          listTablesResult.textContent = 'No tables found in the public schema';
-          listTablesResult.className = 'mt-2 text-yellow-600 text-sm';
-          return;
-        }
-        
-        let tableList = '<ul class="list-disc pl-5">';
-        data.forEach(table => {
-          tableList += `<li>${table.table_name}</li>`;
-        });
-        tableList += '</ul>';
-        
-        listTablesResult.innerHTML = tableList;
-        listTablesResult.className = 'mt-2 text-gray-700 text-sm';
-        
-      } catch (err) {
-        listTablesResult.textContent = 'Error: ' + err.message;
-        listTablesResult.className = 'mt-2 text-red-600 text-sm';
-      }
-    }
 
-    async function checkHealth() {
-      if (!supabase) {
-        healthResult.textContent = 'Please connect to database first';
-        healthResult.className = 'mt-2 text-red-600 text-sm';
-        return;
-      }
-      
-      healthResult.textContent = 'Checking database health...';
-      healthResult.className = 'mt-2 text-blue-600 text-sm';
-      
-      try {
-        // Test database connection
-        const { data, error } = await supabase.rpc('execute_sql', { 
-          sql_query: 'SELECT version()' 
-        });
-        
-        if (error) {
-          healthResult.textContent = 'Database error: ' + error.message;
-          healthResult.className = 'mt-2 text-red-600 text-sm';
-          return;
-        }
-        
-        // Check auth tables
-        const tables = [
-          'users',
-          'user_roles',
-          'user_types',
-          'auth.users'
-        ];
-        
-        let results = '<div class="space-y-2">';
-        results += `<div class="text-green-600">✅ Database connection successful</div>`;
-        
-        for (const table of tables) {
-          try {
-            const { data: tableData, error: tableError } = await supabase
-              .from(table.replace('auth.', ''))
-              .select('count(*)')
-              .limit(1);
-            
-            if (tableError) {
-              results += `<div class="text-red-600">❌ Table ${table}: ${tableError.message}</div>`;
-            } else {
-              results += `<div class="text-green-600">✅ Table ${table} accessible</div>`;
-            }
-          } catch (tableErr) {
-            results += `<div class="text-red-600">❌ Table ${table}: ${tableErr.message}</div>`;
+          const { data, error } = await supabase.rpc("execute_sql", {
+            sql_query: query,
+          });
+
+          if (error) {
+            listTablesResult.textContent =
+              "Error listing tables: " + error.message;
+            listTablesResult.className = "mt-2 text-red-600 text-sm";
+            return;
           }
-        }
-        
-        results += '</div>';
-        
-        healthResult.innerHTML = results;
-        
-      } catch (err) {
-        healthResult.textContent = 'Error: ' + err.message;
-        healthResult.className = 'mt-2 text-red-600 text-sm';
-      }
-    }
 
-    async function fixUserTypes() {
-      if (!supabase) {
-        fixUserTypesStatus.textContent = 'Please connect to database first';
-        fixUserTypesStatus.className = 'mt-2 text-red-600';
-        return;
+          if (!data || data.length === 0) {
+            listTablesResult.textContent =
+              "No tables found in the public schema";
+            listTablesResult.className = "mt-2 text-yellow-600 text-sm";
+            return;
+          }
+
+          let tableList = '<ul class="list-disc pl-5">';
+          data.forEach((table) => {
+            tableList += `<li>${table.table_name}</li>`;
+          });
+          tableList += "</ul>";
+
+          listTablesResult.innerHTML = tableList;
+          listTablesResult.className = "mt-2 text-gray-700 text-sm";
+        } catch (err) {
+          listTablesResult.textContent = "Error: " + err.message;
+          listTablesResult.className = "mt-2 text-red-600 text-sm";
+        }
       }
-      
-      fixUserTypesStatus.textContent = 'Fixing user_types table...';
-      fixUserTypesStatus.className = 'mt-2 text-blue-600';
-      
-      try {
-        // Check if user_types table exists
-        const { error: checkError } = await supabase.from('user_types').select('*').limit(1);
-        
-        if (checkError && checkError.code === '42P01') {
-          // Table doesn't exist, create it
-          const createTableQuery = `
+
+      async function checkHealth() {
+        if (!supabase) {
+          healthResult.textContent = "Please connect to database first";
+          healthResult.className = "mt-2 text-red-600 text-sm";
+          return;
+        }
+
+        healthResult.textContent = "Checking database health...";
+        healthResult.className = "mt-2 text-blue-600 text-sm";
+
+        try {
+          // Test database connection
+          const { data, error } = await supabase.rpc("execute_sql", {
+            sql_query: "SELECT version()",
+          });
+
+          if (error) {
+            healthResult.textContent = "Database error: " + error.message;
+            healthResult.className = "mt-2 text-red-600 text-sm";
+            return;
+          }
+
+          // Check auth tables
+          const tables = ["users", "user_roles", "user_types", "auth.users"];
+
+          let results = '<div class="space-y-2">';
+          results += `<div class="text-green-600">✅ Database connection successful</div>`;
+
+          for (const table of tables) {
+            try {
+              const { data: tableData, error: tableError } = await supabase
+                .from(table.replace("auth.", ""))
+                .select("count(*)")
+                .limit(1);
+
+              if (tableError) {
+                results += `<div class="text-red-600">❌ Table ${table}: ${tableError.message}</div>`;
+              } else {
+                results += `<div class="text-green-600">✅ Table ${table} accessible</div>`;
+              }
+            } catch (tableErr) {
+              results += `<div class="text-red-600">❌ Table ${table}: ${tableErr.message}</div>`;
+            }
+          }
+
+          results += "</div>";
+
+          healthResult.innerHTML = results;
+        } catch (err) {
+          healthResult.textContent = "Error: " + err.message;
+          healthResult.className = "mt-2 text-red-600 text-sm";
+        }
+      }
+
+      async function fixUserTypes() {
+        if (!supabase) {
+          fixUserTypesStatus.textContent = "Please connect to database first";
+          fixUserTypesStatus.className = "mt-2 text-red-600";
+          return;
+        }
+
+        fixUserTypesStatus.textContent = "Fixing user_types table...";
+        fixUserTypesStatus.className = "mt-2 text-blue-600";
+
+        try {
+          // Check if user_types table exists
+          const { error: checkError } = await supabase
+            .from("user_types")
+            .select("*")
+            .limit(1);
+
+          if (checkError && checkError.code === "42P01") {
+            // Table doesn't exist, create it
+            const createTableQuery = `
             CREATE TABLE IF NOT EXISTS public.user_types (
               id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
               user_id UUID NOT NULL,
@@ -714,54 +841,63 @@ Example: SELECT * FROM user_roles LIMIT 10"></textarea>
               UNIQUE(user_id)
             );
           `;
-          
-          const { data, error } = await supabase.rpc('execute_sql', { sql_query: createTableQuery });
-          
-          if (error) {
-            fixUserTypesStatus.textContent = 'Error creating table: ' + error.message;
-            fixUserTypesStatus.className = 'mt-2 text-red-600';
-            return;
-          }
-          
-          fixUserTypesStatus.textContent = 'Created user_types table!';
-          fixUserTypesStatus.className = 'mt-2 text-green-600';
-        } else {
-          // Table exists, make sure it has the right structure
-          const alterTableQuery = `
+
+            const { data, error } = await supabase.rpc("execute_sql", {
+              sql_query: createTableQuery,
+            });
+
+            if (error) {
+              fixUserTypesStatus.textContent =
+                "Error creating table: " + error.message;
+              fixUserTypesStatus.className = "mt-2 text-red-600";
+              return;
+            }
+
+            fixUserTypesStatus.textContent = "Created user_types table!";
+            fixUserTypesStatus.className = "mt-2 text-green-600";
+          } else {
+            // Table exists, make sure it has the right structure
+            const alterTableQuery = `
             ALTER TABLE IF EXISTS public.user_types 
             ADD COLUMN IF NOT EXISTS user_type VARCHAR(255);
           `;
-          
-          const { data, error } = await supabase.rpc('execute_sql', { sql_query: alterTableQuery });
-          
-          if (error) {
-            fixUserTypesStatus.textContent = 'Error altering table: ' + error.message;
-            fixUserTypesStatus.className = 'mt-2 text-red-600';
-            return;
-          }
-          
-          fixUserTypesStatus.textContent = 'Fixed user_types table structure!';
-          fixUserTypesStatus.className = 'mt-2 text-green-600';
-        }
-      } catch (err) {
-        fixUserTypesStatus.textContent = 'Error: ' + err.message;
-        fixUserTypesStatus.className = 'mt-2 text-red-600';
-      }
-    }
 
-    async function createAuthTables() {
-      if (!supabase) {
-        createAuthTablesStatus.textContent = 'Please connect to database first';
-        createAuthTablesStatus.className = 'mt-2 text-red-600';
-        return;
+            const { data, error } = await supabase.rpc("execute_sql", {
+              sql_query: alterTableQuery,
+            });
+
+            if (error) {
+              fixUserTypesStatus.textContent =
+                "Error altering table: " + error.message;
+              fixUserTypesStatus.className = "mt-2 text-red-600";
+              return;
+            }
+
+            fixUserTypesStatus.textContent =
+              "Fixed user_types table structure!";
+            fixUserTypesStatus.className = "mt-2 text-green-600";
+          }
+        } catch (err) {
+          fixUserTypesStatus.textContent = "Error: " + err.message;
+          fixUserTypesStatus.className = "mt-2 text-red-600";
+        }
       }
-      
-      createAuthTablesStatus.textContent = 'Creating authentication tables...';
-      createAuthTablesStatus.className = 'mt-2 text-blue-600';
-      
-      try {
-        // Create necessary tables
-        const createTablesQuery = `
+
+      async function createAuthTables() {
+        if (!supabase) {
+          createAuthTablesStatus.textContent =
+            "Please connect to database first";
+          createAuthTablesStatus.className = "mt-2 text-red-600";
+          return;
+        }
+
+        createAuthTablesStatus.textContent =
+          "Creating authentication tables...";
+        createAuthTablesStatus.className = "mt-2 text-blue-600";
+
+        try {
+          // Create necessary tables
+          const createTablesQuery = `
           -- Create user_types table if it doesn't exist
           CREATE TABLE IF NOT EXISTS public.user_types (
             id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -780,108 +916,120 @@ Example: SELECT * FROM user_roles LIMIT 10"></textarea>
             UNIQUE(user_id)
           );
         `;
-        
-        const { data, error } = await supabase.rpc('execute_sql', { sql_query: createTablesQuery });
-        
-        if (error) {
-          createAuthTablesStatus.textContent = 'Error creating tables: ' + error.message;
-          createAuthTablesStatus.className = 'mt-2 text-red-600';
-          return;
-        }
-        
-        createAuthTablesStatus.textContent = 'Created authentication tables successfully!';
-        createAuthTablesStatus.className = 'mt-2 text-green-600';
-      } catch (err) {
-        createAuthTablesStatus.textContent = 'Error: ' + err.message;
-        createAuthTablesStatus.className = 'mt-2 text-red-600';
-      }
-    }
 
-    async function setAdminRole() {
-      if (!supabase) {
-        setAdminRoleStatus.textContent = 'Please connect to database first';
-        setAdminRoleStatus.className = 'mt-2 text-red-600';
-        return;
+          const { data, error } = await supabase.rpc("execute_sql", {
+            sql_query: createTablesQuery,
+          });
+
+          if (error) {
+            createAuthTablesStatus.textContent =
+              "Error creating tables: " + error.message;
+            createAuthTablesStatus.className = "mt-2 text-red-600";
+            return;
+          }
+
+          createAuthTablesStatus.textContent =
+            "Created authentication tables successfully!";
+          createAuthTablesStatus.className = "mt-2 text-green-600";
+        } catch (err) {
+          createAuthTablesStatus.textContent = "Error: " + err.message;
+          createAuthTablesStatus.className = "mt-2 text-red-600";
+        }
       }
-      
-      const email = adminUserEmail.value.trim();
-      
-      if (!email) {
-        setAdminRoleStatus.textContent = 'Please enter your email';
-        setAdminRoleStatus.className = 'mt-2 text-red-600';
-        return;
-      }
-      
-      setAdminRoleStatus.textContent = 'Setting admin role...';
-      setAdminRoleStatus.className = 'mt-2 text-blue-600';
-      
-      try {
-        // First, ensure the auth tables exist
-        await createAuthTables();
-        
-        // Get user ID from email
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('email', email)
-          .single();
-        
-        if (userError) {
-          setAdminRoleStatus.textContent = 'Error finding user: ' + userError.message;
-          setAdminRoleStatus.className = 'mt-2 text-red-600';
+
+      async function setAdminRole() {
+        if (!supabase) {
+          setAdminRoleStatus.textContent = "Please connect to database first";
+          setAdminRoleStatus.className = "mt-2 text-red-600";
           return;
         }
-        
-        if (!userData) {
-          setAdminRoleStatus.textContent = 'User not found with that email';
-          setAdminRoleStatus.className = 'mt-2 text-red-600';
+
+        const email = adminUserEmail.value.trim();
+
+        if (!email) {
+          setAdminRoleStatus.textContent = "Please enter your email";
+          setAdminRoleStatus.className = "mt-2 text-red-600";
           return;
         }
-        
-        // Update user_types
-        const upsertTypesQuery = `
+
+        setAdminRoleStatus.textContent = "Setting admin role...";
+        setAdminRoleStatus.className = "mt-2 text-blue-600";
+
+        try {
+          // First, ensure the auth tables exist
+          await createAuthTables();
+
+          // Get user ID from email
+          const { data: userData, error: userError } = await supabase
+            .from("users")
+            .select("id")
+            .eq("email", email)
+            .single();
+
+          if (userError) {
+            setAdminRoleStatus.textContent =
+              "Error finding user: " + userError.message;
+            setAdminRoleStatus.className = "mt-2 text-red-600";
+            return;
+          }
+
+          if (!userData) {
+            setAdminRoleStatus.textContent = "User not found with that email";
+            setAdminRoleStatus.className = "mt-2 text-red-600";
+            return;
+          }
+
+          // Update user_types
+          const upsertTypesQuery = `
           INSERT INTO public.user_types (user_id, user_type)
           VALUES ('${userData.id}', 'admin')
           ON CONFLICT (user_id) 
           DO UPDATE SET user_type = 'admin';
         `;
-        
-        const { data: typeData, error: typeError } = await supabase.rpc('execute_sql', { 
-          sql_query: upsertTypesQuery 
-        });
-        
-        if (typeError) {
-          setAdminRoleStatus.textContent = 'Error updating user_types: ' + typeError.message;
-          setAdminRoleStatus.className = 'mt-2 text-orange-600';
-          // Continue anyway
-        }
-        
-        // Update user_roles
-        const upsertRolesQuery = `
+
+          const { data: typeData, error: typeError } = await supabase.rpc(
+            "execute_sql",
+            {
+              sql_query: upsertTypesQuery,
+            },
+          );
+
+          if (typeError) {
+            setAdminRoleStatus.textContent =
+              "Error updating user_types: " + typeError.message;
+            setAdminRoleStatus.className = "mt-2 text-orange-600";
+            // Continue anyway
+          }
+
+          // Update user_roles
+          const upsertRolesQuery = `
           INSERT INTO public.user_roles (user_id, role)
           VALUES ('${userData.id}', 'admin')
           ON CONFLICT (user_id) 
           DO UPDATE SET role = 'admin';
         `;
-        
-        const { data: roleData, error: roleError } = await supabase.rpc('execute_sql', { 
-          sql_query: upsertRolesQuery 
-        });
-        
-        if (roleError) {
-          setAdminRoleStatus.textContent = 'Error updating user_roles: ' + roleError.message;
-          setAdminRoleStatus.className = 'mt-2 text-red-600';
-          return;
+
+          const { data: roleData, error: roleError } = await supabase.rpc(
+            "execute_sql",
+            {
+              sql_query: upsertRolesQuery,
+            },
+          );
+
+          if (roleError) {
+            setAdminRoleStatus.textContent =
+              "Error updating user_roles: " + roleError.message;
+            setAdminRoleStatus.className = "mt-2 text-red-600";
+            return;
+          }
+
+          setAdminRoleStatus.textContent = "Set admin role successfully!";
+          setAdminRoleStatus.className = "mt-2 text-green-600";
+        } catch (err) {
+          setAdminRoleStatus.textContent = "Error: " + err.message;
+          setAdminRoleStatus.className = "mt-2 text-red-600";
         }
-        
-        setAdminRoleStatus.textContent = 'Set admin role successfully!';
-        setAdminRoleStatus.className = 'mt-2 text-green-600';
-        
-      } catch (err) {
-        setAdminRoleStatus.textContent = 'Error: ' + err.message;
-        setAdminRoleStatus.className = 'mt-2 text-red-600';
       }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>

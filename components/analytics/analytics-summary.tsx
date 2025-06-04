@@ -1,45 +1,45 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { UserStats } from "@/lib/user-management-service"
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import type { UserStats } from "@/lib/user-management-service";
 
 export function AnalyticsSummary() {
-  const [stats, setStats] = useState<UserStats | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchStats() {
       try {
-        setIsLoading(true)
-        const response = await fetch('/api/user-management?action=stats')
+        setIsLoading(true);
+        const response = await fetch("/api/user-management?action=stats");
         if (!response.ok) {
-          throw new Error('Failed to fetch stats')
+          throw new Error("Failed to fetch stats");
         }
-        const data = await response.json()
-        setStats(data)
+        const data = await response.json();
+        setStats(data);
       } catch (err) {
-        console.error("Error fetching user stats:", err)
-        setError("Failed to load user statistics")
+        console.error("Error fetching user stats:", err);
+        setError("Failed to load user statistics");
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    fetchStats()
-  }, [])
+    fetchStats();
+  }, []);
 
   if (isLoading) {
-    return <div>Loading statistics...</div>
+    return <div>Loading statistics...</div>;
   }
 
   if (error) {
-    return <div className="text-red-500">{error}</div>
+    return <div className="text-red-500">{error}</div>;
   }
 
   if (!stats) {
-    return <div>No statistics available</div>
+    return <div>No statistics available</div>;
   }
 
   return (
@@ -86,11 +86,9 @@ export function AnalyticsSummary() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.admins}</div>
-          <p className="text-xs text-muted-foreground">
-            System administrators
-          </p>
+          <p className="text-xs text-muted-foreground">System administrators</p>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

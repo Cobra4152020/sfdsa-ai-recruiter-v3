@@ -1,35 +1,44 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { sendEmail } from "@/lib/email/send-email"
-import { emailTemplates } from "@/lib/email/templates"
-import { NFT_AWARD_TIERS } from "@/lib/nft-utils"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { sendEmail } from "@/lib/email/send-email";
+import { emailTemplates } from "@/lib/email/templates";
+import { NFT_AWARD_TIERS } from "@/lib/nft-utils";
 
 export async function POST(request: Request) {
   try {
-    const { userId, nftAwardId } = await request.json()
+    const { userId, nftAwardId } = await request.json();
 
     if (!userId) {
-      return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "User ID is required" },
+        { status: 400 },
+      );
     }
 
     if (!nftAwardId) {
-      return NextResponse.json({ success: false, message: "NFT award ID is required" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "NFT award ID is required" },
+        { status: 400 },
+      );
     }
 
     // Get user email
-    const serviceClient = getServiceSupabase()
+    const serviceClient = getServiceSupabase();
     const { data: user, error: userError } = await serviceClient
       .from("users")
       .select("name, email")
       .eq("id", userId)
-      .single()
+      .single();
 
     if (userError || !user) {
-      console.error("Error fetching user data:", userError)
-      return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
+      console.error("Error fetching user data:", userError);
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 },
+      );
     }
 
     // If no email, return early
@@ -37,7 +46,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: false,
         message: "User has no email address",
-      })
+      });
     }
 
     // Get NFT award details
@@ -46,18 +55,26 @@ export async function POST(request: Request) {
       .select("*")
       .eq("user_id", userId)
       .eq("nft_award_id", nftAwardId)
-      .single()
+      .single();
 
     if (nftError || !nftAward) {
-      console.error("Error fetching NFT award:", nftError)
-      return NextResponse.json({ success: false, message: "NFT award not found" }, { status: 404 })
+      console.error("Error fetching NFT award:", nftError);
+      return NextResponse.json(
+        { success: false, message: "NFT award not found" },
+        { status: 404 },
+      );
     }
 
     // Get award details from the tiers
-    const awardDetails = NFT_AWARD_TIERS.find((award) => award.id === nftAwardId)
+    const awardDetails = NFT_AWARD_TIERS.find(
+      (award) => award.id === nftAwardId,
+    );
 
     if (!awardDetails) {
-      return NextResponse.json({ success: false, message: "Award details not found" }, { status: 404 })
+      return NextResponse.json(
+        { success: false, message: "Award details not found" },
+        { status: 404 },
+      );
     }
 
     // Generate NFT view URL
@@ -65,10 +82,10 @@ export async function POST(request: Request) {
       ? `https://${process.env.VERCEL_URL}`
       : process.env.NEXT_PUBLIC_VERCEL_URL
         ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-        : "http://localhost:3000"
+        : "http://localhost:3000";
 
-    const nftUrl = `${baseUrl}/nft-awards/${nftAwardId}`
-    const nftImageUrl = `${baseUrl}${awardDetails.imageUrl}`
+    const nftUrl = `${baseUrl}/nft-awards/${nftAwardId}`;
+    const nftImageUrl = `${baseUrl}${awardDetails.imageUrl}`;
 
     // Send email notification using our new email utility
     const emailResult = await sendEmail({
@@ -83,19 +100,25 @@ export async function POST(request: Request) {
         contractAddress: nftAward.contract_address,
         nftUrl,
       }),
-    })
+    });
 
     if (!emailResult.success) {
-      console.error("Error sending email:", emailResult.message)
-      return NextResponse.json({ success: false, message: "Failed to send email notification" }, { status: 500 })
+      console.error("Error sending email:", emailResult.message);
+      return NextResponse.json(
+        { success: false, message: "Failed to send email notification" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
       success: true,
       messageId: emailResult.data?.id,
-    })
+    });
   } catch (error) {
-    console.error("Unexpected error:", error)
-    return NextResponse.json({ success: false, message: "An unexpected error occurred" }, { status: 500 })
+    console.error("Unexpected error:", error);
+    return NextResponse.json(
+      { success: false, message: "An unexpected error occurred" },
+      { status: 500 },
+    );
   }
 }

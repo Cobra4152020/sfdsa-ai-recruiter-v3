@@ -26,7 +26,9 @@ interface JourneyPerformanceDashboardProps {
   data: JourneyData | null;
 }
 
-export function JourneyPerformanceDashboard({ data }: JourneyPerformanceDashboardProps) {
+export function JourneyPerformanceDashboard({
+  data,
+}: JourneyPerformanceDashboardProps) {
   if (!data) {
     return <div>No data available</div>;
   }
@@ -37,4 +39,4 @@ export function JourneyPerformanceDashboard({ data }: JourneyPerformanceDashboar
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
   );
-} 
+}

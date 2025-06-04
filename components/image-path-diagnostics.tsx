@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { checkImageExists } from "@/lib/image-path-utils"
+import { useState, useEffect } from "react";
+import { checkImageExists } from "@/lib/image-path-utils";
 
 // List of important images to check
 const CRITICAL_IMAGES = [
@@ -16,35 +16,35 @@ const CRITICAL_IMAGES = [
   "/fitness-icon.png",
   "/psychology-icon.png",
   "/chat-icon.png",
-]
+];
 
 export default function ImagePathDiagnostics() {
-  const [results, setResults] = useState<Record<string, boolean>>({})
-  const [loading, setLoading] = useState(true)
+  const [results, setResults] = useState<Record<string, boolean>>({});
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function checkImages() {
       const checks = await Promise.all(
         CRITICAL_IMAGES.map(async (path) => {
-          const exists = await checkImageExists(path)
-          return { path, exists }
+          const exists = await checkImageExists(path);
+          return { path, exists };
         }),
-      )
+      );
 
       const resultsMap = checks.reduce(
         (acc, { path, exists }) => {
-          acc[path] = exists
-          return acc
+          acc[path] = exists;
+          return acc;
         },
         {} as Record<string, boolean>,
-      )
+      );
 
-      setResults(resultsMap)
-      setLoading(false)
+      setResults(resultsMap);
+      setLoading(false);
     }
 
-    checkImages()
-  }, [])
+    checkImages();
+  }, []);
 
   return (
     <div className="p-4 border rounded-lg bg-white shadow-sm">
@@ -57,7 +57,9 @@ export default function ImagePathDiagnostics() {
           <ul className="space-y-1">
             {Object.entries(results).map(([path, exists]) => (
               <li key={path} className="flex items-center">
-                <span className={`w-4 h-4 rounded-full mr-2 ${exists ? "bg-green-500" : "bg-red-500"}`}></span>
+                <span
+                  className={`w-4 h-4 rounded-full mr-2 ${exists ? "bg-green-500" : "bg-red-500"}`}
+                ></span>
                 <span className={exists ? "text-green-700" : "text-red-700"}>
                   {path}: {exists ? "OK" : "Not Found"}
                 </span>
@@ -67,5 +69,5 @@ export default function ImagePathDiagnostics() {
         </div>
       )}
     </div>
-  )
+  );
 }

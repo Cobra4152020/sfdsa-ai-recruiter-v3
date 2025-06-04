@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Users, Share2, Award, Flame } from "lucide-react"
-import type { BriefingStats as BriefingStatsType } from "@/lib/daily-briefing-service"
+import { motion } from "framer-motion";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Users, Share2, Award, Flame } from "lucide-react";
+import type { BriefingStats as BriefingStatsType } from "@/lib/daily-briefing-service";
 
 interface BriefingStatsProps {
-  stats: BriefingStatsType
-  userStreak?: number
+  stats: BriefingStatsType;
+  userStreak?: number;
 }
 
 const cardVariants = {
@@ -21,7 +21,7 @@ const cardVariants = {
       ease: "easeOut",
     },
   }),
-}
+};
 
 export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
   return (
@@ -49,7 +49,9 @@ export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
             >
               {stats.total_attendees}
             </motion.div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Recruits who viewed today's briefing</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Recruits who viewed today&apos;s briefing
+            </p>
           </CardContent>
         </Card>
       </motion.div>
@@ -77,7 +79,9 @@ export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
             >
               {stats.total_shares}
             </motion.div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Times this briefing was shared</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Times this briefing was shared
+            </p>
           </CardContent>
         </Card>
       </motion.div>
@@ -105,7 +109,9 @@ export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
             >
               {stats.user_platforms_shared.length} / 5
             </motion.div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Platforms you've shared on today</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Platforms you&apos;ve shared on today
+            </p>
           </CardContent>
         </Card>
       </motion.div>
@@ -133,10 +139,12 @@ export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
             >
               {userStreak} days
             </motion.div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Your daily briefing attendance streak</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Your daily briefing attendance streak
+            </p>
           </CardContent>
         </Card>
       </motion.div>
     </div>
-  )
+  );
 }

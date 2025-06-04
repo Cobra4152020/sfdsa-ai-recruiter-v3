@@ -1,20 +1,23 @@
-import { motion, AnimatePresence } from "framer-motion"
-import { Trophy, Star, X } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import { motion, AnimatePresence } from "framer-motion";
+import { Trophy, Star, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface Badge {
-  id: string
-  name: string
-  description: string
-  points: number
+  id: string;
+  name: string;
+  description: string;
+  points: number;
 }
 
 interface BadgeUnlockAnimationProps {
-  badge: Badge
-  onComplete: () => void
+  badge: Badge;
+  onComplete: () => void;
 }
 
-export function BadgeUnlockAnimation({ badge, onComplete }: BadgeUnlockAnimationProps) {
+export function BadgeUnlockAnimation({
+  badge,
+  onComplete,
+}: BadgeUnlockAnimationProps) {
   return (
     <AnimatePresence>
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75">
@@ -76,16 +79,12 @@ export function BadgeUnlockAnimation({ badge, onComplete }: BadgeUnlockAnimation
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 1 }}
           >
-            <Button
-              onClick={onComplete}
-              className="mt-6"
-              variant="default"
-            >
+            <Button onClick={onComplete} className="mt-6" variant="default">
               Continue
             </Button>
           </motion.div>
         </motion.div>
       </div>
     </AnimatePresence>
-  )
-} 
+  );
+}

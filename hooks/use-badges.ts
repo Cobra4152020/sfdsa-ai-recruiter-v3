@@ -1,28 +1,28 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useToast } from "@/components/ui/use-toast"
+import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Badge {
-  id: string
-  name: string
-  description: string
-  icon: string
-  color: string
-  category: "application" | "participation"
-  earned?: boolean
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  category: "application" | "participation";
+  earned?: boolean;
 }
 
 export function useBadges(userId?: string) {
-  const [userBadges, setUserBadges] = useState<Badge[]>([])
-  const [availableBadges, setAvailableBadges] = useState<Badge[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const { toast } = useToast()
+  const [userBadges, setUserBadges] = useState<Badge[]>([]);
+  const [availableBadges, setAvailableBadges] = useState<Badge[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
 
   const fetchBadges = async () => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       // In a real app, this would be API calls
@@ -127,50 +127,50 @@ export function useBadges(userId?: string) {
           color: "bg-rose-100",
           category: "participation",
         },
-      ]
+      ];
 
       // If user is logged in, randomly assign some badges as earned
       if (userId) {
         // For demo purposes, randomly select some badges as earned
-        const earnedBadgeIds = []
-        const badgeCount = Math.floor(Math.random() * 5) + 2 // 2-6 badges
+        const earnedBadgeIds = [];
+        const badgeCount = Math.floor(Math.random() * 5) + 2; // 2-6 badges
 
         for (let i = 0; i < badgeCount; i++) {
-          const randomIndex = Math.floor(Math.random() * allBadges.length)
-          earnedBadgeIds.push(allBadges[randomIndex].id)
+          const randomIndex = Math.floor(Math.random() * allBadges.length);
+          earnedBadgeIds.push(allBadges[randomIndex].id);
         }
 
         // Remove duplicates
-        const uniqueEarnedBadgeIds = [...new Set(earnedBadgeIds)]
+        const uniqueEarnedBadgeIds = [...new Set(earnedBadgeIds)];
 
         // Set user badges
         setUserBadges(
           allBadges
             .filter((badge) => uniqueEarnedBadgeIds.includes(badge.id))
             .map((badge) => ({ ...badge, earned: true })),
-        )
+        );
       } else {
-        setUserBadges([])
+        setUserBadges([]);
       }
 
       // Set all available badges
-      setAvailableBadges(allBadges)
+      setAvailableBadges(allBadges);
     } catch (err) {
-      console.error("Error fetching badges:", err)
-      setError("Failed to load badges")
+      console.error("Error fetching badges:", err);
+      setError("Failed to load badges");
       toast({
         title: "Error",
         description: "Failed to load badges. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchBadges()
-  }, [userId])
+    fetchBadges();
+  }, [userId]);
 
   return {
     userBadges,
@@ -178,5 +178,5 @@ export function useBadges(userId?: string) {
     isLoading,
     error,
     refetch: fetchBadges,
-  }
+  };
 }

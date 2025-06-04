@@ -1,60 +1,71 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
-import { ArrowLeft, Shield, Bell, User, Key } from "lucide-react"
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useToast } from "@/components/ui/use-toast";
+import { ArrowLeft, Shield, Bell, User } from "lucide-react";
+import { getClientSideSupabase } from "@/lib/supabase";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+interface UserProfile {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+}
 
 export default function SettingsPage() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [userProfile, setUserProfile] = useState<any>(null)
+  const [isLoading, setIsLoading] = useState(true);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
   const [notificationSettings, setNotificationSettings] = useState({
     emailNotifications: true,
     applicationUpdates: true,
     newBadges: true,
     leaderboardUpdates: false,
     marketingEmails: false,
-  })
+  });
 
-  const router = useRouter()
-  const { toast } = useToast()
-  const [supabase, setSupabase] = useState(null)
-  const [currentUser, setCurrentUser] = useState(null)
+  const router = useRouter();
+  const { toast } = useToast();
+  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
 
   useEffect(() => {
     const loadClientModules = async () => {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const { useUser } = require("@/context/user-context")
-      const supabaseInstance = getClientSideSupabase()
-      const { currentUser, setCurrentUser } = useUser()
-      setSupabase(supabaseInstance)
-      setCurrentUser(currentUser)
-    }
-    loadClientModules()
-  }, [])
+      const supabaseInstance = getClientSideSupabase();
+      setSupabase(supabaseInstance);
+    };
+    loadClientModules();
+  }, []);
 
   useEffect(() => {
     const checkAuth = async () => {
-      if (!supabase) return
+      if (!supabase) return;
       try {
         const {
           data: { session },
           error,
-        } = await supabase.auth.getSession()
+        } = await supabase.auth.getSession();
 
-        if (error) throw error
+        if (error) throw error;
 
         if (!session) {
           // Not authenticated, redirect to login
-          router.push("/login")
-          return
+          router.push("/login");
+          return;
         }
 
         // Fetch user profile
@@ -62,10 +73,10 @@ export default function SettingsPage() {
           .from("user_profiles")
           .select("*")
           .eq("user_id", session.user.id)
-          .single()
+          .single();
 
         if (profileError && profileError.code !== "PGRST116") {
-          throw profileError
+          throw profileError;
         }
 
         setUserProfile(
@@ -75,53 +86,58 @@ export default function SettingsPage() {
             last_name: session.user.user_metadata?.last_name || "",
             email: session.user.email,
           },
-        )
+        );
       } catch (error) {
-        console.error("Auth check error:", error)
+        console.error("Auth check error:", error);
         toast({
           title: "Authentication error",
-          description: error instanceof Error ? error.message : "Failed to authenticate user",
+          description:
+            error instanceof Error
+              ? error.message
+              : "Failed to authenticate user",
           variant: "destructive",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    checkAuth()
-  }, [router, toast, supabase])
+    checkAuth();
+  }, [router, toast, supabase]);
 
   const handleSaveNotifications = async () => {
     toast({
       title: "Settings saved",
       description: "Your notification preferences have been updated.",
-    })
-  }
+    });
+  };
 
   const handleSaveProfile = async () => {
     try {
+      if (!userProfile || !supabase) return;
       const { error } = await supabase.from("user_profiles").upsert({
         user_id: userProfile.user_id,
         first_name: userProfile.first_name,
         last_name: userProfile.last_name,
         updated_at: new Date().toISOString(),
-      })
+      });
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Profile updated",
         description: "Your profile information has been saved.",
-      })
+      });
     } catch (error) {
-      console.error("Profile update error:", error)
+      console.error("Profile update error:", error);
       toast({
         title: "Update failed",
-        description: error instanceof Error ? error.message : "Failed to update profile",
+        description:
+          error instanceof Error ? error.message : "Failed to update profile",
         variant: "destructive",
-      })
+      });
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -129,13 +145,17 @@ export default function SettingsPage() {
         <Skeleton className="h-8 w-64 mb-6" />
         <Skeleton className="h-[600px] w-full" />
       </main>
-    )
+    );
   }
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex items-center mb-6">
-        <Button variant="ghost" onClick={() => router.push("/dashboard")} className="mr-2">
+        <Button
+          variant="ghost"
+          onClick={() => router.push("/dashboard")}
+          className="mr-2"
+        >
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
@@ -162,7 +182,9 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Profile Information</CardTitle>
-              <CardDescription>Update your personal information</CardDescription>
+              <CardDescription>
+                Update your personal information
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,23 +192,37 @@ export default function SettingsPage() {
                   <Label htmlFor="firstName">First Name</Label>
                   <Input
                     id="firstName"
-                    value={userProfile.first_name}
-                    onChange={(e) => setUserProfile({ ...userProfile, first_name: e.target.value })}
+                    value={userProfile?.first_name ?? ""}
+                    onChange={(e) =>
+                      userProfile &&
+                      setUserProfile({
+                        ...userProfile,
+                        first_name: e.target.value,
+                      })
+                    }
                   />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
                   <Input
                     id="lastName"
-                    value={userProfile.last_name}
-                    onChange={(e) => setUserProfile({ ...userProfile, last_name: e.target.value })}
+                    value={userProfile?.last_name ?? ""}
+                    onChange={(e) =>
+                      userProfile &&
+                      setUserProfile({
+                        ...userProfile,
+                        last_name: e.target.value,
+                      })
+                    }
                   />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" value={userProfile.email} disabled />
-                <p className="text-sm text-gray-500">To change your email, please contact support</p>
+                <Input id="email" value={userProfile?.email ?? ""} disabled />
+                <p className="text-sm text-gray-500">
+                  To change your email, please contact support
+                </p>
               </div>
             </CardContent>
             <CardFooter>
@@ -201,57 +237,94 @@ export default function SettingsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Notification Preferences</CardTitle>
-              <CardDescription>Manage how you receive notifications</CardDescription>
+              <CardDescription>
+                Manage how you receive notifications
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium">Email Notifications</h3>
-                  <p className="text-sm text-gray-500">Receive notifications via email</p>
+                  <p className="text-sm text-gray-500">
+                    Receive notifications via email
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.emailNotifications}
-                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, emailNotifications: checked })}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      emailNotifications: checked,
+                    })
+                  }
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium">Application Updates</h3>
-                  <p className="text-sm text-gray-500">Get notified about your application status</p>
+                  <p className="text-sm text-gray-500">
+                    Get notified about your application status
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.applicationUpdates}
-                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, applicationUpdates: checked })}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      applicationUpdates: checked,
+                    })
+                  }
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium">New Badges</h3>
-                  <p className="text-sm text-gray-500">Get notified when you earn new badges</p>
+                  <p className="text-sm text-gray-500">
+                    Get notified when you earn new badges
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.newBadges}
-                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, newBadges: checked })}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      newBadges: checked,
+                    })
+                  }
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium">Leaderboard Updates</h3>
-                  <p className="text-sm text-gray-500">Get notified about your ranking changes</p>
+                  <p className="text-sm text-gray-500">
+                    Get notified about your ranking changes
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.leaderboardUpdates}
-                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, leaderboardUpdates: checked })}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      leaderboardUpdates: checked,
+                    })
+                  }
                 />
               </div>
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="font-medium">Marketing Emails</h3>
-                  <p className="text-sm text-gray-500">Receive promotional emails and updates</p>
+                  <p className="text-sm text-gray-500">
+                    Receive promotional emails and updates
+                  </p>
                 </div>
                 <Switch
                   checked={notificationSettings.marketingEmails}
-                  onCheckedChange={(checked) => setNotificationSettings({ ...notificationSettings, marketingEmails: checked })}
+                  onCheckedChange={(checked) =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      marketingEmails: checked,
+                    })
+                  }
                 />
               </div>
             </CardContent>
@@ -272,8 +345,13 @@ export default function SettingsPage() {
             <CardContent className="space-y-6">
               <div className="space-y-2">
                 <h3 className="font-medium">Change Password</h3>
-                <p className="text-sm text-gray-500">Update your password to keep your account secure</p>
-                <Button variant="outline" onClick={() => router.push("/reset-password")}>
+                <p className="text-sm text-gray-500">
+                  Update your password to keep your account secure
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => router.push("/reset-password")}
+                >
                   Change Password
                 </Button>
               </div>
@@ -282,5 +360,5 @@ export default function SettingsPage() {
         </TabsContent>
       </Tabs>
     </main>
-  )
+  );
 }

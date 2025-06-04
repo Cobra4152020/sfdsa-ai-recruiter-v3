@@ -20,4 +20,4 @@ export function DonationTrendsChart({ data }: DonationTrendsChartProps) {
       <pre>{JSON.stringify(data, null, 2)}</pre>
     </div>
   );
-} 
+}

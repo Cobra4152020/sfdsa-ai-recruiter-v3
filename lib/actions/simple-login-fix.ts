@@ -1,4 +1,4 @@
-export async function simpleLoginFix(params: any) {
+export async function simpleLoginFix(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/simple-login-fix`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function simpleLoginFix(params: any) {
     console.error(`Error in simpleLoginFix:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

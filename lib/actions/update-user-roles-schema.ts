@@ -1,12 +1,15 @@
-export async function updateUserRolesSchema(params: any) {
+export async function updateUserRolesSchema(params: unknown) {
   try {
-    const response = await fetch(`/api/admin-actions/update-user-roles-schema`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const response = await fetch(
+      `/api/admin-actions/update-user-roles-schema`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(params),
       },
-      body: JSON.stringify(params),
-    });
+    );
 
     const data = await response.json();
 
@@ -19,7 +22,8 @@ export async function updateUserRolesSchema(params: any) {
     console.error(`Error in updateUserRolesSchema:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

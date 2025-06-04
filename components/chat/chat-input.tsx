@@ -1,23 +1,23 @@
-import { useState, FormEvent } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Send } from "lucide-react"
+import { useState, FormEvent } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Send } from "lucide-react";
 
 interface ChatInputProps {
-  onSendMessage: (message: string) => void
-  disabled?: boolean
+  onSendMessage: (message: string) => void;
+  disabled?: boolean;
 }
 
 export function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
-  const [message, setMessage] = useState("")
+  const [message, setMessage] = useState("");
 
   const handleSubmit = (e: FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (message.trim() && !disabled) {
-      onSendMessage(message.trim())
-      setMessage("")
+      onSendMessage(message.trim());
+      setMessage("");
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit} className="flex gap-2">
@@ -28,8 +28,8 @@ export function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
         disabled={disabled}
         className="flex-1"
       />
-      <Button 
-        type="submit" 
+      <Button
+        type="submit"
         disabled={disabled || !message.trim()}
         variant="default"
       >
@@ -37,5 +37,5 @@ export function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
         <span className="sr-only">Send message</span>
       </Button>
     </form>
-  )
-} 
+  );
+}

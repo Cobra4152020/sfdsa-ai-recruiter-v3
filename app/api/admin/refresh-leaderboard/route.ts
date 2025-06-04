@@ -1,16 +1,16 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { API_CACHE_HEADERS } from "@/lib/cache-utils"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { API_CACHE_HEADERS } from "@/lib/cache-utils";
 
 export async function POST() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Refresh the leaderboard materialized view
-    const { data, error } = await supabase.rpc("refresh_leaderboard_view")
+    const { error } = await supabase.rpc("refresh_leaderboard_view");
 
     if (error) {
       return NextResponse.json(
@@ -20,11 +20,14 @@ export async function POST() {
           timestamp: new Date().toISOString(),
         },
         { status: 500, headers: API_CACHE_HEADERS },
-      )
+      );
     }
 
     // Verify the refresh was successful
-    const { data: verifyData, error: verifyError } = await supabase.from("leaderboard_view").select("count").limit(1)
+    const { error: verifyError } = await supabase
+      .from("leaderboard_view")
+      .select("count")
+      .limit(1);
 
     if (verifyError) {
       return NextResponse.json(
@@ -34,7 +37,7 @@ export async function POST() {
           timestamp: new Date().toISOString(),
         },
         { status: 500, headers: API_CACHE_HEADERS },
-      )
+      );
     }
 
     return NextResponse.json(
@@ -44,7 +47,7 @@ export async function POST() {
         timestamp: new Date().toISOString(),
       },
       { headers: API_CACHE_HEADERS },
-    )
+    );
   } catch (error) {
     return NextResponse.json(
       {
@@ -53,6 +56,6 @@ export async function POST() {
         timestamp: new Date().toISOString(),
       },
       { status: 500, headers: API_CACHE_HEADERS },
-    )
+    );
   }
 }

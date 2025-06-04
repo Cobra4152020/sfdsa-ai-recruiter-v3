@@ -1,34 +1,39 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect, useCallback } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { useToast } from "@/components/ui/use-toast"
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { useUser } from "@/context/user-context"
-import { v4 as uuidv4 } from "uuid"
-import { useRouter } from "next/navigation"
-import { useClientOnly } from "@/hooks/use-client-only"
-import { getWindowOrigin } from "@/lib/utils"
+import type React from "react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { useUser } from "@/context/user-context";
+import { v4 as uuidv4 } from "uuid";
+import { useRouter } from "next/navigation";
+import { useClientOnly } from "@/hooks/use-client-only";
+import { getWindowOrigin } from "@/lib/utils";
 
 interface UnifiedRegistrationPopupProps {
-  isOpen: boolean
-  onClose: () => void
-  isApplying?: boolean
-  referralCode?: string
-  requiredPoints?: number
-  actionName?: string
-  initialTab?: "signin" | "signup" | "optin"
-  userType?: "recruit" | "volunteer" | "admin"
-  callbackUrl?: string
-  title?: string
-  description?: string
+  isOpen: boolean;
+  onClose: () => void;
+  isApplying?: boolean;
+  referralCode?: string;
+  requiredPoints?: number;
+  actionName?: string;
+  initialTab?: "signin" | "signup" | "optin";
+  userType?: "recruit" | "volunteer" | "admin";
+  callbackUrl?: string;
+  title?: string;
+  description?: string;
 }
 
 export function UnifiedRegistrationPopup({
@@ -44,53 +49,55 @@ export function UnifiedRegistrationPopup({
   title,
   description,
 }: UnifiedRegistrationPopupProps) {
-  const [activeTab, setActiveTab] = useState<"signin" | "signup" | "optin">(initialTab)
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [confirmPassword, setConfirmPassword] = useState("")
-  const [name, setName] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
-  const [agreeToTerms, setAgreeToTerms] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [resetPassword, setResetPassword] = useState(false)
-  const [trackingNumber, setTrackingNumber] = useState("")
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  const [activeTab, setActiveTab] = useState<"signin" | "signup" | "optin">(
+    initialTab,
+  );
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [name, setName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [resetPassword, setResetPassword] = useState(false);
+  const [trackingNumber, setTrackingNumber] = useState(""); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [isSubmitted, setIsSubmitted] = useState(false); // eslint-disable-line @typescript-eslint/no-unused-vars
 
-  const { toast } = useToast()
-  const { login } = useUser()
-  const router = useRouter()
-  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), [])
-  const origin = useClientOnly(memoizedGetWindowOrigin, '')
+  const { toast } = useToast();
+  const { login } = useUser();
+  const router = useRouter();
+  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), []);
+  const origin = useClientOnly(memoizedGetWindowOrigin, ""); // eslint-disable-line @typescript-eslint/no-unused-vars
 
   // Generate a unique tracking number for opt-in
   useEffect(() => {
     if (activeTab === "optin") {
-      const prefix = referralCode ? "SFDSA-REF" : "SFDSA-DIR"
-      const randomPart = uuidv4().substring(0, 6).toUpperCase()
-      setTrackingNumber(`${prefix}-${randomPart}`)
+      const prefix = referralCode ? "SFDSA-REF" : "SFDSA-DIR";
+      const randomPart = uuidv4().substring(0, 6).toUpperCase();
+      setTrackingNumber(`${prefix}-${randomPart}`);
     }
-  }, [activeTab, referralCode])
+  }, [activeTab, referralCode]);
 
   // Set initial tab
   useEffect(() => {
-    setActiveTab(initialTab)
-  }, [initialTab])
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       if (resetPassword) {
         toast({
           title: "Password reset email sent",
           description: "Check your email for a link to reset your password",
-        })
-        setResetPassword(false)
-        setIsLoading(false)
-        return
+        });
+        setResetPassword(false);
+        setIsLoading(false);
+        return;
       }
 
       // For demo purposes, create a mock user
@@ -101,50 +108,50 @@ export function UnifiedRegistrationPopup({
         userType: userType,
         participation_count: 0,
         has_applied: false,
-      }
+      };
 
-      login(mockUser)
+      login(mockUser);
 
       toast({
         title: "Sign in successful",
         description: "Welcome back!",
-      })
+      });
 
       // Redirect based on user type
       if (callbackUrl) {
-        router.push(callbackUrl)
+        router.push(callbackUrl);
       } else if (userType === "volunteer") {
-        router.push("/volunteer-dashboard")
+        router.push("/volunteer-dashboard");
       } else if (userType === "admin") {
-        router.push("/admin/dashboard")
+        router.push("/admin/dashboard");
       } else {
-        router.push("/dashboard")
+        router.push("/dashboard");
       }
 
-      onClose()
+      onClose();
     } catch (error) {
-      console.error("Sign in error:", error)
+      console.error("Sign in error:", error);
       toast({
         title: "Sign in failed",
         description: "Please check your credentials and try again",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       if (password !== confirmPassword) {
-        throw new Error("Passwords do not match")
+        throw new Error("Passwords do not match");
       }
 
       if (!agreeToTerms) {
-        throw new Error("Please agree to the terms and conditions")
+        throw new Error("Please agree to the terms and conditions");
       }
 
       // For demo purposes, create a mock user
@@ -155,46 +162,47 @@ export function UnifiedRegistrationPopup({
         userType: userType,
         participation_count: 0,
         has_applied: false,
-      }
+      };
 
-      login(mockUser)
+      login(mockUser);
 
       toast({
         title: "Sign up successful",
         description: "Welcome to SFDSA!",
-      })
+      });
 
       // Redirect based on user type
       if (callbackUrl) {
-        router.push(callbackUrl)
+        router.push(callbackUrl);
       } else if (userType === "volunteer") {
-        router.push("/volunteer-dashboard")
+        router.push("/volunteer-dashboard");
       } else if (userType === "admin") {
-        router.push("/admin/dashboard")
+        router.push("/admin/dashboard");
       } else {
-        router.push("/dashboard")
+        router.push("/dashboard");
       }
 
-      onClose()
+      onClose();
     } catch (error) {
-      console.error("Sign up error:", error)
+      console.error("Sign up error:", error);
       toast({
         title: "Sign up failed",
-        description: error instanceof Error ? error.message : "Please try again",
+        description:
+          error instanceof Error ? error.message : "Please try again",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleOptIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       if (!agreeToTerms) {
-        throw new Error("Please agree to the terms and conditions")
+        throw new Error("Please agree to the terms and conditions");
       }
 
       // For demo purposes, create a mock user
@@ -205,63 +213,67 @@ export function UnifiedRegistrationPopup({
         userType: userType,
         participation_count: 0,
         has_applied: false,
-      }
+      };
 
-      login(mockUser)
+      login(mockUser);
 
       toast({
         title: "Opt-in successful",
         description: "Welcome to SFDSA!",
-      })
+      });
 
       // Redirect based on user type
       if (callbackUrl) {
-        router.push(callbackUrl)
+        router.push(callbackUrl);
       } else if (userType === "volunteer") {
-        router.push("/volunteer-dashboard")
+        router.push("/volunteer-dashboard");
       } else if (userType === "admin") {
-        router.push("/admin/dashboard")
+        router.push("/admin/dashboard");
       } else {
-        router.push("/dashboard")
+        router.push("/dashboard");
       }
 
-      onClose()
+      onClose();
     } catch (error) {
-      console.error("Opt-in error:", error)
+      console.error("Opt-in error:", error);
       toast({
         title: "Opt-in failed",
-        description: error instanceof Error ? error.message : "Please try again",
+        description:
+          error instanceof Error ? error.message : "Please try again",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const renderPointsMessage = () => {
-    if (!requiredPoints || !actionName) return null
+    if (!requiredPoints || !actionName) return null;
     return (
       <div className="text-sm text-muted-foreground mb-4">
         This action requires {requiredPoints} points. {actionName}
       </div>
-    )
-  }
+    );
+  };
 
   const getDialogTitle = () => {
-    if (title) return title
-    if (isApplying) return "Apply to Join SFDSA"
-    if (activeTab === "optin") return "Opt-in to SFDSA"
-    if (activeTab === "signup") return "Create an Account"
-    return "Sign In"
-  }
+    if (title) return title;
+    if (isApplying) return "Apply to Join SFDSA";
+    if (activeTab === "optin") return "Opt-in to SFDSA";
+    if (activeTab === "signup") return "Create an Account";
+    return "Sign In";
+  };
 
   const getDialogDescription = () => {
-    if (description) return description
-    if (isApplying) return "Complete your application to join the San Francisco Deputy Sheriff's Department"
-    if (activeTab === "optin") return "Join our community and stay updated with the latest opportunities"
-    if (activeTab === "signup") return "Create your account to access all features"
-    return "Sign in to your account to continue"
-  }
+    if (description) return description;
+    if (isApplying)
+      return "Complete your application to join the San Francisco Deputy Sheriff's Department";
+    if (activeTab === "optin")
+      return "Join our community and stay updated with the latest opportunities";
+    if (activeTab === "signup")
+      return "Create your account to access all features";
+    return "Sign in to your account to continue";
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -273,7 +285,10 @@ export function UnifiedRegistrationPopup({
 
         {renderPointsMessage()}
 
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as typeof activeTab)}>
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as typeof activeTab)}
+        >
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="signin">Sign In</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -332,7 +347,9 @@ export function UnifiedRegistrationPopup({
                   <Checkbox
                     id="remember"
                     checked={rememberMe}
-                    onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                    onCheckedChange={(checked) =>
+                      setRememberMe(checked as boolean)
+                    }
                   />
                   <Label htmlFor="remember" className="text-sm">
                     Remember me
@@ -348,7 +365,11 @@ export function UnifiedRegistrationPopup({
               </div>
 
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Loading..." : resetPassword ? "Send reset link" : "Sign in"}
+                {isLoading
+                  ? "Loading..."
+                  : resetPassword
+                    ? "Send reset link"
+                    : "Sign in"}
               </Button>
             </form>
           </TabsContent>
@@ -445,7 +466,9 @@ export function UnifiedRegistrationPopup({
                 <Checkbox
                   id="terms"
                   checked={agreeToTerms}
-                  onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setAgreeToTerms(checked as boolean)
+                  }
                   required
                 />
                 <Label htmlFor="terms" className="text-sm">
@@ -497,7 +520,9 @@ export function UnifiedRegistrationPopup({
                 <Checkbox
                   id="optin-terms"
                   checked={agreeToTerms}
-                  onCheckedChange={(checked) => setAgreeToTerms(checked as boolean)}
+                  onCheckedChange={(checked) =>
+                    setAgreeToTerms(checked as boolean)
+                  }
                   required
                 />
                 <Label htmlFor="optin-terms" className="text-sm">
@@ -513,5 +538,5 @@ export function UnifiedRegistrationPopup({
         </Tabs>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

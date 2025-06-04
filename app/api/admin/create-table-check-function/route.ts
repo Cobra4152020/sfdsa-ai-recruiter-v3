@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function POST() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Create the check_table_exists function
     const { error } = await supabase.rpc("exec_sql", {
@@ -37,19 +37,28 @@ export async function POST() {
         END;
         $$;
       `,
-    })
+    });
 
     if (error) {
-      console.error("Error creating check_table_exists function:", error)
+      console.error("Error creating check_table_exists function:", error);
       return NextResponse.json(
-        { success: false, message: "Failed to create check_table_exists function" },
+        {
+          success: false,
+          message: "Failed to create check_table_exists function",
+        },
         { status: 500 },
-      )
+      );
     }
 
-    return NextResponse.json({ success: true, message: "Functions created successfully" })
+    return NextResponse.json({
+      success: true,
+      message: "Functions created successfully",
+    });
   } catch (error) {
-    console.error("Exception in create-table-check-function API:", error)
-    return NextResponse.json({ success: false, message: "An unexpected error occurred" }, { status: 500 })
+    console.error("Exception in create-table-check-function API:", error);
+    return NextResponse.json(
+      { success: false, message: "An unexpected error occurred" },
+      { status: 500 },
+    );
   }
 }

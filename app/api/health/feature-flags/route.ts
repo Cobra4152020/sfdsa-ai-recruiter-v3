@@ -1,9 +1,8 @@
-
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { API_CACHE_HEADERS } from "@/lib/cache-utils"
+import { NextResponse } from "next/server";
+import { API_CACHE_HEADERS } from "@/lib/cache-utils";
 
 export async function GET() {
   try {
@@ -12,11 +11,11 @@ export async function GET() {
       badges: process.env.NEXT_PUBLIC_ENABLE_BADGES === "true",
       points: process.env.NEXT_PUBLIC_ENABLE_POINTS === "true",
       debug: process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true",
-    }
+    };
 
     const disabledFeatures = Object.entries(featureFlags)
-      .filter(([_, enabled]) => !enabled)
-      .map(([feature]) => feature)
+      .filter(([, enabled]) => !enabled)
+      .map(([feature]) => feature);
 
     if (disabledFeatures.length > 0) {
       return NextResponse.json(
@@ -26,7 +25,7 @@ export async function GET() {
           features: featureFlags,
         },
         { headers: API_CACHE_HEADERS },
-      )
+      );
     }
 
     return NextResponse.json(
@@ -36,11 +35,15 @@ export async function GET() {
         features: featureFlags,
       },
       { headers: API_CACHE_HEADERS },
-    )
+    );
   } catch (error) {
+    console.error("Feature flags health check failed:", error);
     return NextResponse.json(
-      { success: false, message: `Feature flags health check failed: ${error}` },
+      {
+        success: false,
+        message: `Feature flags health check failed: ${error}`,
+      },
       { status: 500, headers: API_CACHE_HEADERS },
-    )
+    );
   }
 }

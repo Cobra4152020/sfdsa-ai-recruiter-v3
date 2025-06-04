@@ -5,15 +5,19 @@ export default function StaticDailyBriefingPage() {
 
       <div className="bg-white rounded-lg shadow-md p-6">
         <div className="mb-4">
-          <h2 className="text-2xl font-bold">San Francisco Deputy Sheriff's Daily Briefing</h2>
-          <p className="text-sm text-gray-500 mt-1">{new Date().toLocaleDateString()} • Department HQ</p>
+          <h2 className="text-2xl font-bold">
+            San Francisco Deputy Sheriff&apos;s Daily Briefing
+          </h2>
+          <p className="text-sm text-gray-500 mt-1">
+            {new Date().toLocaleDateString()} • Department HQ
+          </p>
         </div>
 
         <div className="prose max-w-none">
-          <h3>Today's Focus: Community Safety</h3>
+          <h3>Today&apos;s Focus: Community Safety</h3>
           <p>
-            Welcome to today's briefing. We continue our commitment to serving the San Francisco community with
-            dedication and integrity.
+            Welcome to today&apos;s briefing. We continue our commitment to
+            serving the San Francisco community with dedication and integrity.
           </p>
 
           <h4>Safety Reminders:</h4>
@@ -25,17 +29,18 @@ export default function StaticDailyBriefingPage() {
 
           <h4>Community Engagement:</h4>
           <p>
-            Our presence in the community is vital for building trust and ensuring safety. Remember to engage positively
-            with community members and be a visible presence in your assigned areas.
+            Our presence in the community is vital for building trust and
+            ensuring safety. Remember to engage positively with community
+            members and be a visible presence in your assigned areas.
           </p>
 
           <h4>Department Updates:</h4>
           <p>
-            Regular training sessions continue next week. Please ensure all required documentation is completed properly
-            and promptly.
+            Regular training sessions continue next week. Please ensure all
+            required documentation is completed properly and promptly.
           </p>
         </div>
       </div>
     </div>
-  )
+  );
 }

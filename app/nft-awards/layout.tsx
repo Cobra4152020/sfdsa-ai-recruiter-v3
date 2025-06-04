@@ -6,4 +6,4 @@ export default function NftAwardsLayout({ children }: { children: ReactNode }) {
       <body>{children}</body>
     </html>
   );
-} 
+}

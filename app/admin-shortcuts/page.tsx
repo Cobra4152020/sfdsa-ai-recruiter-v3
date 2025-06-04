@@ -1,5 +1,5 @@
-import Link from "next/link"
-import { PageWrapper } from "@/components/page-wrapper"
+import Link from "next/link";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function AdminShortcuts() {
   // List of common admin routes
@@ -19,7 +19,7 @@ export default function AdminShortcuts() {
     { path: "/admin/login-audit", name: "Login Audit" },
     { path: "/admin/health", name: "System Health" },
     { path: "/admin/deployment", name: "Deployment Status" },
-  ]
+  ];
 
   return (
     <PageWrapper>
@@ -38,5 +38,5 @@ export default function AdminShortcuts() {
         </div>
       </div>
     </PageWrapper>
-  )
+  );
 }

@@ -1,32 +1,42 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import type { DateRange } from "react-day-picker"
+import * as React from "react";
+import type { DateRange } from "react-day-picker";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { CalendarIcon } from "lucide-react"
-import { addDays, format } from "date-fns"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { CalendarIcon } from "lucide-react";
+import { addDays, format } from "date-fns";
 
 export interface DateRangePickerProps {
-  className?: string
-  onChange?: (date: DateRange | undefined) => void
+  className?: string;
+  onChange?: (date: DateRange | undefined) => void;
 }
 
 export function DateRangePicker({ className, onChange }: DateRangePickerProps) {
   const [date, setDate] = React.useState<DateRange | undefined>({
     from: new Date(new Date().setDate(new Date().getDate() - 30)),
     to: new Date(),
-  })
+  });
 
   React.useEffect(() => {
     if (onChange) {
-      onChange(date)
+      onChange(date);
     }
-  }, [date, onChange])
+  }, [date, onChange]);
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -35,13 +45,17 @@ export function DateRangePicker({ className, onChange }: DateRangePickerProps) {
           <Button
             id="date"
             variant={"outline"}
-            className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+            className={cn(
+              "w-[300px] justify-start text-left font-normal",
+              !date && "text-muted-foreground",
+            )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                  {format(date.from, "LLL dd, y")} -{" "}
+                  {format(date.to, "LLL dd, y")}
                 </>
               ) : (
                 format(date.from, "LLL dd, y")
@@ -63,61 +77,67 @@ export function DateRangePicker({ className, onChange }: DateRangePickerProps) {
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }
 
 interface DatePickerWithRangeProps {
-  date: DateRange | undefined
-  onDateChange: (date: DateRange) => void
-  className?: string
+  date: DateRange | undefined;
+  onDateChange: (date: DateRange) => void;
+  className?: string;
 }
 
-export function DatePickerWithRange({ date, onDateChange, className }: DatePickerWithRangeProps) {
-  const [selectedPreset, setSelectedPreset] = React.useState<string | undefined>(undefined)
+export function DatePickerWithRange({
+  date,
+  onDateChange,
+  className,
+}: DatePickerWithRangeProps) {
+  const [selectedPreset, setSelectedPreset] = React.useState<
+    string | undefined
+  >(undefined);
 
   const handlePresetChange = (preset: string) => {
-    setSelectedPreset(preset)
+    setSelectedPreset(preset);
 
-    const now = new Date()
-    let from: Date
-    let to: Date = now
+    const now = new Date();
+    let from: Date;
+    let to: Date = now;
 
     switch (preset) {
       case "last7days":
-        from = addDays(now, -7)
-        break
+        from = addDays(now, -7);
+        break;
       case "last30days":
-        from = addDays(now, -30)
-        break
+        from = addDays(now, -30);
+        break;
       case "lastMonth":
-        from = new Date(now.getFullYear(), now.getMonth() - 1, 1)
-        to = new Date(now.getFullYear(), now.getMonth(), 0)
-        break
+        from = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+        to = new Date(now.getFullYear(), now.getMonth(), 0);
+        break;
       case "thisMonth":
-        from = new Date(now.getFullYear(), now.getMonth(), 1)
-        break
+        from = new Date(now.getFullYear(), now.getMonth(), 1);
+        break;
       case "lastQuarter":
-        const currentQuarter = Math.floor(now.getMonth() / 3)
-        from = new Date(now.getFullYear(), currentQuarter * 3 - 3, 1)
-        to = new Date(now.getFullYear(), currentQuarter * 3, 0)
-        break
+        const currentQuarter = Math.floor(now.getMonth() / 3);
+        from = new Date(now.getFullYear(), currentQuarter * 3 - 3, 1);
+        to = new Date(now.getFullYear(), currentQuarter * 3, 0);
+        break;
       case "thisQuarter":
-        const thisQuarter = Math.floor(now.getMonth() / 3)
-        from = new Date(now.getFullYear(), thisQuarter * 3, 1)
-        break
+        const thisQuarter = Math.floor(now.getMonth() / 3);
+        from = new Date(now.getFullYear(), thisQuarter * 3, 1);
+        break;
       case "thisYear":
-        from = new Date(now.getFullYear(), 0, 1)
-        break
+        from = new Date(now.getFullYear(), 0, 1);
+        break;
       case "lastYear":
-        from = new Date(now.getFullYear() - 1, 0, 1)
-        to = new Date(now.getFullYear() - 1, 11, 31)
-        break
+        from = new Date(now.getFullYear() - 1, 0, 1);
+        to = new Date(now.getFullYear() - 1, 11, 31);
+        break;
       default:
-        from = addDays(now, -30)
+        from = addDays(now, -30);
     }
 
-    onDateChange({ from, to })
-  }
+    onDateChange({ from, to });
+  };
 
   return (
     <div className={cn("grid gap-2", className)}>
@@ -126,13 +146,17 @@ export function DatePickerWithRange({ date, onDateChange, className }: DatePicke
           <Button
             id="date"
             variant={"outline"}
-            className={cn("w-[300px] justify-start text-left font-normal", !date && "text-muted-foreground")}
+            className={cn(
+              "w-[300px] justify-start text-left font-normal",
+              !date && "text-muted-foreground",
+            )}
           >
             <CalendarIcon className="mr-2 h-4 w-4" />
             {date?.from ? (
               date.to ? (
                 <>
-                  {format(date.from, "LLL dd, y")} - {format(date.to, "LLL dd, y")}
+                  {format(date.from, "LLL dd, y")} -{" "}
+                  {format(date.to, "LLL dd, y")}
                 </>
               ) : (
                 format(date.from, "LLL dd, y")
@@ -167,8 +191,8 @@ export function DatePickerWithRange({ date, onDateChange, className }: DatePicke
             selected={date}
             onSelect={(newDate) => {
               if (newDate) {
-                setSelectedPreset(undefined)
-                onDateChange(newDate)
+                setSelectedPreset(undefined);
+                onDateChange(newDate);
               }
             }}
             numberOfMonths={2}
@@ -176,7 +200,7 @@ export function DatePickerWithRange({ date, onDateChange, className }: DatePicke
         </PopoverContent>
       </Popover>
     </div>
-  )
+  );
 }
 
 // For backward compatibility;

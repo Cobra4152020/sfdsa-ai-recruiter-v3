@@ -1,13 +1,25 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import type { Badge } from "@/lib/badge-utils"
-import { AchievementBadge } from "./achievement-badge"
-import { Progress } from "@/components/ui/progress"
-import { Button } from "@/components/ui/button"
-import { Share2, Lock, CheckCircle, Trophy, Info } from "lucide-react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { useState, useCallback } from "react";
+import type { Badge } from "@/lib/badge-utils";
+import { AchievementBadge } from "./achievement-badge";
+import { Progress } from "@/components/ui/progress";
+import { Button } from "@/components/ui/button";
+import { Share2, Lock, CheckCircle, Trophy, Info } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Dialog,
   DialogContent,
@@ -15,35 +27,41 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog"
-import { AchievementShareDialog } from "./achievement-share-dialog"
-import { useClientOnly } from "@/hooks/use-client-only"
-import { getWindowOrigin } from "@/lib/utils"
+} from "@/components/ui/dialog";
+import { AchievementShareDialog } from "./achievement-share-dialog";
+import { useClientOnly } from "@/hooks/use-client-only";
+import { getWindowOrigin } from "@/lib/utils";
 
 interface BadgeDetailCardProps {
-  badge: Badge
-  earned?: boolean
-  progress?: number
-  currentUser?: { id: string; name: string } | null
-  onShare?: () => void
+  badge: Badge;
+  earned?: boolean;
+  progress?: number;
+  currentUser?: { id: string; name: string } | null;
+  onShare?: () => void;
 }
 
-export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUser, onShare }: BadgeDetailCardProps) {
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
-  
-  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), [])
-  const origin = useClientOnly(memoizedGetWindowOrigin, '')
+export function BadgeDetailCard({
+  badge,
+  earned = false,
+  progress = 0,
+  currentUser,
+  onShare,
+}: BadgeDetailCardProps) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
+
+  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), []);
+  const origin = useClientOnly(memoizedGetWindowOrigin, "");
 
   const handleShareClick = () => {
     if (earned) {
       // If earned, open share dialog
-      setIsShareDialogOpen(true)
+      setIsShareDialogOpen(true);
     } else {
       // If not earned, call onShare to progress
-      onShare?.()
+      onShare?.();
     }
-  }
+  };
 
   return (
     <Card className="h-full flex flex-col overflow-hidden transition-all duration-300 hover:shadow-md border border-primary/20 dark:border-accent/20">
@@ -57,21 +75,23 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
                   <CheckCircle className="h-5 w-5 text-accent" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>You've earned this badge!</p>
+                  <p>You&apos;ve earned this badge!</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
         </div>
         <CardDescription className="text-primary-foreground/80 dark:text-accent/80">
-          {badge.category === "application" ? "Application Achievement" : "Participation Recognition"}
+          {badge.category === "application"
+            ? "Application Achievement"
+            : "Participation Recognition"}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="flex-grow py-4">
         <div className="flex flex-col items-center mb-4">
           <div className="relative">
-            <AchievementBadge type={badge.id as any} size="lg" earned={earned} />
+            <AchievementBadge type={badge.id} size="lg" earned={earned} />
             {!earned && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full">
                 <Lock className="h-6 w-6 text-white/90" />
@@ -80,7 +100,9 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
           </div>
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{badge.description}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+          {badge.description}
+        </p>
 
         <div className="space-y-3">
           <div className="flex items-center justify-between text-sm">
@@ -94,7 +116,10 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
             )}
           </div>
 
-          <Progress value={earned ? 100 : progress} className="h-2 bg-gray-200" />
+          <Progress
+            value={earned ? 100 : progress}
+            className="h-2 bg-gray-200"
+          />
 
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
@@ -112,21 +137,31 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
                   <Trophy className="h-5 w-5 mr-2 text-primary dark:text-accent" />
                   {badge.name} Requirements
                 </DialogTitle>
-                <DialogDescription>Complete these requirements to earn this badge</DialogDescription>
+                <DialogDescription>
+                  Complete these requirements to earn this badge
+                </DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="flex items-start space-x-3">
                   <div className="mt-0.5">
-                    <AchievementBadge type={badge.id as any} size="sm" earned={earned} />
+                    <AchievementBadge
+                      type={badge.id}
+                      size="sm"
+                      earned={earned}
+                    />
                   </div>
                   <div>
                     <h4 className="font-medium text-sm">{badge.name}</h4>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">{badge.description}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {badge.description}
+                    </p>
                   </div>
                 </div>
 
                 <div className="border-t pt-4">
-                  <h4 className="font-medium text-sm mb-2">How to earn this badge:</h4>
+                  <h4 className="font-medium text-sm mb-2">
+                    How to earn this badge:
+                  </h4>
                   <ul className="list-disc pl-5 space-y-1 text-sm">
                     {badge.id === "written" && (
                       <>
@@ -140,14 +175,17 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
                 </div>
               </div>
               <div className="flex justify-between">
-                <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsDialogOpen(false)}
+                >
                   Close
                 </Button>
                 {!earned && currentUser && (
                   <Button
                     onClick={() => {
-                      onShare?.()
-                      setIsDialogOpen(false)
+                      onShare?.();
+                      setIsDialogOpen(false);
                     }}
                     className="bg-primary hover:bg-primary/90 text-primary-foreground dark:bg-primary dark:hover:bg-primary/90 dark:text-accent"
                   >
@@ -196,5 +234,5 @@ export function BadgeDetailCard({ badge, earned = false, progress = 0, currentUs
         />
       )}
     </Card>
-  )
+  );
 }

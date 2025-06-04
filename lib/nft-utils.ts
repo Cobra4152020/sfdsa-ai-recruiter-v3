@@ -1,34 +1,35 @@
 // Helper function to validate UUID format
 function isValidUUID(str: string): boolean {
-  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-  return uuidRegex.test(str)
+  const uuidRegex =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
 }
 
 // Helper function to ensure valid UUID
 export function ensureValidUUID(id: string): string {
   if (isValidUUID(id)) {
-    return id
+    return id;
   }
   // For non-UUID strings, generate a deterministic UUID using the string
-  const encoder = new TextEncoder()
-  const data = encoder.encode(id)
-  let hash = 0
+  const encoder = new TextEncoder();
+  const data = encoder.encode(id);
+  let hash = 0;
   for (let i = 0; i < data.length; i++) {
-    hash = ((hash << 5) - hash) + data[i]
-    hash = hash & hash // Convert to 32-bit integer
+    hash = (hash << 5) - hash + data[i];
+    hash = hash & hash; // Convert to 32-bit integer
   }
-  return `00000000-0000-4000-8000-${hash.toString(16).padStart(12, '0')}`
+  return `00000000-0000-4000-8000-${hash.toString(16).padStart(12, "0")}`;
 }
 
 export interface NFTAward {
-  id: string
-  name: string
-  description: string
-  imageUrl: string
-  pointThreshold: number
-  tokenId?: string
-  contractAddress?: string
-  blockchainExplorerUrl?: string
+  id: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  pointThreshold: number;
+  tokenId?: string;
+  contractAddress?: string;
+  blockchainExplorerUrl?: string;
 }
 
 // Define NFT award tiers
@@ -61,20 +62,27 @@ export const NFT_AWARD_TIERS: NFTAward[] = [
     imageUrl: "/nft-awards/platinum-recruit.png",
     pointThreshold: 10000,
   },
-]
+];
 
 /**
  * Check if a user has earned any new NFT awards based on their points
  * (Server-only logic removed. Implement this in lib/nft-utils-server.ts)
  */
-export async function checkAndAwardNFTs(userId: string, currentPoints: number) {
-  throw new Error('checkAndAwardNFTs is server-only and must be implemented in lib/nft-utils-server.ts');
+export async function checkAndAwardNFTs(
+  _userId: string,
+  _currentPoints: number,
+) {
+  throw new Error(
+    "checkAndAwardNFTs is server-only and must be implemented in lib/nft-utils-server.ts",
+  );
 }
 
 /**
  * Get all NFT awards for a user
  * (Server-only logic removed. Implement this in lib/nft-utils-server.ts)
  */
-export async function getUserNFTAwards(userId: string) {
-  throw new Error('getUserNFTAwards is server-only and must be implemented in lib/nft-utils-server.ts');
+export async function getUserNFTAwards(_userId: string) {
+  throw new Error(
+    "getUserNFTAwards is server-only and must be implemented in lib/nft-utils-server.ts",
+  );
 }

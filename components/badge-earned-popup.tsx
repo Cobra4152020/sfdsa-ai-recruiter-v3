@@ -1,11 +1,11 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { AchievementBadge } from "./achievement-badge"
-import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
-import confetti from "canvas-confetti"
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { AchievementBadge } from "./achievement-badge";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
+import confetti from "canvas-confetti";
 
 type BadgeType =
   | "written"
@@ -19,17 +19,22 @@ type BadgeType =
   | "application-completed"
   | "first-response"
   | "frequent-user"
-  | "resource-downloader"
+  | "resource-downloader";
 
 interface BadgeEarnedPopupProps {
-  badgeType: BadgeType
-  badgeName: string
-  badgeDescription: string
-  onClose: () => void
+  badgeType: BadgeType;
+  badgeName: string;
+  badgeDescription: string;
+  onClose: () => void;
 }
 
-export function BadgeEarnedPopup({ badgeType, badgeName, badgeDescription, onClose }: BadgeEarnedPopupProps) {
-  const [isVisible, setIsVisible] = useState(true)
+export function BadgeEarnedPopup({
+  badgeType,
+  badgeName,
+  badgeDescription,
+  onClose,
+}: BadgeEarnedPopupProps) {
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     // Trigger confetti when the popup appears
@@ -38,20 +43,20 @@ export function BadgeEarnedPopup({ badgeType, badgeName, badgeDescription, onClo
       spread: 70,
       origin: { y: 0.6 },
       colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
-    })
+    });
 
     // Auto-hide after 8 seconds
     const timer = setTimeout(() => {
-      handleClose()
-    }, 8000)
+      handleClose();
+    }, 8000);
 
-    return () => clearTimeout(timer)
-  }, [])
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleClose = () => {
-    setIsVisible(false)
-    setTimeout(onClose, 300) // Wait for exit animation to complete
-  }
+    setIsVisible(false);
+    setTimeout(onClose, 300); // Wait for exit animation to complete
+  };
 
   return (
     <AnimatePresence>
@@ -62,7 +67,7 @@ export function BadgeEarnedPopup({ badgeType, badgeName, badgeDescription, onClo
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           onClick={(e) => {
-            if (e.target === e.currentTarget) handleClose()
+            if (e.target === e.currentTarget) handleClose();
           }}
         >
           <motion.div
@@ -104,8 +109,12 @@ export function BadgeEarnedPopup({ badgeType, badgeName, badgeDescription, onClo
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <h3 className="text-lg font-bold text-[#0A3C1F] dark:text-[#FFD700]">{badgeName}</h3>
-                <p className="mt-1 text-gray-600 dark:text-gray-300">{badgeDescription}</p>
+                <h3 className="text-lg font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+                  {badgeName}
+                </h3>
+                <p className="mt-1 text-gray-600 dark:text-gray-300">
+                  {badgeDescription}
+                </p>
               </motion.div>
 
               <motion.div
@@ -114,7 +123,10 @@ export function BadgeEarnedPopup({ badgeType, badgeName, badgeDescription, onClo
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
               >
-                <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" onClick={handleClose}>
+                <Button
+                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                  onClick={handleClose}
+                >
                   Continue
                 </Button>
               </motion.div>
@@ -123,5 +135,5 @@ export function BadgeEarnedPopup({ badgeType, badgeName, badgeDescription, onClo
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }

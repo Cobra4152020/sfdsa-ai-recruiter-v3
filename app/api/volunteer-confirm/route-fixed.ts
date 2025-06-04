@@ -1,19 +1,19 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { diagnoseUserAuth } from "@/lib/auth-diagnostic"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { diagnoseUserAuth } from "@/lib/auth-diagnostic";
 
 export async function GET(request: Request) {
   try {
-    const { searchParams } = new URL(request.url)
-    const token = searchParams.get("token")
-    const isTest = searchParams.get("test") === "true"
+    const { searchParams } = new URL(request.url);
+    const token = searchParams.get("token");
+    const isTest = searchParams.get("test") === "true";
 
     // For test requests, just return a success response
     if (isTest) {
       return NextResponse.json({
         success: true,
         message: "Test endpoint is working",
-      })
+      });
     }
 
     if (!token) {
@@ -23,10 +23,10 @@ export async function GET(request: Request) {
           message: "No confirmation token provided",
         },
         { status: 400 },
-      )
+      );
     }
 
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Find the token in the database
     const { data: tokenData, error: tokenError } = await supabase
@@ -34,7 +34,7 @@ export async function GET(request: Request) {
       .select("*")
       .eq("token", token)
       .eq("type", "volunteer_recruiter")
-      .single()
+      .single();
 
     if (tokenError || !tokenData) {
       return NextResponse.json(
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
           message: "Invalid or expired confirmation token",
         },
         { status: 400 },
-      )
+      );
     }
 
     // Check if token is expired
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
           message: "Confirmation token has expired. Please register again.",
         },
         { status: 400 },
-      )
+      );
     }
 
     // Check if token is already used
@@ -65,17 +65,17 @@ export async function GET(request: Request) {
           message: "This email has already been confirmed",
         },
         { status: 400 },
-      )
+      );
     }
 
     // Mark token as used
     await supabase
       .from("email_confirmation_tokens")
       .update({ used_at: new Date().toISOString() })
-      .eq("id", tokenData.id)
+      .eq("id", tokenData.id);
 
     // Use diagnostic tool to get user information
-    const diagnostic = await diagnoseUserAuth(tokenData.email)
+    const diagnostic = await diagnoseUserAuth(tokenData.email);
 
     if (!diagnostic.authUserExists && !diagnostic.userProfileExists) {
       return NextResponse.json(
@@ -84,12 +84,15 @@ export async function GET(request: Request) {
           message: "User not found. Please register again.",
         },
         { status: 400 },
-      )
+      );
     }
 
     // Update user profile to mark email as confirmed
     if (diagnostic.userProfileExists && diagnostic.userProfileId) {
-      await supabase.from("user_profiles").update({ is_email_confirmed: true }).eq("user_id", diagnostic.userProfileId)
+      await supabase
+        .from("user_profiles")
+        .update({ is_email_confirmed: true })
+        .eq("user_id", diagnostic.userProfileId);
     }
 
     // Activate the volunteer recruiter role
@@ -100,7 +103,7 @@ export async function GET(request: Request) {
         .select("id")
         .eq("user_id", diagnostic.userProfileId)
         .eq("role", "volunteer_recruiter")
-        .single()
+        .single();
 
       if (roleExists) {
         // Update existing role
@@ -108,7 +111,7 @@ export async function GET(request: Request) {
           .from("user_roles")
           .update({ is_active: true })
           .eq("user_id", diagnostic.userProfileId)
-          .eq("role", "volunteer_recruiter")
+          .eq("role", "volunteer_recruiter");
       } else {
         // Create new role
         await supabase.from("user_roles").insert({
@@ -116,7 +119,7 @@ export async function GET(request: Request) {
           role: "volunteer_recruiter",
           assigned_at: new Date().toISOString(),
           is_active: true,
-        })
+        });
       }
     }
 
@@ -124,22 +127,23 @@ export async function GET(request: Request) {
     if (diagnostic.authUserExists && diagnostic.authUserId) {
       await supabase.auth.admin.updateUserById(diagnostic.authUserId, {
         email_confirm: true,
-      })
+      });
     }
 
     return NextResponse.json({
       success: true,
-      message: "Your email has been confirmed successfully. You can now log in to your volunteer recruiter account.",
+      message:
+        "Your email has been confirmed successfully. You can now log in to your volunteer recruiter account.",
       email: tokenData.email,
-    })
+    });
   } catch (error) {
-    console.error("Error confirming volunteer email:", error)
+    console.error("Error confirming volunteer email:", error);
     return NextResponse.json(
       {
         success: false,
         message: "An unexpected error occurred while confirming your email",
       },
       { status: 500 },
-    )
+    );
   }
 }

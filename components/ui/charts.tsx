@@ -1,6 +1,5 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from 'react'
 import {
   LineChart as RechartsLineChart,
   Line,
@@ -16,30 +15,43 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
-  Cell
-} from 'recharts'
+  Cell,
+} from "recharts";
 
 const COLORS = [
-  '#0088FE',
-  '#00C49F',
-  '#FFBB28',
-  '#FF8042',
-  '#8884d8',
-  '#82ca9d',
-  '#ffc658',
-  '#ff7300'
-]
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7300",
+];
 
-interface ChartProps {
-  data: any[]
-  xField?: string
-  yField?: string
+interface ChartData {
+  [key: string]: string | number;
 }
 
-export function LineChart({ 
-  data, 
-  xField = 'date', 
-  yField = 'value' 
+interface ChartProps {
+  data: ChartData[];
+  xField?: string;
+  yField?: string;
+}
+
+interface BarChartProps {
+  data: ChartData[];
+  index: string;
+  categories: string[];
+  colors?: string[];
+  valueFormatter?: (value: number) => string;
+  yAxisFormatter?: (value: number) => string;
+}
+
+export function LineChart({
+  data,
+  xField = "date",
+  yField = "value",
 }: ChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -57,13 +69,13 @@ export function LineChart({
         />
       </RechartsLineChart>
     </ResponsiveContainer>
-  )
+  );
 }
 
-export function PieChart({ 
-  data 
-}: { 
-  data: { name: string; value: number }[] 
+export function PieChart({
+  data,
+}: {
+  data: { name: string; value: number }[];
 }) {
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -85,13 +97,13 @@ export function PieChart({
         <Legend />
       </RechartsPieChart>
     </ResponsiveContainer>
-  )
+  );
 }
 
-export function AreaChart({ 
-  data, 
-  xField = 'date', 
-  yField = 'value' 
+export function AreaChart({
+  data,
+  xField = "date",
+  yField = "value",
 }: ChartProps) {
   return (
     <ResponsiveContainer width="100%" height={300}>
@@ -110,27 +122,33 @@ export function AreaChart({
         />
       </RechartsAreaChart>
     </ResponsiveContainer>
-  )
+  );
 }
 
-export function BarChart({ 
-  data, 
-  xField = 'name', 
-  yField = 'value' 
-}: ChartProps) {
+export function BarChart({
+  data,
+  index,
+  categories,
+  colors = ["#8884d8"],
+  valueFormatter,
+  yAxisFormatter,
+}: BarChartProps) {
   return (
-    <ResponsiveContainer width="100%" height={300}>
+    <ResponsiveContainer width="100%" height={400}>
       <RechartsBarChart data={data}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey={xField} />
-        <YAxis />
-        <Tooltip />
+        <XAxis dataKey={index} />
+        <YAxis tickFormatter={yAxisFormatter} />
+        <Tooltip formatter={valueFormatter} />
         <Legend />
-        <Bar
-          dataKey={yField}
-          fill="#8884d8"
-        />
+        {categories.map((category, i) => (
+          <Bar
+            key={category}
+            dataKey={category}
+            fill={colors[i % colors.length]}
+          />
+        ))}
       </RechartsBarChart>
     </ResponsiveContainer>
-  )
+  );
 }

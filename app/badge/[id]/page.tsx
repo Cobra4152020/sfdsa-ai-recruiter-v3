@@ -1,24 +1,26 @@
-import type { Metadata } from "next"
-import { getBadgeById, getAllBadgeIds } from "@/lib/badge-utils"
-import { BadgeClient } from "./badge-client"
-import { AuthModalProvider } from "@/context/auth-modal-context"
-import { notFound } from "next/navigation"
-import type { BadgeWithProgress } from "@/types/badge"
+import type { Metadata } from "next";
+import { getBadgeById, getAllBadgeIds } from "@/lib/badge-utils";
+import { BadgeClient } from "./badge-client";
+import { AuthModalProvider } from "@/context/auth-modal-context";
+import { notFound } from "next/navigation";
+import type { BadgeWithProgress } from "@/types/badge";
 
 interface BadgePageProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
-export async function generateMetadata({ params }: BadgePageProps): Promise<Metadata> {
-  const badge = await getBadgeById(params.id)
+export async function generateMetadata({
+  params,
+}: BadgePageProps): Promise<Metadata> {
+  const badge = await getBadgeById(params.id);
 
   if (!badge) {
     return {
       title: "Badge Not Found - SF Deputy Sheriff",
       description: "This badge could not be found.",
-    }
+    };
   }
 
   return {
@@ -42,21 +44,21 @@ export async function generateMetadata({ params }: BadgePageProps): Promise<Meta
       description: badge.description,
       images: [badge.imageUrl || "/generic-badge.png"],
     },
-  }
+  };
 }
 
 export async function generateStaticParams() {
-  const badgeIds = await getAllBadgeIds()
+  const badgeIds = await getAllBadgeIds();
   return badgeIds.map((id) => ({
     id: id,
-  }))
+  }));
 }
 
 export default async function BadgePage({ params }: BadgePageProps) {
-  const badge = await getBadgeById(params.id)
-  
+  const badge = await getBadgeById(params.id);
+
   if (!badge) {
-    notFound()
+    notFound();
   }
 
   // Convert Badge to BadgeWithProgress
@@ -66,11 +68,11 @@ export default async function BadgePage({ params }: BadgePageProps) {
     isUnlocked: false,
     currentTier: 1,
     xpEarned: 0,
-  }
+  };
 
   return (
     <AuthModalProvider>
       <BadgeClient badge={badgeWithProgress} />
     </AuthModalProvider>
-  )
+  );
 }

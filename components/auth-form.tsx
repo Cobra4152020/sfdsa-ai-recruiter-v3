@@ -1,79 +1,85 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { useToast } from "@/components/ui/use-toast"
-import { useUser } from "@/context/user-context"
-import { getClientSideSupabase } from "@/lib/supabase"
-import { Eye, EyeOff, Mail, Lock, User, Github, Twitter } from "lucide-react"
-import { motion, AnimatePresence } from "framer-motion"
-import { logError } from "@/lib/error-monitoring"
-import type { PostgrestError } from "@supabase/supabase-js"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@/context/user-context";
+import { getClientSideSupabase } from "@/lib/supabase";
+import { Eye, EyeOff, Mail, Lock, User, Github, Twitter } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { logError } from "@/lib/error-monitoring";
 
 interface AuthFormProps {
-  onSuccess?: () => void
-  className?: string
+  onSuccess?: () => void;
+  className?: string;
 }
 
 interface RegisterResponse {
-  success: boolean
-  message?: string
-  error?: string
+  success: boolean;
+  message?: string;
+  error?: string;
 }
 
 export function AuthForm({ onSuccess, className }: AuthFormProps) {
-  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [name, setName] = useState("")
-  const [showPassword, setShowPassword] = useState(false)
-  const [rememberMe, setRememberMe] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [resetPassword, setResetPassword] = useState(false)
-  const { toast } = useToast()
-  const { login } = useUser()
-  const supabase = getClientSideSupabase()
+  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [resetPassword, setResetPassword] = useState(false);
+  const { toast } = useToast();
+  const { login } = useUser();
+  const supabase = getClientSideSupabase();
 
   const validatePassword = (password: string): boolean => {
     // At least 8 characters, 1 uppercase, 1 lowercase, 1 number
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/
-    return passwordRegex.test(password)
-  }
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[a-zA-Z\d]{8,}$/;
+    return passwordRegex.test(password);
+  };
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       if (resetPassword) {
         await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
-        })
+        });
 
         toast({
           title: "Password reset email sent",
           description: "Check your email for a link to reset your password",
-        })
+        });
 
-        setResetPassword(false)
-        setIsLoading(false)
-        return
+        setResetPassword(false);
+        setIsLoading(false);
+        return;
       }
 
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      })
+      });
 
       if (error) {
-        throw error
+        throw error;
       }
 
       if (data.user) {
@@ -82,10 +88,14 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
           .from("users")
           .select("*")
           .eq("id", data.user.id)
-          .single()
+          .single();
 
         if (profileError) {
-          logError("Error fetching user profile", new Error(profileError.message), "AuthForm")
+          logError(
+            "Error fetching user profile",
+            new Error(profileError.message),
+            "AuthForm",
+          );
         }
 
         // Login the user in the context
@@ -95,41 +105,50 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
           email: data.user.email || "",
           participation_count: userData?.participation_count || 0,
           has_applied: userData?.has_applied || false,
-        })
+        });
 
         toast({
           title: "Sign in successful",
           description: "Welcome back!",
-        })
+        });
 
         if (onSuccess) {
-          onSuccess()
+          onSuccess();
         }
       }
     } catch (error) {
-      logError("Sign in error", error instanceof Error ? error : new Error(String(error)), "AuthForm")
+      logError(
+        "Sign in error",
+        error instanceof Error ? error : new Error(String(error)),
+        "AuthForm",
+      );
       toast({
         title: "Sign in failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
       // Validate inputs
       if (!name.trim()) {
-        throw new Error("Please enter your name")
+        throw new Error("Please enter your name");
       }
 
       if (!validatePassword(password)) {
-        throw new Error("Password must be at least 8 characters long and contain uppercase, lowercase, and numbers")
+        throw new Error(
+          "Password must be at least 8 characters long and contain uppercase, lowercase, and numbers",
+        );
       }
 
       // Use the API endpoint instead of direct Supabase calls
@@ -143,61 +162,80 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
           email,
           password,
         }),
-      })
+      });
 
-      const data = (await response.json()) as RegisterResponse
+      const data = (await response.json()) as RegisterResponse;
 
       if (!response.ok) {
-        throw new Error(data.message || data.error || "Failed to create account")
+        throw new Error(
+          data.message || data.error || "Failed to create account",
+        );
       }
 
       toast({
         title: "Sign up successful",
         description: "Please check your email to verify your account",
-      })
+      });
 
       // Switch to sign in tab
-      setActiveTab("signin")
+      setActiveTab("signin");
     } catch (error) {
-      logError("Sign up error", error instanceof Error ? error : new Error(String(error)), "AuthForm")
+      logError(
+        "Sign up error",
+        error instanceof Error ? error : new Error(String(error)),
+        "AuthForm",
+      );
       toast({
         title: "Sign up failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleSocialAuth = async (provider: "github" | "twitter") => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
         },
-      })
+      });
 
       if (error) {
-        throw error
+        throw error;
       }
     } catch (error) {
-      logError(`${provider} auth error`, error instanceof Error ? error : new Error(String(error)), "AuthForm")
+      logError(
+        `${provider} auth error`,
+        error instanceof Error ? error : new Error(String(error)),
+        "AuthForm",
+      );
       toast({
         title: "Authentication failed",
-        description: error instanceof Error ? error.message : "An unexpected error occurred",
+        description:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Card className={`w-full max-w-md mx-auto ${className}`}>
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "signin" | "signup")}>
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as "signin" | "signup")}
+      >
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="signin">Sign In</TabsTrigger>
           <TabsTrigger value="signup">Sign Up</TabsTrigger>
@@ -207,7 +245,9 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
           <form onSubmit={handleSignIn}>
             <CardHeader>
               <CardTitle>Sign In</CardTitle>
-              <CardDescription>Enter your credentials to access your account</CardDescription>
+              <CardDescription>
+                Enter your credentials to access your account
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -258,7 +298,9 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                         ) : (
                           <Eye className="h-4 w-4 text-muted-foreground" />
                         )}
-                        <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                        <span className="sr-only">
+                          {showPassword ? "Hide password" : "Show password"}
+                        </span>
                       </Button>
                     </div>
 
@@ -267,7 +309,9 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                         <Checkbox
                           id="remember"
                           checked={rememberMe}
-                          onCheckedChange={(checked) => setRememberMe(!!checked)}
+                          onCheckedChange={(checked) =>
+                            setRememberMe(!!checked)
+                          }
                         />
                         <Label htmlFor="remember" className="text-sm">
                           Remember me
@@ -293,13 +337,23 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                   className="rounded-lg bg-blue-50 dark:bg-blue-900/20 p-4"
                 >
                   <p className="text-sm text-blue-600 dark:text-blue-400">
-                    Enter your email address and we'll send you a link to reset your password.
+                    Enter your email address and we&apos;ll send you a link to
+                    reset your password.
                   </p>
                   <div className="mt-2 flex space-x-2">
-                    <Button type="button" variant="outline" size="sm" onClick={() => setResetPassword(false)}>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setResetPassword(false)}
+                    >
                       Cancel
                     </Button>
-                    <Button type="submit" size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                    <Button
+                      type="submit"
+                      size="sm"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
+                    >
                       Send Reset Link
                     </Button>
                   </div>
@@ -312,7 +366,11 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                   className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Signing in..." : resetPassword ? "Send Reset Link" : "Sign In"}
+                  {isLoading
+                    ? "Signing in..."
+                    : resetPassword
+                      ? "Send Reset Link"
+                      : "Sign In"}
                 </Button>
 
                 <div className="relative my-4">
@@ -320,7 +378,9 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                     <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                   </div>
                   <div className="relative flex justify-center text-xs">
-                    <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                    <span className="bg-background px-2 text-muted-foreground">
+                      Or continue with
+                    </span>
                   </div>
                 </div>
 
@@ -353,7 +413,9 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
           <form onSubmit={handleSignUp}>
             <CardHeader>
               <CardTitle>Sign Up</CardTitle>
-              <CardDescription>Create a new account to get started</CardDescription>
+              <CardDescription>
+                Create a new account to get started
+              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
@@ -412,11 +474,14 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                     ) : (
                       <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
-                    <span className="sr-only">{showPassword ? "Hide password" : "Show password"}</span>
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
                   </Button>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Password must be at least 8 characters long and include a mix of letters, numbers, and symbols.
+                  Password must be at least 8 characters long and include a mix
+                  of letters, numbers, and symbols.
                 </p>
               </div>
 
@@ -447,12 +512,19 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                   <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
                 </div>
                 <div className="relative flex justify-center text-xs">
-                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                  <span className="bg-background px-2 text-muted-foreground">
+                    Or continue with
+                  </span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-2">
-                <Button type="button" variant="outline" onClick={() => handleSocialAuth("github")} disabled={isLoading}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => handleSocialAuth("github")}
+                  disabled={isLoading}
+                >
                   <Github className="h-4 w-4 mr-2" />
                   GitHub
                 </Button>
@@ -472,16 +544,20 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
       </Tabs>
       <CardFooter className="flex justify-center border-t pt-4">
         <p className="text-sm text-muted-foreground">
-          {activeTab === "signin" ? "Don't have an account? " : "Already have an account? "}
+          {activeTab === "signin"
+            ? "Don&apos;t have an account? "
+            : "Already have an account? "}
           <Button
             variant="link"
             className="p-0 text-[#0A3C1F]"
-            onClick={() => setActiveTab(activeTab === "signin" ? "signup" : "signin")}
+            onClick={() =>
+              setActiveTab(activeTab === "signin" ? "signup" : "signin")
+            }
           >
             {activeTab === "signin" ? "Sign up" : "Sign in"}
           </Button>
         </p>
       </CardFooter>
     </Card>
-  )
+  );
 }

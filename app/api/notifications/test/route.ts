@@ -1,23 +1,29 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { type NextRequest, NextResponse } from "next/server"
-import { createNotification } from "@/lib/notification-service"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { type NextRequest, NextResponse } from "next/server";
+import { createNotification } from "@/lib/notification-service";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
     // Get user ID from session
     const {
       data: { session },
-    } = await getServiceSupabase.auth.getSession()
+    } = await getServiceSupabase.auth.getSession();
 
     if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = session.user.id
-    const { type = "test", title, message, actionUrl, imageUrl } = await request.json()
+    const userId = session.user.id;
+    const {
+      type = "test",
+      title,
+      message,
+      actionUrl,
+      imageUrl,
+    } = await request.json();
 
     const notification = await createNotification({
       userId,
@@ -26,15 +32,21 @@ export async function POST(request: NextRequest) {
       message: message || "This is a test notification.",
       actionUrl,
       imageUrl,
-    })
+    });
 
     if (notification) {
-      return NextResponse.json({ success: true, notification })
+      return NextResponse.json({ success: true, notification });
     } else {
-      return NextResponse.json({ error: "Failed to create test notification" }, { status: 500 })
+      return NextResponse.json(
+        { error: "Failed to create test notification" },
+        { status: 500 },
+      );
     }
   } catch (error) {
-    console.error("Error creating test notification:", error)
-    return NextResponse.json({ error: "Failed to create test notification" }, { status: 500 })
+    console.error("Error creating test notification:", error);
+    return NextResponse.json(
+      { error: "Failed to create test notification" },
+      { status: 500 },
+    );
   }
 }

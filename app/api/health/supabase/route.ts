@@ -1,34 +1,34 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { API_CACHE_HEADERS } from "@/lib/cache-utils"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { API_CACHE_HEADERS } from "@/lib/cache-utils";
 
-export const dynamic = "force-static"
-export const revalidate = 3600 // Revalidate every hour
+export const dynamic = "force-static";
+export const revalidate = 3600; // Revalidate every hour
 
 interface TableCheckResult {
-  table: string
-  exists: boolean
-  error: string | null
-  responseTimeMs?: number
+  table: string;
+  exists: boolean;
+  error: string | null;
+  responseTimeMs?: number;
 }
 
 interface PermissionsCheck {
-  success: boolean
-  error: string | null
+  success: boolean;
+  error: string | null;
 }
 
 export async function GET() {
-  const startTime = Date.now()
+  const startTime = Date.now();
   try {
-    const supabase = getServiceSupabase()
-    const connectionTime = Date.now() - startTime
+    const supabase = getServiceSupabase();
+    const connectionTime = Date.now() - startTime;
 
     // Test database connection with a simple query
-    const { data: connectionTest, error: connectionError } = await supabase
+    const { error: connectionError } = await supabase
       .from("users")
       .select("count")
       .limit(1)
-      .single()
+      .single();
 
     if (connectionError) {
       return NextResponse.json(
@@ -41,7 +41,7 @@ export async function GET() {
           },
         },
         { status: 500, headers: API_CACHE_HEADERS },
-      )
+      );
     }
 
     // Check required tables
@@ -53,29 +53,32 @@ export async function GET() {
       "user_nft_awards",
       "leaderboard",
       "performance_metrics",
-    ]
+    ];
 
-    const tableChecks: TableCheckResult[] = []
+    const tableChecks: TableCheckResult[] = [];
 
     for (const table of requiredTables) {
-      const tableStartTime = Date.now()
-      const { error: tableError } = await supabase.from(table).select("count").limit(1)
+      const tableStartTime = Date.now();
+      const { error: tableError } = await supabase
+        .from(table)
+        .select("count")
+        .limit(1);
 
       tableChecks.push({
         table,
         exists: !tableError,
         error: tableError ? tableError.message : null,
         responseTimeMs: Date.now() - tableStartTime,
-      })
+      });
     }
 
-    const missingTables = tableChecks.filter((check) => !check.exists)
+    const missingTables = tableChecks.filter((check) => !check.exists);
 
     // Check permissions by attempting a write operation to a test table
-    let permissionsCheck: PermissionsCheck = { success: true, error: null }
+    let permissionsCheck: PermissionsCheck = { success: true, error: null };
     try {
       // Try to insert and immediately delete a test record
-      const testTable = "performance_metrics" // Using an existing table that should allow writes
+      const testTable = "performance_metrics"; // Using an existing table that should allow writes
       const { error: insertError, data: insertData } = await supabase
         .from(testTable)
         .insert({
@@ -85,41 +88,46 @@ export async function GET() {
           user_id: "health-check",
           timestamp: new Date().toISOString(),
         })
-        .select()
+        .select();
 
       if (insertError) {
         permissionsCheck = {
           success: false,
           error: `Write permission error: ${insertError.message}`,
-        }
+        };
       } else if (insertData && insertData.length > 0) {
         // Delete the test record
-        const { error: deleteError } = await supabase.from(testTable).delete().eq("id", insertData[0].id)
+        const { error: deleteError } = await supabase
+          .from(testTable)
+          .delete()
+          .eq("id", insertData[0].id);
 
         if (deleteError) {
           permissionsCheck = {
             success: false,
             error: `Delete permission error: ${deleteError.message}`,
-          }
+          };
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       permissionsCheck = {
         success: false,
-        error: `Permission check error: ${error.message}`,
-      }
+        error: `Permission check error: ${error instanceof Error ? error.message : String(error)}`,
+      };
     }
 
     // Calculate total response time
-    const totalResponseTime = Date.now() - startTime
+    const totalResponseTime = Date.now() - startTime;
 
     // Determine overall status
-    const isHealthy = missingTables.length === 0 && permissionsCheck.success
+    const isHealthy = missingTables.length === 0 && permissionsCheck.success;
 
     return NextResponse.json(
       {
         success: isHealthy,
-        message: isHealthy ? "Supabase connection is healthy" : "Supabase connection has issues",
+        message: isHealthy
+          ? "Supabase connection is healthy"
+          : "Supabase connection has issues",
         details: {
           connectionTimeMs: connectionTime,
           totalResponseTimeMs: totalResponseTime,
@@ -137,21 +145,26 @@ export async function GET() {
         status: isHealthy ? 200 : 500,
         headers: API_CACHE_HEADERS,
       },
-    )
-  } catch (error: any) {
-    const totalResponseTime = Date.now() - startTime
+    );
+  } catch (error: unknown) {
+    const totalResponseTime = Date.now() - startTime;
 
     return NextResponse.json(
       {
         success: false,
-        message: `Supabase health check failed: ${error.message}`,
+        message: `Supabase health check failed: ${error instanceof Error ? error.message : String(error)}`,
         details: {
-          error: error.message,
-          stack: process.env.NODE_ENV === "development" ? error.stack : undefined,
+          error: error instanceof Error ? error.message : String(error),
+          stack:
+            process.env.NODE_ENV === "development"
+              ? error instanceof Error
+                ? error.stack
+                : String(error)
+              : undefined,
           totalResponseTimeMs: totalResponseTime,
         },
       },
       { status: 500, headers: API_CACHE_HEADERS },
-    )
+    );
   }
 }

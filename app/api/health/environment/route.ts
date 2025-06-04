@@ -1,9 +1,8 @@
-
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { API_CACHE_HEADERS } from "@/lib/cache-utils"
+import { NextResponse } from "next/server";
+import { API_CACHE_HEADERS } from "@/lib/cache-utils";
 
 export async function GET() {
   try {
@@ -17,9 +16,11 @@ export async function GET() {
       "NEXT_PUBLIC_SUPABASE_URL",
       "NEXT_PUBLIC_SUPABASE_ANON_KEY",
       "SUPABASE_SERVICE_ROLE_KEY",
-    ]
+    ];
 
-    const missingEnvVars = requiredEnvVars.filter((envVar) => !process.env[envVar])
+    const missingEnvVars = requiredEnvVars.filter(
+      (envVar) => !process.env[envVar],
+    );
 
     if (missingEnvVars.length > 0) {
       return NextResponse.json(
@@ -30,7 +31,7 @@ export async function GET() {
           buildId: process.env.NEXT_PUBLIC_BUILD_ID || "unknown",
         },
         { status: 500, headers: API_CACHE_HEADERS },
-      )
+      );
     }
 
     return NextResponse.json(
@@ -47,11 +48,11 @@ export async function GET() {
         },
       },
       { headers: API_CACHE_HEADERS },
-    )
+    );
   } catch (error) {
     return NextResponse.json(
       { success: false, message: `Environment health check failed: ${error}` },
       { status: 500, headers: API_CACHE_HEADERS },
-    )
+    );
   }
 }

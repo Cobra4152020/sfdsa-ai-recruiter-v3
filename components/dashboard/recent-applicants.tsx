@@ -1,16 +1,16 @@
-import type { Database } from "@/types/supabase-types"
-import { formatDistanceToNow } from "date-fns"
-import { Badge } from "@/components/ui/badge"
+import type { Database } from "@/types/supabase-types";
+import { formatDistanceToNow } from "date-fns";
+import { Badge } from "@/components/ui/badge";
 
-type Applicant = Database["public"]["Tables"]["applicants"]["Row"]
+type Applicant = Database["public"]["Tables"]["applicants"]["Row"];
 
 interface RecentApplicantsProps {
-  applicants: Applicant[]
+  applicants: Applicant[];
 }
 
 export function RecentApplicants({ applicants }: RecentApplicantsProps) {
   if (applicants.length === 0) {
-    return <div className="text-center py-4">No recent applicants found</div>
+    return <div className="text-center py-4">No recent applicants found</div>;
   }
 
   return (
@@ -26,31 +26,40 @@ export function RecentApplicants({ applicants }: RecentApplicantsProps) {
             </Badge>
           </div>
           <p className="text-sm text-gray-500 mt-1">{applicant.email}</p>
-          {applicant.phone && <p className="text-sm text-gray-500">{applicant.phone}</p>}
+          {applicant.phone && (
+            <p className="text-sm text-gray-500">{applicant.phone}</p>
+          )}
           <div className="flex justify-between items-center mt-3">
-            <div className="text-xs text-gray-500">{applicant.zip_code || "No ZIP"}</div>
             <div className="text-xs text-gray-500">
-              Applied {formatDistanceToNow(new Date(applicant.created_at), { addSuffix: true })}
+              {applicant.zip_code || "No ZIP"}
+            </div>
+            <div className="text-xs text-gray-500">
+              Applied{" "}
+              {formatDistanceToNow(new Date(applicant.created_at), {
+                addSuffix: true,
+              })}
             </div>
           </div>
         </div>
       ))}
     </div>
-  )
+  );
 }
 
-function getStatusVariant(status: string | null): "default" | "secondary" | "destructive" | "outline" {
-  if (!status) return "secondary"
+function getStatusVariant(
+  status: string | null,
+): "default" | "secondary" | "destructive" | "outline" {
+  if (!status) return "secondary";
 
   switch (status.toLowerCase()) {
     case "pending":
-      return "secondary"
+      return "secondary";
     case "approved":
     case "accepted":
-      return "default"
+      return "default";
     case "rejected":
-      return "destructive"
+      return "destructive";
     default:
-      return "outline"
+      return "outline";
   }
 }

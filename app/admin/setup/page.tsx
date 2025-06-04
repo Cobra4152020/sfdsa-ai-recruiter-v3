@@ -1,54 +1,63 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { SetupAdminUserButton } from "@/components/admin/setup-admin-user-button"
-import { getClientSideSupabase } from "@/lib/supabase"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertCircle } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { SetupAdminUserButton } from "@/components/admin/setup-admin-user-button";
+import { getClientSideSupabase } from "@/lib/supabase";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 export default function AdminSetupPage() {
-  const supabase = getClientSideSupabase()
-  const [userId, setUserId] = useState("")
-  const [email, setEmail] = useState("")
-  const [name, setName] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const supabase = getClientSideSupabase();
+  const [userId, setUserId] = useState("");
+  const [email, setEmail] = useState("");
+  const [name, setName] = useState("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     async function checkAuth() {
       try {
-        const { data, error } = await supabase.auth.getSession()
+        const { data, error } = await supabase.auth.getSession();
 
-        if (error) throw error
+        if (error) throw error;
 
         if (data.session) {
-          setIsAuthenticated(true)
-          setUserId(data.session.user.id)
-          setEmail(data.session.user.email || "")
-          setName(data.session.user.user_metadata?.name || "Admin User")
+          setIsAuthenticated(true);
+          setUserId(data.session.user.id);
+          setEmail(data.session.user.email || "");
+          setName(data.session.user.user_metadata?.name || "Admin User");
         } else {
-          setError("You must be logged in to access this page")
+          setError("You must be logged in to access this page");
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to check authentication")
+        setError(
+          err instanceof Error ? err.message : "Failed to check authentication",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
 
-    checkAuth()
-  }, [])
+    checkAuth();
+  }, [supabase.auth]);
 
   if (isLoading) {
     return (
       <div className="container mx-auto py-8 flex justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0A3C1F]"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -67,28 +76,45 @@ export default function AdminSetupPage() {
         <Card className="max-w-md mx-auto">
           <CardHeader>
             <CardTitle>Setup Admin User</CardTitle>
-            <CardDescription>This will set up your account as an admin user in the database</CardDescription>
+            <CardDescription>
+              This will set up your account as an admin user in the database
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="userId">User ID</Label>
-              <Input id="userId" value={userId} onChange={(e) => setUserId(e.target.value)} disabled />
+              <Input
+                id="userId"
+                value={userId}
+                onChange={(e) => setUserId(e.target.value)}
+                disabled
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
-              <Input id="email" value={email} onChange={(e) => setEmail(e.target.value)} disabled />
+              <Input
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled
+              />
             </div>
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
-              <Input id="name" value={name} onChange={(e) => setName(e.target.value)} />
+              <Input
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
             </div>
 
             <Alert className="bg-amber-50 border-amber-200">
               <AlertCircle className="h-4 w-4 text-amber-600" />
               <AlertTitle className="text-amber-800">Important</AlertTitle>
               <AlertDescription className="text-amber-700">
-                This will create necessary database structures and set up your account as an admin. Make sure you're
-                logged in with the account you want to make an admin.
+                This will create necessary database structures and set up your
+                account as an admin. Make sure you&apos;re logged in with the
+                account you want to make an admin.
               </AlertDescription>
             </Alert>
           </CardContent>
@@ -102,9 +128,12 @@ export default function AdminSetupPage() {
         <Alert className="max-w-md mx-auto">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Authentication Required</AlertTitle>
-          <AlertDescription>You need to be logged in to set up an admin user. Please log in first.</AlertDescription>
+          <AlertDescription>
+            You need to be logged in to set up an admin user. Please log in
+            first.
+          </AlertDescription>
         </Alert>
       )}
     </div>
-  )
+  );
 }

@@ -1,9 +1,29 @@
-"use client"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+"use client";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+
+export interface RetentionHeatmapRow {
+  cohort: string;
+  users: number;
+  week1: number;
+  week2: number;
+  week3: number;
+  week4: number;
+  week5: number;
+  week6: number;
+  week7: number;
+  week8: number;
+}
 
 interface RetentionHeatmapProps {
-  data: any[]
-  isLoading: boolean
+  data: RetentionHeatmapRow[];
+  isLoading: boolean;
 }
 
 export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
@@ -12,16 +32,20 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
       <div className="w-full h-[400px] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0A3C1F]"></div>
       </div>
-    )
+    );
   }
 
   if (!data || data.length === 0) {
     return (
       <div className="w-full h-[400px] flex flex-col items-center justify-center">
-        <p className="text-lg font-medium text-gray-500">No retention data available</p>
-        <p className="text-sm text-gray-400">Try selecting a different time period</p>
+        <p className="text-lg font-medium text-gray-500">
+          No retention data available
+        </p>
+        <p className="text-sm text-gray-400">
+          Try selecting a different time period
+        </p>
       </div>
-    )
+    );
   }
 
   return (
@@ -56,7 +80,9 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
                       minWidth: "20px",
                     }}
                   >
-                    <span className="px-2 text-xs text-white">{row.week1.toFixed(1)}%</span>
+                    <span className="px-2 text-xs text-white">
+                      {row.week1.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </TableCell>
@@ -70,7 +96,9 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
                       minWidth: "20px",
                     }}
                   >
-                    <span className="px-2 text-xs text-white">{row.week2.toFixed(1)}%</span>
+                    <span className="px-2 text-xs text-white">
+                      {row.week2.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </TableCell>
@@ -84,7 +112,9 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
                       minWidth: "20px",
                     }}
                   >
-                    <span className="px-2 text-xs text-white">{row.week3.toFixed(1)}%</span>
+                    <span className="px-2 text-xs text-white">
+                      {row.week3.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </TableCell>
@@ -98,7 +128,9 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
                       minWidth: "20px",
                     }}
                   >
-                    <span className="px-2 text-xs text-white">{row.week4.toFixed(1)}%</span>
+                    <span className="px-2 text-xs text-white">
+                      {row.week4.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </TableCell>
@@ -112,7 +144,9 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
                       minWidth: "20px",
                     }}
                   >
-                    <span className="px-2 text-xs text-white">{row.week5.toFixed(1)}%</span>
+                    <span className="px-2 text-xs text-white">
+                      {row.week5.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </TableCell>
@@ -126,7 +160,9 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
                       minWidth: "20px",
                     }}
                   >
-                    <span className="px-2 text-xs text-white">{row.week6.toFixed(1)}%</span>
+                    <span className="px-2 text-xs text-white">
+                      {row.week6.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </TableCell>
@@ -140,7 +176,9 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
                       minWidth: "20px",
                     }}
                   >
-                    <span className="px-2 text-xs text-white">{row.week7.toFixed(1)}%</span>
+                    <span className="px-2 text-xs text-white">
+                      {row.week7.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </TableCell>
@@ -154,7 +192,9 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
                       minWidth: "20px",
                     }}
                   >
-                    <span className="px-2 text-xs text-white">{row.week8.toFixed(1)}%</span>
+                    <span className="px-2 text-xs text-white">
+                      {row.week8.toFixed(1)}%
+                    </span>
                   </div>
                 </div>
               </TableCell>
@@ -163,19 +203,22 @@ export function RetentionHeatmap({ data, isLoading }: RetentionHeatmapProps) {
         </TableBody>
       </Table>
     </div>
-  )
+  );
 }
 
-function getColorForRetention(retention: number, isDark: boolean = false): string {
+function getColorForRetention(
+  retention: number,
+  isDark: boolean = false,
+): string {
   if (isDark) {
-    if (retention >= 75) return "#34D399" // emerald-400
-    if (retention >= 50) return "#60A5FA" // blue-400
-    if (retention >= 25) return "#FBBF24" // amber-400
-    return "#F87171" // red-400
+    if (retention >= 75) return "#34D399"; // emerald-400
+    if (retention >= 50) return "#60A5FA"; // blue-400
+    if (retention >= 25) return "#FBBF24"; // amber-400
+    return "#F87171"; // red-400
   } else {
-    if (retention >= 75) return "#059669" // emerald-600
-    if (retention >= 50) return "#2563EB" // blue-600
-    if (retention >= 25) return "#D97706" // amber-600
-    return "#DC2626" // red-600
+    if (retention >= 75) return "#059669"; // emerald-600
+    if (retention >= 50) return "#2563EB"; // blue-600
+    if (retention >= 25) return "#D97706"; // amber-600
+    return "#DC2626"; // red-600
   }
 }

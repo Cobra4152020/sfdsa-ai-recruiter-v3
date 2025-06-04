@@ -1,15 +1,15 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { useUser } from "@/context/user-context"
-import { PageWrapper } from "@/components/page-wrapper"
-import { TikTokChallengeModal } from "@/components/tiktok-challenge-modal"
-import { TikTokChallengeSubmissionViewer } from "@/components/tiktok-challenge-submission-viewer"
-import { TikTokIcon } from "@/components/tiktok-icon"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
+import { useEffect, useState } from "react";
+import { useUser } from "@/context/user-context";
+import { PageWrapper } from "@/components/page-wrapper";
+import { TikTokChallengeModal } from "@/components/tiktok-challenge-modal";
+import { TikTokChallengeSubmissionViewer } from "@/components/tiktok-challenge-submission-viewer";
+import { TikTokIcon } from "@/components/tiktok-icon";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import {
   Calendar,
   Clock,
@@ -22,92 +22,113 @@ import {
   AlertCircle,
   Users,
   Trophy,
-} from "lucide-react"
-import Image from "next/image"
-import Link from "next/link"
-import { toast } from "@/components/ui/use-toast"
-import { format } from "date-fns"
-import { Skeleton } from "@/components/ui/skeleton"
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import { toast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Challenge {
-  id: number
-  title: string
-  description: string
-  instructions: string
-  hashtags: string[]
-  startDate: Date
-  endDate: Date
-  pointsReward: number
-  badgeReward?: string
-  exampleVideoUrl?: string
-  thumbnailUrl?: string
+  id: number;
+  title: string;
+  description: string;
+  instructions: string;
+  hashtags: string[];
+  startDate: Date;
+  endDate: Date;
+  pointsReward: number;
+  badgeReward?: string;
+  exampleVideoUrl?: string;
+  thumbnailUrl?: string;
   requirements?: {
-    minDuration?: number
-    maxDuration?: number
-    requiredElements?: string[]
-  }
-  status: string
-  completed?: boolean
-  submissionId?: number
-  submissionStatus?: string
+    minDuration?: number;
+    maxDuration?: number;
+    requiredElements?: string[];
+  };
+  status: string;
+  completed?: boolean;
+  submissionId?: number;
+  submissionStatus?: string;
+}
+
+interface LeaderboardEntry {
+  userId: string;
+  userName: string;
+  points: number;
+  rank: number;
+  submissionId?: number;
+  videoUrl?: string;
+  avatarUrl?: string;
+  displayName: string;
+  submittedAt: string;
+  verified?: boolean;
 }
 
 interface TikTokChallengePageClientProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
-export function TikTokChallengePageClient({ params }: TikTokChallengePageClientProps) {
-  const { currentUser } = useUser()
-  const [challenge, setChallenge] = useState<Challenge | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [viewingSubmissionId, setViewingSubmissionId] = useState<number | null>(null)
-  const [leaderboard, setLeaderboard] = useState<any[]>([])
-  const [activeTab, setActiveTab] = useState("details")
+export function TikTokChallengePageClient({
+  params,
+}: TikTokChallengePageClientProps) {
+  const { currentUser } = useUser();
+  const [challenge, setChallenge] = useState<Challenge | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [viewingSubmissionId, setViewingSubmissionId] = useState<number | null>(
+    null,
+  );
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [activeTab, setActiveTab] = useState("details");
 
   useEffect(() => {
     if (params.id) {
-      fetchChallenge()
+      fetchChallenge();
     }
-  }, [params.id])
+  }, [params.id]);
 
   const fetchChallenge = async () => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
 
       // Fetch challenge details
-      const challengeResponse = await fetch(`/api/tiktok-challenges/${params.id}?userId=${currentUser?.id}`)
+      const challengeResponse = await fetch(
+        `/api/tiktok-challenges/${params.id}?userId=${currentUser?.id}`,
+      );
 
       if (!challengeResponse.ok) {
-        throw new Error("Failed to fetch challenge")
+        throw new Error("Failed to fetch challenge");
       }
 
-      const challengeData = await challengeResponse.json()
-      setChallenge(challengeData.challenge)
+      const challengeData = await challengeResponse.json();
+      setChallenge(challengeData.challenge);
 
       // Fetch leaderboard for this challenge
-      const leaderboardResponse = await fetch(`/api/tiktok-challenges/leaderboard?challengeId=${params.id}`)
+      const leaderboardResponse = await fetch(
+        `/api/tiktok-challenges/leaderboard?challengeId=${params.id}`,
+      );
 
       if (leaderboardResponse.ok) {
-        const leaderboardData = await leaderboardResponse.json()
-        setLeaderboard(leaderboardData.leaderboard || [])
+        const leaderboardData = await leaderboardResponse.json();
+        setLeaderboard(leaderboardData.leaderboard || []);
       }
     } catch (error) {
-      console.error("Error fetching challenge:", error)
+      console.error("Error fetching challenge:", error);
       toast({
         title: "Error",
         description: "Failed to load challenge details. Please try again.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const isActive = challenge && new Date(challenge.endDate) > new Date()
-  const canParticipate = isActive && !challenge?.completed
+  const isActive = challenge && new Date(challenge.endDate) > new Date();
+  const canParticipate = isActive && !challenge?.completed;
 
   const handleShare = () => {
     if (navigator.share) {
@@ -118,17 +139,17 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
           url: window.location.href,
         })
         .catch((err) => {
-          console.error("Error sharing:", err)
-        })
+          console.error("Error sharing:", err);
+        });
     } else {
       // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(window.location.href)
+      navigator.clipboard.writeText(window.location.href);
       toast({
         title: "Link copied!",
         description: "Share this challenge with your friends.",
-      })
+      });
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -167,7 +188,7 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
           </div>
         </div>
       </PageWrapper>
-    )
+    );
   }
 
   if (!challenge) {
@@ -178,7 +199,8 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
             <AlertCircle className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h1 className="text-2xl font-bold mb-2">Challenge Not Found</h1>
             <p className="text-gray-600 mb-6">
-              The challenge you're looking for could not be found or has been removed.
+              The challenge you&apos;re looking for could not be found or has
+              been removed.
             </p>
             <Button asChild>
               <Link href="/tiktok-challenges">
@@ -189,14 +211,17 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
           </div>
         </div>
       </PageWrapper>
-    )
+    );
   }
 
   return (
     <PageWrapper>
       <div className="container py-8">
         <div className="mb-6">
-          <Link href="/tiktok-challenges" className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4">
+          <Link
+            href="/tiktok-challenges"
+            className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4"
+          >
             <ArrowLeft className="h-4 w-4 mr-1" />
             <span>Back to Challenges</span>
           </Link>
@@ -242,7 +267,10 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
             <div className="relative rounded-lg overflow-hidden border">
               <div className="aspect-video">
                 <Image
-                  src={challenge.thumbnailUrl || "/placeholder.svg?height=400&width=800&query=TikTok+Challenge"}
+                  src={
+                    challenge.thumbnailUrl ||
+                    "/placeholder.svg?height=400&width=800&query=TikTok+Challenge"
+                  }
                   alt={challenge.title}
                   fill
                   className="object-cover"
@@ -252,7 +280,11 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
                 <div className="flex flex-wrap gap-1">
                   {challenge.hashtags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="bg-black/50 hover:bg-black/70">
+                    <Badge
+                      key={tag}
+                      variant="secondary"
+                      className="bg-black/50 hover:bg-black/70"
+                    >
                       #{tag}
                     </Badge>
                   ))}
@@ -274,7 +306,9 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
 
               <TabsContent value="details" className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-medium mb-2">Challenge Description</h2>
+                  <h2 className="text-xl font-medium mb-2">
+                    Challenge Description
+                  </h2>
                   <p className="text-gray-700">{challenge.description}</p>
                 </div>
 
@@ -284,17 +318,25 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
 
                   {challenge.requirements && (
                     <div className="mt-4 border border-gray-200 rounded-lg p-4 bg-gray-50">
-                      <h3 className="font-medium text-gray-900 mb-2">Requirements:</h3>
+                      <h3 className="font-medium text-gray-900 mb-2">
+                        Requirements:
+                      </h3>
                       <ul className="list-disc list-inside text-gray-700 space-y-1">
                         {challenge.requirements.minDuration && (
-                          <li>Minimum Duration: {challenge.requirements.minDuration} seconds</li>
+                          <li>
+                            Minimum Duration:{" "}
+                            {challenge.requirements.minDuration} seconds
+                          </li>
                         )}
                         {challenge.requirements.maxDuration && (
-                          <li>Maximum Duration: {challenge.requirements.maxDuration} seconds</li>
+                          <li>
+                            Maximum Duration:{" "}
+                            {challenge.requirements.maxDuration} seconds
+                          </li>
                         )}
-                        {challenge.requirements.requiredElements?.map((element, index) => (
-                          <li key={index}>{element}</li>
-                        ))}
+                        {challenge.requirements.requiredElements?.map(
+                          (element, index) => <li key={index}>{element}</li>,
+                        )}
                       </ul>
                     </div>
                   )}
@@ -328,8 +370,12 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
                   {leaderboard.length === 0 ? (
                     <div className="text-center py-8 border border-dashed rounded-lg">
                       <Video className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                      <h3 className="text-gray-500 font-medium">No participants yet</h3>
-                      <p className="text-gray-400 text-sm mt-1">Be the first to complete this challenge!</p>
+                      <h3 className="text-gray-500 font-medium">
+                        No participants yet
+                      </h3>
+                      <p className="text-gray-400 text-sm mt-1">
+                        Be the first to complete this challenge!
+                      </p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -339,12 +385,17 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
                           className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors border"
                         >
                           <div className="flex-shrink-0 w-6 text-center">
-                            <span className="font-medium text-gray-600">{index + 1}</span>
+                            <span className="font-medium text-gray-600">
+                              {index + 1}
+                            </span>
                           </div>
 
                           <div className="ml-3 relative h-10 w-10">
                             <Image
-                              src={entry.avatarUrl || "/placeholder.svg?height=40&width=40&query=avatar"}
+                              src={
+                                entry.avatarUrl ||
+                                "/placeholder.svg?height=40&width=40&query=avatar"
+                              }
                               alt={entry.displayName}
                               fill
                               className="rounded-full object-cover"
@@ -354,12 +405,19 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
                           <div className="ml-3 flex-1">
                             <p className="font-medium">{entry.displayName}</p>
                             <p className="text-sm text-gray-500">
-                              Submitted {format(new Date(entry.submittedAt), "MMM d, yyyy")}
+                              Submitted{" "}
+                              {format(
+                                new Date(entry.submittedAt),
+                                "MMM d, yyyy",
+                              )}
                             </p>
                           </div>
 
                           {entry.verified && (
-                            <Badge variant="outline" className="flex items-center">
+                            <Badge
+                              variant="outline"
+                              className="flex items-center"
+                            >
                               <CheckCircle className="h-3 w-3 mr-1" />
                               Verified
                             </Badge>
@@ -385,7 +443,9 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
                         <Calendar className="h-4 w-4 mr-2" />
                         <span>End Date</span>
                       </div>
-                      <span className={`font-medium ${!isActive ? "text-red-600" : ""}`}>
+                      <span
+                        className={`font-medium ${!isActive ? "text-red-600" : ""}`}
+                      >
                         {format(new Date(challenge.endDate), "MMM d, yyyy")}
                       </span>
                     </div>
@@ -395,7 +455,9 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
                         <Award className="h-4 w-4 mr-2" />
                         <span>Points Reward</span>
                       </div>
-                      <span className="font-medium">{challenge.pointsReward}</span>
+                      <span className="font-medium">
+                        {challenge.pointsReward}
+                      </span>
                     </div>
 
                     {challenge.badgeReward && (
@@ -424,18 +486,30 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
                       <Share className="h-4 w-4 mr-2" />
                       Share Achievement
                     </Button>
-                  ) : challenge.submissionId && challenge.submissionStatus !== "approved" ? (
-                    <Button variant="outline" onClick={() => setViewingSubmissionId(challenge.submissionId!)}>
+                  ) : challenge.submissionId &&
+                    challenge.submissionStatus !== "approved" ? (
+                    <Button
+                      variant="outline"
+                      onClick={() =>
+                        setViewingSubmissionId(challenge.submissionId!)
+                      }
+                    >
                       <Video className="h-4 w-4 mr-2" />
                       View Submission
                     </Button>
                   ) : canParticipate ? (
-                    <Button className="bg-black hover:bg-black/80 text-white" onClick={() => setIsModalOpen(true)}>
+                    <Button
+                      className="bg-black hover:bg-black/80 text-white"
+                      onClick={() => setIsModalOpen(true)}
+                    >
                       <TikTokIcon className="h-4 w-4 mr-2" />
                       Participate Now
                     </Button>
                   ) : (
-                    <Button disabled>Challenge {challenge.status === "active" ? "Ended" : "Unavailable"}</Button>
+                    <Button disabled>
+                      Challenge{" "}
+                      {challenge.status === "active" ? "Ended" : "Unavailable"}
+                    </Button>
                   )}
 
                   <Button variant="outline" onClick={handleShare}>
@@ -466,5 +540,5 @@ export function TikTokChallengePageClient({ params }: TikTokChallengePageClientP
         />
       )}
     </PageWrapper>
-  )
-} 
+  );
+}

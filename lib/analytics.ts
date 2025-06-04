@@ -8,16 +8,19 @@ export function trackPageView(page: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ page }),
-    }).catch((err) => console.error("Error tracking page view:", err))
+    }).catch((err) => console.error("Error tracking page view:", err));
 
     // You could also integrate with services like Google Analytics, Vercel Analytics, etc.
   } catch (error) {
-    console.error("Error tracking page view:", error)
+    console.error("Error tracking page view:", error);
   }
 }
 
 // Track user engagement
-export function trackEngagement(action: string, details?: Record<string, any>) {
+export function trackEngagement(
+  action: string,
+  details?: Record<string, unknown>,
+) {
   try {
     // Send to Supabase analytics table
     fetch("/api/analytics/engagement", {
@@ -26,9 +29,9 @@ export function trackEngagement(action: string, details?: Record<string, any>) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ action, details }),
-    }).catch((err) => console.error("Error tracking engagement:", err))
+    }).catch((err) => console.error("Error tracking engagement:", err));
   } catch (error) {
-    console.error("Error tracking engagement:", error)
+    console.error("Error tracking engagement:", error);
   }
 }
 
@@ -42,8 +45,8 @@ export function trackBadgeEarned(badgeId: string, badgeName: string) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ badgeId, badgeName }),
-    }).catch((err) => console.error("Error tracking badge earned:", err))
+    }).catch((err) => console.error("Error tracking badge earned:", err));
   } catch (error) {
-    console.error("Error tracking badge earned:", error)
+    console.error("Error tracking badge earned:", error);
   }
 }

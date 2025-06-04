@@ -1,4 +1,4 @@
-export async function volunteerRegistration(params: any) {
+export async function volunteerRegistration(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/volunteer-registration`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function volunteerRegistration(params: any) {
     console.error(`Error in volunteerRegistration:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

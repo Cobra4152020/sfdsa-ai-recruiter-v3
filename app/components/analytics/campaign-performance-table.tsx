@@ -14,7 +14,9 @@ interface CampaignPerformanceTableProps {
   data: CampaignPerformance[] | null;
 }
 
-export function CampaignPerformanceTable({ data }: CampaignPerformanceTableProps) {
+export function CampaignPerformanceTable({
+  data,
+}: CampaignPerformanceTableProps) {
   if (!data) {
     return <div>No campaign performance data available</div>;
   }
@@ -51,4 +53,4 @@ export function CampaignPerformanceTable({ data }: CampaignPerformanceTableProps
       </table>
     </div>
   );
-} 
+}

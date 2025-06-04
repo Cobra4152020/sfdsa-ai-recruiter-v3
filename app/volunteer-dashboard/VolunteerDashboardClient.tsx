@@ -5,29 +5,20 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { VolunteerRecruiterDashboard } from "@/components/volunteer-recruiter-dashboard";
 import { RecruiterAnalyticsDashboard } from "@/components/recruiter-analytics-dashboard";
 import { ReferralLinkGenerator } from "@/components/referral-link-generator";
-import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { User } from "@supabase/supabase-js";
 import { logError } from "@/lib/error-monitoring";
 
-interface UserRole {
-  role: string;
-}
-
 export default function VolunteerDashboardClient() {
-  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isLoading, setIsLoading] = useState(true);
-  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     let isMounted = true;
     // Import and call getClientSideSupabase only on the client
-    const { getClientSideSupabase } = require("@/lib/supabase");
-    const supabase = getClientSideSupabase();
-
     async function checkAuth() {
+      const supabase = (await import("@/lib/supabase")).getClientSideSupabase();
+
       try {
         setIsLoading(true);
         const {
@@ -49,25 +40,45 @@ export default function VolunteerDashboardClient() {
           .single();
 
         if (error || !userRoles || userRoles.role !== "volunteer_recruiter") {
-          logError("Role verification failed", error || new Error("No volunteer role found"), "VolunteerDashboardClient");
+          logError(
+            "Role verification failed",
+            error instanceof Error
+              ? error
+              : new Error(error?.message || "No volunteer role found"),
+            "VolunteerDashboardClient",
+          );
           if (isMounted) {
             router.push("/volunteer-login");
           }
           return;
         }
 
-        const { data: userData, error: userError } = await supabase.auth.getUser();
+        const { data: volunteerData, error: volunteerError } = await supabase
+          .from("volunteers")
+          .select(
+            "*", // Adjust columns as needed
+          )
+          .eq("user_id", session.user.id)
+          .single();
 
-        if (userError) {
-          throw userError;
+        if (volunteerError) {
+          console.error("Error fetching volunteer data:", volunteerError);
+          setError("Failed to load volunteer information.");
+        } else if (volunteerData) {
+          setVolunteer(volunteerData);
+        } else {
+          setVolunteer(null);
         }
 
         if (isMounted) {
-          setUser(userData.user);
           setIsLoading(false);
         }
       } catch (error) {
-        logError("Auth check error", error instanceof Error ? error : new Error(String(error)), "VolunteerDashboardClient");
+        logError(
+          "Auth check error",
+          error instanceof Error ? error : new Error(String(error)),
+          "VolunteerDashboardClient",
+        );
         if (isMounted) {
           router.push("/volunteer-login");
         }
@@ -116,13 +127,16 @@ export default function VolunteerDashboardClient() {
         <TabsContent value="contacts">
           {/* Contact form component would go here */}
           <div className="p-8 text-center">
-            <h2 className="text-2xl font-bold text-[#0A3C1F] mb-4">Contact Potential Recruits</h2>
+            <h2 className="text-2xl font-bold text-[#0A3C1F] mb-4">
+              Contact Potential Recruits
+            </h2>
             <p className="text-gray-600 mb-4">
-              This section allows you to directly contact potential recruits. The feature is coming soon.
+              This section allows you to directly contact potential recruits.
+              The feature is coming soon.
             </p>
           </div>
         </TabsContent>
       </Tabs>
     </div>
   );
-} 
+}

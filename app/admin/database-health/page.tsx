@@ -1,9 +1,10 @@
-import { SupabaseHealthCheck } from "@/components/supabase-health-check"
+import { SupabaseHealthCheck } from "@/components/supabase-health-check";
 
 export const metadata = {
   title: "Database Health Check",
-  description: "Monitor and verify the health of your Supabase database connection",
-}
+  description:
+    "Monitor and verify the health of your Supabase database connection",
+};
 
 export default function DatabaseHealthPage() {
   return (
@@ -13,5 +14,5 @@ export default function DatabaseHealthPage() {
         <SupabaseHealthCheck />
       </div>
     </div>
-  )
+  );
 }

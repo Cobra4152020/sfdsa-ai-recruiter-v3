@@ -1,6 +1,6 @@
-import { PageWrapper } from "@/components/page-wrapper"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Trophy, Star, Award, Zap } from "lucide-react"
+import { PageWrapper } from "@/components/page-wrapper";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Trophy, Star, Award, Zap } from "lucide-react";
 
 export default function NFTAwardsPage() {
   return (
@@ -8,10 +8,13 @@ export default function NFTAwardsPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">NFT Awards</h1>
+            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+              NFT Awards
+            </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Earn exclusive NFT awards for your achievements in the recruitment process.
-              These digital collectibles represent your journey and dedication.
+              Earn exclusive NFT awards for your achievements in the recruitment
+              process. These digital collectibles represent your journey and
+              dedication.
             </p>
           </div>
 
@@ -25,7 +28,9 @@ export default function NFTAwardsPage() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="aspect-square bg-gray-100 rounded-lg mb-4"></div>
-                <h3 className="text-lg font-semibold mb-2">Bronze Recruit NFT</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Bronze Recruit NFT
+                </h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Awarded for reaching 1,000 points in the recruitment process.
                 </p>
@@ -47,7 +52,9 @@ export default function NFTAwardsPage() {
               </CardHeader>
               <CardContent className="p-6">
                 <div className="aspect-square bg-gray-100 rounded-lg mb-4"></div>
-                <h3 className="text-lg font-semibold mb-2">Silver Recruit NFT</h3>
+                <h3 className="text-lg font-semibold mb-2">
+                  Silver Recruit NFT
+                </h3>
                 <p className="text-sm text-gray-600 mb-4">
                   Awarded for reaching 2,500 points in the recruitment process.
                 </p>
@@ -95,13 +102,15 @@ export default function NFTAwardsPage() {
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Earn Points</h3>
                   <p className="text-gray-600">
-                    Participate in daily briefings, complete challenges, and engage with the community to earn points.
+                    Participate in daily briefings, complete challenges, and
+                    engage with the community to earn points.
                   </p>
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold mb-2">Track Progress</h3>
                   <p className="text-gray-600">
-                    Monitor your points and achievements in your profile dashboard.
+                    Monitor your points and achievements in your profile
+                    dashboard.
                   </p>
                 </div>
               </div>
@@ -110,5 +119,5 @@ export default function NFTAwardsPage() {
         </div>
       </div>
     </PageWrapper>
-  )
-} 
+  );
+}

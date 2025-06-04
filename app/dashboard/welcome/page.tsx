@@ -1,14 +1,16 @@
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { ArrowRight, Star, Share2, Trophy, Users } from "lucide-react"
-import Link from "next/link"
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, Star, Share2, Trophy, Users } from "lucide-react";
+import Link from "next/link";
 
 export default function WelcomePage() {
   return (
     <div className="container max-w-4xl py-8">
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4">Welcome to SFDSA Recruiter! 🎉</h1>
+        <h1 className="text-4xl font-bold mb-4">
+          Welcome to SFDSA Recruiter! 🎉
+        </h1>
         <div className="flex justify-center items-center gap-2 mb-4">
           <Badge variant="secondary" className="text-xl py-2">
             <Star className="w-5 h-5 mr-1 text-yellow-500" />
@@ -49,15 +51,21 @@ export default function WelcomePage() {
           <h2 className="text-2xl font-semibold mb-4">🎯 Next Steps</h2>
           <ul className="space-y-3">
             <li className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">1</div>
+              <div className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
+                1
+              </div>
               Complete your profile
             </li>
             <li className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">2</div>
+              <div className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                2
+              </div>
               Take the aptitude quiz
             </li>
             <li className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center">3</div>
+              <div className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center">
+                3
+              </div>
               Join daily challenges
             </li>
           </ul>
@@ -71,11 +79,15 @@ export default function WelcomePage() {
       </div>
 
       <div className="text-center">
-        <h2 className="text-2xl font-semibold mb-4">🌟 Unlock Special Features</h2>
+        <h2 className="text-2xl font-semibold mb-4">
+          🌟 Unlock Special Features
+        </h2>
         <div className="grid gap-4 md:grid-cols-3 mb-6">
           <div className="p-4 rounded-lg bg-primary/5">
             <h3 className="font-semibold">100 Points</h3>
-            <p className="text-sm text-muted-foreground">Access exclusive content</p>
+            <p className="text-sm text-muted-foreground">
+              Access exclusive content
+            </p>
           </div>
           <div className="p-4 rounded-lg bg-primary/5">
             <h3 className="font-semibold">200 Points</h3>
@@ -83,7 +95,9 @@ export default function WelcomePage() {
           </div>
           <div className="p-4 rounded-lg bg-primary/5">
             <h3 className="font-semibold">500 Points</h3>
-            <p className="text-sm text-muted-foreground">Get mentorship access</p>
+            <p className="text-sm text-muted-foreground">
+              Get mentorship access
+            </p>
           </div>
         </div>
         <Button asChild size="lg">
@@ -94,5 +108,5 @@ export default function WelcomePage() {
         </Button>
       </div>
     </div>
-  )
-} 
+  );
+}

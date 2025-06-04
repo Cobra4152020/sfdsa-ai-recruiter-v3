@@ -1,63 +1,95 @@
-import { v4 as uuidv4 } from "uuid"
-import { reportPerformanceMetric } from "./performance-monitoring"
+import { v4 as uuidv4 } from "uuid";
+import { reportPerformanceMetric } from "./performance-monitoring";
 
 // Types for journey tracking
 export type JourneyStep = {
-  journeyId: string
-  journeyName: string
-  stepName: string
-  stepNumber: number
-  timestamp: number
-  duration?: number
-  metrics?: Record<string, number>
-  userId?: string
-  sessionId: string
-  previousStep?: string
-  metadata?: Record<string, any>
-}
+  journeyId: string;
+  journeyName: string;
+  stepName: string;
+  stepNumber: number;
+  timestamp: number;
+  duration?: number;
+  metrics?: JourneyMetrics;
+  userId?: string;
+  sessionId: string;
+  previousStep?: string;
+  metadata?: Record<string, unknown>;
+};
 
 export type Journey = {
-  id: string
-  name: string
-  startTime: number
-  endTime?: number
-  steps: JourneyStep[]
-  completed: boolean
-  userId?: string
-  sessionId: string
-  metadata?: Record<string, any>
+  id: string;
+  name: string;
+  startTime: number;
+  endTime?: number;
+  steps: JourneyStep[];
+  completed: boolean;
+  userId?: string;
+  sessionId: string;
+  metadata?: Record<string, unknown>;
+};
+
+interface JourneyMetadata {
+  startTime?: string;
+  endTime?: string;
+  duration?: number;
+  status?: "in_progress" | "completed" | "abandoned";
+  lastStep?: string;
+  totalSteps?: number;
+  completedSteps?: number;
+  success?: boolean;
+  abandonReason?: string;
+  [key: string]: string | number | boolean | null | undefined;
 }
 
+interface JourneyMetrics {
+  completionRate?: number;
+  averageDuration?: number;
+  p95Duration?: number;
+  stepCompletionRates?: Record<string, number>;
+  stepDurations?: Record<string, number>;
+  dropOffRates?: Record<string, number>;
+  [key: string]: number | Record<string, number> | undefined;
+}
+
+// interface PerformanceMetric { // Commented out unused interface
+//   name: string;
+//   value: number;
+//   timestamp: Date;
+// }
+
 // In-memory storage for active journeys (will be lost on page refresh)
-const activeJourneys: Record<string, Journey> = {}
+const activeJourneys: Record<string, Journey> = {};
 
 // Session ID management
-let currentSessionId = ""
+let currentSessionId = "";
 
 export function getSessionId(): string {
-  if (typeof window === "undefined") return ""
+  if (typeof window === "undefined") return "";
 
   if (!currentSessionId) {
     // Try to get from sessionStorage
-    const storedSessionId = sessionStorage.getItem("performance_session_id")
+    const storedSessionId = sessionStorage.getItem("performance_session_id");
 
     if (storedSessionId) {
-      currentSessionId = storedSessionId
+      currentSessionId = storedSessionId;
     } else {
       // Create new session ID
-      currentSessionId = uuidv4()
-      sessionStorage.setItem("performance_session_id", currentSessionId)
+      currentSessionId = uuidv4();
+      sessionStorage.setItem("performance_session_id", currentSessionId);
     }
   }
 
-  return currentSessionId
+  return currentSessionId;
 }
 
 // Start a new user journey
-export function startJourney(journeyName: string, metadata: Record<string, any> = {}): string {
-  const journeyId = uuidv4()
-  const sessionId = getSessionId()
-  const userId = getUserId()
+export function startJourney(
+  journeyName: string,
+  metadata: JourneyMetadata = {},
+): string {
+  const journeyId = uuidv4();
+  const sessionId = getSessionId();
+  const userId = getUserId();
 
   const journey: Journey = {
     id: journeyId,
@@ -68,52 +100,56 @@ export function startJourney(journeyName: string, metadata: Record<string, any> 
     userId,
     sessionId,
     metadata,
-  }
+  };
 
-  activeJourneys[journeyId] = journey
+  activeJourneys[journeyId] = journey;
 
   // Report journey start
   reportPerformanceMetric({
     name: `journey-${journeyName}-start`,
     value: 0, // No duration yet
     rating: "good",
-    path: window.location.pathname,
+    path: typeof window !== "undefined" ? window.location.pathname : "",
     timestamp: Date.now(),
-    metadata: {
-      journeyId,
-      sessionId,
-      userId,
-    },
-  })
+    userAgent:
+      typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+  });
 
-  return journeyId
+  return journeyId;
 }
 
 // Record a step in the journey
 export function recordJourneyStep(
   journeyId: string,
   stepName: string,
-  metrics: Record<string, number> = {},
-  metadata: Record<string, any> = {},
+  metrics: JourneyMetrics = {},
+  metadata: JourneyMetadata = {},
 ): void {
-  const journey = activeJourneys[journeyId]
+  const journey = activeJourneys[journeyId];
 
   if (!journey) {
-    console.warn(`Journey with ID ${journeyId} not found. Creating a new journey.`)
-    const newJourneyId = startJourney(`auto-${stepName}`)
-    recordJourneyStep(newJourneyId, stepName, metrics, metadata)
-    return
+    console.warn(
+      `Journey with ID ${journeyId} not found. Creating a new journey.`,
+    );
+    const newJourneyId = startJourney(`auto-${stepName}`);
+    recordJourneyStep(newJourneyId, stepName, metrics, metadata);
+    return;
   }
 
-  const stepNumber = journey.steps.length + 1
-  const timestamp = performance.now()
-  const previousStep = journey.steps.length > 0 ? journey.steps[journey.steps.length - 1].stepName : undefined
+  const stepNumber = journey.steps.length + 1;
+  const timestamp = performance.now();
+  const previousStep =
+    journey.steps.length > 0
+      ? journey.steps[journey.steps.length - 1].stepName
+      : undefined;
 
   // Calculate duration from previous step or journey start
   const previousTimestamp =
-    journey.steps.length > 0 ? journey.steps[journey.steps.length - 1].timestamp : journey.startTime
+    journey.steps.length > 0
+      ? journey.steps[journey.steps.length - 1].timestamp
+      : journey.startTime;
 
-  const duration = timestamp - previousTimestamp
+  const duration = timestamp - previousTimestamp;
 
   const step: JourneyStep = {
     journeyId,
@@ -127,147 +163,142 @@ export function recordJourneyStep(
     sessionId: journey.sessionId,
     previousStep,
     metadata,
-  }
+  };
 
-  journey.steps.push(step)
+  journey.steps.push(step);
 
   // Report step metrics
   reportPerformanceMetric({
     name: `journey-${journey.name}-step-${stepName}`,
     value: duration,
     rating: getRatingForDuration(duration),
-    path: window.location.pathname,
+    path: typeof window !== "undefined" ? window.location.pathname : "",
     timestamp: Date.now(),
-    metadata: {
-      journeyId,
-      stepNumber,
-      previousStep,
-      sessionId: journey.sessionId,
-      userId: journey.userId,
-    },
-  })
+    userAgent:
+      typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+  });
 
   // Report any additional metrics
   Object.entries(metrics).forEach(([metricName, value]) => {
-    reportPerformanceMetric({
-      name: `journey-${journey.name}-${metricName}`,
-      value,
-      rating: "good", // Custom metrics don't have standard ratings
-      path: window.location.pathname,
-      timestamp: Date.now(),
-      metadata: {
-        journeyId,
-        stepName,
-        stepNumber,
-        sessionId: journey.sessionId,
-        userId: journey.userId,
-      },
-    })
-  })
+    if (typeof value === "number") {
+      reportPerformanceMetric({
+        name: `journey-${journey.name}-${metricName}`,
+        value,
+        rating: "good", // Custom metrics don't have standard ratings
+        path: typeof window !== "undefined" ? window.location.pathname : "",
+        timestamp: Date.now(),
+        userAgent:
+          typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+      });
+    }
+  });
 }
 
 // Complete a journey
-export function completeJourney(journeyId: string, success = true, metadata: Record<string, any> = {}): void {
-  const journey = activeJourneys[journeyId]
+export function completeJourney(
+  journeyId: string,
+  success = true,
+  metadata: JourneyMetadata = {},
+): void {
+  const journey = activeJourneys[journeyId];
 
   if (!journey) {
-    console.warn(`Cannot complete journey with ID ${journeyId}: not found`)
-    return
+    console.warn(`Cannot complete journey with ID ${journeyId}: not found`);
+    return;
   }
 
-  journey.endTime = performance.now()
-  journey.completed = true
-  journey.metadata = { ...journey.metadata, ...metadata, success }
+  journey.endTime = performance.now();
+  journey.completed = true;
+  journey.metadata = { ...journey.metadata, ...metadata, success };
 
-  const totalDuration = journey.endTime - journey.startTime
+  const totalDuration = journey.endTime - journey.startTime;
 
   // Report journey completion
   reportPerformanceMetric({
     name: `journey-${journey.name}-complete`,
     value: totalDuration,
     rating: getRatingForDuration(totalDuration, journey.name),
-    path: window.location.pathname,
+    path: typeof window !== "undefined" ? window.location.pathname : "",
     timestamp: Date.now(),
-    metadata: {
-      journeyId,
-      stepCount: journey.steps.length,
-      success,
-      sessionId: journey.sessionId,
-      userId: journey.userId,
-    },
-  })
+    userAgent:
+      typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+  });
 
   // Store journey data in database
-  storeJourneyData(journey)
+  storeJourneyData(journey);
 
   // Clean up
-  delete activeJourneys[journeyId]
+  delete activeJourneys[journeyId];
 }
 
 // Abandon a journey
-export function abandonJourney(journeyId: string, reason = "unknown", metadata: Record<string, any> = {}): void {
-  const journey = activeJourneys[journeyId]
+export function abandonJourney(
+  journeyId: string,
+  reason = "unknown",
+  metadata: JourneyMetadata = {},
+): void {
+  const journey = activeJourneys[journeyId];
 
   if (!journey) {
-    console.warn(`Cannot abandon journey with ID ${journeyId}: not found`)
-    return
+    console.warn(`Cannot abandon journey with ID ${journeyId}: not found`);
+    return;
   }
 
-  journey.endTime = performance.now()
-  journey.completed = false
-  journey.metadata = { ...journey.metadata, ...metadata, abandonReason: reason }
+  journey.endTime = performance.now();
+  journey.completed = false;
+  journey.metadata = {
+    ...journey.metadata,
+    ...metadata,
+    abandonReason: reason,
+  };
 
-  const totalDuration = journey.endTime - journey.startTime
+  const totalDuration = journey.endTime - journey.startTime;
 
   // Report journey abandonment
   reportPerformanceMetric({
     name: `journey-${journey.name}-abandon`,
     value: totalDuration,
     rating: "poor", // Abandoned journeys are considered poor performance
-    path: window.location.pathname,
+    path: typeof window !== "undefined" ? window.location.pathname : "",
     timestamp: Date.now(),
-    metadata: {
-      journeyId,
-      stepCount: journey.steps.length,
-      lastStep: journey.steps.length > 0 ? journey.steps[journey.steps.length - 1].stepName : "none",
-      reason,
-      sessionId: journey.sessionId,
-      userId: journey.userId,
-    },
-  })
+    userAgent:
+      typeof navigator !== "undefined" ? navigator.userAgent : undefined,
+  });
 
   // Store journey data in database
-  storeJourneyData(journey)
+  storeJourneyData(journey);
 
   // Clean up
-  delete activeJourneys[journeyId]
+  delete activeJourneys[journeyId];
 }
 
 // Get active journey by name
 export function getActiveJourneyByName(journeyName: string): string | null {
-  const journey = Object.values(activeJourneys).find((j) => j.name === journeyName)
-  return journey ? journey.id : null
+  const journey = Object.values(activeJourneys).find(
+    (j) => j.name === journeyName,
+  );
+  return journey ? journey.id : null;
 }
 
 // Get user ID if available
 function getUserId(): string | undefined {
-  if (typeof window === "undefined") return undefined
+  if (typeof window === "undefined") return undefined;
 
   // Try to get from localStorage or other auth mechanism
   // This is a placeholder - implement based on your auth system
   try {
     // Check if we have a user ID in localStorage
-    const userId = localStorage.getItem("userId")
-    if (userId) return userId
+    const userId = localStorage.getItem("userId");
+    if (userId) return userId;
 
     // Or try to get from your auth context/state
     // const user = getUser() // Your auth function
     // if (user?.id) return user.id
   } catch (e) {
-    console.warn("Error getting user ID:", e)
+    console.warn("Error getting user ID:", e);
   }
 
-  return undefined
+  return undefined;
 }
 
 // Store journey data in database
@@ -281,18 +312,21 @@ async function storeJourneyData(journey: Journey): Promise<void> {
       body: JSON.stringify(journey),
       // Use keepalive to ensure the request completes even if the page is unloading
       keepalive: true,
-    })
+    });
 
     if (!response.ok) {
-      console.error("Failed to store journey data:", await response.text())
+      console.error("Failed to store journey data:", await response.text());
     }
   } catch (error) {
-    console.error("Error storing journey data:", error)
+    console.error("Error storing journey data:", error);
   }
 }
 
 // Get rating based on duration
-function getRatingForDuration(duration: number, journeyType = "default"): "good" | "needs-improvement" | "poor" {
+function getRatingForDuration(
+  duration: number,
+  journeyType = "default",
+): "good" | "needs-improvement" | "poor" {
   // Define thresholds based on journey type
   const thresholds: Record<string, [number, number]> = {
     login: [2000, 5000],
@@ -301,25 +335,31 @@ function getRatingForDuration(duration: number, journeyType = "default"): "good"
     game: [3000, 8000],
     "profile-view": [2000, 5000],
     default: [3000, 8000],
-  }
+  };
 
-  const [goodThreshold, improvementThreshold] = thresholds[journeyType] || thresholds.default
+  const [goodThreshold, improvementThreshold] =
+    thresholds[journeyType] || thresholds.default;
 
-  if (duration <= goodThreshold) return "good"
-  if (duration <= improvementThreshold) return "needs-improvement"
-  return "poor"
+  if (duration <= goodThreshold) return "good";
+  if (duration <= improvementThreshold) return "needs-improvement";
+  return "poor";
 }
 
 // Add metadata to journey
-export function addJourneyMetadata(journeyId: string, metadata: Record<string, any>): void {
-  const journey = activeJourneys[journeyId]
+export function addJourneyMetadata(
+  journeyId: string,
+  metadata: JourneyMetadata,
+): void {
+  const journey = activeJourneys[journeyId];
 
   if (!journey) {
-    console.warn(`Cannot add metadata to journey with ID ${journeyId}: not found`)
-    return
+    console.warn(
+      `Cannot add metadata to journey with ID ${journeyId}: not found`,
+    );
+    return;
   }
 
-  journey.metadata = { ...journey.metadata, ...metadata }
+  journey.metadata = { ...journey.metadata, ...metadata };
 }
 
 // Get all predefined journey types
@@ -332,4 +372,4 @@ export const JOURNEY_TYPES = {
   PROFILE_VIEW: "profile-view",
   TRIVIA: "trivia",
   LEADERBOARD: "leaderboard",
-}
+};

@@ -1,56 +1,66 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { DollarSign, Calculator } from "lucide-react"
-import { type DonationPointRule, getDonationPointRules } from "@/lib/donation-points-service"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { DollarSign, Calculator } from "lucide-react";
+import {
+  type DonationPointRule,
+  getDonationPointRules,
+} from "@/lib/donation-points-service";
 
 export function DonationPointsCalculator() {
-  const [amount, setAmount] = useState<number>(50)
-  const [isRecurring, setIsRecurring] = useState<boolean>(false)
-  const [rules, setRules] = useState<DonationPointRule[]>([])
-  const [loading, setLoading] = useState<boolean>(true)
-  const [points, setPoints] = useState<number>(0)
+  const [donationAmount, setDonationAmount] = useState<string>("");
+  const [pointsEarned, setPointsEarned] = useState<number>(0);
+  // const [isCalculating, setIsCalculating] = useState(false);
+  const [rules, setRules] = useState<DonationPointRule[]>([]);
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchRules = async () => {
-      setLoading(true)
-      const result = await getDonationPointRules()
+      const result = await getDonationPointRules();
       if (result.success && result.rules) {
-        setRules(result.rules)
+        setRules(result.rules);
       }
-      setLoading(false)
-    }
+    };
 
-    fetchRules()
-  }, [])
+    fetchRules();
+  }, []);
 
   useEffect(() => {
-    if (rules.length > 0 && amount > 0) {
-      calculatePoints()
+    if (rules.length > 0 && donationAmount > 0) {
+      calculatePoints();
     }
-  }, [amount, isRecurring, rules])
+  }, [donationAmount, isRecurring, rules]);
 
   const calculatePoints = () => {
     // Find applicable rule
     const rule = rules.find(
-      (r) => r.isActive && r.minAmount <= amount && (r.maxAmount === null || r.maxAmount >= amount),
-    )
+      (r) =>
+        r.isActive &&
+        r.minAmount <= donationAmount &&
+        (r.maxAmount === null || r.maxAmount >= donationAmount),
+    );
 
     if (rule) {
-      const basePoints = Math.floor(amount * rule.pointsPerDollar)
-      const multiplier = isRecurring ? rule.recurringMultiplier : 1
-      setPoints(Math.floor(basePoints * multiplier))
+      const basePoints = Math.floor(donationAmount * rule.pointsPerDollar);
+      const multiplier = isRecurring ? rule.recurringMultiplier : 1;
+      setPointsEarned(Math.floor(basePoints * multiplier));
     } else {
       // Default calculation if no rule applies
-      const basePoints = Math.floor(amount * 10) // Default 10 points per dollar
-      const multiplier = isRecurring ? 1.5 : 1 // Default 1.5x for recurring
-      setPoints(Math.floor(basePoints * multiplier))
+      const basePoints = Math.floor(donationAmount * 10); // Default 10 points per dollar
+      const multiplier = isRecurring ? 1.5 : 1; // Default 1.5x for recurring
+      setPointsEarned(Math.floor(basePoints * multiplier));
     }
-  }
+  };
 
   return (
     <Card>
@@ -59,7 +69,9 @@ export function DonationPointsCalculator() {
           <CardTitle className="text-lg">Points Calculator</CardTitle>
           <Calculator className="h-5 w-5 text-[#0A3C1F]" />
         </div>
-        <CardDescription>See how many points you'll earn for your donation</CardDescription>
+        <CardDescription>
+          See how many points you&apos;ll earn for your donation
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -72,29 +84,54 @@ export function DonationPointsCalculator() {
                 type="number"
                 min="1"
                 step="1"
-                value={amount}
-                onChange={(e) => setAmount(Number.parseFloat(e.target.value) || 0)}
+                value={donationAmount}
+                onChange={(e) => setDonationAmount(e.target.value)}
                 className="pl-9"
               />
             </div>
           </div>
 
           <div className="flex items-center space-x-2">
-            <Switch id="recurring" checked={isRecurring} onCheckedChange={setIsRecurring} />
+            <Switch
+              id="recurring"
+              checked={isRecurring}
+              onCheckedChange={setIsRecurring}
+            />
             <Label htmlFor="recurring">Recurring monthly donation</Label>
           </div>
 
           <div className="pt-4 border-t">
             <div className="flex justify-between items-center">
-              <span className="text-sm font-medium">Points you'll earn:</span>
-              <span className="text-2xl font-bold text-[#0A3C1F]">{points.toLocaleString()}</span>
+              <span className="text-sm font-medium">
+                Points you&apos;ll earn:
+              </span>
+              <span className="text-2xl font-bold text-[#0A3C1F]">
+                {pointsEarned.toLocaleString()}
+              </span>
             </div>
             {isRecurring && (
-              <p className="text-xs text-muted-foreground mt-1">Recurring donations earn bonus points each month!</p>
+              <p className="text-xs text-muted-foreground mt-1">
+                Recurring donations earn bonus points each month!
+              </p>
             )}
+          </div>
+
+          <div className="pt-4 border-t">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-medium">
+                You&apos;ll earn approximately{" "}
+                <span className="font-semibold text-[#0A3C1F]">
+                  {pointsEarned.toLocaleString()} points
+                </span>{" "}
+                with this donation
+                {isRecurring && (
+                  <span> each month (includes recurring bonus!)</span>
+                )}
+              </span>
+            </div>
           </div>
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

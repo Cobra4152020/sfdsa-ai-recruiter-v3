@@ -1,25 +1,8 @@
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Gift, Lock, ChevronDown, ChevronUp, Check } from 'lucide-react'
-import { cn } from '@/lib/utils'
-import type { BadgeReward } from '@/types/badge'
-import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+import { Gift, Lock } from "lucide-react";
 
 interface BadgeRewardsProps {
-  rewards: string[]
-  unlocked: boolean
+  rewards: string[];
+  unlocked: boolean;
 }
 
 export function BadgeRewards({ rewards, unlocked }: BadgeRewardsProps) {
@@ -41,5 +24,5 @@ export function BadgeRewards({ rewards, unlocked }: BadgeRewardsProps) {
         ))}
       </ul>
     </div>
-  )
-} 
+  );
+}

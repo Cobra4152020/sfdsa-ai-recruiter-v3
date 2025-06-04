@@ -69,5 +69,5 @@ export function DatabaseSchemaDiagram() {
         </div>
       </div>
     </div>
-  )
+  );
 }

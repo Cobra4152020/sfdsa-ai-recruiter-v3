@@ -1,38 +1,43 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState, useRef } from "react"
-import { motion } from "framer-motion"
-import { AchievementBadge } from "./achievement-badge"
-import { Progress } from "@/components/ui/progress"
-import { Heart, Share2, TrendingUp, Award } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import { toast } from "@/components/ui/use-toast"
-import { useUser } from "@/context/user-context"
-import Link from "next/link"
+import type React from "react";
+import { useState, useRef } from "react";
+import { motion } from "framer-motion";
+import { AchievementBadge } from "./achievement-badge";
+import { Progress } from "@/components/ui/progress";
+import { Heart, Share2, TrendingUp, Award } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { toast } from "@/components/ui/use-toast";
+import { useUser } from "@/context/user-context";
+import Link from "next/link";
+import type { BadgeType } from "@/types/badge";
 
 interface LeaderboardCardProps {
-  id: string
-  rank: number
-  name: string
-  points: number
-  badgeCount: number
-  nftCount: number
-  isCurrentUser?: boolean
-  hasApplied?: boolean
-  shareCount?: number
-  likeCount?: number
-  isRising?: boolean
-  avatarUrl?: string
+  id: string;
+  rank: number;
+  name: string;
+  points: number;
+  badgeCount: number;
+  nftCount: number;
+  isCurrentUser?: boolean;
+  hasApplied?: boolean;
+  shareCount?: number;
+  likeCount?: number;
+  isRising?: boolean;
+  avatarUrl?: string;
   badges?: Array<{
-    id: string
-    badge_type: string
-    name: string
-  }>
-  completionPercentage?: number
+    id: string;
+    badge_type: BadgeType;
+    name: string;
+  }>;
+  completionPercentage?: number;
 }
 
 export function Leaderboard3DCard({
@@ -41,7 +46,7 @@ export function Leaderboard3DCard({
   name,
   points,
   badgeCount,
-  nftCount,
+  nftCount: _nftCount, // eslint-disable-line @typescript-eslint/no-unused-vars
   isCurrentUser = false,
   hasApplied = false,
   shareCount = 0,
@@ -51,33 +56,43 @@ export function Leaderboard3DCard({
   badges = [],
   completionPercentage = 0,
 }: LeaderboardCardProps) {
-  const [rotation, setRotation] = useState({ x: 0, y: 0 })
-  const [isHovered, setIsHovered] = useState(false)
-  const [liked, setLiked] = useState(false)
-  const [localLikeCount, setLocalLikeCount] = useState(likeCount)
-  const cardRef = useRef<HTMLDivElement>(null)
-  const { currentUser } = useUser()
+  const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [liked, setLiked] = useState(false);
+  const [localLikeCount, setLocalLikeCount] = useState(likeCount);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { currentUser } = useUser();
+
+  // Commented out unused state variables
+  // const [selectedUser, setSelectedUser] = useState(null);
+  // const [showShareDialog, setShowShareDialog] = useState(false);
+  // const [pendingLikes, setPendingLikes] = useState(new Set());
+  // const [leaderboardData, setLeaderboardData] = useState([]);
+
+  // Commented out unused computed values
+  // const totalParticipants = leaderboardData.length;
+  // const userRank = leaderboardData.findIndex(user => user.id === currentUser?.id) + 1;
 
   // Handle mouse move for 3D effect
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return
+    if (!cardRef.current) return;
 
-    const rect = cardRef.current.getBoundingClientRect()
-    const x = e.clientX - rect.left
-    const y = e.clientY - rect.top
-    const centerX = rect.width / 2
-    const centerY = rect.height / 2
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
 
-    const rotateX = (y - centerY) / 20
-    const rotateY = (centerX - x) / 20
+    const rotateX = (y - centerY) / 20;
+    const rotateY = (centerX - x) / 20;
 
-    setRotation({ x: rotateX, y: rotateY })
-  }
+    setRotation({ x: rotateX, y: rotateY });
+  };
 
   const handleMouseLeave = () => {
-    setIsHovered(false)
-    setRotation({ x: 0, y: 0 })
-  }
+    setIsHovered(false);
+    setRotation({ x: 0, y: 0 });
+  };
 
   const handleLike = () => {
     if (!currentUser) {
@@ -85,22 +100,24 @@ export function Leaderboard3DCard({
         title: "Sign in required",
         description: "Please sign in to like this profile",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
-    setLiked(!liked)
-    setLocalLikeCount(liked ? localLikeCount - 1 : localLikeCount + 1)
+    setLiked(!liked);
+    setLocalLikeCount(liked ? localLikeCount - 1 : localLikeCount + 1);
 
     // API call would go here
     toast({
       title: liked ? "Like removed" : "Profile liked!",
-      description: liked ? "You've removed your like" : `You've liked ${name}'s profile`,
-    })
-  }
+      description: liked
+        ? "You've removed your like"
+        : `You've liked ${name}'s profile`,
+    });
+  };
 
   const handleShare = async () => {
-    const shareUrl = `${window.location.origin}/profile/${id}`
+    const shareUrl = `${window.location.origin}/profile/${id}`;
 
     if (navigator.share) {
       try {
@@ -108,32 +125,34 @@ export function Leaderboard3DCard({
           title: `${name}'s SF Sheriff Recruitment Profile`,
           text: `Check out ${name}'s profile on the San Francisco Sheriff's Office recruitment platform!`,
           url: shareUrl,
-        })
+        });
       } catch (error) {
-        console.error("Error sharing:", error)
+        console.error("Error sharing:", error);
       }
     } else {
-      navigator.clipboard.writeText(shareUrl)
+      navigator.clipboard.writeText(shareUrl);
       toast({
         title: "Link copied!",
         description: "Profile link copied to clipboard",
-      })
+      });
     }
-  }
+  };
 
   // Get medal color based on rank
   const getMedalColor = () => {
-    if (rank === 1) return "bg-accent"
-    if (rank === 2) return "bg-secondary"
-    if (rank === 3) return "bg-muted"
-    return "bg-gray-200 dark:bg-gray-700"
-  }
+    if (rank === 1) return "bg-accent";
+    if (rank === 2) return "bg-secondary";
+    if (rank === 3) return "bg-muted";
+    return "bg-gray-200 dark:bg-gray-700";
+  };
 
   return (
     <motion.div
       ref={cardRef}
       className={`relative rounded-xl overflow-hidden shadow-lg transition-all duration-300 ${
-        isCurrentUser ? "ring-2 ring-primary bg-primary/5" : "bg-card dark:bg-gray-800"
+        isCurrentUser
+          ? "ring-2 ring-primary bg-primary/5"
+          : "bg-card dark:bg-gray-800"
       }`}
       style={{
         transformStyle: "preserve-3d",
@@ -199,7 +218,10 @@ export function Leaderboard3DCard({
             <div className="flex items-center">
               <h3 className="font-bold text-lg">{name}</h3>
               {isCurrentUser && (
-                <Badge variant="outline" className="ml-2 bg-primary/10 text-primary border-primary/20">
+                <Badge
+                  variant="outline"
+                  className="ml-2 bg-primary/10 text-primary border-primary/20"
+                >
                   You
                 </Badge>
               )}
@@ -234,7 +256,12 @@ export function Leaderboard3DCard({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <div>
-                      <AchievementBadge type={badge.badge_type as any} size="sm" earned={true} showTooltip={false} />
+                      <AchievementBadge
+                        type={badge.badge_type}
+                        size="sm"
+                        earned={true}
+                        showTooltip={false}
+                      />
                     </div>
                   </TooltipTrigger>
                   <TooltipContent>
@@ -260,21 +287,31 @@ export function Leaderboard3DCard({
               className={`flex items-center ${liked ? "text-red-500" : ""}`}
               onClick={handleLike}
             >
-              <Heart className={`h-4 w-4 mr-1 ${liked ? "fill-red-500" : ""}`} />
+              <Heart
+                className={`h-4 w-4 mr-1 ${liked ? "fill-red-500" : ""}`}
+              />
               <span>{localLikeCount}</span>
             </Button>
-            <Button variant="outline" size="sm" className="flex items-center" onClick={handleShare}>
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center"
+              onClick={handleShare}
+            >
               <Share2 className="h-4 w-4 mr-1" />
               <span>{shareCount}</span>
             </Button>
           </div>
           <Link href={`/profile/${id}`} prefetch={false}>
-            <Button size="sm" className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+            <Button
+              size="sm"
+              className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+            >
               View Profile
             </Button>
           </Link>
         </div>
       </div>
     </motion.div>
-  )
+  );
 }

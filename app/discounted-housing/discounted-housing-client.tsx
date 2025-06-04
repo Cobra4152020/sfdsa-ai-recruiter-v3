@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { PointsGate } from "@/components/points-gate"
-import DiscountedHousingContent from "./content"
+import { PointsGate } from "@/components/points-gate";
+import DiscountedHousingContent from "./content";
 
 export default function DiscountedHousingClient() {
   return (
@@ -11,5 +11,5 @@ export default function DiscountedHousingClient() {
     >
       <DiscountedHousingContent />
     </PointsGate>
-  )
-} 
+  );
+}

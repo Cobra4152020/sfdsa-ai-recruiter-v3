@@ -1,18 +1,18 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LineChart } from "@/components/ui/charts"
-import type { DonationTrend } from "@/app/types/donation-analytics"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { LineChart } from "@/components/ui/charts";
+import type { DonationTrend } from "@/app/types/donation-analytics";
 
 interface DonationTrendsChartProps {
-  data: DonationTrend[]
+  data: DonationTrend[];
 }
 
 export function DonationTrendsChart({ data }: DonationTrendsChartProps) {
   const formatValue = (value: number, name?: string) => {
-    if (name === "amount") return `$${value.toLocaleString()}`
-    return value.toLocaleString()
-  }
+    if (name === "amount") return `$${value.toLocaleString()}`;
+    return value.toLocaleString();
+  };
 
   return (
     <Card>
@@ -31,5 +31,5 @@ export function DonationTrendsChart({ data }: DonationTrendsChartProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

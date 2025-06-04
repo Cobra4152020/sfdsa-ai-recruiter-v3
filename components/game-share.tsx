@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import { Button } from "@/components/ui/button"
+import { useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -9,40 +9,45 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Share2, Facebook, Twitter, Linkedin } from "lucide-react"
-import { useToast } from "@/components/ui/use-toast"
-import { addParticipationPoints } from "@/lib/points-service"
-import { useUser } from "@/context/user-context"
-import { useAuthModal } from "@/context/auth-modal-context"
-import { useClientOnly } from "@/hooks/use-client-only"
-import { getWindowOrigin, isBrowser } from "@/lib/utils"
+} from "@/components/ui/dialog";
+import { Share2, Facebook, Twitter, Linkedin } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
+import { addParticipationPoints } from "@/lib/points-service";
+import { useUser } from "@/context/user-context";
+import { useAuthModal } from "@/context/auth-modal-context";
+import { useClientOnly } from "@/hooks/use-client-only";
+import { getWindowOrigin, isBrowser } from "@/lib/utils";
 
 interface GameShareProps {
-  score: number
-  gameName: string
-  gameDescription: string
-  onPointsAdded?: (points: number) => void
+  score: number;
+  gameName: string;
+  gameDescription: string;
+  onPointsAdded?: (points: number) => void;
 }
 
-export function GameShare({ score, gameName, gameDescription, onPointsAdded }: GameShareProps) {
-  const [showShareDialog, setShowShareDialog] = useState(false)
-  const [isSharing, setIsSharing] = useState(false)
-  const { toast } = useToast()
-  const { currentUser } = useUser()
-  const { openModal } = useAuthModal()
-  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), [])
-  const origin = useClientOnly(memoizedGetWindowOrigin, '')
+export function GameShare({
+  score,
+  gameName,
+  gameDescription,
+  onPointsAdded,
+}: GameShareProps) {
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+  const { toast } = useToast();
+  const { currentUser } = useUser();
+  const { openModal } = useAuthModal();
+  const memoizedGetWindowOrigin = useCallback(() => getWindowOrigin(), []);
+  const origin = useClientOnly(memoizedGetWindowOrigin, "");
 
   const handleShare = async (platform: string) => {
     if (!currentUser) {
-      openModal("signin", "recruit")
-      return
+      openModal("signin", "recruit");
+      return;
     }
 
-    if (!isBrowser()) return
+    if (!isBrowser()) return;
 
-    setIsSharing(true)
+    setIsSharing(true);
 
     try {
       // Add participation points - 10 points for sharing
@@ -50,20 +55,20 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
         currentUser.id,
         10,
         "game_share",
-        `Shared ${gameName} score on ${platform}`
-      )
+        `Shared ${gameName} score on ${platform}`,
+      );
 
       if (success) {
-        onPointsAdded?.(10)
+        onPointsAdded?.(10);
         toast({
           title: "Points added!",
           description: "You earned 10 points for sharing your score.",
-        })
+        });
       }
 
       // Create share text
-      const shareText = `I scored ${score} points in ${gameName} on the SF Deputy Sheriff recruitment site! ${gameDescription}`
-      const shareUrl = `${origin}/games/${gameName.toLowerCase()}`
+      const shareText = `I scored ${score} points in ${gameName} on the SF Deputy Sheriff recruitment site! ${gameDescription}`;
+      const shareUrl = `${origin}/games/${gameName.toLowerCase()}`;
 
       // Handle platform-specific sharing
       switch (platform) {
@@ -73,38 +78,41 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
               shareText,
             )}`,
             "_blank",
-          )
-          break
+          );
+          break;
         case "Twitter":
           window.open(
             `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
             "_blank",
-          )
-          break
+          );
+          break;
         case "LinkedIn":
           window.open(
             `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
             "_blank",
-          )
-          break
+          );
+          break;
       }
 
-      setShowShareDialog(false)
+      setShowShareDialog(false);
     } catch (error) {
-      console.error("Error sharing:", error)
+      console.error("Error sharing:", error);
       toast({
         variant: "destructive",
         title: "Error",
         description: "Failed to share your score. Please try again.",
-      })
+      });
     } finally {
-      setIsSharing(false)
+      setIsSharing(false);
     }
-  }
+  };
 
   return (
     <>
-      <Button onClick={() => setShowShareDialog(true)} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+      <Button
+        onClick={() => setShowShareDialog(true)}
+        className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+      >
         <Share2 className="mr-2 h-4 w-4" />
         Share Your Score
       </Button>
@@ -114,7 +122,8 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
           <DialogHeader>
             <DialogTitle>Share Your Score</DialogTitle>
             <DialogDescription>
-              Share your score of {score} points in {gameName} and earn bonus participation points!
+              Share your score of {score} points in {gameName} and earn bonus
+              participation points!
             </DialogDescription>
           </DialogHeader>
 
@@ -146,12 +155,15 @@ export function GameShare({ score, gameName, gameDescription, onPointsAdded }: G
           </div>
 
           <DialogFooter>
-            <Button onClick={() => setShowShareDialog(false)} className="bg-gray-100 hover:bg-gray-200 text-gray-900">
+            <Button
+              onClick={() => setShowShareDialog(false)}
+              className="bg-gray-100 hover:bg-gray-200 text-gray-900"
+            >
               Cancel
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

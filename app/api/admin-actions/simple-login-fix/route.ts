@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function simpleLoginFix() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Execute a simpler fix that doesn't check constraints first
     const { data, error } = await supabase.rpc("exec_sql", {
@@ -36,37 +36,38 @@ export async function simpleLoginFix() {
         
         COMMIT;
       `,
-    })
+    });
 
     if (error) {
-      console.error("Error executing simple login fix:", error)
+      console.error("Error executing simple login fix:", error);
       return {
         success: false,
         message: "Failed to fix login issues",
         error: error.message,
         details: error,
-      }
+      };
     }
 
     // Revalidate relevant paths
-            
+
     return {
       success: true,
       message: "Login issues fixed successfully. Try logging in now.",
       data,
-    }
-  } catch (error: any) {
-    console.error("Unexpected error in simple login fix:", error)
+    };
+  } catch (error: unknown) {
+    console.error("Unexpected error in simple login fix:", error);
     return {
       success: false,
       message: "An unexpected error occurred",
-      error: error.message,
-      stack: error.stack,
-    }
+      error:
+        error instanceof Error ? error.message : "An unknown error occurred",
+      stack: error instanceof Error ? error.stack : undefined,
+    };
   }
 }
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
 export async function POST(request: Request) {
@@ -76,9 +77,15 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error(`Error in simpleLoginFix:`, error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      },
+      { status: 500 },
+    );
   }
 }

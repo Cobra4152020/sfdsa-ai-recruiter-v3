@@ -1,9 +1,9 @@
-import { PerformanceDashboard } from "@/components/performance-dashboard"
+import { PerformanceDashboard } from "@/components/performance-dashboard";
 
 export const metadata = {
   title: "Performance Dashboard | SFDSA AI Recruiter",
   description: "Monitor and analyze application performance metrics",
-}
+};
 
 export default function PerformancePage() {
   return (
@@ -11,5 +11,5 @@ export default function PerformancePage() {
       <h1 className="text-3xl font-bold mb-6">Performance Dashboard</h1>
       <PerformanceDashboard />
     </div>
-  )
+  );
 }

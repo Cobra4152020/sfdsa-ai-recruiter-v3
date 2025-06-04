@@ -1,11 +1,9 @@
-"use client"
+"use client";
 
-import { Suspense } from "react"
-import { BadgesContent } from "./badges-content"
-import { PageWrapper } from "@/components/page-wrapper"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Award, Trophy, Star, Shield } from "lucide-react"
+import { PageWrapper } from "@/components/page-wrapper";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Award, Trophy, Star, Shield } from "lucide-react";
 
 export default function BadgesPage() {
   return (
@@ -13,10 +11,13 @@ export default function BadgesPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">Badge Gallery</h1>
+            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+              Badge Gallery
+            </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Earn badges by completing challenges, participating in events, and contributing to the SFDSA community.
-              Track your progress and compete with other recruits.
+              Earn badges by completing challenges, participating in events, and
+              contributing to the SFDSA community. Track your progress and
+              compete with other recruits.
             </p>
           </div>
 
@@ -80,5 +81,5 @@ export default function BadgesPage() {
         </div>
       </div>
     </PageWrapper>
-  )
+  );
 }

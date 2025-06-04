@@ -18,8 +18,14 @@ export function DonationStatsCards({ data }: DonationStatsCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
       <StatCard title="Total Donations" value={data.total_donations} />
-      <StatCard title="Total Amount" value={`$${data.total_amount.toFixed(2)}`} />
-      <StatCard title="Average Amount" value={`$${data.average_amount.toFixed(2)}`} />
+      <StatCard
+        title="Total Amount"
+        value={`$${data.total_amount.toFixed(2)}`}
+      />
+      <StatCard
+        title="Average Amount"
+        value={`$${data.average_amount.toFixed(2)}`}
+      />
       <StatCard title="Unique Donors" value={data.donor_count} />
       <StatCard title="Recurring Donors" value={data.recurring_count} />
     </div>
@@ -38,4 +44,4 @@ function StatCard({ title, value }: StatCardProps) {
       <div className="text-2xl font-bold">{value}</div>
     </div>
   );
-} 
+}

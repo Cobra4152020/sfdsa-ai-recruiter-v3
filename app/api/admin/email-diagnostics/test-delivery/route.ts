@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server"
-import { sendEmail } from "@/lib/email/send-email"
+import { NextResponse } from "next/server";
+import { sendEmail } from "@/lib/email/send-email";
 
 export async function POST(request: Request) {
   try {
-    const { email } = await request.json()
+    const { email } = await request.json();
 
     if (!email) {
       return NextResponse.json({
         success: false,
         message: "Email address is required",
-      })
+      });
     }
 
     // Send a test email
@@ -28,14 +28,14 @@ export const revalidate = 3600; // Revalidate every hour;
           <p>Time sent: ${new Date().toISOString()}</p>
         </div>
       `,
-    })
+    });
 
     if (!result.success) {
       return NextResponse.json({
         success: false,
         message: "Failed to send test email",
         details: result,
-      })
+      });
     }
 
     return NextResponse.json({
@@ -45,12 +45,15 @@ export const revalidate = 3600; // Revalidate every hour;
         emailId: result.data?.id,
         recipient: email,
       },
-    })
+    });
   } catch (error) {
-    console.error("Email delivery test error:", error)
+    console.error("Email delivery test error:", error);
     return NextResponse.json({
       success: false,
-      message: error instanceof Error ? error.message : "Unknown error sending test email",
-    })
+      message:
+        error instanceof Error
+          ? error.message
+          : "Unknown error sending test email",
+    });
   }
 }

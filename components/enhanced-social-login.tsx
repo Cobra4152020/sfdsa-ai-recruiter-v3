@@ -1,23 +1,24 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { enhancedAuthService } from "@/lib/enhanced-auth-service-client"
-import { useToast } from "@/components/ui/use-toast"
-import type { Provider } from "@supabase/supabase-js"
-import { Facebook, Twitter, Linkedin } from "lucide-react"
-import { Spinner } from "@/components/ui/spinner"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { enhancedAuthService } from "@/lib/enhanced-auth-service-client";
+import { useToast } from "@/components/ui/use-toast";
+import type { Provider } from "@supabase/supabase-js";
+import { Facebook, Twitter, Linkedin } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
+import type { AuthResult } from "@/lib/enhanced-auth-service";
 
 interface EnhancedSocialLoginProps {
-  onLoginStart?: () => void
-  className?: string
-  showApple?: boolean
-  showLinkedin?: boolean
-  size?: "sm" | "md" | "lg"
-  variant?: "default" | "outline" | "ghost"
-  layout?: "horizontal" | "vertical"
-  onSuccess?: (result: any) => void
-  onError?: (error: any) => void
+  onLoginStart?: () => void;
+  className?: string;
+  showApple?: boolean;
+  showLinkedin?: boolean;
+  size?: "sm" | "md" | "lg";
+  variant?: "default" | "outline" | "ghost";
+  layout?: "horizontal" | "vertical";
+  onSuccess?: (result: AuthResult) => void;
+  onError?: (error: unknown) => void;
 }
 
 export function EnhancedSocialLogin({
@@ -31,45 +32,48 @@ export function EnhancedSocialLogin({
   onSuccess,
   onError,
 }: EnhancedSocialLoginProps) {
-  const [isLoading, setIsLoading] = useState<Provider | null>(null)
-  const { toast } = useToast()
+  const [isLoading, setIsLoading] = useState<Provider | null>(null);
+  const { toast } = useToast();
 
   const handleSocialLogin = async (provider: Provider) => {
-    setIsLoading(provider)
-    onLoginStart?.()
+    setIsLoading(provider);
+    onLoginStart?.();
 
     try {
-      const result = await enhancedAuthService.signInWithSocialProvider(provider)
+      const result =
+        await enhancedAuthService.signInWithSocialProvider(provider);
 
       if (result.success && result.redirectUrl) {
         // Call success callback if provided
-        onSuccess?.(result)
+        onSuccess?.(result);
 
         // Redirect to the provider's OAuth page
-        window.location.href = result.redirectUrl
+        window.location.href = result.redirectUrl;
       } else {
-        onError?.(result)
+        onError?.(result);
         toast({
           variant: "destructive",
           title: "Authentication failed",
           description: result.message,
-        })
-        setIsLoading(null)
+        });
+        setIsLoading(null);
       }
     } catch (error) {
-      console.error(`${provider} login error:`, error)
-      onError?.(error)
+      console.error(`${provider} login error:`, error);
+      onError?.(error);
       toast({
         variant: "destructive",
         title: "Authentication failed",
-        description: error instanceof Error ? error.message : "Failed to authenticate",
-      })
-      setIsLoading(null)
+        description:
+          error instanceof Error ? error.message : "Failed to authenticate",
+      });
+      setIsLoading(null);
     }
-  }
+  };
 
-  const buttonSize = size === "sm" ? "sm" : size === "lg" ? "lg" : "default"
-  const containerClass = layout === "horizontal" ? "flex gap-3 flex-wrap" : "space-y-3"
+  const buttonSize = size === "sm" ? "sm" : size === "lg" ? "lg" : "default";
+  const containerClass =
+    layout === "horizontal" ? "flex gap-3 flex-wrap" : "space-y-3";
 
   return (
     <div className={`${containerClass} ${className}`}>
@@ -84,7 +88,11 @@ export function EnhancedSocialLogin({
         {isLoading === "google" ? (
           <Spinner size="sm" className="mr-2" />
         ) : (
-          <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <svg
+            className="mr-2 h-4 w-4"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
             <path
               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
               fill="#4285F4"
@@ -152,7 +160,9 @@ export function EnhancedSocialLogin({
           ) : (
             <Linkedin className="mr-2 h-4 w-4" />
           )}
-          {isLoading === "linkedin" ? "Connecting..." : "Continue with LinkedIn"}
+          {isLoading === "linkedin"
+            ? "Connecting..."
+            : "Continue with LinkedIn"}
         </Button>
       )}
 
@@ -168,7 +178,12 @@ export function EnhancedSocialLogin({
           {isLoading === "apple" ? (
             <Spinner size="sm" variant="white" className="mr-2" />
           ) : (
-            <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <svg
+              className="mr-2 h-4 w-4"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+            >
               <path d="M17.0001 7.24805C17.6401 6.48805 18.0001 5.48805 18.0001 4.48805C18.0001 4.24805 18.0001 4.00805 17.9601 3.76805C17.0001 3.84805 15.8801 4.40805 15.1201 5.24805C14.5601 5.76805 14.0801 6.76805 14.0801 7.76805C14.0801 8.04805 14.1201 8.32805 14.1201 8.40805C14.2001 8.44805 14.3201 8.44805 14.4401 8.44805C15.2001 8.44805 16.3201 7.92805 17.0001 7.24805Z" />
               <path d="M20.0001 15.2C20.0001 15.24 20.0001 15.28 20.0001 15.32C19.6001 16.36 19.0001 17.28 18.3201 18.16C17.7601 18.84 17.1601 19.52 16.2401 19.52C15.4001 19.52 14.8401 19.04 14.0001 19.04C13.1201 19.04 12.6001 19.52 11.7201 19.52C10.8001 19.52 10.1601 18.8 9.56008 18.12C8.56008 16.96 7.72008 15.2 7.72008 13.52C7.72008 10.88 9.40008 9.4 11.0401 9.4C11.9201 9.4 12.6401 9.92 13.2001 9.92C13.7201 9.92 14.5201 9.36 15.5601 9.36C16.0801 9.36 17.2801 9.4 18.0801 10.56C18.0401 10.6 16.6401 11.44 16.6401 13.28C16.6401 15.44 18.4001 16.16 18.4401 16.16C18.4401 16.16 18.4001 16.24 18.3201 16.36C18.9201 16.76 19.4801 17.4 20.0001 18.28C20.0001 18.28 20.0001 15.24 20.0001 15.2Z" />
             </svg>
@@ -177,5 +192,5 @@ export function EnhancedSocialLogin({
         </Button>
       )}
     </div>
-  )
+  );
 }

@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Image, { type ImageProps } from "next/image"
-import { resolveImagePath, checkImageExists } from "@/lib/image-path-utils"
+import { useState, useEffect } from "react";
+import Image, { type ImageProps } from "next/image";
+import { resolveImagePath, checkImageExists } from "@/lib/image-path-utils";
 
 interface OptimizedImageProps extends Omit<ImageProps, "src"> {
-  src: string
-  fallbackSrc?: string
-  className?: string
+  src: string;
+  fallbackSrc?: string;
+  className?: string;
 }
 
 export function OptimizedImage({
@@ -19,40 +19,42 @@ export function OptimizedImage({
   className,
   ...props
 }: OptimizedImageProps) {
-  const [imageSrc, setImageSrc] = useState<string>(src)
-  const [imageError, setImageError] = useState<boolean>(false)
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [imageSrc, setImageSrc] = useState<string>(src);
+  const [imageError, setImageError] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    const resolvedSrc = resolveImagePath(src)
+    const resolvedSrc = resolveImagePath(src);
 
     const verifyImage = async () => {
       try {
-        const exists = await checkImageExists(resolvedSrc)
+        const exists = await checkImageExists(resolvedSrc);
         if (!exists) {
-          console.warn(`Image at ${resolvedSrc} does not exist, using fallback`)
-          setImageSrc(fallbackSrc)
+          console.warn(
+            `Image at ${resolvedSrc} does not exist, using fallback`,
+          );
+          setImageSrc(fallbackSrc);
         } else {
-          setImageSrc(resolvedSrc)
+          setImageSrc(resolvedSrc);
         }
       } catch (error) {
-        console.error("Error verifying image:", error)
-        setImageSrc(fallbackSrc)
+        console.error("Error verifying image:", error);
+        setImageSrc(fallbackSrc);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    verifyImage()
-  }, [src, fallbackSrc])
+    verifyImage();
+  }, [src, fallbackSrc]);
 
   const handleError = () => {
     if (!imageError) {
-      console.warn(`Error loading image from ${imageSrc}, using fallback`)
-      setImageSrc(fallbackSrc)
-      setImageError(true)
+      console.warn(`Error loading image from ${imageSrc}, using fallback`);
+      setImageSrc(fallbackSrc);
+      setImageError(true);
     }
-  }
+  };
 
   return (
     <>
@@ -76,5 +78,5 @@ export function OptimizedImage({
         />
       )}
     </>
-  )
+  );
 }

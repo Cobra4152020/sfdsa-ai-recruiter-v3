@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Input } from "@/components/ui/input"
-import { Search } from "lucide-react"
+import { Input } from "@/components/ui/input";
+import { Search } from "lucide-react";
 
 export interface BadgeSearchProps {
   value: string;
@@ -20,5 +20,5 @@ export function BadgeSearch({ value, onChange }: BadgeSearchProps) {
         className="pl-10 w-[200px] sm:w-[300px]"
       />
     </div>
-  )
-} 
+  );
+}

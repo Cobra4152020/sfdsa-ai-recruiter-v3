@@ -1,39 +1,42 @@
-import { getClientSideSupabase } from "@/lib/supabase"
+import { getClientSideSupabase } from "@/lib/supabase";
 
 export interface AuthResult {
-  success: boolean
-  message: string
-  userId?: string
-  userType?: string
-  error?: any
+  success: boolean;
+  message: string;
+  userId?: string;
+  userType?: string;
+  error?: unknown;
 }
 
 export const authService = {
   /**
    * Sign in with email and password
    */
-  async signInWithPassword(email: string, password: string): Promise<AuthResult> {
-    const supabase = getClientSideSupabase()
+  async signInWithPassword(
+    email: string,
+    password: string,
+  ): Promise<AuthResult> {
+    const supabase = getClientSideSupabase();
 
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
-      })
+      });
 
       if (error) {
         return {
           success: false,
           message: error.message,
           error,
-        }
+        };
       }
 
       if (!data.user) {
         return {
           success: false,
           message: "Authentication failed. Please try again.",
-        }
+        };
       }
 
       // Determine user type
@@ -41,23 +44,26 @@ export const authService = {
         .from("user_types")
         .select("user_type")
         .eq("user_id", data.user.id)
-        .single()
+        .single();
 
-      const userType = userTypeData?.user_type || "recruit"
+      const userType = userTypeData?.user_type || "recruit";
 
       return {
         success: true,
         message: "Login successful",
         userId: data.user.id,
         userType,
-      }
+      };
     } catch (error) {
-      console.error("Sign in error:", error)
+      console.error("Sign in error:", error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : "An unexpected error occurred",
+        message:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
         error,
-      }
+      };
     }
   },
 
@@ -65,15 +71,15 @@ export const authService = {
    * Get current session with user type
    */
   async getSessionWithUserType() {
-    const supabase = getClientSideSupabase()
+    const supabase = getClientSideSupabase();
 
     try {
       const {
         data: { session },
-      } = await supabase.auth.getSession()
+      } = await supabase.auth.getSession();
 
       if (!session) {
-        return { session: null, userType: null }
+        return { session: null, userType: null };
       }
 
       // Get user type
@@ -81,15 +87,15 @@ export const authService = {
         .from("user_types")
         .select("user_type")
         .eq("user_id", session.user.id)
-        .single()
+        .single();
 
       return {
         session,
         userType: userTypeData?.user_type || null,
-      }
+      };
     } catch (error) {
-      console.error("Error getting session with user type:", error)
-      return { session: null, userType: null }
+      console.error("Error getting session with user type:", error);
+      return { session: null, userType: null };
     }
   },
 
@@ -97,15 +103,19 @@ export const authService = {
    * Check if user is a recruit
    */
   async isRecruit(userId: string): Promise<boolean> {
-    const supabase = getClientSideSupabase()
+    const supabase = getClientSideSupabase();
 
     try {
-      const { data } = await supabase.from("user_types").select("user_type").eq("user_id", userId).single()
+      const { data } = await supabase
+        .from("user_types")
+        .select("user_type")
+        .eq("user_id", userId)
+        .single();
 
-      return data?.user_type === "recruit"
+      return data?.user_type === "recruit";
     } catch (error) {
-      console.error("Error checking if user is recruit:", error)
-      return false
+      console.error("Error checking if user is recruit:", error);
+      return false;
     }
   },
 
@@ -113,15 +123,19 @@ export const authService = {
    * Check if user is a volunteer recruiter
    */
   async isVolunteerRecruiter(userId: string): Promise<boolean> {
-    const supabase = getClientSideSupabase()
+    const supabase = getClientSideSupabase();
 
     try {
-      const { data } = await supabase.from("user_types").select("user_type").eq("user_id", userId).single()
+      const { data } = await supabase
+        .from("user_types")
+        .select("user_type")
+        .eq("user_id", userId)
+        .single();
 
-      return data?.user_type === "volunteer"
+      return data?.user_type === "volunteer";
     } catch (error) {
-      console.error("Error checking if user is volunteer recruiter:", error)
-      return false
+      console.error("Error checking if user is volunteer recruiter:", error);
+      return false;
     }
   },
 
@@ -129,7 +143,7 @@ export const authService = {
    * Send a magic link for passwordless login
    */
   async sendMagicLink(email: string, redirectUrl: string): Promise<AuthResult> {
-    const supabase = getClientSideSupabase()
+    const supabase = getClientSideSupabase();
 
     try {
       const { error } = await supabase.auth.signInWithOtp({
@@ -137,27 +151,28 @@ export const authService = {
         options: {
           emailRedirectTo: redirectUrl,
         },
-      })
+      });
 
       if (error) {
         return {
           success: false,
           message: error.message,
           error,
-        }
+        };
       }
 
       return {
         success: true,
         message: "Magic link sent successfully",
-      }
+      };
     } catch (error) {
-      console.error("Magic link error:", error)
+      console.error("Magic link error:", error);
       return {
         success: false,
-        message: error instanceof Error ? error.message : "Failed to send magic link",
+        message:
+          error instanceof Error ? error.message : "Failed to send magic link",
         error,
-      }
+      };
     }
   },
-}
+};

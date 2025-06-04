@@ -1,14 +1,17 @@
-"use client"
+"use client";
 
-import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Facebook, Twitter, Instagram, Linkedin, Youtube } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SocialMediaLinksProps {
-  className?: string
-  showLabels?: boolean
+  className?: string;
+  showLabels?: boolean;
 }
 
-export function SocialMediaLinks({ className, showLabels = false }: SocialMediaLinksProps) {
+export function SocialMediaLinks({
+  className,
+  showLabels = false,
+}: SocialMediaLinksProps) {
   const socialLinks = [
     {
       name: "Facebook",
@@ -35,7 +38,7 @@ export function SocialMediaLinks({ className, showLabels = false }: SocialMediaL
       url: "https://youtube.com/sfdsa",
       icon: Youtube,
     },
-  ]
+  ];
 
   return (
     <div className={cn("flex items-center space-x-4", className)}>
@@ -55,5 +58,5 @@ export function SocialMediaLinks({ className, showLabels = false }: SocialMediaL
         </a>
       ))}
     </div>
-  )
+  );
 }

@@ -24,9 +24,24 @@ export type BadgeStatus = "earned" | "progress" | "locked";
 
 export type BadgeRarity = "common" | "uncommon" | "rare" | "epic" | "legendary";
 
-export type BadgeLayoutType = "grid" | "list" | "timeline" | "masonry" | "carousel";
-export type BadgeDisplayStyle = "standard" | "compact" | "detailed" | "3d" | "minimal";
-export type BadgeRewardType = "feature" | "content" | "physical" | "points" | "custom";
+export type BadgeLayoutType =
+  | "grid"
+  | "list"
+  | "timeline"
+  | "masonry"
+  | "carousel";
+export type BadgeDisplayStyle =
+  | "standard"
+  | "compact"
+  | "detailed"
+  | "3d"
+  | "minimal";
+export type BadgeRewardType =
+  | "feature"
+  | "content"
+  | "physical"
+  | "points"
+  | "custom";
 
 export interface Badge {
   id: string;
@@ -47,20 +62,28 @@ export interface Badge {
 }
 
 export interface BadgeProgress {
-  badgeId: string;
+  id: string;
   userId: string;
+  badgeId: string;
   progress: number;
-  isUnlocked: boolean;
-  unlockedAt?: string;
-  actionsCompleted: any[];
-  lastActionAt: string;
+  status: "in_progress" | "completed";
+  actionsCompleted: string[];
   createdAt: string;
   updatedAt: string;
-  history?: any[];
-  lastUpdated?: string;
+  history?: {
+    action: string;
+    timestamp: string;
+    progress: number;
+  }[];
 }
 
-export type TimelineEventType = 'start' | 'progress' | 'milestone' | 'completion' | 'unlock' | 'share';
+export type TimelineEventType =
+  | "start"
+  | "progress"
+  | "milestone"
+  | "completion"
+  | "unlock"
+  | "share";
 
 export interface TimelineEvent {
   id: string;
@@ -119,25 +142,29 @@ export interface UserXP {
   lastDailyChallenge?: string;
 }
 
+export interface Goal {
+  id: string;
+  description: string;
+  completed: boolean;
+  [key: string]: string | number | boolean;
+}
+
 export interface BadgeChallenge {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  badgeId: string;
-  requirements: string[];
-  rewards: string[];
-  startDate: string;
-  endDate: string;
-  isActive: boolean;
-  xpReward: number;
-  createdAt: string;
-  updatedAt: string;
+  type: BadgeType;
+  progress: Record<string, number>;
+  value: number;
+  rewardType: "badge" | "points" | "nft";
+  rewardData: Record<string, unknown>;
+  customGoals: Record<string, Goal> | null;
 }
 
 export interface UserChallengeProgress {
   userId: string;
   challengeId: string;
-  progress: Record<string, any>;
+  progress: Record<string, unknown>;
   isComplete: boolean;
   completedAt?: string;
   createdAt: string;
@@ -167,10 +194,10 @@ export interface BadgeReward {
   id: string;
   badgeId: string;
   type: string;
-  value: any;
+  value: unknown;
   description: string;
   rewardType: BadgeRewardType;
-  rewardData: Record<string, any>;
+  rewardData: Record<string, unknown>;
   requiredTier: number;
   isActive: boolean;
 }
@@ -183,7 +210,7 @@ export interface UserBadgePreferences {
     push: boolean;
   };
   pinnedBadges: string[];
-  customGoals: Record<string, any> | null;
+  customGoals: Record<string, unknown> | null;
   createdAt: string;
   updatedAt: string;
 }
@@ -217,4 +244,4 @@ export interface BadgeShare {
   platform: string;
   shareUrl?: string;
   createdAt: string;
-} 
+}

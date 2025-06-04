@@ -1,34 +1,44 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import { sendEmail } from "@/lib/email/send-email"
-import { emailTemplates } from "@/lib/email/templates"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { sendEmail } from "@/lib/email/send-email";
+import { emailTemplates } from "@/lib/email/templates";
 
 export async function POST(request: Request) {
   try {
-    const { userId, badgeName, badgeDescription, badgeShareMessage } = await request.json()
+    const { userId, badgeName, badgeDescription, badgeShareMessage } =
+      await request.json();
 
     if (!userId) {
-      return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "User ID is required" },
+        { status: 400 },
+      );
     }
 
     if (!badgeName) {
-      return NextResponse.json({ success: false, message: "Badge name is required" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "Badge name is required" },
+        { status: 400 },
+      );
     }
 
     // Get user email
-    const serviceClient = getServiceSupabase()
+    const serviceClient = getServiceSupabase();
     const { data: user, error: userError } = await serviceClient
       .from("users")
       .select("name, email")
       .eq("id", userId)
-      .single()
+      .single();
 
     if (userError || !user) {
-      console.error("Error fetching user data:", userError)
-      return NextResponse.json({ success: false, message: "User not found" }, { status: 404 })
+      console.error("Error fetching user data:", userError);
+      return NextResponse.json(
+        { success: false, message: "User not found" },
+        { status: 404 },
+      );
     }
 
     // If no email, return early
@@ -36,7 +46,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         success: false,
         message: "User has no email address",
-      })
+      });
     }
 
     // Generate badge URL
@@ -44,9 +54,9 @@ export async function POST(request: Request) {
       ? `https://${process.env.VERCEL_URL}`
       : process.env.NEXT_PUBLIC_VERCEL_URL
         ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-        : "http://localhost:3000"
+        : "http://localhost:3000";
 
-    const badgeUrl = `${baseUrl}/user-badge/${encodeURIComponent(user.name || "Recruit")}`
+    const badgeUrl = `${baseUrl}/user-badge/${encodeURIComponent(user.name || "Recruit")}`;
 
     // Send email notification using our new email utility
     const emailResult = await sendEmail({
@@ -59,19 +69,25 @@ export async function POST(request: Request) {
         badgeShareMessage,
         badgeUrl,
       }),
-    })
+    });
 
     if (!emailResult.success) {
-      console.error("Error sending email:", emailResult.message)
-      return NextResponse.json({ success: false, message: "Failed to send email notification" }, { status: 500 })
+      console.error("Error sending email:", emailResult.message);
+      return NextResponse.json(
+        { success: false, message: "Failed to send email notification" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({
       success: true,
       messageId: emailResult.data?.id,
-    })
+    });
   } catch (error) {
-    console.error("Unexpected error:", error)
-    return NextResponse.json({ success: false, message: "An unexpected error occurred" }, { status: 500 })
+    console.error("Unexpected error:", error);
+    return NextResponse.json(
+      { success: false, message: "An unexpected error occurred" },
+      { status: 500 },
+    );
   }
 }

@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState, useEffect } from "react"
-import { useUser } from "@/context/user-context"
+import { useState, useEffect } from "react";
+import { useUser } from "@/context/user-context";
 
 interface Activity {
-  id: number
-  activityType: string
-  description: string
-  points: number
-  createdAt: string
-  recruitId?: string
-  metadata?: any
+  id: number;
+  activityType: string;
+  description: string;
+  points: number;
+  createdAt: string;
+  recruitId?: string;
+  metadata?: Record<string, unknown>;
 }
 
-const ITEMS_PER_PAGE = 8
+const ITEMS_PER_PAGE = 8;
 
 const activityIcons: Record<string, React.ReactNode> = {
   referral_signup: "👤",
@@ -30,29 +30,29 @@ const activityIcons: Record<string, React.ReactNode> = {
   tier_achievement: "🏆",
   social_share: "📱",
   feedback_submission: "📋",
-}
+};
 
 export function RecruiterActivityHistory() {
-  const { currentUser } = useUser()
-  const [activities, setActivities] = useState<Activity[]>([])
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [totalPoints, setTotalPoints] = useState(0)
-  const [searchTerm, setSearchTerm] = useState("")
-  const [activityFilter, setActivityFilter] = useState("all")
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
+  const { currentUser } = useUser();
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activityFilter, setActivityFilter] = useState("all");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    if (!currentUser?.id) return
+    if (!currentUser?.id) return;
 
     const fetchActivities = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         // This would be an API call in a real implementation
         // For demonstration, we'll mock the data with a delay
-        await new Promise(resolve => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         // Mock data
         const mockActivities: Activity[] = [
@@ -147,48 +147,51 @@ export function RecruiterActivityHistory() {
             points: 50,
             createdAt: "2023-06-28T09:00:00Z",
           },
-        ]
+        ];
 
-        setActivities(mockActivities)
-        
+        setActivities(mockActivities);
+
         // Calculate total points
-        const total = mockActivities.reduce((sum, activity) => sum + activity.points, 0)
-        setTotalPoints(total)
+        const total = mockActivities.reduce(
+          (sum, activity) => sum + activity.points,
+          0,
+        );
+        setTotalPoints(total);
       } catch (err) {
-        setError("Failed to load activity history")
-        console.error(err)
+        setError("Failed to load activity history");
+        console.error(err);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchActivities()
-  }, [currentUser?.id])
+    fetchActivities();
+  }, [currentUser?.id]);
 
   // Apply filters when activities, searchTerm, or activityFilter change
   useEffect(() => {
-    let filtered = activities
+    let filtered = activities;
     if (activityFilter !== "all") {
-      filtered = filtered.filter((a) => a.activityType === activityFilter)
+      filtered = filtered.filter((a) => a.activityType === activityFilter);
     }
     if (searchTerm) {
       filtered = filtered.filter((a) =>
-        a.description.toLowerCase().includes(searchTerm.toLowerCase())
-      )
+        a.description.toLowerCase().includes(searchTerm.toLowerCase()),
+      );
     }
-    setFilteredActivities(filtered)
-    setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1)
-    setCurrentPage(1)
-  }, [activities, searchTerm, activityFilter])
+    setFilteredActivities(filtered);
+    setTotalPages(Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1);
+    setCurrentPage(1);
+  }, [activities, searchTerm, activityFilter]);
 
   // Paginate filtered activities
   const paginatedActivities = filteredActivities.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  )
+    currentPage * ITEMS_PER_PAGE,
+  );
 
-  if (isLoading) return <div>Loading activity history...</div>
-  if (error) return <div>Error: {error}</div>
+  if (isLoading) return <div>Loading activity history...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div>
@@ -214,20 +217,29 @@ export function RecruiterActivityHistory() {
       <ul>
         {paginatedActivities.map((activity) => (
           <li key={activity.id}>
-            <span>{activityIcons[activity.activityType] || ""}</span> {activity.description} ({activity.points} pts)
-            <span style={{ marginLeft: 8, color: '#888' }}>{new Date(activity.createdAt).toLocaleString()}</span>
+            <span>{activityIcons[activity.activityType] || ""}</span>{" "}
+            {activity.description} ({activity.points} pts)
+            <span style={{ marginLeft: 8, color: "#888" }}>
+              {new Date(activity.createdAt).toLocaleString()}
+            </span>
           </li>
         ))}
       </ul>
       <div>
         Page {currentPage} of {totalPages}
-        <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>
+        <button
+          onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+          disabled={currentPage === 1}
+        >
           Previous
         </button>
-        <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>
+        <button
+          onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+          disabled={currentPage === totalPages}
+        >
           Next
         </button>
       </div>
     </div>
-  )
+  );
 }

@@ -1,4 +1,4 @@
-import { env } from "./env-utils"
+import { env } from "./env-utils";
 
 /**
  * Resolves an image path based on the current environment
@@ -7,23 +7,28 @@ import { env } from "./env-utils"
  */
 export function resolveImagePath(path: string): string {
   // Remove leading slash if present
-  const cleanPath = path.startsWith("/") ? path.slice(1) : path
+  const cleanPath = path.startsWith("/") ? path.slice(1) : path;
 
   // In development or when using mock data, use the local path
-  if (process.env.NODE_ENV === "development" || env("USE_MOCK_DATA") === "true") {
-    return `/${cleanPath}`
+  if (
+    process.env.NODE_ENV === "development" ||
+    env("USE_MOCK_DATA") === "true"
+  ) {
+    return `/${cleanPath}`;
   }
 
   // In production, use the Vercel URL
-  const baseUrl = env("NEXT_PUBLIC_VERCEL_URL") || ""
-  const protocol = baseUrl.includes("localhost") ? "http" : "https"
+  const baseUrl = env("NEXT_PUBLIC_VERCEL_URL") || "";
+  const protocol = baseUrl.includes("localhost") ? "http" : "https";
 
   if (!baseUrl) {
-    console.warn("NEXT_PUBLIC_VERCEL_URL is not defined, falling back to relative path")
-    return `/${cleanPath}`
+    console.warn(
+      "NEXT_PUBLIC_VERCEL_URL is not defined, falling back to relative path",
+    );
+    return `/${cleanPath}`;
   }
 
-  return `${protocol}://${baseUrl}/${cleanPath}`
+  return `${protocol}://${baseUrl}/${cleanPath}`;
 }
 
 /**
@@ -33,11 +38,11 @@ export function resolveImagePath(path: string): string {
  */
 export async function checkImageExists(path: string): Promise<boolean> {
   try {
-    const response = await fetch(path, { method: "HEAD" })
-    return response.ok
+    const response = await fetch(path, { method: "HEAD" });
+    return response.ok;
   } catch (error) {
-    console.error(`Error checking if image exists at ${path}:`, error)
-    return false
+    console.error(`Error checking if image exists at ${path}:`, error);
+    return false;
   }
 }
 
@@ -82,7 +87,7 @@ export function getAvailableImagePaths(): string[] {
     "/silicon-valley-tech-hq.png",
     "/north-beach-italian-restaurants.png",
     "/abstract-geometric-shapes.png",
-  ]
+  ];
 }
 
 /**
@@ -91,5 +96,5 @@ export function getAvailableImagePaths(): string[] {
  * @returns The full path to the image
  */
 export function getImagePath(path: string): string {
-  return resolveImagePath(path)
+  return resolveImagePath(path);
 }

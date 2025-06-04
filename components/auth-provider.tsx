@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { AuthModalProvider } from "@/context/auth-modal-context"
-import { UnifiedRegistrationPopup } from "@/components/unified-registration-popup"
+import { AuthModalProvider } from "@/context/auth-modal-context";
+import { UnifiedRegistrationPopup } from "@/components/unified-registration-popup";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
@@ -11,5 +11,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       {children}
       <UnifiedRegistrationPopup />
     </AuthModalProvider>
-  )
+  );
 }

@@ -1,13 +1,13 @@
-import { NextResponse } from "next/server"
-import { createClient } from "@supabase/supabase-js"
+import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 // Create a direct supabase admin client without using the existing service
 function getAdminClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !supabaseServiceRole) {
-    throw new Error("Missing Supabase environment variables")
+    throw new Error("Missing Supabase environment variables");
   }
 
   return createClient(supabaseUrl, supabaseServiceRole, {
@@ -15,58 +15,66 @@ function getAdminClient() {
       autoRefreshToken: false,
       persistSession: false,
     },
-  })
+  });
 }
 
 // Helper function to execute SQL with error handling
-async function executeSql(query: string, params: any[] = []) {
-  const supabase = getAdminClient()
+async function executeSql(query: string, params: unknown[] = []) {
+  const supabase = getAdminClient();
   const { error } = await supabase.rpc("exec_sql", {
     sql_query: query,
     params_array: params,
-  })
+  });
 
   if (error) {
-    throw new Error(`SQL error: ${error.message}`)
+    throw new Error(`SQL error: ${error.message}`);
   }
 }
 
-export async function publicFixAdminProfile(userId: string, adminEmail: string, securityCode: string) {
+export async function publicFixAdminProfile(
+  userId: string,
+  adminEmail: string,
+  securityCode: string,
+) {
   try {
     // Verify security code matches env var or is the hardcoded emergency code
-    const validCode = process.env.ADMIN_RECOVERY_CODE || "sfdsa-emergency-admin-fix"
+    const validCode =
+      process.env.ADMIN_RECOVERY_CODE || "sfdsa-emergency-admin-fix";
     if (securityCode !== validCode) {
       return {
         success: false,
-        message: "Invalid security code. For security reasons, please use the correct code.",
-      }
+        message:
+          "Invalid security code. For security reasons, please use the correct code.",
+      };
     }
 
-    const supabase = getAdminClient()
+    const supabase = getAdminClient();
 
     // Check if user exists in auth
-    const { data: userData, error: userError } = await supabase.auth.admin.getUserById(userId)
+    const { data: userData, error: userError } =
+      await supabase.auth.admin.getUserById(userId);
 
     if (userError || !userData.user) {
       return {
         success: false,
         message: `User with ID ${userId} not found in auth system.`,
-      }
+      };
     }
 
     // Verify email matches
     if (userData.user.email !== adminEmail) {
       return {
         success: false,
-        message: "User ID and email do not match. Please provide the correct email for this user ID.",
-      }
+        message:
+          "User ID and email do not match. Please provide the correct email for this user ID.",
+      };
     }
 
     // Create admin schema if it doesn't exist
     try {
-      await executeSql("CREATE SCHEMA IF NOT EXISTS admin;")
+      await executeSql("CREATE SCHEMA IF NOT EXISTS admin;");
     } catch (error) {
-      console.log("Error creating admin schema, may already exist:", error)
+      console.log("Error creating admin schema, may already exist:", error);
       // Continue anyway
     }
 
@@ -81,38 +89,16 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
           created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
           updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
         );
-      `)
+      `);
     } catch (error) {
-      console.log("Error creating admin.users table, may already exist:", error)
+      console.log(
+        "Error creating admin.users table, may already exist:",
+        error,
+      );
       // Continue anyway
     }
 
     // Check if user_types table exists
-    let tableExists = false
-    try {
-      const { data } = await supabase.from("user_types").select("count(*)", { count: "exact", head: true })
-      tableExists = true
-    } catch (error) {
-      console.log("user_types table might not exist, creating it")
-
-      try {
-        await executeSql(`
-          CREATE TABLE IF NOT EXISTS public.user_types (
-            user_id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-            user_type TEXT NOT NULL CHECK (user_type IN ('admin', 'recruit', 'volunteer')),
-            email TEXT,
-            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-          );
-        `)
-      } catch (createError) {
-        return {
-          success: false,
-          message: `Failed to create user_types table: ${String(createError)}`,
-        }
-      }
-    }
-
-    // Insert or update user_types
     try {
       await executeSql(
         `
@@ -122,17 +108,18 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
         DO UPDATE SET user_type = 'admin', email = $2;
       `,
         [userId, adminEmail],
-      )
+      );
     } catch (error) {
       return {
         success: false,
         message: `Failed to update user_types: ${String(error)}`,
-      }
+      };
     }
 
     // Insert admin user record
     try {
-      const userName = userData.user.user_metadata?.name || adminEmail.split("@")[0]
+      const userName =
+        userData.user.user_metadata?.name || adminEmail.split("@")[0];
 
       await executeSql(
         `
@@ -142,20 +129,22 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
         DO UPDATE SET email = $2, name = $3, updated_at = NOW();
       `,
         [userId, adminEmail, userName],
-      )
+      );
     } catch (error) {
       return {
         success: false,
         message: `Failed to update admin.users: ${String(error)}`,
-      }
+      };
     }
 
     // Insert user_roles
     try {
       // Check if user_roles table exists
       try {
-        await supabase.from("user_roles").select("count(*)", { count: "exact", head: true })
-      } catch (error) {
+        await supabase
+          .from("user_roles")
+          .select("count(*)", { count: "exact", head: true });
+      } catch {
         // Create user_roles table if it doesn't exist
         await executeSql(`
           CREATE TABLE IF NOT EXISTS public.user_roles (
@@ -166,7 +155,7 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
             is_active BOOLEAN DEFAULT TRUE,
             UNIQUE(user_id, role)
           );
-        `)
+        `);
       }
 
       await executeSql(
@@ -177,18 +166,18 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
         DO UPDATE SET is_active = TRUE;
       `,
         [userId],
-      )
+      );
     } catch (error) {
       return {
         success: false,
         message: `Failed to update user_roles: ${String(error)}`,
-      }
+      };
     }
 
     // Set up security policies
     try {
       // Enable RLS on admin.users
-      await executeSql("ALTER TABLE admin.users ENABLE ROW LEVEL SECURITY;")
+      await executeSql("ALTER TABLE admin.users ENABLE ROW LEVEL SECURITY;");
 
       // Create RLS policies if they don't exist
       await executeSql(`
@@ -219,29 +208,30 @@ export async function publicFixAdminProfile(userId: string, adminEmail: string, 
           NULL;
         END
         $$;
-      `)
+      `);
     } catch (error) {
-      console.error("Error setting up RLS policies:", error)
+      console.error("Error setting up RLS policies:", error);
       // Continue anyway, this isn't critical for the fix
     }
 
-        
     return {
       success: true,
-      message: "Admin profile fixed successfully. You should now be able to log in.",
+      message:
+        "Admin profile fixed successfully. You should now be able to log in.",
       userId,
       email: adminEmail,
-    }
+    };
   } catch (error) {
-    console.error("Error fixing admin profile:", error)
+    console.error("Error fixing admin profile:", error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "An unexpected error occurred",
-    }
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour
 
 // Note: This endpoint has been converted to static
@@ -249,10 +239,14 @@ export const revalidate = 3600; // Revalidate every hour
 // For static deployment, this functionality should be handled through
 // a separate admin interface or serverless functions
 
-export async function POST(request: Request) {
-  return NextResponse.json({
-    success: false,
-    message: "This endpoint is not available in static deployment. Please use the admin interface or contact support for assistance.",
-    source: 'static'
-  }, { status: 403 })
+export async function POST() {
+  return NextResponse.json(
+    {
+      success: false,
+      message:
+        "This endpoint is not available in static deployment. Please use the admin interface or contact support for assistance.",
+      source: "static",
+    },
+    { status: 403 },
+  );
 }

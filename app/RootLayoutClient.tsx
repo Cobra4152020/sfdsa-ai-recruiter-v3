@@ -1,54 +1,69 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from "react"
-import { usePathname, useRouter } from "next/navigation"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import { User } from "@supabase/supabase-js"
-import { UserProvider } from "@/context/user-context"
-import { Spinner } from "@/components/ui/spinner"
+import { useEffect, ReactNode } from "react";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthModalProvider } from "@/context/auth-modal-context";
+import { UserProvider, useUser } from "@/context/user-context";
+import { getClientSideSupabase } from "@/lib/supabase";
+// import { Analytics } from "@vercel/analytics/react"; // Commented out for now
+// import { SpeedInsights } from "@vercel/speed-insights/next"; // Commented out for now
+import { ErrorMonitor } from "@/components/error-monitor";
+import PerformanceMonitor from "@/components/performance-monitor";
+import { WebSocketErrorHandler } from "@/components/websocket-error-handler";
+import { ImprovedHeader } from "@/components/improved-header";
+import { ImprovedFooter } from "@/components/improved-footer";
+import { ThemeProvider } from "@/components/theme-provider";
+import { RegistrationProvider } from "@/context/registration-context";
 
 interface RootLayoutClientProps {
-  children: React.ReactNode
+  children: ReactNode;
 }
 
-export default function RootLayoutClient({
-  children,
-}: RootLayoutClientProps) {
-  const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState<User | null>(null)
-  const pathname = usePathname()
-  const router = useRouter()
-  const supabase = createClientComponentClient()
+export default function RootLayoutClient({ children }: RootLayoutClientProps) {
+  const { setCurrentUser } = useUser();
 
   useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession()
-        
+    const supabase = getClientSideSupabase();
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
         if (session?.user) {
-          setUser(session.user)
+          const { user } = session;
+          setCurrentUser({
+            ...user,
+            email: user.email ?? "",
+          });
+        } else {
+          setCurrentUser(null);
         }
-      } catch (error) {
-        console.error("Error checking user session:", error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
+      },
+    );
 
-    checkUser()
-  }, [supabase.auth])
-
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
+    return () => {
+      authListener?.subscription.unsubscribe();
+    };
+  }, [setCurrentUser]);
 
   return (
-    <UserProvider>
-      {children}
-    </UserProvider>
-  )
-} 
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      <UserProvider>
+        <RegistrationProvider>
+          <AuthModalProvider>
+            <TooltipProvider>
+              <ErrorMonitor>
+                <PerformanceMonitor>
+                  <WebSocketErrorHandler>
+                    <ImprovedHeader />
+                    {children}
+                    <ImprovedFooter />
+                    <Toaster />
+                  </WebSocketErrorHandler>
+                </PerformanceMonitor>
+              </ErrorMonitor>
+            </TooltipProvider>
+          </AuthModalProvider>
+        </RegistrationProvider>
+      </UserProvider>
+    </ThemeProvider>
+  );
+}

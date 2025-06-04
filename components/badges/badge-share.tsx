@@ -1,46 +1,58 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Twitter, Facebook, Linkedin, Link as LinkIcon } from "lucide-react"
-import { useState, useEffect } from "react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Twitter, Facebook, Linkedin, Link as LinkIcon } from "lucide-react";
+import { useState, useEffect } from "react";
+import type { SocialPlatform } from "@/lib/social-sharing-service";
 
 interface BadgeShareProps {
-  badgeId: string
-  badgeName: string
-  isUnlocked: boolean
-  onShare: () => void
+  badgeId: string;
+  badgeName: string;
+  isUnlocked: boolean;
+  onShare: (platform: SocialPlatform) => void;
 }
 
-export function BadgeShare({ badgeId, badgeName, isUnlocked, onShare }: BadgeShareProps) {
-  const [copied, setCopied] = useState(false)
-  const [shareUrl, setShareUrl] = useState("")
+export function BadgeShare({
+  badgeId,
+  badgeName,
+  isUnlocked,
+  onShare,
+}: BadgeShareProps) {
+  const [copied, setCopied] = useState(false);
+  const [shareUrl, setShareUrl] = useState("");
 
   useEffect(() => {
-    setShareUrl(`${window.location.origin}/badges/${badgeId}`)
-  }, [badgeId])
+    setShareUrl(`${window.location.origin}/badges/${badgeId}`);
+  }, [badgeId]);
 
-  const shareText = `I just earned the ${badgeName} badge! Join me in becoming a San Francisco Deputy Sheriff. #LawEnforcement #JoinTheForce`
+  const shareText = `I just earned the ${badgeName} badge! Join me in becoming a San Francisco Deputy Sheriff. #LawEnforcement #JoinTheForce`;
 
   const socialShareUrls = {
     twitter: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`,
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`
-  }
+    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
+  };
 
   const copyToClipboard = async () => {
     try {
-      await navigator.clipboard.writeText(shareUrl)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-      onShare()
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+      onShare("copy");
     } catch (error) {
-      console.error("Failed to copy URL:", error)
+      console.error("Failed to copy URL:", error);
     }
-  }
+  };
 
   if (!isUnlocked) {
-    return null
+    return null;
   }
 
   return (
@@ -56,8 +68,8 @@ export function BadgeShare({ badgeId, badgeName, isUnlocked, onShare }: BadgeSha
               variant="outline"
               size="icon"
               onClick={() => {
-                window.open(socialShareUrls.twitter, "_blank")
-                onShare()
+                window.open(socialShareUrls.twitter, "_blank");
+                onShare("twitter");
               }}
             >
               <Twitter className="h-4 w-4" />
@@ -67,8 +79,8 @@ export function BadgeShare({ badgeId, badgeName, isUnlocked, onShare }: BadgeSha
               variant="outline"
               size="icon"
               onClick={() => {
-                window.open(socialShareUrls.facebook, "_blank")
-                onShare()
+                window.open(socialShareUrls.facebook, "_blank");
+                onShare("facebook");
               }}
             >
               <Facebook className="h-4 w-4" />
@@ -78,8 +90,8 @@ export function BadgeShare({ badgeId, badgeName, isUnlocked, onShare }: BadgeSha
               variant="outline"
               size="icon"
               onClick={() => {
-                window.open(socialShareUrls.linkedin, "_blank")
-                onShare()
+                window.open(socialShareUrls.linkedin, "_blank");
+                onShare("linkedin");
               }}
             >
               <Linkedin className="h-4 w-4" />
@@ -101,5 +113,5 @@ export function BadgeShare({ badgeId, badgeName, isUnlocked, onShare }: BadgeSha
         </div>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

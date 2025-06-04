@@ -1,5 +1,4 @@
-import { getServiceSupabase } from "@/app/lib/supabase/server"
-import type { Badge, BadgeType, BadgeRarity } from "@/types/badge"
+import type { Badge } from "@/types/badge";
 
 // Define all available badges as a constant
 const ALL_BADGES: Badge[] = [
@@ -14,12 +13,12 @@ const ALL_BADGES: Badge[] = [
     requirements: [
       "Complete written test study guide",
       "Score at least 80% on practice test",
-      "Review feedback"
+      "Review feedback",
     ],
     rewards: [
       "Access to advanced study materials",
       "Test-taking tips",
-      "Practice test feedback"
+      "Practice test feedback",
     ],
     imageUrl: "/placeholder.svg?key=t6kke",
     createdAt: new Date().toISOString(),
@@ -35,13 +34,9 @@ const ALL_BADGES: Badge[] = [
     requirements: [
       "Complete interview preparation guide",
       "Practice common questions",
-      "Review feedback"
+      "Review feedback",
     ],
-    rewards: [
-      "Mock interview access",
-      "Interview tips",
-      "Sample answers"
-    ],
+    rewards: ["Mock interview access", "Interview tips", "Sample answers"],
     imageUrl: "/placeholder.svg?key=409vx",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -56,13 +51,9 @@ const ALL_BADGES: Badge[] = [
     requirements: [
       "Complete fitness assessment",
       "Follow training program",
-      "Pass practice test"
+      "Pass practice test",
     ],
-    rewards: [
-      "Training program access",
-      "Fitness tips",
-      "Progress tracking"
-    ],
+    rewards: ["Training program access", "Fitness tips", "Progress tracking"],
     imageUrl: "/placeholder.svg?key=j0utq",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -77,13 +68,9 @@ const ALL_BADGES: Badge[] = [
     requirements: [
       "Review polygraph guide",
       "Complete questionnaire",
-      "Watch preparation video"
+      "Watch preparation video",
     ],
-    rewards: [
-      "Detailed guide access",
-      "Sample questions",
-      "Expert tips"
-    ],
+    rewards: ["Detailed guide access", "Sample questions", "Expert tips"],
     imageUrl: "/placeholder.svg?key=r9mwp",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -98,13 +85,9 @@ const ALL_BADGES: Badge[] = [
     requirements: [
       "Review evaluation guide",
       "Complete self-assessment",
-      "Watch preparation video"
+      "Watch preparation video",
     ],
-    rewards: [
-      "Detailed guide access",
-      "Sample questions",
-      "Expert tips"
-    ],
+    rewards: ["Detailed guide access", "Sample questions", "Expert tips"],
     imageUrl: "/placeholder.svg?key=k2nxq",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -119,28 +102,24 @@ const ALL_BADGES: Badge[] = [
     requirements: [
       "Earn all achievement badges",
       "Complete application",
-      "Attend orientation"
+      "Attend orientation",
     ],
-    rewards: [
-      "Special recognition",
-      "Priority support",
-      "Exclusive content"
-    ],
+    rewards: ["Special recognition", "Priority support", "Exclusive content"],
     imageUrl: "/placeholder.svg?key=h7vzt",
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }
-]
+  },
+];
 
 // Get badge by ID
 export async function getBadgeById(id: string): Promise<Badge | null> {
-  const badge = ALL_BADGES.find(b => b.id === id)
-  return badge || null
+  const badge = ALL_BADGES.find((b) => b.id === id);
+  return badge || null;
 }
 
 // Get all available badge IDs
 export async function getAllBadgeIds(): Promise<string[]> {
-  return ALL_BADGES.map(badge => badge.id)
+  return ALL_BADGES.map((badge) => badge.id);
 }
 
 // Award a badge to a user
@@ -148,14 +127,15 @@ export async function awardBadge(userId: string, badgeId: string) {
   try {
     // Implementation would go here
     // This is a placeholder since we don't have the actual implementation
-    console.log(`Awarding badge ${badgeId} to user ${userId}`)
-    return { success: true }
+    console.log(`Awarding badge ${badgeId} to user ${userId}`);
+    return { success: true };
   } catch (error) {
-    console.error("Error awarding badge:", error)
+    console.error("Error awarding badge:", error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "An unexpected error occurred",
-    }
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
@@ -164,11 +144,11 @@ export async function assignBadgeToUser(userId: string, badgeId: string) {
   try {
     // Implementation would go here
     // This is a placeholder since we don't have the actual implementation
-    console.log(`Assigning badge ${badgeId} to user ${userId}`)
-    return { success: true }
+    console.log(`Assigning badge ${badgeId} to user ${userId}`);
+    return { success: true };
   } catch (error) {
-    console.error("Error assigning badge to user:", error)
-    return { success: false, error }
+    console.error("Error assigning badge to user:", error);
+    return { success: false, error };
   }
 }
 
@@ -177,13 +157,14 @@ export async function awardBadgeToUser(userId: string, badgeId: string) {
   try {
     // Implementation would go here
     // This is a placeholder since we don't have the actual implementation
-    console.log(`Awarding badge ${badgeId} to user ${userId}`)
-    return { success: true }
+    console.log(`Awarding badge ${badgeId} to user ${userId}`);
+    return { success: true };
   } catch (error) {
-    console.error("Error awarding badge:", error)
+    console.error("Error awarding badge:", error);
     return {
       success: false,
-      message: error instanceof Error ? error.message : "An unexpected error occurred",
-    }
+      message:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }

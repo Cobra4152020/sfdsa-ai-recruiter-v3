@@ -55,4 +55,4 @@ export interface UserActivitySummary {
   profile_updates: number;
   applications: number;
   messages: number;
-} 
+}

@@ -1,4 +1,4 @@
-export async function setupAdminUser(params: any) {
+export async function setupAdminUser(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/setup-admin-user`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function setupAdminUser(params: any) {
     console.error(`Error in setupAdminUser:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

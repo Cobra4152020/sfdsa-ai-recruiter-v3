@@ -1,12 +1,16 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { installWebSocketErrorHandler } from "@/lib/websocket-error-handler"
+import { useEffect } from "react";
+import { installWebSocketErrorHandler } from "@/lib/websocket-error-handler";
 
-export function WebSocketErrorHandler() {
+export function WebSocketErrorHandler({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   useEffect(() => {
-    installWebSocketErrorHandler()
-  }, [])
+    installWebSocketErrorHandler();
+  }, []);
 
-  return null
+  return <>{children}</>;
 }

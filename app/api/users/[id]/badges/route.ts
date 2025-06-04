@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server"
-import type { BadgeType } from "@/lib/badge-utils"
+import { NextResponse } from "next/server";
+import type { BadgeType } from "@/lib/badge-utils";
 
-export const dynamic = 'force-static'
+export const dynamic = "force-static";
 
 // Static mock data for badges
 const mockBadges = [
@@ -37,56 +37,74 @@ const mockBadges = [
     category: "application",
     color: "bg-blue-700",
     icon: "/placeholder.svg?key=j0utq",
-  }
-]
+  },
+];
 
 // Generate static paths for all user IDs
 export function generateStaticParams() {
   return [
-    { id: 'test-user' },
-    { id: 'user1' },
-    { id: 'user2' },
-    { id: 'user3' }
-  ]
+    { id: "test-user" },
+    { id: "user1" },
+    { id: "user2" },
+    { id: "user3" },
+  ];
 }
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
   try {
-    const userId = params.id
+    const userId = params.id;
 
     if (!userId) {
-      return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "User ID is required" },
+        { status: 400 },
+      );
     }
 
     // Filter badges for this user
-    const userBadges = mockBadges.filter(badge => badge.user_id === userId)
+    const userBadges = mockBadges.filter((badge) => badge.user_id === userId);
 
     return NextResponse.json({
       success: true,
       badges: userBadges,
-      source: 'static'
-    })
+      source: "static",
+    });
   } catch (error) {
-    console.error("Error fetching user badges:", error)
+    console.error("Error fetching user badges:", error);
     return NextResponse.json(
-      { success: false, message: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    )
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
   }
 }
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(
+  request: Request,
+  { params }: { params: { id: string } },
+) {
   try {
-    const userId = params.id
+    const userId = params.id;
 
     if (!userId) {
-      return NextResponse.json({ success: false, message: "User ID is required" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "User ID is required" },
+        { status: 400 },
+      );
     }
 
-    const { badge_type } = await request.json()
+    const { badge_type } = await request.json();
 
     if (!badge_type) {
-      return NextResponse.json({ success: false, message: "Badge type is required" }, { status: 400 })
+      return NextResponse.json(
+        { success: false, message: "Badge type is required" },
+        { status: 400 },
+      );
     }
 
     // Create a new badge based on the type
@@ -100,16 +118,19 @@ export async function POST(request: Request, { params }: { params: { id: string 
       category: "participation",
       color: "bg-blue-500",
       icon: "/placeholder.svg",
-    }
+    };
 
-    mockBadges.push(newBadge)
+    mockBadges.push(newBadge);
 
-    return NextResponse.json({ success: true, badge: newBadge })
+    return NextResponse.json({ success: true, badge: newBadge });
   } catch (error) {
-    console.error("Error awarding badge:", error)
+    console.error("Error awarding badge:", error);
     return NextResponse.json(
-      { success: false, message: error instanceof Error ? error.message : "Unknown error" },
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
-    )
+    );
   }
 }

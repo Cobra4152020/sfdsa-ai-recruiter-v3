@@ -1,27 +1,28 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Bell } from "lucide-react"
-import { NotificationPanel } from "./notification-panel"
-import { useClickOutside } from "@/hooks/use-click-outside"
+import { useState, useEffect, useRef } from "react";
+import { Bell } from "lucide-react";
+import { NotificationPanel } from "./notification-panel";
+import { useClickOutside } from "@/hooks/use-click-outside";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 interface NotificationBellProps {
-  userId: string
+  userId: string;
 }
 
 export function NotificationBell({ userId }: NotificationBellProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(0)
-  const ref = useClickOutside<HTMLDivElement>(() => setIsOpen(false))
+  const [isOpen, setIsOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+  useClickOutside(ref, () => setIsOpen(false));
 
   useEffect(() => {
     // Only try to fetch notifications if we have a userId
-    if (!userId) return
+    if (!userId) return;
 
     const fetchUnreadCount = async () => {
       try {
-        const { getClientSideSupabase } = require("@/lib/supabase")
-        const supabase = getClientSideSupabase()
+        const supabase = getClientSideSupabase();
 
         // Try with is_read first (this appears to be the correct column name)
         const { data: isReadData, error: isReadError } = await supabase
@@ -29,45 +30,48 @@ export function NotificationBell({ userId }: NotificationBellProps) {
           .select("id")
           .eq("user_id", userId)
           .eq("is_read", false)
-          .limit(100)
+          .limit(100);
 
         // If that fails, try with read column
         if (isReadError) {
-          console.warn("Error fetching notifications with is_read, trying read column:", isReadError)
+          console.warn(
+            "Error fetching notifications with is_read, trying read column:",
+            isReadError,
+          );
 
           const { data: readData, error: readError } = await supabase
             .from("notifications")
             .select("id")
             .eq("user_id", userId)
             .eq("read", false)
-            .limit(100)
+            .limit(100);
 
           if (readError) {
-            console.warn("Error fetching unread count:", readError)
-            return
+            console.warn("Error fetching unread count:", readError);
+            return;
           }
 
-          setUnreadCount(readData?.length || 0)
-          return
+          setUnreadCount(readData?.length || 0);
+          return;
         }
 
-        setUnreadCount(isReadData?.length || 0)
+        setUnreadCount(isReadData?.length || 0);
       } catch (error) {
-        console.warn("Exception fetching unread count:", error)
+        console.warn("Exception fetching unread count:", error);
       }
-    }
+    };
 
-    fetchUnreadCount()
+    fetchUnreadCount();
 
     // Set up a polling interval to check for new notifications
-    const interval = setInterval(fetchUnreadCount, 30000)
+    const interval = setInterval(fetchUnreadCount, 30000);
 
-    return () => clearInterval(interval)
-  }, [userId])
+    return () => clearInterval(interval);
+  }, [userId]);
 
   const togglePanel = () => {
-    setIsOpen(!isOpen)
-  }
+    setIsOpen(!isOpen);
+  };
 
   return (
     <div className="relative" ref={ref}>
@@ -84,7 +88,9 @@ export function NotificationBell({ userId }: NotificationBellProps) {
         )}
       </button>
 
-      {isOpen && <NotificationPanel userId={userId} onClose={() => setIsOpen(false)} />}
+      {isOpen && (
+        <NotificationPanel userId={userId} onClose={() => setIsOpen(false)} />
+      )}
     </div>
-  )
+  );
 }

@@ -1,20 +1,23 @@
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function setupChatDatabase() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Check if add_participation_points function exists
-    const { data: functionExists, error: functionCheckError } = await supabase.rpc("function_exists", {
-      function_name: "add_participation_points",
-    })
+    const { data: functionExists, error: functionCheckError } =
+      await supabase.rpc("function_exists", {
+        function_name: "add_participation_points",
+      });
 
     if (functionCheckError || !functionExists) {
-      console.log("Creating add_participation_points function...")
+      console.log("Creating add_participation_points function...");
 
       // Create the function
-      const { error: createFunctionError } = await supabase.rpc("create_function", {
-        function_definition: `
+      const { error: createFunctionError } = await supabase.rpc(
+        "create_function",
+        {
+          function_definition: `
         CREATE OR REPLACE FUNCTION add_participation_points(
           user_id_param UUID,
           points_param INTEGER,
@@ -51,27 +54,31 @@ export async function setupChatDatabase() {
         END;
         $$ LANGUAGE plpgsql;
         `,
-      })
+        },
+      );
 
       if (createFunctionError) {
-        console.error("Error creating function:", createFunctionError)
+        console.error("Error creating function:", createFunctionError);
       }
     }
 
     // Create indexes on chat_interactions table
-    const { error: indexError } = await supabase.rpc("create_index_if_not_exists", {
-      index_name: "chat_interactions_user_id_idx",
-      table_name: "chat_interactions",
-      column_name: "user_id",
-    })
+    const { error: indexError } = await supabase.rpc(
+      "create_index_if_not_exists",
+      {
+        index_name: "chat_interactions_user_id_idx",
+        table_name: "chat_interactions",
+        column_name: "user_id",
+      },
+    );
 
     if (indexError) {
-      console.warn("Error creating index:", indexError)
+      console.warn("Error creating index:", indexError);
     }
 
-    return true
+    return true;
   } catch (error) {
-    console.error("Error setting up chat database:", error)
-    return false
+    console.error("Error setting up chat database:", error);
+    return false;
   }
 }

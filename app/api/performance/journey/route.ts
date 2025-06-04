@@ -1,7 +1,7 @@
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 // Static journey data
 const mockJourneys = [
@@ -17,7 +17,7 @@ const mockJourneys = [
     totalDuration: 3600000,
     metadata: {
       browser: "Chrome",
-      platform: "Desktop"
+      platform: "Desktop",
     },
     steps: [
       {
@@ -30,8 +30,8 @@ const mockJourneys = [
         userId: "user-1",
         sessionId: "session-1",
         metrics: {
-          timeOnPage: 300
-        }
+          timeOnPage: 300,
+        },
       },
       {
         journeyId: "journey-1",
@@ -43,19 +43,19 @@ const mockJourneys = [
         userId: "user-1",
         sessionId: "session-1",
         metrics: {
-          timeOnPage: 600
-        }
-      }
-    ]
-  }
-]
+          timeOnPage: 600,
+        },
+      },
+    ],
+  },
+];
 
 export async function GET() {
   return NextResponse.json({
     success: true,
     journeys: mockJourneys,
-    source: 'static'
-  })
+    source: "static",
+  });
 }
 
 // Note: POST endpoint removed as it cannot be static

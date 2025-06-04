@@ -1,4 +1,4 @@
-export async function runSqlQuery(params: any) {
+export async function runSqlQuery(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/run-sql-query`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function runSqlQuery(params: any) {
     console.error(`Error in runSqlQuery:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

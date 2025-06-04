@@ -1,59 +1,63 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { UserProfileCard } from "@/components/user-profile-card"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import { SkipToContent } from "@/components/skip-to-content"
+import { useState, useEffect, type ComponentType, type ReactNode } from "react";
+import { UserProfileCard } from "@/components/user-profile-card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { SkipToContent } from "@/components/skip-to-content";
 
 interface ProfilePageClientProps {
   params: {
-    id: string
-  }
+    id: string;
+  };
 }
 
 export function ProfilePageClient({ params }: ProfilePageClientProps) {
-  const userId = params.id
-  const [userName, setUserName] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [UserProvider, setUserProvider] = useState<any>(null)
+  const userId = params.id;
+  const [userName, setUserName] = useState<string | null>(null);
+  // const [isLoading, setIsLoading] = useState(true);
+  const [UserProvider, setUserProvider] = useState<ComponentType<{
+    children: ReactNode;
+  }> | null>(null);
 
   useEffect(() => {
     const loadClientModules = async () => {
-      const { UserProvider } = await import("@/context/user-context")
-      setUserProvider(() => UserProvider)
-    }
-    loadClientModules()
-  }, [])
+      const { UserProvider } = await import("@/context/user-context");
+      setUserProvider(() => UserProvider);
+    };
+    loadClientModules();
+  }, []);
 
   useEffect(() => {
     const fetchUserName = async () => {
       try {
-        const response = await fetch(`/api/users/${userId}/profile`)
-        const data = await response.json()
+        const response = await fetch(`/api/users/${userId}/profile`);
+        const data = await response.json();
 
         if (data.success && data.profile) {
-          setUserName(data.profile.name)
+          setUserName(data.profile.name);
         }
       } catch (error) {
-        console.error("Error fetching user name:", error)
+        console.error("Error fetching user name:", error);
       } finally {
-        setIsLoading(false)
+        // setIsLoading(false);
       }
-    }
+    };
 
-    fetchUserName()
-  }, [userId])
+    fetchUserName();
+  }, [userId]);
 
   // Meta tags for social sharing
-  const title = userName ? `${userName}'s Profile - SF Sheriff Recruitment` : "User Profile - SF Sheriff Recruitment"
+  const title = userName
+    ? `${userName}'s Profile - SF Sheriff Recruitment`
+    : "User Profile - SF Sheriff Recruitment";
   const description = userName
     ? `Check out ${userName}'s profile on the San Francisco Sheriff's Office recruitment platform.`
-    : "View this user's profile on the San Francisco Sheriff's Office recruitment platform."
+    : "View this user's profile on the San Francisco Sheriff's Office recruitment platform.";
 
   if (!UserProvider) {
-    return null
+    return null;
   }
 
   return (
@@ -69,7 +73,10 @@ export function ProfilePageClient({ params }: ProfilePageClientProps) {
 
         <SkipToContent />
 
-        <main id="main-content" className="flex-1 pt-40 pb-12 bg-[#F8F5EE] dark:bg-[#121212]">
+        <main
+          id="main-content"
+          className="flex-1 pt-40 pb-12 bg-[#F8F5EE] dark:bg-[#121212]"
+        >
           <div className="container mx-auto px-4">
             <Link href="/awards" prefetch={false}>
               <Button variant="ghost" className="mb-8">
@@ -85,5 +92,5 @@ export function ProfilePageClient({ params }: ProfilePageClientProps) {
         </main>
       </div>
     </UserProvider>
-  )
-} 
+  );
+}

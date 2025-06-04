@@ -1,59 +1,65 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Skeleton } from "@/components/ui/skeleton"
-import { DollarSign, Gift, Award, TrendingUp } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
+import { DollarSign, Gift, Award, TrendingUp } from "lucide-react";
 
 interface DonationPointsDisplayProps {
-  userId: string
+  userId: string;
 }
 
 export function DonationPointsDisplay({ userId }: DonationPointsDisplayProps) {
-  const [loading, setLoading] = useState(true)
-  const [points, setPoints] = useState(0)
-  const [donationCount, setDonationCount] = useState(0)
+  const [loading, setLoading] = useState(true);
+  const [points, setPoints] = useState(0);
+  const [donationCount, setDonationCount] = useState(0);
   const [nextAward, setNextAward] = useState<{
-    name: string
-    pointsNeeded: number
-    totalRequired: number
-  } | null>(null)
+    name: string;
+    pointsNeeded: number;
+    totalRequired: number;
+  } | null>(null);
 
   useEffect(() => {
     const fetchDonationPoints = async () => {
       try {
-        setLoading(true)
-        const response = await fetch(`/api/users/${userId}/donation-points`)
-        const data = await response.json()
+        setLoading(true);
+        const response = await fetch(`/api/users/${userId}/donation-points`);
+        const data = await response.json();
 
         if (data.success) {
-          setPoints(data.points || 0)
-          setDonationCount(data.donationCount || 0)
+          setPoints(data.points || 0);
+          setDonationCount(data.donationCount || 0);
 
           // Fetch next award info
-          const profileResponse = await fetch(`/api/users/${userId}/profile`)
-          const profileData = await profileResponse.json()
+          const profileResponse = await fetch(`/api/users/${userId}/profile`);
+          const profileData = await profileResponse.json();
 
           if (profileData.success && profileData.profile.next_award) {
             setNextAward({
               name: profileData.profile.next_award.name,
               pointsNeeded: profileData.profile.next_award.pointsNeeded,
               totalRequired: profileData.profile.next_award.pointThreshold,
-            })
+            });
           }
         }
       } catch (error) {
-        console.error("Error fetching donation points:", error)
+        console.error("Error fetching donation points:", error);
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
     if (userId) {
-      fetchDonationPoints()
+      fetchDonationPoints();
     }
-  }, [userId])
+  }, [userId]);
 
   if (loading) {
     return (
@@ -69,12 +75,19 @@ export function DonationPointsDisplay({ userId }: DonationPointsDisplayProps) {
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   const progressPercentage = nextAward
-    ? Math.min(100, Math.round(((nextAward.totalRequired - nextAward.pointsNeeded) / nextAward.totalRequired) * 100))
-    : 0
+    ? Math.min(
+        100,
+        Math.round(
+          ((nextAward.totalRequired - nextAward.pointsNeeded) /
+            nextAward.totalRequired) *
+            100,
+        ),
+      )
+    : 0;
 
   return (
     <Card>
@@ -116,12 +129,14 @@ export function DonationPointsDisplay({ userId }: DonationPointsDisplayProps) {
                 <div className="flex justify-between text-xs">
                   <span>Progress</span>
                   <span>
-                    {nextAward.totalRequired - nextAward.pointsNeeded} / {nextAward.totalRequired} points
+                    {nextAward.totalRequired - nextAward.pointsNeeded} /{" "}
+                    {nextAward.totalRequired} points
                   </span>
                 </div>
                 <Progress value={progressPercentage} className="h-2" />
                 <p className="text-xs text-muted-foreground">
-                  {nextAward.pointsNeeded} more points needed for {nextAward.name}
+                  {nextAward.pointsNeeded} more points needed for{" "}
+                  {nextAward.name}
                 </p>
               </div>
             </div>
@@ -129,5 +144,5 @@ export function DonationPointsDisplay({ userId }: DonationPointsDisplayProps) {
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

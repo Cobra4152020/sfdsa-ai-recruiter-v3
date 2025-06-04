@@ -1,31 +1,33 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { NFTAwardCard } from "@/components/nft-award-card"
-import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
-import Link from "next/link"
-import { PageWrapper } from "@/components/page-wrapper"
-import type { NFTAward } from "@/lib/nft-utils"
+import { useState, useEffect } from "react";
+import type { ComponentType, ReactNode } from "react";
+import { NFTAwardCard } from "@/components/nft-award-card";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { PageWrapper } from "@/components/page-wrapper";
+import type { NFTAward } from "@/lib/nft-utils";
 
 interface NFTAwardPageClientProps {
-  award: NFTAward | undefined
+  award: NFTAward | undefined;
 }
 
 export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
-  const [showOptInForm, setShowOptInForm] = useState(false)
-  const [UserProvider, setUserProvider] = useState<any>(null)
+  const [UserProvider, setUserProvider] = useState<ComponentType<{
+    children: ReactNode;
+  }> | null>(null);
 
   useEffect(() => {
     const loadClientModules = async () => {
-      const { UserProvider } = await import("@/context/user-context")
-      setUserProvider(() => UserProvider)
-    }
-    loadClientModules()
-  }, [])
+      const { UserProvider } = await import("@/context/user-context");
+      setUserProvider(() => UserProvider);
+    };
+    loadClientModules();
+  }, []);
 
   if (!UserProvider) {
-    return null
+    return null;
   }
 
   if (!award) {
@@ -35,7 +37,9 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
           <main className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
             <div className="text-center">
               <h1 className="text-3xl font-bold mb-4">NFT Award Not Found</h1>
-              <p className="mb-8">The NFT award you're looking for doesn't exist.</p>
+              <p className="mb-8">
+                The NFT award you&apos;re looking for doesn&apos;t exist.
+              </p>
               <Link href="/" prefetch={false}>
                 <Button>
                   <ArrowLeft className="mr-2 h-4 w-4" />
@@ -46,12 +50,12 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
           </main>
         </PageWrapper>
       </UserProvider>
-    )
+    );
   }
 
   // Meta tags for social sharing
-  const title = `${award.name} - SF Sheriff Recruitment NFT Award`
-  const description = award.description
+  const title = `${award.name} - SF Sheriff Recruitment NFT Award`;
+  const description = award.description;
 
   return (
     <UserProvider>
@@ -85,8 +89,12 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
             </Link>
 
             <div className="max-w-3xl mx-auto text-center mb-8">
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">{award.name}</h1>
-              <p className="text-lg text-[#0A3C1F]/70 dark:text-white/70">{award.description}</p>
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">
+                {award.name}
+              </h1>
+              <p className="text-lg text-[#0A3C1F]/70 dark:text-white/70">
+                {award.description}
+              </p>
             </div>
 
             <div className="flex flex-col items-center justify-center">
@@ -102,11 +110,13 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
 
               <div className="mt-12 max-w-xl mx-auto text-center">
                 <h2 className="text-2xl font-bold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">
-                  Join the San Francisco Sheriff's Office
+                  Join the San Francisco Sheriff&apos;s Office
                 </h2>
                 <p className="text-[#0A3C1F]/70 dark:text-white/70 mb-6">
-                  Earn exclusive NFT awards like this one by participating in our recruitment process. Discover a
-                  rewarding career with competitive pay, excellent benefits, and opportunities for advancement.
+                  Earn exclusive NFT awards like this one by participating in
+                  our recruitment process. Discover a rewarding career with
+                  competitive pay, excellent benefits, and opportunities for
+                  advancement.
                 </p>
 
                 <Link href="/" prefetch={false}>
@@ -120,5 +130,5 @@ export function NFTAwardPageClient({ award }: NFTAwardPageClientProps) {
         </main>
       </PageWrapper>
     </UserProvider>
-  )
-} 
+  );
+}

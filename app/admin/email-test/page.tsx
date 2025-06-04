@@ -1,5 +1,5 @@
-import { EmailTest } from "@/components/email-test"
-import { PageWrapper } from "@/components/page-wrapper"
+import { EmailTest } from "@/components/email-test";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function EmailTestPage() {
   return (
@@ -9,5 +9,5 @@ export default function EmailTestPage() {
         <EmailTest />
       </div>
     </PageWrapper>
-  )
+  );
 }

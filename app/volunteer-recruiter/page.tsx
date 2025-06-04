@@ -1,12 +1,12 @@
-import type { Metadata } from "next"
-import { PageWrapper } from "@/components/page-wrapper"
-import { VolunteerRecruiterSystem } from "@/components/volunteer-recruiter-system"
+import type { Metadata } from "next";
+import { PageWrapper } from "@/components/page-wrapper";
+import { VolunteerRecruiterSystem } from "@/components/volunteer-recruiter-system";
 
 export const metadata: Metadata = {
   title: "Volunteer Recruiter Portal | SF Deputy Sheriff Recruitment",
   description:
-    "Join our volunteer recruitment team and help build the future of the San Francisco Sheriff's Department.",
-}
+    "Join our volunteer recruitment team and help build the future of the San Francisco Sheriff&apos;s Department.",
+};
 
 export default function VolunteerRecruiterPage() {
   return (
@@ -15,5 +15,5 @@ export default function VolunteerRecruiterPage() {
         <VolunteerRecruiterSystem />
       </div>
     </PageWrapper>
-  )
+  );
 }

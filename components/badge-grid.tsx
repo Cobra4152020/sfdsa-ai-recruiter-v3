@@ -1,94 +1,96 @@
-"use client"
+"use client";
 
-import { useMemo, useState } from "react"
-import { motion } from "framer-motion"
-import { BadgeWithProgress } from "@/types/badge"
-import { useEnhancedBadges } from "@/hooks/use-enhanced-badges"
-import { AchievementBadge } from "@/components/achievement-badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Share2 } from "lucide-react"
-import { BadgeShareDialog } from "@/components/badges/badge-share-dialog"
+import { useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import { BadgeWithProgress } from "@/types/badge";
+import { useEnhancedBadges } from "@/hooks/use-enhanced-badges";
+import { AchievementBadge } from "@/components/achievement-badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Share2 } from "lucide-react";
+import { BadgeShareDialog } from "@/components/badges/badge-share-dialog";
 
 interface BadgeGridProps {
-  userId?: string
-  searchQuery: string
+  searchQuery: string;
   filters: {
-    category: string
-    difficulty: string
-    status: string
-  }
-  status?: "earned" | "progress" | "locked"
-  showAll?: boolean
+    category: string;
+    difficulty: string;
+    status: string;
+  };
+  status?: "earned" | "progress" | "locked";
+  showAll?: boolean;
 }
 
 export function BadgeGrid({
-  userId,
   searchQuery,
   filters,
   status,
   showAll = false,
 }: BadgeGridProps) {
-  const { collections, isLoading, error } = useEnhancedBadges()
-  const [selectedBadge, setSelectedBadge] = useState<BadgeWithProgress | null>(null)
-  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
+  const { collections, isLoading, error } = useEnhancedBadges();
+  const [selectedBadge, setSelectedBadge] = useState<BadgeWithProgress | null>(
+    null,
+  );
+  const [isShareDialogOpen, setIsShareDialogOpen] = useState(false);
 
   const filteredBadges = useMemo(() => {
-    if (!collections || !Array.isArray(collections)) return []
+    if (!collections || !Array.isArray(collections)) return [];
 
     // Flatten all badges from collections and ensure they exist
     let badges = collections
-      .filter(c => c && Array.isArray(c.badges))
-      .flatMap(c => c.badges)
-      .filter((badge): badge is BadgeWithProgress => 
-        !!badge && 
-        typeof badge === 'object' && 
-        typeof badge.name === 'string'
-      )
+      .filter((c) => c && Array.isArray(c.badges))
+      .flatMap((c) => c.badges)
+      .filter(
+        (badge): badge is BadgeWithProgress =>
+          !!badge &&
+          typeof badge === "object" &&
+          typeof badge.name === "string",
+      );
 
     // Apply search filter
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
-      badges = badges.filter(badge => 
-        badge.name.toLowerCase().includes(query) ||
-        (badge.description || '').toLowerCase().includes(query)
-      )
+      const query = searchQuery.toLowerCase();
+      badges = badges.filter(
+        (badge) =>
+          badge.name.toLowerCase().includes(query) ||
+          (badge.description || "").toLowerCase().includes(query),
+      );
     }
 
     // Apply category filter
     if (filters.category !== "all") {
-      badges = badges.filter(badge => badge.type === filters.category)
+      badges = badges.filter((badge) => badge.type === filters.category);
     }
 
     // Apply difficulty filter
     if (filters.difficulty !== "all") {
-      badges = badges.filter(badge => badge.rarity === filters.difficulty)
+      badges = badges.filter((badge) => badge.rarity === filters.difficulty);
     }
 
     // Apply status filter if not showing all
     if (!showAll && status) {
-      badges = badges.filter(badge => {
+      badges = badges.filter((badge) => {
         switch (status) {
           case "earned":
-            return badge.earned
+            return badge.earned;
           case "progress":
-            return !badge.earned && (badge.progress || 0) > 0
+            return !badge.earned && (badge.progress || 0) > 0;
           case "locked":
-            return !badge.earned && (!badge.progress || badge.progress === 0)
+            return !badge.earned && (!badge.progress || badge.progress === 0);
           default:
-            return true
+            return true;
         }
-      })
+      });
     }
 
-    return badges
-  }, [collections, searchQuery, filters, status, showAll])
+    return badges;
+  }, [collections, searchQuery, filters, status, showAll]);
 
   if (error) {
     return (
       <div className="text-center text-red-500 py-8">
         Failed to load badges. Please try again.
       </div>
-    )
+    );
   }
 
   if (isLoading) {
@@ -98,13 +100,13 @@ export function BadgeGrid({
           <Skeleton key={i} className="h-48 rounded-lg" />
         ))}
       </div>
-    )
+    );
   }
 
   const handleBadgeClick = (badge: BadgeWithProgress) => {
-    setSelectedBadge(badge)
-    setIsShareDialogOpen(true)
-  }
+    setSelectedBadge(badge);
+    setIsShareDialogOpen(true);
+  };
 
   return (
     <>
@@ -133,12 +135,16 @@ export function BadgeGrid({
             </div>
             <div className="text-center">
               <h3 className="mt-2 font-medium text-sm">{badge.name}</h3>
-              <p className="text-xs text-gray-500 mt-1">{badge.points} points</p>
-              {badge.progress !== undefined && badge.progress > 0 && !badge.earned && (
-                <p className="text-xs text-blue-500 mt-1">
-                  {Math.round(badge.progress * 100)}% complete
-                </p>
-              )}
+              <p className="text-xs text-gray-500 mt-1">
+                {badge.points} points
+              </p>
+              {badge.progress !== undefined &&
+                badge.progress > 0 &&
+                !badge.earned && (
+                  <p className="text-xs text-blue-500 mt-1">
+                    {Math.round(badge.progress * 100)}% complete
+                  </p>
+                )}
             </div>
           </motion.div>
         ))}
@@ -147,10 +153,10 @@ export function BadgeGrid({
         badge={selectedBadge}
         isOpen={isShareDialogOpen}
         onClose={() => {
-          setIsShareDialogOpen(false)
-          setSelectedBadge(null)
+          setIsShareDialogOpen(false);
+          setSelectedBadge(null);
         }}
       />
     </>
-  )
-} 
+  );
+}

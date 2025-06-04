@@ -1,112 +1,121 @@
-import fs from "fs"
-import path from "path"
+import fs from "fs";
+import path from "path";
 
 // Function to recursively find all files in a directory
 function findFiles(dir: string, fileList: string[] = []): string[] {
-  const files = fs.readdirSync(dir)
+  const files = fs.readdirSync(dir);
 
   files.forEach((file) => {
-    const filePath = path.join(dir, file)
+    const filePath = path.join(dir, file);
     if (fs.statSync(filePath).isDirectory()) {
-      fileList = findFiles(filePath, fileList)
+      fileList = findFiles(filePath, fileList);
     } else {
-      fileList.push(filePath)
+      fileList.push(filePath);
     }
-  })
+  });
 
-  return fileList
+  return fileList;
 }
 
 // Function to extract dynamic route segments from file paths
 function extractDynamicRoutes(files: string[]): { [key: string]: Set<string> } {
-  const routes: { [key: string]: Set<string> } = {}
+  const routes: { [key: string]: Set<string> } = {};
 
   files.forEach((file) => {
     // Only look at files in the app directory
-    if (!file.includes("app")) return
+    if (!file.includes("app")) return;
 
     // Extract the route path from the file path
-    const routePath = file.split("app")[1]
+    const routePath = file.split("app")[1];
 
     // Check if the route has dynamic segments
     if (routePath.includes("[") && routePath.includes("]")) {
       // Extract the dynamic segments
-      const segments = routePath.split("/")
-      const dynamicSegments = segments.filter((segment) => segment.includes("[") && segment.includes("]"))
+      const segments = routePath.split("/");
+      const dynamicSegments = segments.filter(
+        (segment) => segment.includes("[") && segment.includes("]"),
+      );
 
       // For each dynamic segment, extract the parameter name
       dynamicSegments.forEach((segment) => {
-        const paramName = segment.replace("[", "").replace("]", "").split(".")[0]
-        const routePattern = routePath.replace(segment, "[param]")
+        const paramName = segment
+          .replace("[", "")
+          .replace("]", "")
+          .split(".")[0];
+        const routePattern = routePath.replace(segment, "[param]");
 
         if (!routes[routePattern]) {
-          routes[routePattern] = new Set()
+          routes[routePattern] = new Set();
         }
 
-        routes[routePattern].add(paramName)
-      })
+        routes[routePattern].add(paramName);
+      });
     }
-  })
+  });
 
-  return routes
+  return routes;
 }
 
 // Find all files in the project
-const allFiles = findFiles(".")
+const allFiles = findFiles(".");
 
 // Extract dynamic routes
-const dynamicRoutes = extractDynamicRoutes(allFiles)
+const dynamicRoutes = extractDynamicRoutes(allFiles);
 
 // Find routes with conflicting parameter names
-const conflicts: { [key: string]: string[] } = {}
+const conflicts: { [key: string]: string[] } = {};
 
 Object.entries(dynamicRoutes).forEach(([routePattern, paramNames]) => {
   if (paramNames.size > 1) {
-    conflicts[routePattern] = Array.from(paramNames)
+    conflicts[routePattern] = Array.from(paramNames);
   }
-})
+});
 
 // Print the results
-console.log("Dynamic Routes:")
+console.log("Dynamic Routes:");
 Object.entries(dynamicRoutes).forEach(([routePattern, paramNames]) => {
-  console.log(`  ${routePattern}: ${Array.from(paramNames).join(", ")}`)
-})
+  console.log(`  ${routePattern}: ${Array.from(paramNames).join(", ")}`);
+});
 
-console.log("\nConflicts:")
+console.log("\nConflicts:");
 if (Object.keys(conflicts).length === 0) {
-  console.log("  No conflicts found!")
+  console.log("  No conflicts found!");
 } else {
   Object.entries(conflicts).forEach(([routePattern, paramNames]) => {
-    console.log(`  ${routePattern}: ${paramNames.join(", ")}`)
-  })
+    console.log(`  ${routePattern}: ${paramNames.join(", ")}`);
+  });
 }
 
 // Suggest fixes
-console.log("\nSuggested Fixes:")
+console.log("\nSuggested Fixes:");
 if (Object.keys(conflicts).length === 0) {
-  console.log("  No fixes needed!")
+  console.log("  No fixes needed!");
 } else {
   Object.entries(conflicts).forEach(([routePattern, paramNames]) => {
-    console.log(`  For route pattern ${routePattern}:`)
-    console.log(`    - Standardize on parameter name '${paramNames[0]}' for all routes`)
+    console.log(`  For route pattern ${routePattern}:`);
+    console.log(
+      `    - Standardize on parameter name '${paramNames[0]}' for all routes`,
+    );
 
     // Find all files that match this route pattern
     const matchingFiles = allFiles.filter((file) => {
-      if (!file.includes("app")) return false
+      if (!file.includes("app")) return false;
 
-      const filePath = file.split("app")[1]
-      const segments = filePath.split("/")
-      const dynamicSegments = segments.filter((segment) => segment.includes("[") && segment.includes("]"))
+      const filePath = file.split("app")[1];
+      const segments = filePath.split("/");
+      const dynamicSegments = segments.filter(
+        (segment) => segment.includes("[") && segment.includes("]"),
+      );
 
-      if (dynamicSegments.length === 0) return false
+      if (dynamicSegments.length === 0) return false;
 
-      const testPattern = filePath.replace(dynamicSegments[0], "[param]")
-      return testPattern === routePattern
-    })
+      const testPattern = filePath.replace(dynamicSegments[0], "[param]");
+      return testPattern === routePattern;
+    });
 
-    console.log(`    - Files to update:`)
+    console.log(`    - Files to update:`);
     matchingFiles.forEach((file) => {
-      console.log(`      - ${file}`)
-    })
-  })
+      console.log(`      - ${file}`);
+    });
+  });
 }

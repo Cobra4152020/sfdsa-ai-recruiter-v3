@@ -1,14 +1,27 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect, useCallback } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import type React from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Dialog,
   DialogContent,
@@ -16,25 +29,33 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { useToast } from "@/components/ui/use-toast"
-import { UserActivity } from "@/components/admin/user-activity"
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
+import { UserActivity } from "@/components/admin/user-activity";
 import type {
   UserWithRole,
   UserRole,
   RecruitUser,
   VolunteerUser,
   AdminUser,
-} from "@/lib/user-management-service"
-import { ArrowLeft, Save, Trash, RefreshCw, Shield, UserCog, User } from "lucide-react"
-import Link from "next/link"
-import { getClientSideSupabase } from "@/lib/supabase"
+} from "@/lib/user-management-service";
+import {
+  ArrowLeft,
+  Save,
+  Trash,
+  RefreshCw,
+  Shield,
+  UserCog,
+  User,
+} from "lucide-react";
+import Link from "next/link";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 type FormData = {
   recruit: Partial<RecruitUser>;
   volunteer: Partial<VolunteerUser>;
   admin: Partial<AdminUser>;
-}
+};
 
 interface AdminUserPageClientProps {
   params: {
@@ -43,45 +64,47 @@ interface AdminUserPageClientProps {
 }
 
 export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
-  const router = useRouter()
-  const { toast } = useToast()
-  const [user, setUser] = useState<UserWithRole | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [isDeleting, setIsDeleting] = useState(false)
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
-  const [showRoleChangeConfirm, setShowRoleChangeConfirm] = useState(false)
-  const [selectedRole, setSelectedRole] = useState<UserRole>("recruit")
-  const [formData, setFormData] = useState<FormData["recruit"] | FormData["volunteer"] | FormData["admin"]>({})
+  const router = useRouter();
+  const { toast } = useToast();
+  const [user, setUser] = useState<UserWithRole | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [showRoleChangeConfirm, setShowRoleChangeConfirm] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<UserRole>("recruit");
+  const [formData, setFormData] = useState<
+    FormData["recruit"] | FormData["volunteer"] | FormData["admin"]
+  >({});
 
   const fetchUser = useCallback(async () => {
     try {
-      setIsLoading(true)
-      const supabase = getClientSideSupabase()
+      setIsLoading(true);
+      const supabase = getClientSideSupabase();
       const { data: userData, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', params.id)
-        .single()
+        .from("users")
+        .select("*")
+        .eq("id", params.id)
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
       if (userData) {
-        setUser(userData)
+        setUser(userData);
         switch (userData.user_type) {
           case "recruit": {
-            const recruitUser = userData as RecruitUser
+            const recruitUser = userData as RecruitUser;
             const recruitFormData: FormData["recruit"] = {
               email: recruitUser.email,
               first_name: recruitUser.first_name,
               last_name: recruitUser.last_name,
               phone: recruitUser.phone,
               user_type: "recruit",
-            }
-            setFormData(recruitFormData)
-            break
+            };
+            setFormData(recruitFormData);
+            break;
           }
           case "volunteer": {
-            const volunteerUser = userData as VolunteerUser
+            const volunteerUser = userData as VolunteerUser;
             const volunteerFormData: FormData["volunteer"] = {
               email: volunteerUser.email,
               first_name: volunteerUser.first_name,
@@ -89,126 +112,123 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
               phone: volunteerUser.phone,
               organization: volunteerUser.organization,
               user_type: "volunteer",
-            }
-            setFormData(volunteerFormData)
-            break
+            };
+            setFormData(volunteerFormData);
+            break;
           }
           case "admin": {
-            const adminUser = userData as AdminUser
+            const adminUser = userData as AdminUser;
             const adminFormData: FormData["admin"] = {
               email: adminUser.email,
               name: adminUser.name,
               user_type: "admin",
-            }
-            setFormData(adminFormData)
-            break
+            };
+            setFormData(adminFormData);
+            break;
           }
         }
       }
     } catch (error) {
-      console.error("Error fetching user:", error)
+      console.error("Error fetching user:", error);
       toast({
         title: "Error",
         description: "Failed to fetch user details",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }, [params.id, toast])
+  }, [params.id, toast]);
 
   useEffect(() => {
-    fetchUser()
-  }, [fetchUser])
+    fetchUser();
+  }, [fetchUser]);
 
   const handleSave = async () => {
-    if (!user) return
-    setIsLoading(true)
+    if (!user) return;
+    setIsLoading(true);
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { error } = await supabase
-        .from('users')
+        .from("users")
         .update(formData)
-        .eq('id', user.id)
+        .eq("id", user.id);
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: "The user has been successfully updated.",
-      })
-      fetchUser()
+      });
+      fetchUser();
     } catch (error) {
-      console.error("Error updating user:", error)
+      console.error("Error updating user:", error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!user) return
-    setIsDeleting(true)
+    if (!user) return;
+    setIsDeleting(true);
     try {
-      const supabase = getClientSideSupabase()
-      const { error } = await supabase
-        .from('users')
-        .delete()
-        .eq('id', user.id)
+      const supabase = getClientSideSupabase();
+      const { error } = await supabase.from("users").delete().eq("id", user.id);
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Success",
         description: "The user has been successfully deleted.",
-      })
-      router.push("/admin/users")
+      });
+      router.push("/admin/users");
     } catch (error) {
-      console.error("Error deleting user:", error)
+      console.error("Error deleting user:", error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsDeleting(false)
-      setShowDeleteConfirm(false)
+      setIsDeleting(false);
+      setShowDeleteConfirm(false);
     }
-  }
+  };
 
   const handleChangeRole = async () => {
-    if (!user) return
-    setIsLoading(true)
+    if (!user) return;
+    setIsLoading(true);
     try {
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       const { error } = await supabase
-        .from('users')
+        .from("users")
         .update({ user_type: selectedRole })
-        .eq('id', user.id)
+        .eq("id", user.id);
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Role changed",
         description: `The user's role has been changed to ${selectedRole}.`,
-      })
-      fetchUser()
+      });
+      fetchUser();
     } catch (error) {
-      console.error("Error changing role:", error)
+      console.error("Error changing role:", error);
       toast({
         title: "Error",
         description: "An unexpected error occurred",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
-      setShowRoleChangeConfirm(false)
+      setIsLoading(false);
+      setShowRoleChangeConfirm(false);
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -218,7 +238,7 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
           <div className="h-64 bg-gray-200 dark:bg-gray-700 rounded" />
         </div>
       </div>
-    )
+    );
   }
 
   if (!user) {
@@ -227,7 +247,9 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
         <Card>
           <CardHeader>
             <CardTitle>User Not Found</CardTitle>
-            <CardDescription>The requested user could not be found.</CardDescription>
+            <CardDescription>
+              The requested user could not be found.
+            </CardDescription>
           </CardHeader>
           <CardFooter>
             <Button asChild>
@@ -239,7 +261,7 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
           </CardFooter>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
@@ -389,7 +411,9 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
                     <Label htmlFor="first_name">First Name</Label>
                     <Input
                       id="first_name"
-                      value={(formData as FormData["volunteer"]).first_name || ""}
+                      value={
+                        (formData as FormData["volunteer"]).first_name || ""
+                      }
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
@@ -402,7 +426,9 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
                     <Label htmlFor="last_name">Last Name</Label>
                     <Input
                       id="last_name"
-                      value={(formData as FormData["volunteer"]).last_name || ""}
+                      value={
+                        (formData as FormData["volunteer"]).last_name || ""
+                      }
                       onChange={(e) =>
                         setFormData((prev) => ({
                           ...prev,
@@ -416,7 +442,9 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
                   <Label htmlFor="organization">Organization</Label>
                   <Input
                     id="organization"
-                    value={(formData as FormData["volunteer"]).organization || ""}
+                    value={
+                      (formData as FormData["volunteer"]).organization || ""
+                    }
                     onChange={(e) =>
                       setFormData((prev) => ({
                         ...prev,
@@ -477,14 +505,22 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
           <DialogHeader>
             <DialogTitle>Delete User</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete this user? This action cannot be undone.
+              Are you sure you want to delete this user? This action cannot be
+              undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowDeleteConfirm(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteConfirm(false)}
+            >
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={isDeleting}
+            >
               {isDeleting ? (
                 <>
                   <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
@@ -501,7 +537,10 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showRoleChangeConfirm} onOpenChange={setShowRoleChangeConfirm}>
+      <Dialog
+        open={showRoleChangeConfirm}
+        onOpenChange={setShowRoleChangeConfirm}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Change User Role</DialogTitle>
@@ -510,7 +549,10 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
             </DialogDescription>
           </DialogHeader>
           <div className="py-4">
-            <Select value={selectedRole} onValueChange={(value: UserRole) => setSelectedRole(value)}>
+            <Select
+              value={selectedRole}
+              onValueChange={(value: UserRole) => setSelectedRole(value)}
+            >
               <SelectTrigger>
                 <SelectValue placeholder="Select a role" />
               </SelectTrigger>
@@ -522,7 +564,10 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
             </Select>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setShowRoleChangeConfirm(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setShowRoleChangeConfirm(false)}
+            >
               Cancel
             </Button>
             <Button onClick={handleChangeRole} disabled={isLoading}>
@@ -542,5 +587,5 @@ export function AdminUserPageClient({ params }: AdminUserPageClientProps) {
         </DialogContent>
       </Dialog>
     </div>
-  )
-} 
+  );
+}

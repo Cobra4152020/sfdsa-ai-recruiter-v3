@@ -1,58 +1,65 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { initErrorMonitoring, getLoggedErrors, clearErrorLog, type ErrorRecord } from "@/lib/error-monitoring"
-import { XCircle, AlertTriangle, Clock, RefreshCw, Trash2 } from "lucide-react"
+import { useEffect, useState } from "react";
+import {
+  initErrorMonitoring,
+  getLoggedErrors,
+  clearErrorLog,
+  type ErrorRecord,
+} from "@/lib/error-monitoring";
+import { XCircle, AlertTriangle, RefreshCw, Trash2 } from "lucide-react";
 
 interface ErrorMonitorProps {
-  initiallyExpanded?: boolean
+  initiallyExpanded?: boolean;
 }
 
-export function ErrorMonitorClient({ initiallyExpanded = false }: ErrorMonitorProps) {
-  const [isExpanded, setIsExpanded] = useState(initiallyExpanded)
-  const [errors, setErrors] = useState<ErrorRecord[]>([])
-  const [isVisible, setIsVisible] = useState(false)
+export function ErrorMonitorClient({
+  initiallyExpanded = false,
+}: ErrorMonitorProps) {
+  const [isExpanded, setIsExpanded] = useState(initiallyExpanded);
+  const [errors, setErrors] = useState<ErrorRecord[]>([]);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     // Initialize error monitoring
-    initErrorMonitoring()
+    initErrorMonitoring();
 
     // Update errors on custom event
     const handleErrorCaptured = () => {
-      setErrors(getLoggedErrors())
-    }
+      setErrors(getLoggedErrors());
+    };
 
-    window.addEventListener("error-captured", handleErrorCaptured)
+    window.addEventListener("error-captured", handleErrorCaptured);
 
     // Check for console errors every 5 seconds
     const intervalId = setInterval(() => {
-      setErrors(getLoggedErrors())
-    }, 5000)
+      setErrors(getLoggedErrors());
+    }, 5000);
 
     // Clean up
     return () => {
-      window.removeEventListener("error-captured", handleErrorCaptured)
-      clearInterval(intervalId)
-    }
-  }, [])
+      window.removeEventListener("error-captured", handleErrorCaptured);
+      clearInterval(intervalId);
+    };
+  }, []);
 
   // Set visibility based on whether there are errors
   useEffect(() => {
     if (errors.length > 0) {
-      setIsVisible(true)
+      setIsVisible(true);
     }
-  }, [errors])
+  }, [errors]);
 
-  if (!isVisible) return null
+  if (!isVisible) return null;
 
   const clearErrors = () => {
-    clearErrorLog()
-    setErrors([])
-  }
+    clearErrorLog();
+    setErrors([]);
+  };
 
   const refreshErrors = () => {
-    setErrors(getLoggedErrors())
-  }
+    setErrors(getLoggedErrors());
+  };
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
@@ -61,7 +68,9 @@ export function ErrorMonitorClient({ initiallyExpanded = false }: ErrorMonitorPr
           <div className="bg-red-100 dark:bg-red-900/30 p-3 flex items-center justify-between">
             <div className="flex items-center text-red-800 dark:text-red-300">
               <AlertTriangle className="h-5 w-5 mr-2" />
-              <h3 className="font-medium">Console Error Monitor ({errors.length})</h3>
+              <h3 className="font-medium">
+                Console Error Monitor ({errors.length})
+              </h3>
             </div>
             <div className="flex items-center space-x-2">
               <button
@@ -130,5 +139,5 @@ export function ErrorMonitorClient({ initiallyExpanded = false }: ErrorMonitorPr
         </button>
       )}
     </div>
-  )
+  );
 }

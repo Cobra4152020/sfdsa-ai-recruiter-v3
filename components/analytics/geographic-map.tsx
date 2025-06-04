@@ -1,65 +1,82 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { getGeographicData } from "@/lib/analytics-service"
+import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getGeographicData } from "@/lib/analytics-service";
 
 interface GeographicData {
-  zip_code: string
-  count: number
+  zip_code: string;
+  count: number;
 }
 
 interface GeographicMapProps {
-  data: GeographicData[]
-  isLoading: boolean
+  data: GeographicData[];
+  isLoading: boolean;
 }
 
 export function GeographicMap({ data, isLoading }: GeographicMapProps) {
-  const [userType, setUserType] = useState<"all" | "recruit" | "volunteer">("all")
-  const [mapData, setMapData] = useState<GeographicData[]>([])
-  const [loading, setLoading] = useState(false)
+  const [userType, setUserType] = useState<"all" | "recruit" | "volunteer">(
+    "all",
+  );
+  const [mapData, setMapData] = useState<GeographicData[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
-      const data = await getGeographicData(userType)
-      setMapData(data)
+      const data = await getGeographicData(userType);
+      setMapData(data);
     } catch (error) {
-      console.error("Error loading geographic data:", error)
+      console.error("Error loading geographic data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (data && data.length > 0) {
-      setMapData(data)
+      setMapData(data);
     } else {
-      loadData()
+      loadData();
     }
-  }, [data, userType, loadData])
+  }, [data, userType, loadData]);
 
   if (isLoading || loading) {
     return (
       <div className="w-full h-[400px] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0A3C1F]"></div>
       </div>
-    )
+    );
   }
 
   if (!mapData || mapData.length === 0) {
     return (
       <div className="w-full h-[400px] flex flex-col items-center justify-center">
-        <p className="text-lg font-medium text-gray-500">No geographic data available</p>
-        <p className="text-sm text-gray-400">Try selecting a different user type</p>
+        <p className="text-lg font-medium text-gray-500">
+          No geographic data available
+        </p>
+        <p className="text-sm text-gray-400">
+          Try selecting a different user type
+        </p>
       </div>
-    )
+    );
   }
 
   return (
     <div>
       <div className="mb-4 flex justify-end">
-        <Select value={userType} onValueChange={(value) => setUserType(value as "all" | "recruit" | "volunteer")}>
+        <Select
+          value={userType}
+          onValueChange={(value) =>
+            setUserType(value as "all" | "recruit" | "volunteer")
+          }
+        >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="User Type" />
           </SelectTrigger>
@@ -82,9 +99,12 @@ export function GeographicMap({ data, isLoading }: GeographicMapProps) {
           referrerPolicy="no-referrer-when-downgrade"
         ></iframe>
         <div className="absolute inset-0 bg-white/80 flex flex-col items-center justify-center">
-          <p className="text-lg font-medium text-gray-700">Map Visualization Placeholder</p>
+          <p className="text-lg font-medium text-gray-700">
+            Map Visualization Placeholder
+          </p>
           <p className="text-sm text-gray-500 mt-2">
-            In a production environment, this would display a real map with user distribution
+            In a production environment, this would display a real map with user
+            distribution
           </p>
           <div className="mt-6 w-full max-w-md">
             <h3 className="text-md font-medium mb-2">Top 5 Zip Codes</h3>
@@ -96,7 +116,9 @@ export function GeographicMap({ data, isLoading }: GeographicMapProps) {
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-blue-500 rounded-full"
-                        style={{ width: `${(item.count / mapData[0].count) * 100}%` }}
+                        style={{
+                          width: `${(item.count / mapData[0].count) * 100}%`,
+                        }}
                       ></div>
                     </div>
                   </div>
@@ -108,5 +130,5 @@ export function GeographicMap({ data, isLoading }: GeographicMapProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

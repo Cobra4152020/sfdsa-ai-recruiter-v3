@@ -1,47 +1,50 @@
-"use client"
+"use client";
 
-import { useState, useCallback } from "react"
-import { ThemeProvider } from "@/components/theme-provider"
-import { UserProvider } from "@/context/user-context"
-import { RegistrationProvider } from "@/context/registration-context"
-import { AuthModalProvider } from "@/context/auth-modal-context"
-import { ImprovedHeader } from "@/components/improved-header"
-import { ImprovedFooter } from "@/components/improved-footer"
-import { OptInForm } from "@/components/opt-in-form"
-import { UnifiedAuthModal } from "@/components/unified-auth-modal"
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button"
-import { WebSocketErrorHandler } from "@/components/websocket-error-handler"
-import { ErrorMonitor } from "@/components/error-monitor"
-import PerformanceMonitor from "@/components/performance-monitor"
-import { useClientOnly } from "@/hooks/use-client-only"
+import { useState, useCallback } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
+import { UserProvider } from "@/context/user-context";
+import { RegistrationProvider } from "@/context/registration-context";
+import { AuthModalProvider } from "@/context/auth-modal-context";
+import { ImprovedHeader } from "@/components/improved-header";
+import { ImprovedFooter } from "@/components/improved-footer";
+import { OptInForm } from "@/components/opt-in-form";
+import { UnifiedAuthModal } from "@/components/unified-auth-modal";
+import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
+import { WebSocketErrorHandler } from "@/components/websocket-error-handler";
+import { ErrorMonitor } from "@/components/error-monitor";
+import PerformanceMonitor from "@/components/performance-monitor";
+import { useClientOnly } from "@/hooks/use-client-only";
 
 export default function RootLayoutClient({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-  const [isOptInFormOpen, setIsOptInFormOpen] = useState(false)
-  const [isApplying, setIsApplying] = useState(false)
+  const [isOptInFormOpen, setIsOptInFormOpen] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
   const memoizedCallback = useCallback(() => {
-    return true
-  }, [])
+    return true;
+  }, []);
 
-  const isMounted = useClientOnly(memoizedCallback, false)
+  const isMounted = useClientOnly(memoizedCallback, false);
 
   const showOptInForm = (applying = false) => {
-    setIsApplying(applying)
-    setIsOptInFormOpen(true)
-  }
+    setIsApplying(applying);
+    setIsOptInFormOpen(true);
+  };
 
   const handleCloseOptInForm = () => {
-    setIsOptInFormOpen(false)
-  }
+    setIsOptInFormOpen(false);
+  };
 
   const content = (
     <div className="min-h-screen flex flex-col">
       <ImprovedHeader showOptInForm={showOptInForm} />
-      <main id="main-content" className="flex-1 pt-16 pb-12 bg-background dark:bg-[#121212]">
+      <main
+        id="main-content"
+        className="flex-1 pt-16 pb-12 bg-background dark:bg-[#121212]"
+      >
         <WebSocketErrorHandler />
         <ErrorMonitor />
         <PerformanceMonitor />
@@ -50,14 +53,18 @@ export default function RootLayoutClient({
       <ImprovedFooter />
 
       {isOptInFormOpen && (
-        <OptInForm onClose={handleCloseOptInForm} isApplying={isApplying} isOpen={isOptInFormOpen} />
+        <OptInForm
+          onClose={handleCloseOptInForm}
+          isApplying={isApplying}
+          isOpen={isOptInFormOpen}
+        />
       )}
       <div className="fixed bottom-6 right-6 z-50">
         <AskSgtKenButton position="fixed" variant="secondary" />
       </div>
       <UnifiedAuthModal />
     </div>
-  )
+  );
 
   // Return a placeholder during server-side rendering
   if (!isMounted) {
@@ -71,18 +78,16 @@ export default function RootLayoutClient({
         </main>
         <div className="h-64 bg-white dark:bg-[#121212] animate-pulse" />
       </div>
-    )
+    );
   }
 
   return (
     <ThemeProvider defaultTheme="light" storageKey="app-theme">
       <UserProvider>
         <RegistrationProvider>
-          <AuthModalProvider>
-            {content}
-          </AuthModalProvider>
+          <AuthModalProvider>{content}</AuthModalProvider>
         </RegistrationProvider>
       </UserProvider>
     </ThemeProvider>
-  )
-} 
+  );
+}

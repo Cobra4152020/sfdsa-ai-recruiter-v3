@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Users, Award, Clock, TrendingUp } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Users, Award, Clock, TrendingUp } from "lucide-react";
 
 interface DashboardStats {
-  totalApplicants: number
-  qualifiedCandidates: number
-  processingTime: string
-  conversionRate: string
+  totalApplicants: number;
+  qualifiedCandidates: number;
+  processingTime: string;
+  conversionRate: string;
 }
 
 interface DashboardStatsWrapperProps {
-  stats: DashboardStats
+  stats: DashboardStats;
 }
 
 export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
@@ -20,7 +26,9 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="space-y-1">
-            <CardTitle className="text-sm font-medium">Total Applicants</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Total Applicants
+            </CardTitle>
             <CardDescription>All time applications</CardDescription>
           </div>
           <Users className="h-4 w-4 text-[#0A3C1F]" />
@@ -33,7 +41,9 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="space-y-1">
-            <CardTitle className="text-sm font-medium">Qualified Candidates</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Qualified Candidates
+            </CardTitle>
             <CardDescription>Meeting requirements</CardDescription>
           </div>
           <Award className="h-4 w-4 text-[#0A3C1F]" />
@@ -46,7 +56,9 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="space-y-1">
-            <CardTitle className="text-sm font-medium">Avg. Processing Time</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Avg. Processing Time
+            </CardTitle>
             <CardDescription>Application to decision</CardDescription>
           </div>
           <Clock className="h-4 w-4 text-[#0A3C1F]" />
@@ -59,7 +71,9 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <div className="space-y-1">
-            <CardTitle className="text-sm font-medium">Conversion Rate</CardTitle>
+            <CardTitle className="text-sm font-medium">
+              Conversion Rate
+            </CardTitle>
             <CardDescription>Qualified to hired</CardDescription>
           </div>
           <TrendingUp className="h-4 w-4 text-[#0A3C1F]" />
@@ -69,5 +83,5 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
         </CardContent>
       </Card>
     </div>
-  )
-} 
+  );
+}

@@ -1,19 +1,18 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { toast } from "@/components/ui/use-toast"
-import { useUser } from "@/context/user-context"
-import { Award, Heart } from "lucide-react"
+import { useEffect, useState } from "react";
+import { toast } from "@/components/ui/use-toast";
+import { useUser } from "@/context/user-context";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 export function NotificationToastListener() {
-  const { currentUser } = useUser()
-  const [isSubscribed, setIsSubscribed] = useState(false)
+  const { currentUser } = useUser();
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   useEffect(() => {
-    if (!currentUser?.id || isSubscribed) return
+    if (!currentUser?.id || isSubscribed) return;
 
     // Subscribe to new notifications for this user
-    const { getClientSideSupabase } = require("@/lib/supabase")
     const channel = getClientSideSupabase()
       .channel(`notifications:${currentUser.id}`)
       .on(
@@ -25,25 +24,25 @@ export function NotificationToastListener() {
           filter: `user_id=eq.${currentUser.id}`,
         },
         (payload) => {
-          const notification = payload.new
+          const notification = payload.new;
 
           // Show toast notification
           toast({
             title: notification.title,
             description: notification.message,
             duration: 5000,
-          })
+          });
         },
       )
-      .subscribe()
+      .subscribe();
 
-    setIsSubscribed(true)
+    setIsSubscribed(true);
 
     return () => {
-      getClientSideSupabase().removeChannel(channel)
-      setIsSubscribed(false)
-    }
-  }, [currentUser, isSubscribed])
+      getClientSideSupabase().removeChannel(channel);
+      setIsSubscribed(false);
+    };
+  }, [currentUser, isSubscribed]);
 
-  return null
+  return null;
 }

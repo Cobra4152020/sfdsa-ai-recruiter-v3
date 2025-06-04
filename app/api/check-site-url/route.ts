@@ -1,6 +1,6 @@
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
@@ -9,14 +9,14 @@ export async function GET() {
       NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
       NODE_ENV: process.env.NODE_ENV,
       VERCEL_URL: process.env.VERCEL_URL,
-    }
+    };
 
     // Determine the base URL
-    let baseUrl = process.env.NEXT_PUBLIC_SITE_URL
+    let baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
     if (!baseUrl && process.env.VERCEL_URL) {
-      baseUrl = `https://${process.env.VERCEL_URL}`
+      baseUrl = `https://${process.env.VERCEL_URL}`;
     } else if (!baseUrl) {
-      baseUrl = "http://localhost:3000"
+      baseUrl = "http://localhost:3000";
     }
 
     // Compute important URLs
@@ -24,14 +24,15 @@ export async function GET() {
       baseUrl,
       loginRedirectUrl: `${baseUrl}/login`,
       callbackUrl: `${baseUrl}/api/auth/callback`,
-    }
+    };
 
     // Check if the configuration is valid
-    const isProduction = process.env.NODE_ENV === "production"
+    const isProduction = process.env.NODE_ENV === "production";
     const hasCorrectSiteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL && process.env.NEXT_PUBLIC_SITE_URL.includes("sfdeputysheriff.com")
+      process.env.NEXT_PUBLIC_SITE_URL &&
+      process.env.NEXT_PUBLIC_SITE_URL.includes("sfdeputysheriff.com");
 
-    const isValid = !isProduction || hasCorrectSiteUrl
+    const isValid = !isProduction || hasCorrectSiteUrl;
 
     return NextResponse.json({
       isValid,
@@ -39,9 +40,12 @@ export async function GET() {
       siteUrl: process.env.NEXT_PUBLIC_SITE_URL || "Not set",
       envVars,
       computedUrls,
-    })
+    });
   } catch (error) {
-    console.error("Error checking site URL:", error)
-    return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 })
+    console.error("Error checking site URL:", error);
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Unknown error" },
+      { status: 500 },
+    );
   }
 }

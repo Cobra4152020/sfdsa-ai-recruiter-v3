@@ -1,49 +1,60 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { Award, Trophy, TrendingUp, Star } from "lucide-react"
-import { useUser } from "@/context/user-context"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Award, Trophy, TrendingUp, Star } from "lucide-react";
+import { useUser } from "@/context/user-context";
+import type { RecruiterStats } from "@/lib/recruiter-rewards-service";
 
 interface RecruiterPointsDisplayProps {
-  recruiterId?: string
+  recruiterId?: string;
 }
 
-export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayProps) {
-  const { currentUser } = useUser()
-  const [stats, setStats] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+export function RecruiterPointsDisplay({
+  recruiterId,
+}: RecruiterPointsDisplayProps) {
+  const { currentUser } = useUser();
+  const [stats, setStats] = useState<RecruiterStats | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const userId = recruiterId || currentUser?.id
+  const userId = recruiterId || currentUser?.id;
 
   useEffect(() => {
-    if (!userId) return
+    if (!userId) return;
 
     const fetchStats = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
-        const response = await fetch(`/api/recruiter/stats?recruiterId=${userId}`)
-        const data = await response.json()
+        const response = await fetch(
+          `/api/recruiter/stats?recruiterId=${userId}`,
+        );
+        const data = await response.json();
 
         if (data.success && data.stats) {
-          setStats(data.stats)
+          setStats(data.stats);
         } else {
-          setError(data.message || "Failed to load recruiter stats")
+          setError(data.message || "Failed to load recruiter stats");
         }
       } catch (err) {
-        setError("An error occurred while fetching recruiter stats")
-        console.error(err)
+        setError("An error occurred while fetching recruiter stats");
+        console.error(err);
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchStats()
-  }, [userId])
+    fetchStats();
+  }, [userId]);
 
   if (isLoading) {
     return (
@@ -60,7 +71,7 @@ export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayPr
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (error || !stats) {
@@ -71,18 +82,23 @@ export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayPr
           <CardDescription>Error loading recruiter stats</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-center text-red-500 py-4">{error || "Unable to load recruiter information"}</div>
+          <div className="text-center text-red-500 py-4">
+            {error || "Unable to load recruiter information"}
+          </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   const progressPercentage = stats.nextTier
     ? Math.min(
         100,
-        ((stats.totalPoints - (stats.nextTier.pointsRequired - stats.pointsToNextTier)) / stats.pointsToNextTier) * 100,
+        ((stats.totalPoints -
+          (stats.nextTier.pointsRequired - stats.pointsToNextTier)) /
+          stats.pointsToNextTier) *
+          100,
       )
-    : 100
+    : 100;
 
   return (
     <Card>
@@ -90,7 +106,9 @@ export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayPr
         <div className="flex justify-between items-center">
           <div>
             <CardTitle>Recruiter Dashboard</CardTitle>
-            <CardDescription>Your recruitment progress and achievements</CardDescription>
+            <CardDescription>
+              Your recruitment progress and achievements
+            </CardDescription>
           </div>
           <Badge
             variant="outline"
@@ -106,25 +124,34 @@ export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayPr
           {/* Points and Next Tier */}
           <div className="bg-slate-50 p-4 rounded-lg">
             <div className="flex justify-between items-center mb-2">
-              <div className="text-sm font-medium text-slate-500">Total Recruiter Points</div>
-              <div className="text-2xl font-bold">{stats.totalPoints.toLocaleString()}</div>
+              <div className="text-sm font-medium text-slate-500">
+                Total Recruiter Points
+              </div>
+              <div className="text-2xl font-bold">
+                {stats.totalPoints.toLocaleString()}
+              </div>
             </div>
 
             {stats.nextTier ? (
               <>
                 <div className="mb-1 flex justify-between text-xs">
-                  <span className="text-slate-500">Current: {stats.currentTier}</span>
-                  <span className="text-slate-500">Next: {stats.nextTier.name}</span>
+                  <span className="text-slate-500">
+                    Current: {stats.currentTier}
+                  </span>
+                  <span className="text-slate-500">
+                    Next: {stats.nextTier.name}
+                  </span>
                 </div>
                 <Progress value={progressPercentage} className="h-2" />
                 <div className="mt-2 text-xs text-slate-500 text-center">
-                  {stats.pointsToNextTier.toLocaleString()} points needed for next tier
+                  {stats.pointsToNextTier.toLocaleString()} points needed for
+                  next tier
                 </div>
               </>
             ) : (
               <div className="text-center text-sm text-green-600 mt-2">
                 <Star className="inline h-4 w-4 mr-1" />
-                You've reached the highest tier!
+                You&apos;ve reached the highest tier!
               </div>
             )}
           </div>
@@ -134,7 +161,9 @@ export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayPr
             <div className="bg-green-50 p-4 rounded-lg">
               <div className="flex items-center mb-2">
                 <Award className="h-5 w-5 mr-2 text-green-600" />
-                <span className="text-sm font-medium text-green-800">Referral Success</span>
+                <span className="text-sm font-medium text-green-800">
+                  Referral Success
+                </span>
               </div>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
@@ -143,11 +172,15 @@ export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayPr
                 </div>
                 <div>
                   <div className="text-gray-600">Applications</div>
-                  <div className="font-semibold">{stats.referralApplications}</div>
+                  <div className="font-semibold">
+                    {stats.referralApplications}
+                  </div>
                 </div>
                 <div>
                   <div className="text-gray-600">Interviews</div>
-                  <div className="font-semibold">{stats.referralInterviews}</div>
+                  <div className="font-semibold">
+                    {stats.referralInterviews}
+                  </div>
                 </div>
                 <div>
                   <div className="text-gray-600">Hires</div>
@@ -159,13 +192,17 @@ export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayPr
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="flex items-center mb-2">
                 <TrendingUp className="h-5 w-5 mr-2 text-blue-600" />
-                <span className="text-sm font-medium text-blue-800">Rewards</span>
+                <span className="text-sm font-medium text-blue-800">
+                  Rewards
+                </span>
               </div>
               <div>
                 <div className="text-gray-600 text-sm">Rewards Redeemed</div>
                 <div className="font-semibold">{stats.rewardsRedeemed}</div>
                 <div className="mt-2 text-xs text-blue-600">
-                  {stats.rewardsRedeemed > 0 ? "View your redemption history" : "Redeem your points for rewards!"}
+                  {stats.rewardsRedeemed > 0
+                    ? "View your redemption history"
+                    : "Redeem your points for rewards!"}
                 </div>
               </div>
             </div>
@@ -173,5 +210,5 @@ export function RecruiterPointsDisplay({ recruiterId }: RecruiterPointsDisplayPr
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

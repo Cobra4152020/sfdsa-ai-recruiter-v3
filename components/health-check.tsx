@@ -1,52 +1,51 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
-import { CheckCircle, XCircle, RefreshCw, AlertTriangle } from "lucide-react"
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle, XCircle, AlertTriangle } from "lucide-react";
 
 interface HealthCheckData {
   database: {
-    status: string
-    latency: string
-    connections: number
-    uptime: string
-  }
+    status: string;
+    latency: string;
+    connections: number;
+    uptime: string;
+  };
   email: {
-    status: string
-    deliveryRate: string
-    bounceRate: string
-    queueSize: number
-  }
+    status: string;
+    deliveryRate: string;
+    bounceRate: string;
+    queueSize: number;
+  };
   auth: {
-    status: string
-    activeUsers: number
-    failedLogins: number
-    tokenExpiry: string
-  }
+    status: string;
+    activeUsers: number;
+    failedLogins: number;
+    tokenExpiry: string;
+  };
   storage: {
-    status: string
-    availability: string
-    errorRate: string
-    bandwidth: string
-  }
+    status: string;
+    availability: string;
+    errorRate: string;
+    bandwidth: string;
+  };
 }
 
 interface HealthCheckProps {
-  data: HealthCheckData
+  data: HealthCheckData;
 }
 
 export function HealthCheck({ data }: HealthCheckProps) {
   const StatusIcon = ({ status }: { status: string }) => {
-    if (status === "healthy") return <CheckCircle className="h-5 w-5 text-green-500" />
-    if (status === "error") return <XCircle className="h-5 w-5 text-red-500" />
-    return <AlertTriangle className="h-5 w-5 text-yellow-500" />
-  }
+    if (status === "healthy")
+      return <CheckCircle className="h-5 w-5 text-green-500" />;
+    if (status === "error") return <XCircle className="h-5 w-5 text-red-500" />;
+    return <AlertTriangle className="h-5 w-5 text-yellow-500" />;
+  };
 
   // Calculate overall status
-  const allHealthy = Object.values(data).every((service) => service.status === "healthy")
+  const allHealthy = Object.values(data).every(
+    (service) => service.status === "healthy",
+  );
 
   return (
     <div className="space-y-4">
@@ -78,10 +77,18 @@ export function HealthCheck({ data }: HealthCheckProps) {
             <span className="ml-2">Database</span>
           </div>
           <div className="text-sm">
-            <span className={data.database.status === "healthy" ? "text-green-600" : "text-red-600"}>
+            <span
+              className={
+                data.database.status === "healthy"
+                  ? "text-green-600"
+                  : "text-red-600"
+              }
+            >
               {data.database.status.toUpperCase()}
             </span>
-            <span className="text-gray-500 ml-2">({data.database.latency})</span>
+            <span className="text-gray-500 ml-2">
+              ({data.database.latency})
+            </span>
           </div>
         </div>
 
@@ -91,10 +98,18 @@ export function HealthCheck({ data }: HealthCheckProps) {
             <span className="ml-2">Email Service</span>
           </div>
           <div className="text-sm">
-            <span className={data.email.status === "healthy" ? "text-green-600" : "text-red-600"}>
+            <span
+              className={
+                data.email.status === "healthy"
+                  ? "text-green-600"
+                  : "text-red-600"
+              }
+            >
               {data.email.status.toUpperCase()}
             </span>
-            <span className="text-gray-500 ml-2">({data.email.deliveryRate} delivery)</span>
+            <span className="text-gray-500 ml-2">
+              ({data.email.deliveryRate} delivery)
+            </span>
           </div>
         </div>
 
@@ -104,10 +119,18 @@ export function HealthCheck({ data }: HealthCheckProps) {
             <span className="ml-2">Authentication</span>
           </div>
           <div className="text-sm">
-            <span className={data.auth.status === "healthy" ? "text-green-600" : "text-red-600"}>
+            <span
+              className={
+                data.auth.status === "healthy"
+                  ? "text-green-600"
+                  : "text-red-600"
+              }
+            >
               {data.auth.status.toUpperCase()}
             </span>
-            <span className="text-gray-500 ml-2">({data.auth.activeUsers} active)</span>
+            <span className="text-gray-500 ml-2">
+              ({data.auth.activeUsers} active)
+            </span>
           </div>
         </div>
 
@@ -117,13 +140,21 @@ export function HealthCheck({ data }: HealthCheckProps) {
             <span className="ml-2">Storage</span>
           </div>
           <div className="text-sm">
-            <span className={data.storage.status === "healthy" ? "text-green-600" : "text-red-600"}>
+            <span
+              className={
+                data.storage.status === "healthy"
+                  ? "text-green-600"
+                  : "text-red-600"
+              }
+            >
               {data.storage.status.toUpperCase()}
             </span>
-            <span className="text-gray-500 ml-2">({data.storage.availability} uptime)</span>
+            <span className="text-gray-500 ml-2">
+              ({data.storage.availability} uptime)
+            </span>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }

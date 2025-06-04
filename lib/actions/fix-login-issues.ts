@@ -1,4 +1,4 @@
-export async function fixLoginIssues(params: any) {
+export async function fixLoginIssues(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/fix-login-issues`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function fixLoginIssues(params: any) {
     console.error(`Error in fixLoginIssues:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

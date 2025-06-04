@@ -1,4 +1,4 @@
-export async function setupAdminRpc(params: any) {
+export async function setupAdminRpc(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/setup-admin-rpc`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function setupAdminRpc(params: any) {
     console.error(`Error in setupAdminRpc:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

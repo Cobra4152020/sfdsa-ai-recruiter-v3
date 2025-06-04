@@ -1,41 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
-import { useRouter } from "next/navigation"
-import { X } from "lucide-react"
+import { useState } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
+import { X } from "lucide-react";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 interface OptInFormProps {
-  onClose: () => void
-  isApplying?: boolean
-  isOpen?: boolean
-  referralCode?: string
+  onClose: () => void;
+  isApplying?: boolean;
+  isOpen?: boolean;
+  referralCode?: string;
 }
 
-export function OptInForm({ onClose, isApplying = false, isOpen = false, referralCode }: OptInFormProps) {
-  const [email, setEmail] = useState("")
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
-  const [phone, setPhone] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
-  const { toast } = useToast()
-  const router = useRouter()
+export function OptInForm({
+  onClose,
+  isApplying = false, // eslint-disable-line @typescript-eslint/no-unused-vars
+  isOpen = false,
+  referralCode,
+}: OptInFormProps) {
+  const [email, setEmail] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const { toast } = useToast();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
-    setError(null)
-    setSuccess(false)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      const { getClientSideSupabase } = require("@/lib/supabase")
-      const supabase = getClientSideSupabase()
+      const supabase = getClientSideSupabase();
       // Create application record
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("applications")
         .insert([
           {
@@ -48,35 +54,44 @@ export function OptInForm({ onClose, isApplying = false, isOpen = false, referra
           },
         ])
         .select()
-        .single()
+        .single();
 
-      if (error) throw error
+      if (error) throw error;
 
       toast({
         title: "Application Submitted",
-        description: "Thank you for your interest! We'll be in touch soon.",
-      })
+        description:
+          "Thank you for your interest! We&apos;ll be in touch soon.",
+      });
 
-      onClose()
-      router.push("/application-submitted")
+      onClose();
+      router.push("/application-submitted");
     } catch (error) {
-      console.error("Application submission error:", error)
+      console.error("Application submission error:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to submit application",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Failed to submit application",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader className="flex justify-between items-center">
           <DialogTitle className="text-xl">Apply Now</DialogTitle>
-          <Button variant="ghost" size="icon" className="h-6 w-6 rounded-full" onClick={onClose}>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6 rounded-full"
+            onClick={onClose}
+          >
             <X className="h-4 w-4" />
             <span className="sr-only">Close</span>
           </Button>
@@ -85,7 +100,8 @@ export function OptInForm({ onClose, isApplying = false, isOpen = false, referra
         <form onSubmit={handleSubmit} className="space-y-4 py-4">
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              Start your journey with the San Francisco Deputy Sheriff's Department.
+              Start your journey with the San Francisco Deputy Sheriff&apos;s
+              Department.
             </p>
           </div>
 
@@ -151,8 +167,8 @@ export function OptInForm({ onClose, isApplying = false, isOpen = false, referra
               />
             </div>
 
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
               disabled={isLoading}
             >
@@ -162,5 +178,5 @@ export function OptInForm({ onClose, isApplying = false, isOpen = false, referra
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

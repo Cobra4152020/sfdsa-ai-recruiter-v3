@@ -1,22 +1,22 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Trophy, Medal, Star, ArrowUp, ArrowDown, Minus } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { useEffect, useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Trophy, Medal, Star, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 type LeaderboardEntry = {
-  id: string
-  name: string
-  points: number
-  rank: number
-  previousRank: number
-  badgeCount: number
-  avatarUrl: string
-  isCurrentUser?: boolean
-}
+  id: string;
+  name: string;
+  points: number;
+  rank: number;
+  previousRank: number;
+  badgeCount: number;
+  avatarUrl: string;
+  isCurrentUser?: boolean;
+};
 
 // Sample data with avatar URLs and previous ranks
 const sampleLeaderboardData: LeaderboardEntry[] = [
@@ -65,13 +65,13 @@ const sampleLeaderboardData: LeaderboardEntry[] = [
     badgeCount: 5,
     avatarUrl: "/asian-male-officer-headshot.png",
   },
-]
+];
 
 interface RealTimeLeaderboardProps {
-  currentUserId?: string
-  useMockData?: boolean
-  className?: string
-  limit?: number
+  currentUserId?: string;
+  useMockData?: boolean;
+  className?: string;
+  limit?: number;
 }
 
 export function RealTimeLeaderboard({
@@ -80,8 +80,10 @@ export function RealTimeLeaderboard({
   className,
   limit = 5,
 }: RealTimeLeaderboardProps) {
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>([])
-  const [loading, setLoading] = useState(true)
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardEntry[]>(
+    [],
+  );
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLeaderboardData = async () => {
@@ -93,12 +95,12 @@ export function RealTimeLeaderboard({
               ...entry,
               isCurrentUser: entry.id === currentUserId,
             }))
-            .slice(0, limit)
-          setLeaderboardData(mockData)
+            .slice(0, limit);
+          setLeaderboardData(mockData);
         } else {
           // In a real app, you would fetch from your API
-          const response = await fetch("/api/leaderboard")
-          const data = await response.json()
+          const response = await fetch("/api/leaderboard");
+          const data = await response.json();
 
           // Process the data to mark current user
           const processedData = data
@@ -106,20 +108,20 @@ export function RealTimeLeaderboard({
               ...entry,
               isCurrentUser: entry.id === currentUserId,
             }))
-            .slice(0, limit)
+            .slice(0, limit);
 
-          setLeaderboardData(processedData)
+          setLeaderboardData(processedData);
         }
       } catch (error) {
-        console.error("Error fetching leaderboard data:", error)
+        console.error("Error fetching leaderboard data:", error);
         // Fallback to sample data on error
-        setLeaderboardData(sampleLeaderboardData.slice(0, limit))
+        setLeaderboardData(sampleLeaderboardData.slice(0, limit));
       } finally {
-        setLoading(false)
+        setLoading(false);
       }
-    }
+    };
 
-    fetchLeaderboardData()
+    fetchLeaderboardData();
 
     // Set up SSE for real-time updates in a real application
     // This is just a simulation for the mock data
@@ -137,36 +139,36 @@ export function RealTimeLeaderboard({
               ...entry,
               previousRank: entry.rank,
               rank: index + 1,
-            }))
-        })
-      }, 5000)
+            }));
+        });
+      }, 5000);
 
-      return () => clearInterval(interval)
+      return () => clearInterval(interval);
     }
-  }, [currentUserId, useMockData, limit])
+  }, [currentUserId, useMockData, limit]);
 
   const getRankIcon = (rank: number) => {
     switch (rank) {
       case 1:
-        return <Trophy className="h-5 w-5 text-yellow-500" />
+        return <Trophy className="h-5 w-5 text-yellow-500" />;
       case 2:
-        return <Medal className="h-5 w-5 text-gray-400" />
+        return <Medal className="h-5 w-5 text-gray-400" />;
       case 3:
-        return <Medal className="h-5 w-5 text-amber-700" />
+        return <Medal className="h-5 w-5 text-amber-700" />;
       default:
-        return <Star className="h-5 w-5 text-gray-300" />
+        return <Star className="h-5 w-5 text-gray-300" />;
     }
-  }
+  };
 
   const getRankChangeIcon = (current: number, previous: number) => {
     if (current < previous) {
-      return <ArrowUp className="h-4 w-4 text-green-500" />
+      return <ArrowUp className="h-4 w-4 text-green-500" />;
     } else if (current > previous) {
-      return <ArrowDown className="h-4 w-4 text-red-500" />
+      return <ArrowDown className="h-4 w-4 text-red-500" />;
     } else {
-      return <Minus className="h-4 w-4 text-gray-400" />
+      return <Minus className="h-4 w-4 text-gray-400" />;
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -180,7 +182,7 @@ export function RealTimeLeaderboard({
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -195,36 +197,57 @@ export function RealTimeLeaderboard({
               key={entry.id}
               className={cn(
                 "flex items-center justify-between p-3 rounded-lg",
-                entry.isCurrentUser ? "bg-[#F0F7F2] border border-[#0A3C1F]" : "bg-white border border-gray-100",
+                entry.isCurrentUser
+                  ? "bg-[#F0F7F2] border border-[#0A3C1F]"
+                  : "bg-white border border-gray-100",
                 "hover:shadow-sm transition-shadow",
               )}
             >
               <div className="flex items-center gap-3">
-                <div className="flex items-center justify-center w-8 h-8">{getRankIcon(entry.rank)}</div>
+                <div className="flex items-center justify-center w-8 h-8">
+                  {getRankIcon(entry.rank)}
+                </div>
                 <Avatar className="h-10 w-10 border border-gray-200">
-                  <AvatarImage src={entry.avatarUrl || "/placeholder.svg"} alt={entry.name} />
+                  <AvatarImage
+                    src={entry.avatarUrl || "/placeholder.svg"}
+                    alt={entry.name}
+                  />
                   <AvatarFallback>{entry.name.substring(0, 2)}</AvatarFallback>
                 </Avatar>
                 <div>
-                  <p className={cn("font-medium", entry.isCurrentUser && "text-[#0A3C1F]")}>
+                  <p
+                    className={cn(
+                      "font-medium",
+                      entry.isCurrentUser && "text-[#0A3C1F]",
+                    )}
+                  >
                     {entry.name} {entry.isCurrentUser && "(You)"}
                   </p>
                   <div className="flex items-center gap-1">
-                    <span className="text-xs text-gray-500">{entry.badgeCount} badges</span>
-                    <div className="flex items-center ml-2">{getRankChangeIcon(entry.rank, entry.previousRank)}</div>
+                    <span className="text-xs text-gray-500">
+                      {entry.badgeCount} badges
+                    </span>
+                    <div className="flex items-center ml-2">
+                      {getRankChangeIcon(entry.rank, entry.previousRank)}
+                    </div>
                   </div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <Badge variant="outline" className="bg-[#F0F7F2] text-[#0A3C1F] border-[#0A3C1F]">
+                <Badge
+                  variant="outline"
+                  className="bg-[#F0F7F2] text-[#0A3C1F] border-[#0A3C1F]"
+                >
                   {entry.points} pts
                 </Badge>
-                <span className="text-sm font-medium text-gray-500">#{entry.rank}</span>
+                <span className="text-sm font-medium text-gray-500">
+                  #{entry.rank}
+                </span>
               </div>
             </div>
           ))}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

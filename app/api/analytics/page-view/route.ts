@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
 // Mock analytics data
@@ -14,13 +14,13 @@ const mockAnalytics = {
     { path: "/trivia", views: 2500 },
     { path: "/leaderboard", views: 2000 },
     { path: "/nft-awards", views: 1500 },
-    { path: "/about", views: 1000 }
+    { path: "/about", views: 1000 },
   ],
-  source: 'static'
+  source: "static",
 };
 
 export async function GET() {
-  return NextResponse.json(mockAnalytics)
+  return NextResponse.json(mockAnalytics);
 }
 
 // Note: POST endpoint removed as it cannot be static

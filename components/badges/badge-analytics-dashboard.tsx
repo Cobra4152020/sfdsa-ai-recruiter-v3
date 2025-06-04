@@ -1,45 +1,55 @@
-"use client"
+"use client";
 
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { BadgeWithProgress, BadgeType } from '@/types/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { LineChart, BarChart, PieChart } from '@/components/ui/charts'
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { BadgeWithProgress, BadgeType } from "@/types/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { LineChart, PieChart } from "@/components/ui/charts";
+// import { useUser } from "@/context/user-context"; // Commented out unused import
 
 interface BadgeAnalyticsDashboardProps {
-  badges: BadgeWithProgress[]
-  userId?: string
-  timeRange?: 'week' | 'month' | 'year' | 'all'
+  badges: BadgeWithProgress[];
 }
 
-export function BadgeAnalyticsDashboard({
+export default function BadgeAnalyticsDashboard({
   badges,
-  userId,
-  timeRange = 'month'
 }: BadgeAnalyticsDashboardProps) {
-  const [selectedTab, setSelectedTab] = useState('overview')
+  // const { currentUser } = useUser(); // Commented out unused variable
+  const [selectedTab, setSelectedTab] = useState("overview");
+  // const [selectedTimeframe, setSelectedTimeframe] = useState("30-days"); // Commented out unused variable
 
   // Calculate analytics
-  const totalBadges = badges.length
-  const earnedBadges = badges.filter(b => b.earned).length
-  const inProgressBadges = badges.filter(b => !b.earned && b.progress > 0).length
-  const completionRate = (earnedBadges / totalBadges) * 100
+  const totalBadges = badges.length;
+  const earnedBadges = badges.filter((b) => b.earned).length;
+  const inProgressBadges = badges.filter(
+    (b) => !b.earned && b.progress > 0,
+  ).length;
+  const completionRate = (earnedBadges / totalBadges) * 100;
 
   // Group badges by type
-  const badgesByType = badges.reduce((acc, badge) => {
-    acc[badge.type] = (acc[badge.type] || 0) + 1
-    return acc
-  }, {} as Record<BadgeType, number>)
+  const badgesByType = badges.reduce(
+    (acc, badge) => {
+      acc[badge.type] = (acc[badge.type] || 0) + 1;
+      return acc;
+    },
+    {} as Record<BadgeType, number>,
+  );
 
   // Calculate progress over time
-  const progressHistory = badges.flatMap(badge => 
-    badge.progressDetails?.history.map(h => ({
-      ...h,
-      badgeId: badge.id,
-      badgeName: badge.name
-    })) || []
-  ).sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime())
+  const progressHistory = badges
+    .flatMap(
+      (badge) =>
+        badge.progressDetails?.history?.map((h) => ({
+          ...h,
+          badgeId: badge.id,
+          badgeName: badge.name,
+        })) || [],
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime(),
+    );
 
   return (
     <div className="space-y-6">
@@ -65,7 +75,9 @@ export function BadgeAnalyticsDashboard({
                 <CardTitle>Earned Badges</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-600">{earnedBadges}</div>
+                <div className="text-3xl font-bold text-green-600">
+                  {earnedBadges}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -73,7 +85,9 @@ export function BadgeAnalyticsDashboard({
                 <CardTitle>In Progress</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-blue-600">{inProgressBadges}</div>
+                <div className="text-3xl font-bold text-blue-600">
+                  {inProgressBadges}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -97,7 +111,7 @@ export function BadgeAnalyticsDashboard({
                 <PieChart
                   data={Object.entries(badgesByType).map(([type, count]) => ({
                     name: type,
-                    value: count
+                    value: count,
                   }))}
                 />
               </CardContent>
@@ -112,10 +126,10 @@ export function BadgeAnalyticsDashboard({
             </CardHeader>
             <CardContent>
               <LineChart
-                data={progressHistory.map(h => ({
+                data={progressHistory.map((h) => ({
                   date: new Date(h.timestamp).toLocaleDateString(),
-                  progress: h.value,
-                  badge: h.badgeName
+                  progress: h.progress,
+                  badge: h.badgeName,
                 }))}
               />
             </CardContent>
@@ -130,8 +144,8 @@ export function BadgeAnalyticsDashboard({
             <CardContent>
               <div className="space-y-4">
                 {badges
-                  .filter(b => b.earned)
-                  .map(badge => (
+                  .filter((b) => b.earned)
+                  .map((badge) => (
                     <motion.div
                       key={badge.id}
                       initial={{ opacity: 0, y: 20 }}
@@ -142,7 +156,10 @@ export function BadgeAnalyticsDashboard({
                         <div>
                           <h3 className="font-medium">{badge.name}</h3>
                           <p className="text-sm text-gray-500">
-                            Earned on {new Date(badge.progressDetails.lastUpdated).toLocaleDateString()}
+                            Earned on{" "}
+                            {new Date(
+                              badge.progressDetails.updatedAt,
+                            ).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="text-green-600">
@@ -157,5 +174,5 @@ export function BadgeAnalyticsDashboard({
         </TabsContent>
       </Tabs>
     </div>
-  )
-} 
+  );
+}

@@ -16,5 +16,5 @@ export function ShieldLogo({ className = "w-6 h-6" }: { className?: string }) {
         fill="none"
       />
     </svg>
-  )
+  );
 }

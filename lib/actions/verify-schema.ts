@@ -1,15 +1,15 @@
 export async function verifySchema() {
   try {
-    const response = await fetch("/api/actions/verify-schema")
-    const data = await response.json()
+    const response = await fetch("/api/actions/verify-schema");
+    const data = await response.json();
 
     if (!response.ok) {
-      throw new Error(data.error || "Failed to verify schema")
+      throw new Error(data.error || "Failed to verify schema");
     }
 
-    return data
+    return data;
   } catch (error) {
-    console.error("Error in verifySchema action:", error)
+    console.error("Error in verifySchema action:", error);
     return {
       tables: [],
       globalIssues: [
@@ -21,6 +21,6 @@ export async function verifySchema() {
       ],
       success: false,
       error: error instanceof Error ? error.message : String(error),
-    }
+    };
   }
-} 
+}

@@ -3,27 +3,27 @@
 ## Authentication
 
 ### POST /api/auth/login
+
 Authenticate a user and receive a JWT token.
 
 ```typescript
-Request:
-{
-  email: string
-  password: string
+Request: {
+  email: string;
+  password: string;
 }
 
-Response:
-{
-  token: string
+Response: {
+  token: string;
   user: {
-    id: string
-    email: string
-    role: "user" | "admin"
+    id: string;
+    email: string;
+    role: "user" | "admin";
   }
 }
 ```
 
 ### POST /api/auth/register
+
 Register a new user account.
 
 ```typescript
@@ -45,27 +45,28 @@ Response:
 ## Chat API
 
 ### GET /api/chat/history
+
 Retrieve chat history for the authenticated user.
 
 ```typescript
-Response:
-{
+Response: {
   messages: Array<{
-    id: string
-    content: string
-    role: "user" | "assistant"
-    timestamp: string
-    status?: "sent" | "delivered" | "read"
+    id: string;
+    content: string;
+    role: "user" | "assistant";
+    timestamp: string;
+    status?: "sent" | "delivered" | "read";
     attachments?: Array<{
-      type: "image" | "file"
-      url: string
-      name: string
-    }>
-  }>
+      type: "image" | "file";
+      url: string;
+      name: string;
+    }>;
+  }>;
 }
 ```
 
 ### POST /api/chat/message
+
 Send a new message in the chat.
 
 ```typescript
@@ -92,15 +93,16 @@ Response:
 ```
 
 ### WebSocket /api/chat/ws
+
 Real-time chat connection endpoint.
 
 ```typescript
 // Connect with token
-ws://your-domain/api/chat/ws?token=${jwt}
+//your-domain/api/chat/ws?token=${jwt}
 
 // Message format
-{
-  type: "message" | "typing" | "read" | "error"
+ws: {
+  type: "message" | "typing" | "read" | "error";
   payload: {
     // Varies by type
   }
@@ -110,83 +112,83 @@ ws://your-domain/api/chat/ws?token=${jwt}
 ## Badge System API
 
 ### GET /api/badges
+
 Get all available badges.
 
 ```typescript
-Response:
-{
+Response: {
   badges: Array<{
-    id: string
-    name: string
-    description: string
-    points: number
-    type: string
-    rarity: "common" | "rare" | "epic" | "legendary"
-    requirements: string[]
-  }>
+    id: string;
+    name: string;
+    description: string;
+    points: number;
+    type: string;
+    rarity: "common" | "rare" | "epic" | "legendary";
+    requirements: string[];
+  }>;
 }
 ```
 
 ### GET /api/badges/user
+
 Get user's badge progress.
 
 ```typescript
-Response:
-{
+Response: {
   badges: Array<{
-    id: string
-    progress: number
-    earned: boolean
-    earnedAt?: string
-    currentValue: number
-    maxValue: number
-  }>
+    id: string;
+    progress: number;
+    earned: boolean;
+    earnedAt?: string;
+    currentValue: number;
+    maxValue: number;
+  }>;
 }
 ```
 
 ### POST /api/badges/progress
+
 Update progress for a badge.
 
 ```typescript
-Request:
-{
-  badgeId: string
-  progress: number
+Request: {
+  badgeId: string;
+  progress: number;
 }
 
-Response:
-{
-  success: boolean
-  newProgress: number
-  badgeEarned: boolean
+Response: {
+  success: boolean;
+  newProgress: number;
+  badgeEarned: boolean;
 }
 ```
 
 ### POST /api/badges/share
+
 Share a badge achievement.
 
 ```typescript
-Request:
-{
-  badgeId: string
-  platform: "twitter" | "facebook" | "linkedin"
+Request: {
+  badgeId: string;
+  platform: "twitter" | "facebook" | "linkedin";
 }
 
-Response:
-{
-  success: boolean
-  shareUrl: string
+Response: {
+  success: boolean;
+  shareUrl: string;
 }
 ```
 
 ## Rate Limiting
 
 All API endpoints are rate-limited to prevent abuse:
+
 - Authentication endpoints: 5 requests per minute
 - Chat endpoints: 60 messages per minute
 - Badge endpoints: 30 requests per minute
 
 When rate limit is exceeded, the API returns:
+
 ```typescript
 Response (429 Too Many Requests):
 {
@@ -210,6 +212,7 @@ All endpoints follow a consistent error response format:
 ```
 
 Common error codes:
+
 - `auth_required`: Authentication required
 - `invalid_credentials`: Invalid login credentials
 - `validation_error`: Invalid request data
@@ -277,6 +280,7 @@ Common error codes:
 ## Environment Variables
 
 Required environment variables:
+
 ```bash
 # Authentication
 JWT_SECRET=your-jwt-secret
@@ -293,4 +297,4 @@ STORAGE_REGION=your-storage-region
 OPENAI_API_KEY=your-openai-key
 STRIPE_SECRET_KEY=your-stripe-key
 STRIPE_WEBHOOK_SECRET=your-webhook-secret
-``` 
+```

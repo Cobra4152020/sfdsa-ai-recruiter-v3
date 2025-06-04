@@ -7,8 +7,10 @@
  */
 export function isStaticBuild() {
   // Check if we're running in a static build context (Vercel static export)
-  return process.env.NEXT_PUBLIC_STATIC_BUILD === 'true' || 
-         process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === 'true';
+  return (
+    process.env.NEXT_PUBLIC_STATIC_BUILD === "true" ||
+    process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === "true"
+  );
 }
 
 /**
@@ -21,12 +23,12 @@ export async function safeDatabaseFetch(dbFetchFunction, mockData = []) {
     // Return mock data during static builds
     return mockData;
   }
-  
+
   try {
     // Execute the real database function in production
     return await dbFetchFunction();
   } catch (error) {
-    console.error('Database fetch error:', error);
+    console.error("Database fetch error:", error);
     return mockData;
   }
 }
@@ -36,4 +38,4 @@ export async function safeDatabaseFetch(dbFetchFunction, mockData = []) {
  */
 export function isDatabaseFeatureEnabled() {
   return !isStaticBuild();
-} 
+}

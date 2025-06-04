@@ -1,70 +1,75 @@
-"use client"
+"use client";
 
-import { useMemo } from 'react'
-import { motion } from 'framer-motion'
-import { TimelineEvent, BadgeWithProgress } from '@/types/badge'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { ScrollArea } from '@/components/ui/scroll-area'
-import { Star, Trophy, Share2, Flag, Target, Award } from 'lucide-react'
+import { useMemo } from "react";
+import { motion } from "framer-motion";
+import { TimelineEvent, BadgeWithProgress } from "@/types/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Star, Trophy, Share2, Flag, Target, Award } from "lucide-react";
 
 interface BadgeTimelineProps {
-  userId?: string
-  limit?: number
-  events?: TimelineEvent[]
-  badges?: BadgeWithProgress[]
+  userId?: string;
+  limit?: number;
+  events?: TimelineEvent[];
+  badges?: BadgeWithProgress[];
 }
 
-export function BadgeTimeline({ userId, limit = 10, events = [], badges = [] }: BadgeTimelineProps) {
+export function BadgeTimeline({
+  userId,
+  limit = 10,
+  events = [],
+  badges = [],
+}: BadgeTimelineProps) {
   const sortedEvents = useMemo(() => {
-    return [...events].sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    ).slice(0, limit)
-  }, [events, limit])
+    return [...events]
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, limit);
+  }, [events, limit]);
 
-  const getEventIcon = (type: TimelineEvent['type']) => {
+  const getEventIcon = (type: TimelineEvent["type"]) => {
     switch (type) {
-      case 'start':
-        return <Flag className="h-5 w-5 text-blue-500" />
-      case 'progress':
-        return <Target className="h-5 w-5 text-green-500" />
-      case 'milestone':
-        return <Star className="h-5 w-5 text-yellow-500" />
-      case 'completion':
-        return <Trophy className="h-5 w-5 text-purple-500" />
-      case 'unlock':
-        return <Award className="h-5 w-5 text-indigo-500" />
-      case 'share':
-        return <Share2 className="h-5 w-5 text-pink-500" />
+      case "start":
+        return <Flag className="h-5 w-5 text-blue-500" />;
+      case "progress":
+        return <Target className="h-5 w-5 text-green-500" />;
+      case "milestone":
+        return <Star className="h-5 w-5 text-yellow-500" />;
+      case "completion":
+        return <Trophy className="h-5 w-5 text-purple-500" />;
+      case "unlock":
+        return <Award className="h-5 w-5 text-indigo-500" />;
+      case "share":
+        return <Share2 className="h-5 w-5 text-pink-500" />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const formatDate = (date: string) => {
-    const eventDate = new Date(date)
-    const now = new Date()
-    const diffTime = Math.abs(now.getTime() - eventDate.getTime())
-    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+    const eventDate = new Date(date);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - eventDate.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
     if (diffDays === 0) {
-      return 'Today'
+      return "Today";
     } else if (diffDays === 1) {
-      return 'Yesterday'
+      return "Yesterday";
     } else if (diffDays < 7) {
-      return `${diffDays} days ago`
+      return `${diffDays} days ago`;
     } else {
-      return eventDate.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        year: 'numeric'
-      })
+      return eventDate.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
     }
-  }
+  };
 
   const getBadgeName = (badgeId: string) => {
-    const badge = badges.find(b => b.id === badgeId)
-    return badge?.name || 'Unknown Badge'
-  }
+    const badge = badges.find((b) => b.id === badgeId);
+    return badge?.name || "Unknown Badge";
+  };
 
   if (!userId) {
     return (
@@ -78,7 +83,7 @@ export function BadgeTimeline({ userId, limit = 10, events = [], badges = [] }: 
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   if (sortedEvents.length === 0) {
@@ -93,7 +98,7 @@ export function BadgeTimeline({ userId, limit = 10, events = [], badges = [] }: 
           </div>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -140,5 +145,5 @@ export function BadgeTimeline({ userId, limit = 10, events = [], badges = [] }: 
         </ScrollArea>
       </CardContent>
     </Card>
-  )
-} 
+  );
+}

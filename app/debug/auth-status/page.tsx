@@ -1,4 +1,4 @@
-import { AuthDebug } from "@/components/auth-debug"
+import { AuthDebug } from "@/components/auth-debug";
 
 export default function AuthStatusPage() {
   return (
@@ -6,5 +6,5 @@ export default function AuthStatusPage() {
       <h1 className="text-2xl font-bold mb-6">Authentication Status</h1>
       <AuthDebug />
     </div>
-  )
+  );
 }

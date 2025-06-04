@@ -1,10 +1,10 @@
-import { Resend } from "resend"
+import { Resend } from "resend";
 
 // Initialize Resend with API key from environment variables
-const resendApiKey = process.env.RESEND_API_KEY
+const resendApiKey = process.env.RESEND_API_KEY;
 
 // Create a singleton instance of Resend
-let resendInstance: Resend | null = null
+let resendInstance: Resend | null = null;
 
 /**
  * Get the Resend client instance
@@ -12,15 +12,17 @@ let resendInstance: Resend | null = null
  */
 export function getResendClient(): Resend | null {
   if (!resendApiKey) {
-    console.warn("RESEND_API_KEY is not defined. Email functionality will be disabled.")
-    return null
+    console.warn(
+      "RESEND_API_KEY is not defined. Email functionality will be disabled.",
+    );
+    return null;
   }
 
   if (!resendInstance) {
-    resendInstance = new Resend(resendApiKey)
+    resendInstance = new Resend(resendApiKey);
   }
 
-  return resendInstance
+  return resendInstance;
 }
 
 /**
@@ -28,5 +30,5 @@ export function getResendClient(): Resend | null {
  * @returns boolean indicating if email functionality is available
  */
 export function isEmailEnabled(): boolean {
-  return !!resendApiKey
+  return !!resendApiKey;
 }

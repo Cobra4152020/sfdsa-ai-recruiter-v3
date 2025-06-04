@@ -1,17 +1,23 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Calendar } from "@/components/ui/calendar"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { useToast } from "@/components/ui/use-toast"
-import { useUser } from "@/context/user-context"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { useToast } from "@/components/ui/use-toast";
+import { useUser } from "@/context/user-context";
 import {
   CalendarIcon,
   FileText,
@@ -23,25 +29,95 @@ import {
   GamepadIcon,
   Award,
   Trophy,
-} from "lucide-react"
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import Link from "next/link"
+} from "lucide-react";
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import Link from "next/link";
 
 interface RecruitDashboardProps {
-  className?: string
+  className?: string;
+}
+
+interface PointsHistoryEntry {
+  date: string;
+  points: number;
+}
+
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: "completed" | "in-progress" | "pending";
+  dueDate: string;
+  priority: "high" | "medium" | "low";
+}
+
+interface Appointment {
+  id: string;
+  title: string;
+  date: string;
+  location: string;
+  status: "scheduled" | "pending" | "completed";
+}
+
+interface Document {
+  id: string;
+  title: string;
+  uploadDate: string;
+  status: "approved" | "pending" | "rejected";
+  type: string;
+}
+
+interface Message {
+  id: string;
+  from: string;
+  subject: string;
+  content: string;
+  date: string;
+  read: boolean;
+}
+
+interface Notification {
+  id: string;
+  type: string;
+  content: string;
+  date: string;
+  read: boolean;
+}
+
+interface DashboardData {
+  applicationProgress: number;
+  pointsTotal: number;
+  badgeCount: number;
+  nftCount: number;
+  pointsHistory: PointsHistoryEntry[];
+  tasks: Task[];
+  appointments: Appointment[];
+  documents: Document[];
+  messages: Message[];
+  notifications: Notification[];
 }
 
 export function RecruitDashboard({ className }: RecruitDashboardProps) {
-  const { currentUser, isLoading: isUserLoading } = useUser()
-  const { toast } = useToast()
-  const [activeTab, setActiveTab] = useState("overview")
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [dashboardData, setDashboardData] = useState<any>(null)
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined)
-  const [documentTitle, setDocumentTitle] = useState("")
-  const [documentFile, setDocumentFile] = useState<File | null>(null)
-  const [messageText, setMessageText] = useState("")
+  const { currentUser, isLoading: isUserLoading } = useUser();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState("overview");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null,
+  );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [documentTitle, setDocumentTitle] = useState("");
+  const [documentFile, setDocumentFile] = useState<File | null>(null);
+  const [messageText, setMessageText] = useState("");
   const [triviaStats, setTriviaStats] = useState<{
     gamesPlayed: number;
     averageScore: number;
@@ -54,134 +130,138 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
     bestScore: "0/0",
     totalPointsEarned: 0,
     badgesEarned: [],
-  })
+  });
 
   useEffect(() => {
     const fetchDashboardData = async () => {
       // Don't fetch if user is not loaded yet
-      if (isUserLoading) return
-      
+      if (isUserLoading) return;
+
       // Don't fetch if no user is logged in
       if (!currentUser) {
-        setIsLoading(false)
-        return
+        setIsLoading(false);
+        return;
       }
 
-      setIsLoading(true)
-      setError(null)
-      
+      setIsLoading(true);
+      setError(null);
+
       try {
         // In a real implementation, this would be an API call
         // For now, we'll use mock data
-        await new Promise((resolve) => setTimeout(resolve, 1000))
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         const mockPointsHistory = Array.from({ length: 30 }, (_, i) => {
-          const date = new Date()
-          date.setDate(date.getDate() - 29 + i)
+          const date = new Date();
+          date.setDate(date.getDate() - 29 + i);
           return {
             date: date.toISOString().split("T")[0],
             points: Math.floor(Math.random() * 100) + 50,
-          }
-        })
+          };
+        });
 
-        const mockTasks = [
+        const mockTasks: Task[] = [
           {
             id: "task1",
             title: "Complete application form",
             description: "Fill out the online application form",
-            status: "completed",
+            status: "completed" as const,
             dueDate: "2023-05-15",
-            priority: "high",
+            priority: "high" as const,
           },
           {
             id: "task2",
             title: "Submit required documents",
-            description: "Upload your ID, education certificates, and references",
-            status: "in-progress",
+            description:
+              "Upload your ID, education certificates, and references",
+            status: "in-progress" as const,
             dueDate: "2023-05-20",
-            priority: "high",
+            priority: "high" as const,
           },
           {
             id: "task3",
             title: "Schedule written exam",
             description: "Book your slot for the written examination",
-            status: "pending",
+            status: "pending" as const,
             dueDate: "2023-05-25",
-            priority: "medium",
+            priority: "medium" as const,
           },
           {
             id: "task4",
             title: "Prepare for physical fitness test",
-            description: "Review requirements and practice for the physical fitness assessment",
-            status: "pending",
+            description:
+              "Review requirements and practice for the physical fitness assessment",
+            status: "pending" as const,
             dueDate: "2023-06-10",
-            priority: "medium",
+            priority: "medium" as const,
           },
           {
             id: "task5",
             title: "Background check forms",
-            description: "Complete and submit background check authorization forms",
-            status: "pending",
+            description:
+              "Complete and submit background check authorization forms",
+            status: "pending" as const,
             dueDate: "2023-06-15",
-            priority: "high",
+            priority: "high" as const,
           },
           {
             id: "task6",
             title: "Play SF Trivia with Sgt. Ken",
-            description: "Play the trivia game to learn more about San Francisco and earn points",
-            status: "in-progress",
+            description:
+              "Play the trivia game to learn more about San Francisco and earn points",
+            status: "in-progress" as const,
             dueDate: "2023-05-30",
-            priority: "medium",
+            priority: "medium" as const,
           },
-        ]
+        ];
 
-        const mockAppointments = [
+        const mockAppointments: Appointment[] = [
           {
             id: "apt1",
             title: "Written Exam",
             date: "2023-05-28T10:00:00",
-            location: "SF Sheriff's Office - 1 Dr Carlton B Goodlett Pl",
-            status: "scheduled",
+            location: "SF Sheriff&apos;s Office - 1 Dr Carlton B Goodlett Pl",
+            status: "scheduled" as const,
           },
           {
             id: "apt2",
             title: "Physical Fitness Test",
             date: "2023-06-15T09:00:00",
-            location: "SF Sheriff's Training Facility",
-            status: "pending",
+            location: "SF Sheriff&apos;s Training Facility",
+            status: "pending" as const,
           },
           {
             id: "apt3",
             title: "Oral Interview",
             date: "2023-06-30T13:00:00",
-            location: "SF Sheriff's Office - 1 Dr Carlton B Goodlett Pl",
-            status: "pending",
+            location: "SF Sheriff&apos;s Office - 1 Dr Carlton B Goodlett Pl",
+            status: "pending" as const,
           },
-        ]
+        ];
 
-        const mockDocuments = [
+        const mockDocuments: Document[] = [
           {
             id: "doc1",
             title: "Application Form",
             uploadDate: "2023-05-10T14:30:00",
-            status: "approved",
+            status: "approved" as const,
             type: "application",
           },
           {
             id: "doc2",
-            title: "Driver's License",
+            title: "Driver&apos;s License",
             uploadDate: "2023-05-10T14:35:00",
-            status: "approved",
+            status: "approved" as const,
             type: "identification",
           },
           {
             id: "doc3",
             title: "College Transcript",
             uploadDate: "2023-05-10T14:40:00",
-            status: "pending",
+            status: "pending" as const,
             type: "education",
           },
-        ]
+        ];
 
         const mockMessages = [
           {
@@ -207,7 +287,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             from: "Training Division",
             subject: "Preparation Resources",
             content:
-              "To help you prepare for the upcoming written exam, we've attached some study materials and practice tests.",
+              "To help you prepare for the upcoming written exam, we&apos;ve attached some study materials and practice tests.",
             date: "2023-05-15T11:30:00",
             read: false,
           },
@@ -220,45 +300,48 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             date: "2023-05-16T10:45:00",
             read: false,
           },
-        ]
+        ];
 
         const mockNotifications = [
           {
             id: "notif1",
-            title: "Document Approved",
-            content: "Your Driver's License has been verified and approved.",
+            type: "document",
+            content:
+              "Your Driver&apos;s License has been verified and approved.",
             date: "2023-05-12T14:25:00",
             read: false,
           },
           {
             id: "notif2",
-            title: "Appointment Reminder",
+            type: "appointment",
             content: "Your Written Exam is scheduled for May 28th at 10:00 AM.",
             date: "2023-05-20T09:00:00",
             read: false,
           },
           {
             id: "notif3",
-            title: "New Message",
+            type: "message",
             content: "You have a new message from the Training Division.",
             date: "2023-05-15T11:35:00",
             read: false,
           },
           {
             id: "notif4",
-            title: "Badge Earned!",
-            content: "Congratulations! You've earned the 'Trivia Enthusiast' badge.",
+            type: "badge",
+            content:
+              "Congratulations! You&apos;ve earned the 'Trivia Enthusiast' badge.",
             date: "2023-05-14T15:20:00",
             read: false,
           },
           {
             id: "notif5",
-            title: "Points Milestone",
-            content: "You've reached 1,000 points! Keep up the great work.",
+            type: "points",
+            content:
+              "You&apos;ve reached 1,000 points! Keep up the great work.",
             date: "2023-05-13T16:45:00",
             read: false,
           },
-        ]
+        ];
 
         // Mock trivia data
         const mockTriviaStats = {
@@ -267,10 +350,18 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           bestScore: "5/5",
           totalPointsEarned: 475,
           badgesEarned: [
-            { name: "Trivia Participant", date: "2023-05-01", description: "Completed your first trivia game" },
-            { name: "Trivia Enthusiast", date: "2023-05-10", description: "Played 10 trivia games" },
+            {
+              name: "Trivia Participant",
+              date: "2023-05-01",
+              description: "Completed your first trivia game",
+            },
+            {
+              name: "Trivia Enthusiast",
+              date: "2023-05-10",
+              description: "Played 10 trivia games",
+            },
           ],
-        }
+        };
 
         setDashboardData({
           applicationProgress: 35,
@@ -283,19 +374,21 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           documents: mockDocuments,
           messages: mockMessages,
           notifications: mockNotifications,
-        })
+        });
 
-        setTriviaStats(mockTriviaStats)
+        setTriviaStats(mockTriviaStats);
       } catch (error) {
-        console.error("Error fetching dashboard data:", error)
-        setError("An error occurred while fetching dashboard data. Please try again later.")
+        console.error("Error fetching dashboard data:", error);
+        setError(
+          "An error occurred while fetching dashboard data. Please try again later.",
+        );
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchDashboardData()
-  }, [currentUser, isUserLoading])
+    fetchDashboardData();
+  }, [currentUser, isUserLoading]);
 
   const handleScheduleAppointment = () => {
     if (!selectedDate) {
@@ -303,17 +396,17 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
         title: "Please select a date",
         description: "You must select a date to schedule an appointment",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     toast({
       title: "Appointment Requested",
       description: `Your appointment request for ${selectedDate.toLocaleDateString()} has been submitted.`,
-    })
+    });
 
-    setSelectedDate(undefined)
-  }
+    setSelectedDate(undefined);
+  };
 
   const handleUploadDocument = () => {
     if (!documentTitle || !documentFile) {
@@ -321,18 +414,18 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
         title: "Missing information",
         description: "Please provide both a title and a file",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     toast({
       title: "Document Uploaded",
       description: `Your document "${documentTitle}" has been uploaded successfully.`,
-    })
+    });
 
-    setDocumentTitle("")
-    setDocumentFile(null)
-  }
+    setDocumentTitle("");
+    setDocumentFile(null);
+  };
 
   const handleSendMessage = () => {
     if (!messageText.trim()) {
@@ -340,17 +433,17 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
         title: "Empty message",
         description: "Please enter a message before sending",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     toast({
       title: "Message Sent",
       description: "Your message has been sent to the recruitment team.",
-    })
+    });
 
-    setMessageText("")
-  }
+    setMessageText("");
+  };
 
   // Show error state if there's an error
   if (error) {
@@ -361,7 +454,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           <Button onClick={() => window.location.reload()}>Retry</Button>
         </div>
       </div>
-    )
+    );
   }
 
   // Show loading state while user is loading or data is loading
@@ -372,7 +465,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
         </div>
       </div>
-    )
+    );
   }
 
   // Show message if no user is logged in
@@ -380,20 +473,24 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
     return (
       <div className={className}>
         <div className="flex flex-col items-center justify-center h-64">
-          <p className="text-gray-500 mb-4">Please log in to view your dashboard</p>
+          <p className="text-gray-500 mb-4">
+            Please log in to view your dashboard
+          </p>
           <Button asChild>
             <Link href="/login">Log In</Link>
           </Button>
         </div>
       </div>
-    )
+    );
   }
 
   return (
     <div className={className}>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">Recruit Dashboard</h2>
+          <h2 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+            Recruit Dashboard
+          </h2>
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
@@ -409,38 +506,63 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Application Progress</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Application Progress
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.applicationProgress}%</div>
-                <Progress value={dashboardData.applicationProgress} className="h-2 mt-2" />
+                <div className="text-2xl font-bold">
+                  {dashboardData?.applicationProgress}%
+                </div>
+                <Progress
+                  value={dashboardData?.applicationProgress}
+                  className="h-2 mt-2"
+                />
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Total Points</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Total Points
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.pointsTotal.toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground mt-1">+125 this week</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData?.pointsTotal.toLocaleString()}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  +125 this week
+                </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">Badges Earned</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  Badges Earned
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.badgeCount}</div>
-                <div className="text-xs text-muted-foreground mt-1">2 new this month</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData?.badgeCount}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  2 new this month
+                </div>
               </CardContent>
             </Card>
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm font-medium">NFT Awards</CardTitle>
+                <CardTitle className="text-sm font-medium">
+                  NFT Awards
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{dashboardData.nftCount}</div>
-                <div className="text-xs text-muted-foreground mt-1">Bronze Recruit achieved</div>
+                <div className="text-2xl font-bold">
+                  {dashboardData?.nftCount}
+                </div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  Bronze Recruit achieved
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -449,13 +571,15 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           <Card>
             <CardHeader>
               <CardTitle>Points History</CardTitle>
-              <CardDescription>Your participation points over the last 30 days</CardDescription>
+              <CardDescription>
+                Your participation points over the last 30 days
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="h-[300px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart
-                    data={dashboardData.pointsHistory}
+                    data={dashboardData?.pointsHistory}
                     margin={{
                       top: 10,
                       right: 30,
@@ -467,7 +591,13 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                     <XAxis dataKey="date" />
                     <YAxis />
                     <Tooltip />
-                    <Area type="monotone" dataKey="points" stroke="#0A3C1F" fill="#0A3C1F" fillOpacity={0.2} />
+                    <Area
+                      type="monotone"
+                      dataKey="points"
+                      stroke="#0A3C1F"
+                      fill="#0A3C1F"
+                      fillOpacity={0.2}
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -482,20 +612,30 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboardData.notifications.map((notification: any) => (
-                    <div key={notification.id} className="flex items-start space-x-4">
-                      <div className="bg-[#0A3C1F]/10 rounded-full p-2">
-                        <Bell className="h-4 w-4 text-[#0A3C1F]" />
+                  {dashboardData?.notifications.map(
+                    (notification: Notification) => (
+                      <div
+                        key={notification.id}
+                        className="flex items-start space-x-4"
+                      >
+                        <div className="bg-[#0A3C1F]/10 rounded-full p-2">
+                          <Bell className="h-4 w-4 text-[#0A3C1F]" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium">
+                            {notification.type.charAt(0).toUpperCase() +
+                              notification.type.slice(1)}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {notification.content}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(notification.date).toLocaleString()}
+                          </p>
+                        </div>
                       </div>
-                      <div>
-                        <h4 className="font-medium">{notification.title}</h4>
-                        <p className="text-sm text-muted-foreground">{notification.content}</p>
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {new Date(notification.date).toLocaleString()}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -506,10 +646,10 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboardData.tasks
-                    .filter((task: any) => task.status !== "completed")
+                  {dashboardData?.tasks
+                    .filter((task: Task) => task.status !== "completed")
                     .slice(0, 3)
-                    .map((task: any) => (
+                    .map((task: Task) => (
                       <div key={task.id} className="flex items-start space-x-4">
                         <div
                           className={`rounded-full p-2 ${
@@ -524,9 +664,13 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                         </div>
                         <div>
                           <h4 className="font-medium">{task.title}</h4>
-                          <p className="text-sm text-muted-foreground">{task.description}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {task.description}
+                          </p>
                           <div className="flex items-center mt-1">
-                            <p className="text-xs text-muted-foreground">Due: {task.dueDate}</p>
+                            <p className="text-xs text-muted-foreground">
+                              Due: {task.dueDate}
+                            </p>
                             <Badge
                               variant="outline"
                               className={`ml-2 ${
@@ -535,7 +679,9 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                                   : "bg-yellow-50 text-yellow-600 border-yellow-200"
                               }`}
                             >
-                              {task.status === "in-progress" ? "In Progress" : "Pending"}
+                              {task.status === "in-progress"
+                                ? "In Progress"
+                                : "Pending"}
                             </Badge>
                           </div>
                         </div>
@@ -551,11 +697,13 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           <Card>
             <CardHeader>
               <CardTitle>Your Tasks</CardTitle>
-              <CardDescription>Track your application process tasks</CardDescription>
+              <CardDescription>
+                Track your application process tasks
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {dashboardData.tasks.map((task: any) => (
+                {dashboardData?.tasks.map((task: Task) => (
                   <div
                     key={task.id}
                     className={`p-4 border rounded-lg ${
@@ -585,7 +733,9 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                         </div>
                         <div>
                           <h4 className="font-medium">{task.title}</h4>
-                          <p className="text-sm text-muted-foreground">{task.description}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {task.description}
+                          </p>
                         </div>
                       </div>
                       <Badge
@@ -598,28 +748,41 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                               : "bg-blue-50 text-blue-600 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800"
                         }`}
                       >
-                        {task.priority.charAt(0).toUpperCase() + task.priority.slice(1)} Priority
+                        {task.priority.charAt(0).toUpperCase() +
+                          task.priority.slice(1)}{" "}
+                        Priority
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between mt-4">
-                      <div className="text-sm text-muted-foreground">Due: {task.dueDate}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Due: {task.dueDate}
+                      </div>
                       <div className="flex space-x-2">
                         {task.status !== "completed" && (
                           <Button
                             variant="outline"
                             size="sm"
-                            className={task.status === "pending" ? "bg-blue-50 text-blue-600" : ""}
+                            className={
+                              task.status === "pending"
+                                ? "bg-blue-50 text-blue-600"
+                                : ""
+                            }
                             onClick={() => {
                               toast({
-                                title: task.status === "pending" ? "Task Started" : "Task Completed",
+                                title:
+                                  task.status === "pending"
+                                    ? "Task Started"
+                                    : "Task Completed",
                                 description:
                                   task.status === "pending"
-                                    ? `You've started working on "${task.title}"`
-                                    : `You've completed "${task.title}"`,
-                              })
+                                    ? `You&apos;ve started working on "${task.title}"`
+                                    : `You&apos;ve completed "${task.title}"`,
+                              });
                             }}
                           >
-                            {task.status === "pending" ? "Start Task" : "Mark Complete"}
+                            {task.status === "pending"
+                              ? "Start Task"
+                              : "Mark Complete"}
                           </Button>
                         )}
                         {task.title === "Play SF Trivia with Sgt. Ken" ? (
@@ -627,7 +790,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                             variant="outline"
                             size="sm"
                             onClick={() => {
-                              window.location.href = "/trivia"
+                              window.location.href = "/trivia";
                             }}
                           >
                             <GamepadIcon className="h-4 w-4 mr-2" />
@@ -641,7 +804,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                               toast({
                                 title: "Task Details",
                                 description: `Viewing details for "${task.title}"`,
-                              })
+                              });
                             }}
                           >
                             View Details
@@ -665,26 +828,36 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                   <GamepadIcon className="h-5 w-5 mr-2 text-[#0A3C1F]" />
                   Your Trivia Statistics
                 </CardTitle>
-                <CardDescription>Track your progress in the SF Trivia Challenge</CardDescription>
+                <CardDescription>
+                  Track your progress in the SF Trivia Challenge
+                </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-[#0A3C1F]/10 p-4 rounded-lg text-center">
                       <p className="text-sm text-gray-500">Games Played</p>
-                      <p className="text-3xl font-bold text-[#0A3C1F]">{triviaStats.gamesPlayed}</p>
+                      <p className="text-3xl font-bold text-[#0A3C1F]">
+                        {triviaStats.gamesPlayed}
+                      </p>
                     </div>
                     <div className="bg-[#FFD700]/10 p-4 rounded-lg text-center">
                       <p className="text-sm text-gray-500">Best Score</p>
-                      <p className="text-3xl font-bold text-[#0A3C1F]">{triviaStats.bestScore}</p>
+                      <p className="text-3xl font-bold text-[#0A3C1F]">
+                        {triviaStats.bestScore}
+                      </p>
                     </div>
                     <div className="bg-blue-50 p-4 rounded-lg text-center">
                       <p className="text-sm text-gray-500">Average Score</p>
-                      <p className="text-3xl font-bold text-blue-700">{triviaStats.averageScore}/5</p>
+                      <p className="text-3xl font-bold text-blue-700">
+                        {triviaStats.averageScore}/5
+                      </p>
                     </div>
                     <div className="bg-green-50 p-4 rounded-lg text-center">
                       <p className="text-sm text-gray-500">Points Earned</p>
-                      <p className="text-3xl font-bold text-green-700">{triviaStats.totalPointsEarned}</p>
+                      <p className="text-3xl font-bold text-green-700">
+                        {triviaStats.totalPointsEarned}
+                      </p>
                     </div>
                   </div>
 
@@ -704,10 +877,15 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                               <Award className="h-5 w-5 text-[#FFD700]" />
                             </div>
                             <div>
-                              <p className="font-medium text-[#0A3C1F]">{badge.name}</p>
-                              <p className="text-xs text-gray-500">{badge.description}</p>
+                              <p className="font-medium text-[#0A3C1F]">
+                                {badge.name}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                {badge.description}
+                              </p>
                               <p className="text-xs text-gray-400 mt-1">
-                                Earned on {new Date(badge.date).toLocaleDateString()}
+                                Earned on{" "}
+                                {new Date(badge.date).toLocaleDateString()}
                               </p>
                             </div>
                           </div>
@@ -715,7 +893,8 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                       </div>
                     ) : (
                       <p className="text-gray-500 text-sm italic">
-                        You haven't earned any trivia badges yet. Keep playing to earn badges!
+                        You haven&apos;t earned any trivia badges yet. Keep
+                        playing to earn badges!
                       </p>
                     )}
                   </div>
@@ -727,7 +906,9 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             <Card>
               <CardHeader className="bg-gradient-to-r from-[#0A3C1F]/10 to-[#FFD700]/10">
                 <CardTitle>Play SF Trivia with Sgt. Ken</CardTitle>
-                <CardDescription>Test your knowledge and earn rewards</CardDescription>
+                <CardDescription>
+                  Test your knowledge and earn rewards
+                </CardDescription>
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center space-y-4">
@@ -735,10 +916,13 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                     <GamepadIcon className="h-16 w-16 text-[#0A3C1F]" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">Ready to Test Your Knowledge?</h3>
+                    <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
+                      Ready to Test Your Knowledge?
+                    </h3>
                     <p className="text-gray-600 mb-4">
-                      Challenge yourself with questions about San Francisco history, landmarks, and Sheriff's Department
-                      facts. Earn points and unlock special badges!
+                      Challenge yourself with questions about San Francisco
+                      history, landmarks, and Sheriff&apos;s Department facts.
+                      Earn points and unlock special badges!
                     </p>
 
                     <div className="bg-[#0A3C1F]/5 p-4 rounded-lg text-left mb-6">
@@ -750,7 +934,10 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                         <li>Earn 25-100 points per game based on your score</li>
                         <li>Unlock exclusive badges for consistent playing</li>
                         <li>Improve your position on the leaderboard</li>
-                        <li>Learn important facts about SF and the Sheriff's Department</li>
+                        <li>
+                          Learn important facts about SF and the Sheriff&apos;s
+                          Department
+                        </li>
                       </ul>
                     </div>
 
@@ -773,7 +960,9 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                 <Trophy className="h-5 w-5 mr-2 text-[#FFD700]" />
                 Trivia Leaderboard
               </CardTitle>
-              <CardDescription>See how you rank against other recruits</CardDescription>
+              <CardDescription>
+                See how you rank against other recruits
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
@@ -819,7 +1008,9 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                       <td className="py-3">{triviaStats.gamesPlayed}</td>
                       <td className="py-3">{triviaStats.averageScore}/5</td>
                       <td className="py-3">{triviaStats.totalPointsEarned}</td>
-                      <td className="py-3">{triviaStats.badgesEarned.length}</td>
+                      <td className="py-3">
+                        {triviaStats.badgesEarned.length}
+                      </td>
                     </tr>
                     <tr className="border-b">
                       <td className="py-3 font-medium">9</td>
@@ -845,68 +1036,77 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboardData.appointments.map((appointment: any) => (
-                    <div
-                      key={appointment.id}
-                      className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className="bg-[#0A3C1F]/10 rounded-full p-2">
-                          <CalendarIcon className="h-4 w-4 text-[#0A3C1F]" />
+                  {dashboardData?.appointments.map(
+                    (appointment: Appointment) => (
+                      <div
+                        key={appointment.id}
+                        className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+                      >
+                        <div className="flex items-start space-x-3">
+                          <div className="bg-[#0A3C1F]/10 rounded-full p-2">
+                            <CalendarIcon className="h-4 w-4 text-[#0A3C1F]" />
+                          </div>
+                          <div>
+                            <h4 className="font-medium">{appointment.title}</h4>
+                            <p className="text-sm text-muted-foreground">
+                              {appointment.location}
+                            </p>
+                            <p className="text-sm font-medium mt-1">
+                              {new Date(appointment.date).toLocaleString(
+                                undefined,
+                                {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                  hour: "numeric",
+                                  minute: "numeric",
+                                },
+                              )}
+                            </p>
+                            <Badge
+                              variant="outline"
+                              className={`mt-2 ${
+                                appointment.status === "scheduled"
+                                  ? "bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:border-green-800"
+                                  : "bg-yellow-50 text-yellow-600 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800"
+                              }`}
+                            >
+                              {appointment.status === "scheduled"
+                                ? "Confirmed"
+                                : "Pending"}
+                            </Badge>
+                          </div>
                         </div>
-                        <div>
-                          <h4 className="font-medium">{appointment.title}</h4>
-                          <p className="text-sm text-muted-foreground">{appointment.location}</p>
-                          <p className="text-sm font-medium mt-1">
-                            {new Date(appointment.date).toLocaleString(undefined, {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
-                              day: "numeric",
-                              hour: "numeric",
-                              minute: "numeric",
-                            })}
-                          </p>
-                          <Badge
+                        <div className="flex justify-end mt-4 space-x-2">
+                          <Button
                             variant="outline"
-                            className={`mt-2 ${
-                              appointment.status === "scheduled"
-                                ? "bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:border-green-800"
-                                : "bg-yellow-50 text-yellow-600 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800"
-                            }`}
+                            size="sm"
+                            onClick={() => {
+                              toast({
+                                title: "Calendar Added",
+                                description: `"${appointment.title}" has been added to your calendar.`,
+                              });
+                            }}
                           >
-                            {appointment.status === "scheduled" ? "Confirmed" : "Pending"}
-                          </Badge>
+                            Add to Calendar
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              toast({
+                                title: "Appointment Details",
+                                description: `Viewing details for "${appointment.title}"`,
+                              });
+                            }}
+                          >
+                            View Details
+                          </Button>
                         </div>
                       </div>
-                      <div className="flex justify-end mt-4 space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "Calendar Added",
-                              description: `"${appointment.title}" has been added to your calendar.`,
-                            })
-                          }}
-                        >
-                          Add to Calendar
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "Appointment Details",
-                              description: `Viewing details for "${appointment.title}"`,
-                            })
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                    ),
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -914,7 +1114,9 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Schedule New Appointment</CardTitle>
-                <CardDescription>Request a new appointment with the recruitment team</CardDescription>
+                <CardDescription>
+                  Request a new appointment with the recruitment team
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -926,8 +1128,12 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                     >
                       <option value="">Select appointment type</option>
                       <option value="document-review">Document Review</option>
-                      <option value="application-assistance">Application Assistance</option>
-                      <option value="interview-prep">Interview Preparation</option>
+                      <option value="application-assistance">
+                        Application Assistance
+                      </option>
+                      <option value="interview-prep">
+                        Interview Preparation
+                      </option>
                       <option value="general-inquiry">General Inquiry</option>
                     </select>
                   </div>
@@ -941,9 +1147,10 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                       className="border rounded-md p-3"
                       disabled={(date) => {
                         // Disable weekends and past dates
-                        const day = date.getDay()
-                        const isPastDate = date < new Date(new Date().setHours(0, 0, 0, 0))
-                        return day === 0 || day === 6 || isPastDate
+                        const day = date.getDay();
+                        const isPastDate =
+                          date < new Date(new Date().setHours(0, 0, 0, 0));
+                        return day === 0 || day === 6 || isPastDate;
                       }}
                     />
                   </div>
@@ -990,11 +1197,13 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Your Documents</CardTitle>
-                <CardDescription>Uploaded documents and their status</CardDescription>
+                <CardDescription>
+                  Uploaded documents and their status
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboardData.documents.map((document: any) => (
+                  {dashboardData?.documents.map((document: Document) => (
                     <div
                       key={document.id}
                       className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
@@ -1016,14 +1225,18 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                                     : "bg-yellow-50 text-yellow-600 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800"
                               }`}
                             >
-                              {document.status.charAt(0).toUpperCase() + document.status.slice(1)}
+                              {document.status.charAt(0).toUpperCase() +
+                                document.status.slice(1)}
                             </Badge>
                           </div>
                           <p className="text-sm text-muted-foreground">
-                            Type: {document.type.charAt(0).toUpperCase() + document.type.slice(1)}
+                            Type:{" "}
+                            {document.type.charAt(0).toUpperCase() +
+                              document.type.slice(1)}
                           </p>
                           <p className="text-sm text-muted-foreground">
-                            Uploaded: {new Date(document.uploadDate).toLocaleString()}
+                            Uploaded:{" "}
+                            {new Date(document.uploadDate).toLocaleString()}
                           </p>
                         </div>
                       </div>
@@ -1035,7 +1248,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                             toast({
                               title: "Document Downloaded",
                               description: `"${document.title}" has been downloaded.`,
-                            })
+                            });
                           }}
                         >
                           Download
@@ -1047,7 +1260,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                             toast({
                               title: "Document Details",
                               description: `Viewing details for "${document.title}"`,
-                            })
+                            });
                           }}
                         >
                           View Details
@@ -1062,7 +1275,9 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Upload New Document</CardTitle>
-                <CardDescription>Submit required documents for your application</CardDescription>
+                <CardDescription>
+                  Submit required documents for your application
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
@@ -1108,13 +1323,21 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                               name="file-upload"
                               type="file"
                               className="sr-only"
-                              onChange={(e) => setDocumentFile(e.target.files?.[0] || null)}
+                              onChange={(e) =>
+                                setDocumentFile(e.target.files?.[0] || null)
+                              }
                             />
                           </label>
                           <p className="pl-1">or drag and drop</p>
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">PDF, PNG, JPG, GIF up to 10MB</p>
-                        {documentFile && <p className="text-sm text-[#0A3C1F] font-medium mt-2">{documentFile.name}</p>}
+                        <p className="text-xs text-gray-500 dark:text-gray-400">
+                          PDF, PNG, JPG, GIF up to 10MB
+                        </p>
+                        {documentFile && (
+                          <p className="text-sm text-[#0A3C1F] font-medium mt-2">
+                            {documentFile.name}
+                          </p>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -1145,11 +1368,13 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Your Messages</CardTitle>
-                <CardDescription>Communication with the recruitment team</CardDescription>
+                <CardDescription>
+                  Communication with the recruitment team
+                </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboardData.messages.map((message: any) => (
+                  {dashboardData?.messages.map((message: Message) => (
                     <div
                       key={message.id}
                       className={`p-4 border rounded-lg ${
@@ -1166,12 +1391,17 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                           <div className="flex items-center justify-between">
                             <h4 className="font-medium">{message.subject}</h4>
                             {!message.read && (
-                              <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
+                              <Badge
+                                variant="outline"
+                                className="bg-blue-50 text-blue-600 border-blue-200"
+                              >
                                 New
                               </Badge>
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground">From: {message.from}</p>
+                          <p className="text-sm text-muted-foreground">
+                            From: {message.from}
+                          </p>
                           <p className="text-sm mt-2">{message.content}</p>
                           <p className="text-xs text-muted-foreground mt-1">
                             {new Date(message.date).toLocaleString()}
@@ -1186,7 +1416,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                             toast({
                               title: "Message Marked as Read",
                               description: `"${message.subject}" has been marked as read.`,
-                            })
+                            });
                           }}
                         >
                           {message.read ? "Mark as Unread" : "Mark as Read"}
@@ -1198,7 +1428,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                             toast({
                               title: "Reply Sent",
                               description: `Your reply to "${message.subject}" has been sent.`,
-                            })
+                            });
                           }}
                         >
                           Reply
@@ -1225,16 +1455,25 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                     >
                       <option value="">Select recipient</option>
                       <option value="recruitment-team">Recruitment Team</option>
-                      <option value="background-unit">Background Investigation Unit</option>
-                      <option value="training-division">Training Division</option>
+                      <option value="background-unit">
+                        Background Investigation Unit
+                      </option>
+                      <option value="training-division">
+                        Training Division
+                      </option>
                       <option value="hr-department">HR Department</option>
-                      <option value="sgt-ken">Sgt. Ken (Trivia Game Admin)</option>
+                      <option value="sgt-ken">
+                        Sgt. Ken (Trivia Game Admin)
+                      </option>
                     </select>
                   </div>
 
                   <div>
                     <Label htmlFor="message-subject">Subject</Label>
-                    <Input id="message-subject" placeholder="Enter message subject" />
+                    <Input
+                      id="message-subject"
+                      placeholder="Enter message subject"
+                    />
                   </div>
 
                   <div>
@@ -1249,11 +1488,16 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                   </div>
 
                   <div>
-                    <Label htmlFor="message-attachment">Attachment (Optional)</Label>
+                    <Label htmlFor="message-attachment">
+                      Attachment (Optional)
+                    </Label>
                     <Input id="message-attachment" type="file" />
                   </div>
 
-                  <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white" onClick={handleSendMessage}>
+                  <Button
+                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                    onClick={handleSendMessage}
+                  >
                     Send Message
                   </Button>
                 </div>
@@ -1263,5 +1507,5 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

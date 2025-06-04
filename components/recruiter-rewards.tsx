@@ -1,11 +1,19 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Skeleton } from "@/components/ui/skeleton"
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+  CardFooter,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Dialog,
   DialogContent,
@@ -13,80 +21,73 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { Gift, Award, CheckCircle, AlertCircle, Lock } from "lucide-react"
-import { toast } from "@/components/ui/use-toast"
-import { useUser } from "@/context/user-context"
-
-interface RecruiterReward {
-  id: number
-  name: string
-  description: string
-  pointsRequired: number
-  rewardType: string
-  imageUrl: string
-  isActive: boolean
-  maxRedemptions: number | null
-  redemptionsCount: number
-}
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
+import { Gift, Award, CheckCircle, AlertCircle, Lock } from "lucide-react";
+import { toast } from "@/components/ui/use-toast";
+import { useUser } from "@/context/user-context";
+import type { RecruiterReward } from "@/lib/recruiter-rewards-service";
 
 export function RecruiterRewards() {
-  const { currentUser } = useUser()
-  const [rewards, setRewards] = useState<RecruiterReward[]>([])
-  const [totalPoints, setTotalPoints] = useState(0)
-  const [isLoading, setIsLoading] = useState(true)
-  const [selectedReward, setSelectedReward] = useState<RecruiterReward | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [notes, setNotes] = useState("")
+  const { currentUser } = useUser();
+  const [rewards, setRewards] = useState<RecruiterReward[]>([]);
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [selectedReward, setSelectedReward] = useState<RecruiterReward | null>(
+    null,
+  );
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notes, setNotes] = useState("");
 
   useEffect(() => {
-    if (!currentUser?.id) return
+    if (!currentUser?.id) return;
 
     const fetchData = async () => {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         // Fetch rewards
-        const rewardsResponse = await fetch("/api/recruiter/rewards")
-        const rewardsData = await rewardsResponse.json()
+        const rewardsResponse = await fetch("/api/recruiter/rewards");
+        const rewardsData = await rewardsResponse.json();
 
         if (rewardsData.success && rewardsData.rewards) {
-          setRewards(rewardsData.rewards)
+          setRewards(rewardsData.rewards);
         }
 
         // Fetch recruiter points
-        const pointsResponse = await fetch(`/api/recruiter/points?recruiterId=${currentUser.id}`)
-        const pointsData = await pointsResponse.json()
+        const pointsResponse = await fetch(
+          `/api/recruiter/points?recruiterId=${currentUser.id}`,
+        );
+        const pointsData = await pointsResponse.json();
 
         if (pointsData.success && pointsData.totalPoints !== undefined) {
-          setTotalPoints(pointsData.totalPoints)
+          setTotalPoints(pointsData.totalPoints);
         }
       } catch (err) {
-        console.error("Error fetching rewards data:", err)
+        console.error("Error fetching rewards data:", err);
         toast({
           title: "Error",
           description: "Failed to load rewards information",
           variant: "destructive",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchData()
-  }, [currentUser?.id])
+    fetchData();
+  }, [currentUser?.id]);
 
   const handleRedeemClick = (reward: RecruiterReward) => {
-    setSelectedReward(reward)
-    setIsModalOpen(true)
-    setNotes("")
-  }
+    setSelectedReward(reward);
+    setIsModalOpen(true);
+    setNotes("");
+  };
 
   const handleRedeemSubmit = async () => {
-    if (!currentUser?.id || !selectedReward) return
+    if (!currentUser?.id || !selectedReward) return;
 
-    setIsSubmitting(true)
+    setIsSubmitting(true);
     try {
       const response = await fetch("/api/recruiter/rewards/redeem", {
         method: "POST",
@@ -98,55 +99,58 @@ export function RecruiterRewards() {
           rewardId: selectedReward.id,
           notes: notes.trim() || undefined,
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (data.success) {
         toast({
           title: "Reward Redeemed!",
           description: `You've successfully redeemed: ${selectedReward.name}`,
-        })
-        setIsModalOpen(false)
+        });
+        setIsModalOpen(false);
 
         // Update local state to reflect the redemption
-        setTotalPoints((prev) => prev - selectedReward.pointsRequired)
+        setTotalPoints((prev) => prev - selectedReward.pointsRequired);
         setRewards((prev) =>
           prev.map((reward) =>
-            reward.id === selectedReward.id ? { ...reward, redemptionsCount: reward.redemptionsCount + 1 } : reward,
+            reward.id === selectedReward.id
+              ? { ...reward, redemptionsCount: reward.redemptionsCount + 1 }
+              : reward,
           ),
-        )
+        );
       } else {
         toast({
           title: "Redemption Failed",
-          description: data.message || "There was an error redeeming your reward",
+          description:
+            data.message || "There was an error redeeming your reward",
           variant: "destructive",
-        })
+        });
       }
     } catch (err) {
-      console.error("Error redeeming reward:", err)
+      console.error("Error redeeming reward:", err);
       toast({
         title: "Error",
         description: "An unexpected error occurred while redeeming your reward",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   const getRewardTypeIcon = (type: string) => {
     switch (type) {
       case "badge":
-        return <Award className="h-4 w-4 mr-1" />
+        return <Award className="h-4 w-4 mr-1" />;
       case "certificate":
-        return <CheckCircle className="h-4 w-4 mr-1" />
+        return <CheckCircle className="h-4 w-4 mr-1" />;
       case "gift_card":
-        return <Gift className="h-4 w-4 mr-1" />
+        return <Gift className="h-4 w-4 mr-1" />;
       default:
-        return <Gift className="h-4 w-4 mr-1" />
+        return <Gift className="h-4 w-4 mr-1" />;
     }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -168,7 +172,7 @@ export function RecruiterRewards() {
           ))}
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -179,29 +183,35 @@ export function RecruiterRewards() {
             <Gift className="h-5 w-5 mr-2" /> Recruiter Rewards
           </CardTitle>
           <CardDescription>
-            Redeem your hard-earned points for rewards. You currently have <strong>{totalPoints}</strong> points.
+            Redeem your hard-earned points for rewards. You currently have{" "}
+            <strong>{totalPoints}</strong> points.
           </CardDescription>
         </CardHeader>
         <CardContent>
           {rewards.length > 0 ? (
             <div className="grid gap-6">
               {rewards.map((reward) => {
-                const canRedeem = totalPoints >= reward.pointsRequired
+                const canRedeem = totalPoints >= reward.pointsRequired;
                 const isLimitReached =
-                  reward.maxRedemptions !== null && reward.redemptionsCount >= reward.maxRedemptions
+                  reward.maxRedemptions !== null &&
+                  reward.redemptionsCount >= reward.maxRedemptions;
 
                 return (
                   <div
                     key={reward.id}
                     className={`flex gap-4 p-4 rounded-lg border ${
-                      canRedeem && !isLimitReached ? "border-green-200 bg-green-50" : "border-gray-200 bg-gray-50"
+                      canRedeem && !isLimitReached
+                        ? "border-green-200 bg-green-50"
+                        : "border-gray-200 bg-gray-50"
                     }`}
                   >
                     <div className="h-20 w-20 rounded overflow-hidden bg-white border flex items-center justify-center">
                       {reward.imageUrl ? (
-                        <img
+                        <Image
                           src={reward.imageUrl || "/placeholder.svg"}
                           alt={reward.name}
+                          width={80}
+                          height={80}
                           className="object-contain h-full w-full"
                         />
                       ) : (
@@ -212,33 +222,44 @@ export function RecruiterRewards() {
                     <div className="flex-1">
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-medium text-gray-900">{reward.name}</h3>
+                          <h3 className="font-medium text-gray-900">
+                            {reward.name}
+                          </h3>
                           <Badge variant="outline" className="mt-1">
                             {getRewardTypeIcon(reward.rewardType)}
                             {reward.rewardType.replace("_", " ")}
                           </Badge>
                         </div>
                         <div className="text-right">
-                          <span className="font-bold">{reward.pointsRequired} points</span>
+                          <span className="font-bold">
+                            {reward.pointsRequired} points
+                          </span>
                           {reward.maxRedemptions !== null && (
                             <div className="text-xs text-gray-500 mt-1">
-                              {reward.redemptionsCount}/{reward.maxRedemptions} claimed
+                              {reward.redemptionsCount}/{reward.maxRedemptions}{" "}
+                              claimed
                             </div>
                           )}
                         </div>
                       </div>
 
-                      <p className="text-sm text-gray-600 mt-2">{reward.description}</p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        {reward.description}
+                      </p>
 
                       <div className="mt-3 flex justify-between items-center">
                         <div className="w-2/3">
                           <Progress
-                            value={Math.min(100, (totalPoints / reward.pointsRequired) * 100)}
+                            value={Math.min(
+                              100,
+                              (totalPoints / reward.pointsRequired) * 100,
+                            )}
                             className="h-2"
                           />
                           {!canRedeem && (
                             <div className="text-xs text-gray-500 mt-1">
-                              {reward.pointsRequired - totalPoints} more points needed
+                              {reward.pointsRequired - totalPoints} more points
+                              needed
                             </div>
                           )}
                         </div>
@@ -266,11 +287,13 @@ export function RecruiterRewards() {
                       </div>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           ) : (
-            <div className="text-center py-8 text-gray-500">No rewards are currently available. Check back later!</div>
+            <div className="text-center py-8 text-gray-500">
+              No rewards are currently available. Check back later!
+            </div>
           )}
         </CardContent>
         <CardFooter className="border-t pt-4 text-sm text-gray-500">
@@ -284,16 +307,20 @@ export function RecruiterRewards() {
           <DialogHeader>
             <DialogTitle>Confirm Redemption</DialogTitle>
             <DialogDescription>
-              You are about to redeem <strong>{selectedReward?.name}</strong> for{" "}
-              <strong>{selectedReward?.pointsRequired} points</strong>.
+              You are about to redeem <strong>{selectedReward?.name}</strong>{" "}
+              for <strong>{selectedReward?.pointsRequired} points</strong>.
             </DialogDescription>
           </DialogHeader>
 
           <div className="py-4">
-            <p className="text-sm text-gray-600 mb-4">{selectedReward?.description}</p>
+            <p className="text-sm text-gray-600 mb-4">
+              {selectedReward?.description}
+            </p>
 
             <div className="mb-4">
-              <p className="text-sm font-medium mb-1">Additional Notes (Optional)</p>
+              <p className="text-sm font-medium mb-1">
+                Additional Notes (Optional)
+              </p>
               <Textarea
                 placeholder="Add any specific details or requests regarding this redemption..."
                 value={notes}
@@ -306,23 +333,32 @@ export function RecruiterRewards() {
               <p className="flex items-start">
                 <AlertCircle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
                 <span>
-                  This action will deduct {selectedReward?.pointsRequired} points from your account. Reward redemptions
-                  cannot be reversed.
+                  This action will deduct {selectedReward?.pointsRequired}{" "}
+                  points from your account. Reward redemptions cannot be
+                  reversed.
                 </span>
               </p>
             </div>
           </div>
 
           <DialogFooter>
-            <Button variant="outline" onClick={() => setIsModalOpen(false)} disabled={isSubmitting}>
+            <Button
+              variant="outline"
+              onClick={() => setIsModalOpen(false)}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
-            <Button onClick={handleRedeemSubmit} disabled={isSubmitting} className="bg-primary hover:bg-primary/90">
+            <Button
+              onClick={handleRedeemSubmit}
+              disabled={isSubmitting}
+              className="bg-primary hover:bg-primary/90"
+            >
               {isSubmitting ? "Processing..." : "Confirm Redemption"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }

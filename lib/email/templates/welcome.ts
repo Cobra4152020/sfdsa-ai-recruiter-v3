@@ -1,9 +1,12 @@
 interface WelcomeTemplateProps {
-  recipientName: string
-  loginUrl: string
+  recipientName: string;
+  loginUrl: string;
 }
 
-export function welcome({ recipientName, loginUrl }: WelcomeTemplateProps): string {
+export function welcome({
+  recipientName,
+  loginUrl,
+}: WelcomeTemplateProps): string {
   return `
     <!DOCTYPE html>
     <html>
@@ -92,5 +95,5 @@ export function welcome({ recipientName, loginUrl }: WelcomeTemplateProps): stri
       </div>
     </body>
     </html>
-  `
+  `;
 }

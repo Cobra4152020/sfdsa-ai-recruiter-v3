@@ -1,42 +1,61 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { useToast } from "@/components/ui/use-toast"
-import { Coffee, Heart, Trophy, Star, CreditCard, HandHeart, Users, BookOpen, Building } from "lucide-react"
-import { loadStripe } from "@stripe/stripe-js"
-import { Elements } from "@stripe/react-stripe-js"
-import { DonationForm } from "@/components/donation-form"
-import { VenmoOption } from "@/components/venmo-option"
-import Image from "next/image"
-import { DonationImpactDisplay } from "@/components/donation-impact-display"
-import { MonthlyImpactCalculator } from "@/components/monthly-impact-calculator"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Coffee,
+  Heart,
+  Trophy,
+  Star,
+  CreditCard,
+  HandHeart,
+  Users,
+  BookOpen,
+  Building,
+} from "lucide-react";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import { DonationForm } from "@/components/donation-form";
+import { VenmoOption } from "@/components/venmo-option";
+import Image from "next/image";
+import { DonationImpactDisplay } from "@/components/donation-impact-display";
+import { MonthlyImpactCalculator } from "@/components/monthly-impact-calculator";
 
 // Load Stripe outside of component to avoid recreating it
 const stripePromise = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
   ? loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
-  : null
+  : null;
 
 export default function DonatePage() {
-  const [donationAmount, setDonationAmount] = useState<string>("10")
-  const [customAmount, setCustomAmount] = useState<string>("")
-  const [donorName, setDonorName] = useState<string>("")
-  const [donorEmail, setDonorEmail] = useState<string>("")
-  const [isAnonymous, setIsAnonymous] = useState<boolean>(false)
-  const [donationMessage, setDonationMessage] = useState<string>("")
-  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "venmo">("stripe")
-  const [clientSecret, setClientSecret] = useState<string>("")
-  const [isRecurring, setIsRecurring] = useState<boolean>(false)
-  const [isLoading, setIsLoading] = useState<boolean>(false)
-  const { toast } = useToast()
-  const [allowRecognition, setAllowRecognition] = useState<boolean>(false)
+  const [donationAmount, setDonationAmount] = useState<string>("10");
+  const [customAmount, setCustomAmount] = useState<string>("");
+  const [donorName, setDonorName] = useState<string>("");
+  const [donorEmail, setDonorEmail] = useState<string>("");
+  const [isAnonymous, setIsAnonymous] = useState<boolean>(false);
+  const [donationMessage, setDonationMessage] = useState<string>("");
+  const [paymentMethod, setPaymentMethod] = useState<"stripe" | "venmo">(
+    "stripe",
+  );
+  const [clientSecret, setClientSecret] = useState<string>("");
+  const [isRecurring, setIsRecurring] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const { toast } = useToast();
+  const [allowRecognition, setAllowRecognition] = useState<boolean>(false);
 
-  const amount = customAmount || donationAmount
+  const amount = customAmount || donationAmount;
 
   const handlePreparePayment = async () => {
     if (!amount || !donorEmail) {
@@ -44,12 +63,12 @@ export default function DonatePage() {
         title: "Missing information",
         description: "Please provide your email and donation amount.",
         variant: "destructive",
-      })
-      return
+      });
+      return;
     }
 
     if (paymentMethod === "stripe") {
-      setIsLoading(true)
+      setIsLoading(true);
       try {
         const response = await fetch("/api/donations/create-payment-intent", {
           method: "POST",
@@ -64,40 +83,42 @@ export default function DonatePage() {
             organization: "protecting", // Always set to Protecting SF
             allowRecognition,
           }),
-        })
+        });
 
-        const data = await response.json()
+        const data = await response.json();
         if (data.error) {
-          throw new Error(data.error)
+          throw new Error(data.error);
         }
 
-        setClientSecret(data.clientSecret)
+        setClientSecret(data.clientSecret);
       } catch (error) {
-        console.error("Payment preparation error:", error)
+        console.error("Payment preparation error:", error);
         toast({
           title: "Error preparing payment",
           description: (error as Error).message,
           variant: "destructive",
-        })
+        });
       } finally {
-        setIsLoading(false)
+        setIsLoading(false);
       }
     }
-  }
+  };
 
   // Reset client secret when payment method changes
   useEffect(() => {
-    setClientSecret("")
-  }, [paymentMethod])
+    setClientSecret("");
+  }, [paymentMethod]);
 
   return (
     <div className="container mx-auto px-4 py-12">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-4">Support Protecting San Francisco</h1>
+          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-4">
+            Support Protecting San Francisco
+          </h1>
           <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Your donations help maintain this recruitment platform and support our mission to build a stronger, safer
-            San Francisco.
+            Your donations help maintain this recruitment platform and support
+            our mission to build a stronger, safer San Francisco.
           </p>
         </div>
 
@@ -114,11 +135,14 @@ export default function DonatePage() {
               />
             </div>
             <div className="flex-grow max-w-xl">
-              <h2 className="text-xl font-bold text-[#0A3C1F] mb-2">Protecting San Francisco</h2>
+              <h2 className="text-xl font-bold text-[#0A3C1F] mb-2">
+                Protecting San Francisco
+              </h2>
               <p className="text-gray-700">
-                Support the 501(c)3 charitable organization (tax-deductible) and the charitable arm of the San Francisco
-                Deputy Sheriffs' Association. Your contributions directly fund recruitment initiatives, community
-                outreach, and educational programs.
+                Support the 501(c)3 charitable organization (tax-deductible) and
+                the charitable arm of the San Francisco Deputy Sheriffs&apos;
+                Association. Your contributions directly fund recruitment
+                initiatives, community outreach, and educational programs.
               </p>
             </div>
           </div>
@@ -134,19 +158,23 @@ export default function DonatePage() {
               />
             </div>
             <div className="flex-grow max-w-xl">
-              <h2 className="text-xl font-bold text-[#0A3C1F] mb-2">San Francisco Deputy Sheriffs' Association</h2>
+              <h2 className="text-xl font-bold text-[#0A3C1F] mb-2">
+                San Francisco Deputy Sheriffs&apos; Association
+              </h2>
               <p className="text-gray-700">
-                The SFDSA is a 501(c)5 organization representing deputy sheriffs. While the SFDSA does not accept
-                donations directly, it works closely with Protecting San Francisco to support recruitment and community
-                initiatives.
+                The SFDSA is a 501(c)5 organization representing deputy
+                sheriffs. While the SFDSA does not accept donations directly, it
+                works closely with Protecting San Francisco to support
+                recruitment and community initiatives.
               </p>
             </div>
           </div>
 
           <div className="mt-6 p-4 bg-[#0A3C1F]/5 rounded-lg">
             <p className="text-center font-medium text-[#0A3C1F]">
-              All donations made through this site are processed via Stripe and Venmo and are directed to Protecting San
-              Francisco, a registered 501(c)3 charitable organization.
+              All donations made through this site are processed via Stripe and
+              Venmo and are directed to Protecting San Francisco, a registered
+              501(c)3 charitable organization.
             </p>
           </div>
         </div>
@@ -157,21 +185,25 @@ export default function DonatePage() {
               <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
                 <Coffee className="h-8 w-8 text-[#0A3C1F]" />
               </div>
-              <CardTitle className="text-xl text-[#0A3C1F]">Small Gift</CardTitle>
+              <CardTitle className="text-xl text-[#0A3C1F]">
+                Small Gift
+              </CardTitle>
             </CardHeader>
             <CardContent className="text-center pt-2">
-              <p className="text-gray-600 mb-4">Every contribution makes a difference, no matter the size.</p>
+              <p className="text-gray-600 mb-4">
+                Every contribution makes a difference, no matter the size.
+              </p>
               <div className="flex justify-center space-x-2">
                 <Button
                   variant="outline"
                   className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
                   onClick={() => {
-                    setDonationAmount("10")
-                    setCustomAmount("")
+                    setDonationAmount("10");
+                    setCustomAmount("");
                     toast({
                       title: "Amount selected",
-                      description: "You've selected a $10 donation",
-                    })
+                      description: "You&apos;ve selected a $10 donation",
+                    });
                   }}
                 >
                   $10
@@ -185,21 +217,25 @@ export default function DonatePage() {
               <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
                 <HandHeart className="h-8 w-8 text-[#0A3C1F]" />
               </div>
-              <CardTitle className="text-xl text-[#0A3C1F]">Supporter</CardTitle>
+              <CardTitle className="text-xl text-[#0A3C1F]">
+                Supporter
+              </CardTitle>
             </CardHeader>
             <CardContent className="text-center pt-2">
-              <p className="text-gray-600 mb-4">Help us reach more potential recruits with your support.</p>
+              <p className="text-gray-600 mb-4">
+                Help us reach more potential recruits with your support.
+              </p>
               <div className="flex justify-center space-x-2">
                 <Button
                   variant="outline"
                   className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
                   onClick={() => {
-                    setDonationAmount("25")
-                    setCustomAmount("")
+                    setDonationAmount("25");
+                    setCustomAmount("");
                     toast({
                       title: "Amount selected",
-                      description: "You've selected a $25 donation",
-                    })
+                      description: "You&apos;ve selected a $25 donation",
+                    });
                   }}
                 >
                   $25
@@ -216,18 +252,20 @@ export default function DonatePage() {
               <CardTitle className="text-xl text-[#0A3C1F]">Champion</CardTitle>
             </CardHeader>
             <CardContent className="text-center pt-2">
-              <p className="text-gray-600 mb-4">Make a significant impact on our recruitment initiatives.</p>
+              <p className="text-gray-600 mb-4">
+                Make a significant impact on our recruitment initiatives.
+              </p>
               <div className="flex justify-center space-x-2">
                 <Button
                   variant="outline"
                   className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
                   onClick={() => {
-                    setDonationAmount("50")
-                    setCustomAmount("")
+                    setDonationAmount("50");
+                    setCustomAmount("");
                     toast({
                       title: "Amount selected",
-                      description: "You've selected a $50 donation",
-                    })
+                      description: "You&apos;ve selected a $50 donation",
+                    });
                   }}
                 >
                   $50
@@ -241,21 +279,25 @@ export default function DonatePage() {
               <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
                 <Heart className="h-8 w-8 text-[#0A3C1F]" />
               </div>
-              <CardTitle className="text-xl text-[#0A3C1F]">Benefactor</CardTitle>
+              <CardTitle className="text-xl text-[#0A3C1F]">
+                Benefactor
+              </CardTitle>
             </CardHeader>
             <CardContent className="text-center pt-2">
-              <p className="text-gray-600 mb-4">Transform our ability to serve the community.</p>
+              <p className="text-gray-600 mb-4">
+                Transform our ability to serve the community.
+              </p>
               <div className="flex justify-center space-x-2">
                 <Button
                   variant="outline"
                   className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
                   onClick={() => {
-                    setDonationAmount("100")
-                    setCustomAmount("")
+                    setDonationAmount("100");
+                    setCustomAmount("");
                     toast({
                       title: "Amount selected",
-                      description: "You've selected a $100 donation",
-                    })
+                      description: "You&apos;ve selected a $100 donation",
+                    });
                   }}
                 >
                   $100
@@ -278,9 +320,12 @@ export default function DonatePage() {
           <TabsContent value="one-time">
             <Card>
               <CardHeader>
-                <CardTitle className="text-[#0A3C1F]">Make a One-Time Donation</CardTitle>
+                <CardTitle className="text-[#0A3C1F]">
+                  Make a One-Time Donation
+                </CardTitle>
                 <CardDescription>
-                  Your donation will support the maintenance and improvement of our recruitment platform.
+                  Your donation will support the maintenance and improvement of
+                  our recruitment platform.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -292,13 +337,17 @@ export default function DonatePage() {
                         defaultValue="10"
                         value={donationAmount}
                         onValueChange={(value) => {
-                          setDonationAmount(value)
-                          setCustomAmount("")
+                          setDonationAmount(value);
+                          setCustomAmount("");
                         }}
                         className="grid grid-cols-4 gap-4"
                       >
                         <div>
-                          <RadioGroupItem value="10" id="amount-10" className="peer sr-only" />
+                          <RadioGroupItem
+                            value="10"
+                            id="amount-10"
+                            className="peer sr-only"
+                          />
                           <Label
                             htmlFor="amount-10"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
@@ -307,7 +356,11 @@ export default function DonatePage() {
                           </Label>
                         </div>
                         <div>
-                          <RadioGroupItem value="25" id="amount-25" className="peer sr-only" />
+                          <RadioGroupItem
+                            value="25"
+                            id="amount-25"
+                            className="peer sr-only"
+                          />
                           <Label
                             htmlFor="amount-25"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
@@ -316,7 +369,11 @@ export default function DonatePage() {
                           </Label>
                         </div>
                         <div>
-                          <RadioGroupItem value="50" id="amount-50" className="peer sr-only" />
+                          <RadioGroupItem
+                            value="50"
+                            id="amount-50"
+                            className="peer sr-only"
+                          />
                           <Label
                             htmlFor="amount-50"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
@@ -325,7 +382,11 @@ export default function DonatePage() {
                           </Label>
                         </div>
                         <div>
-                          <RadioGroupItem value="100" id="amount-100" className="peer sr-only" />
+                          <RadioGroupItem
+                            value="100"
+                            id="amount-100"
+                            className="peer sr-only"
+                          />
                           <Label
                             htmlFor="amount-100"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
@@ -339,7 +400,9 @@ export default function DonatePage() {
                     <div className="space-y-2">
                       <Label htmlFor="custom-amount">Custom Amount</Label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                          $
+                        </span>
                         <Input
                           id="custom-amount"
                           type="number"
@@ -349,14 +412,17 @@ export default function DonatePage() {
                           className="pl-8"
                           value={customAmount}
                           onChange={(e) => {
-                            setCustomAmount(e.target.value)
-                            setDonationAmount("")
+                            setCustomAmount(e.target.value);
+                            setDonationAmount("");
                           }}
                         />
                       </div>
                     </div>
 
-                    <DonationImpactDisplay amount={donationAmount} customAmount={customAmount} />
+                    <DonationImpactDisplay
+                      amount={donationAmount}
+                      customAmount={customAmount}
+                    />
 
                     <div className="space-y-2">
                       <Label htmlFor="donor-name">Your Name (Optional)</Label>
@@ -378,7 +444,9 @@ export default function DonatePage() {
                         onChange={(e) => setDonorEmail(e.target.value)}
                         required
                       />
-                      <p className="text-xs text-gray-500">We'll send your donation receipt to this email.</p>
+                      <p className="text-xs text-gray-500">
+                        We&apos;ll send your donation receipt to this email.
+                      </p>
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -389,7 +457,10 @@ export default function DonatePage() {
                         checked={isAnonymous}
                         onChange={(e) => setIsAnonymous(e.target.checked)}
                       />
-                      <Label htmlFor="anonymous" className="text-sm font-normal">
+                      <Label
+                        htmlFor="anonymous"
+                        className="text-sm font-normal"
+                      >
                         Make my donation anonymous
                       </Label>
                     </div>
@@ -402,8 +473,12 @@ export default function DonatePage() {
                         checked={allowRecognition}
                         onChange={(e) => setAllowRecognition(e.target.checked)}
                       />
-                      <Label htmlFor="allow-recognition" className="text-sm font-normal">
-                        I would like my name to appear on the donor recognition wall
+                      <Label
+                        htmlFor="allow-recognition"
+                        className="text-sm font-normal"
+                      >
+                        I would like my name to appear on the donor recognition
+                        wall
                       </Label>
                     </div>
 
@@ -431,8 +506,12 @@ export default function DonatePage() {
                           onClick={() => setPaymentMethod("stripe")}
                         >
                           <CreditCard className="h-8 w-8 mb-2 text-[#0A3C1F]" />
-                          <span className="text-sm font-medium">Credit Card</span>
-                          <span className="text-xs text-gray-500 mt-1">Powered by Stripe</span>
+                          <span className="text-sm font-medium">
+                            Credit Card
+                          </span>
+                          <span className="text-xs text-gray-500 mt-1">
+                            Powered by Stripe
+                          </span>
                         </div>
                         <div
                           className={`border-2 rounded-md p-4 flex flex-col items-center cursor-pointer transition-colors ${
@@ -451,7 +530,9 @@ export default function DonatePage() {
                             <path d="M19.5955 2C20.5 2 21.5 2.5 21.9352 3.77148C22.1 4.5 22.1 5.5 21.9 6.60156L17.8 21.5C17.6 22.2 16.9 22.8 16.1 22.8H7.30005C6.70005 22.8 6.20005 22.3 6.20005 21.7C6.20005 21.6 6.20005 21.5 6.20005 21.4L10.4 6.60156C10.7 5.40156 11.7 4.60156 12.9 4.60156H19.6V2H19.5955ZM12.9 6.60156C12.4 6.60156 12 6.90156 11.9 7.40156L7.70005 22.2C7.70005 22.3 7.70005 22.3 7.80005 22.3C7.90005 22.3 7.90005 22.3 8.00005 22.3H16.1C16.3 22.3 16.5 22.1 16.6 21.9L20.7 7.00001C20.8 6.40001 20.8 5.80001 20.7 5.40001C20.6 5.00001 20.2 4.70001 19.7 4.70001H13L12.9 6.60156ZM3.00005 7.60156C2.40005 7.60156 1.90005 8.10156 1.90005 8.70156C1.90005 8.80156 1.90005 8.90156 1.90005 9.00156L4.70005 21.4C4.80005 22.1 5.40005 22.6 6.10005 22.6C6.70005 22.6 7.20005 22.1 7.20005 21.5C7.20005 21.4 7.20005 21.3 7.20005 21.2L4.40005 8.80156C4.30005 8.10156 3.70005 7.60156 3.00005 7.60156Z" />
                           </svg>
                           <span className="text-sm font-medium">Venmo</span>
-                          <span className="text-xs text-gray-500 mt-1">Quick mobile payment</span>
+                          <span className="text-xs text-gray-500 mt-1">
+                            Quick mobile payment
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -466,7 +547,10 @@ export default function DonatePage() {
                   </Elements>
                 ) : (
                   <div className="p-4 text-center">
-                    <p className="text-red-500">Stripe could not be initialized. Please check your configuration.</p>
+                    <p className="text-red-500">
+                      Stripe could not be initialized. Please check your
+                      configuration.
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -477,7 +561,11 @@ export default function DonatePage() {
                     <Button
                       type="button"
                       className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white w-full"
-                      disabled={!donorEmail || (!donationAmount && !customAmount) || isLoading}
+                      disabled={
+                        !donorEmail ||
+                        (!donationAmount && !customAmount) ||
+                        isLoading
+                      }
                       onClick={handlePreparePayment}
                     >
                       {isLoading ? "Preparing..." : "Continue to Payment"}
@@ -498,9 +586,12 @@ export default function DonatePage() {
           <TabsContent value="monthly">
             <Card>
               <CardHeader>
-                <CardTitle className="text-[#0A3C1F]">Become a Monthly Supporter</CardTitle>
+                <CardTitle className="text-[#0A3C1F]">
+                  Become a Monthly Supporter
+                </CardTitle>
                 <CardDescription>
-                  Your recurring donation provides sustainable support for our recruitment efforts.
+                  Your recurring donation provides sustainable support for our
+                  recruitment efforts.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -512,13 +603,17 @@ export default function DonatePage() {
                         defaultValue="10"
                         value={donationAmount}
                         onValueChange={(value) => {
-                          setDonationAmount(value)
-                          setCustomAmount("")
+                          setDonationAmount(value);
+                          setCustomAmount("");
                         }}
                         className="grid grid-cols-4 gap-4"
                       >
                         <div>
-                          <RadioGroupItem value="5" id="monthly-5" className="peer sr-only" />
+                          <RadioGroupItem
+                            value="5"
+                            id="monthly-5"
+                            className="peer sr-only"
+                          />
                           <Label
                             htmlFor="monthly-5"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
@@ -527,7 +622,11 @@ export default function DonatePage() {
                           </Label>
                         </div>
                         <div>
-                          <RadioGroupItem value="10" id="monthly-10" className="peer sr-only" />
+                          <RadioGroupItem
+                            value="10"
+                            id="monthly-10"
+                            className="peer sr-only"
+                          />
                           <Label
                             htmlFor="monthly-10"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
@@ -536,7 +635,11 @@ export default function DonatePage() {
                           </Label>
                         </div>
                         <div>
-                          <RadioGroupItem value="25" id="monthly-25" className="peer sr-only" />
+                          <RadioGroupItem
+                            value="25"
+                            id="monthly-25"
+                            className="peer sr-only"
+                          />
                           <Label
                             htmlFor="monthly-25"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
@@ -545,7 +648,11 @@ export default function DonatePage() {
                           </Label>
                         </div>
                         <div>
-                          <RadioGroupItem value="50" id="monthly-50" className="peer sr-only" />
+                          <RadioGroupItem
+                            value="50"
+                            id="monthly-50"
+                            className="peer sr-only"
+                          />
                           <Label
                             htmlFor="monthly-50"
                             className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
@@ -557,9 +664,13 @@ export default function DonatePage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="monthly-custom">Custom Monthly Amount</Label>
+                      <Label htmlFor="monthly-custom">
+                        Custom Monthly Amount
+                      </Label>
                       <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                          $
+                        </span>
                         <Input
                           id="monthly-custom"
                           type="number"
@@ -569,14 +680,17 @@ export default function DonatePage() {
                           className="pl-8"
                           value={customAmount}
                           onChange={(e) => {
-                            setCustomAmount(e.target.value)
-                            setDonationAmount("")
+                            setCustomAmount(e.target.value);
+                            setDonationAmount("");
                           }}
                         />
                       </div>
                     </div>
 
-                    <DonationImpactDisplay amount={donationAmount} customAmount={customAmount} />
+                    <DonationImpactDisplay
+                      amount={donationAmount}
+                      customAmount={customAmount}
+                    />
 
                     <div className="space-y-2">
                       <Label htmlFor="monthly-name">Your Name (Optional)</Label>
@@ -598,7 +712,9 @@ export default function DonatePage() {
                         onChange={(e) => setDonorEmail(e.target.value)}
                         required
                       />
-                      <p className="text-xs text-gray-500">We'll send your donation receipts to this email.</p>
+                      <p className="text-xs text-gray-500">
+                        We&apos;ll send your donation receipts to this email.
+                      </p>
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -609,7 +725,10 @@ export default function DonatePage() {
                         checked={isAnonymous}
                         onChange={(e) => setIsAnonymous(e.target.checked)}
                       />
-                      <Label htmlFor="monthly-anonymous" className="text-sm font-normal">
+                      <Label
+                        htmlFor="monthly-anonymous"
+                        className="text-sm font-normal"
+                      >
                         Make my donations anonymous
                       </Label>
                     </div>
@@ -622,13 +741,19 @@ export default function DonatePage() {
                         checked={allowRecognition}
                         onChange={(e) => setAllowRecognition(e.target.checked)}
                       />
-                      <Label htmlFor="allow-recognition" className="text-sm font-normal">
-                        I would like my name to appear on the donor recognition wall
+                      <Label
+                        htmlFor="allow-recognition"
+                        className="text-sm font-normal"
+                      >
+                        I would like my name to appear on the donor recognition
+                        wall
                       </Label>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="monthly-message">Message (Optional)</Label>
+                      <Label htmlFor="monthly-message">
+                        Message (Optional)
+                      </Label>
                       <textarea
                         id="monthly-message"
                         rows={3}
@@ -646,12 +771,22 @@ export default function DonatePage() {
                           className={`border-2 rounded-md p-4 flex flex-col items-center cursor-pointer transition-colors border-[#0A3C1F] bg-[#0A3C1F]/5`}
                         >
                           <CreditCard className="h-8 w-8 mb-2 text-[#0A3C1F]" />
-                          <span className="text-sm font-medium">Credit Card</span>
-                          <span className="text-xs text-gray-500 mt-1">Powered by Stripe</span>
+                          <span className="text-sm font-medium">
+                            Credit Card
+                          </span>
+                          <span className="text-xs text-gray-500 mt-1">
+                            Powered by Stripe
+                          </span>
                         </div>
                         <div className="text-center text-sm text-gray-500 mt-2">
-                          <p>Recurring donations are only available via credit card.</p>
-                          <p>Venmo does not currently support automatic recurring payments.</p>
+                          <p>
+                            Recurring donations are only available via credit
+                            card.
+                          </p>
+                          <p>
+                            Venmo does not currently support automatic recurring
+                            payments.
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -666,7 +801,10 @@ export default function DonatePage() {
                   </Elements>
                 ) : (
                   <div className="p-4 text-center">
-                    <p className="text-red-500">Stripe could not be initialized. Please check your configuration.</p>
+                    <p className="text-red-500">
+                      Stripe could not be initialized. Please check your
+                      configuration.
+                    </p>
                   </div>
                 )}
               </CardContent>
@@ -676,7 +814,11 @@ export default function DonatePage() {
                   <Button
                     type="button"
                     className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white w-full"
-                    disabled={!donorEmail || (!donationAmount && !customAmount) || isLoading}
+                    disabled={
+                      !donorEmail ||
+                      (!donationAmount && !customAmount) ||
+                      isLoading
+                    }
                     onClick={handlePreparePayment}
                   >
                     {isLoading ? "Preparing..." : "Subscribe"}
@@ -689,7 +831,9 @@ export default function DonatePage() {
         </Tabs>
 
         <div className="mt-12 bg-white rounded-lg border border-[#0A3C1F]/20 p-6 max-w-2xl mx-auto">
-          <h2 className="text-xl font-bold text-[#0A3C1F] mb-6 text-center">Your Donation's Impact</h2>
+          <h2 className="text-xl font-bold text-[#0A3C1F] mb-6 text-center">
+            Your Donation&apos;s Impact
+          </h2>
 
           <div className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -698,11 +842,14 @@ export default function DonatePage() {
                   <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                     $10
                   </div>
-                  <h3 className="font-semibold text-[#0A3C1F]">Recruit Information Package</h3>
+                  <h3 className="font-semibold text-[#0A3C1F]">
+                    Recruit Information Package
+                  </h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Provides comprehensive information packages for 5 potential recruits, including career guides,
-                  application checklists, and preparation materials.
+                  Provides comprehensive information packages for 5 potential
+                  recruits, including career guides, application checklists, and
+                  preparation materials.
                 </p>
               </div>
 
@@ -711,11 +858,14 @@ export default function DonatePage() {
                   <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                     $25
                   </div>
-                  <h3 className="font-semibold text-[#0A3C1F]">AI Assistant Improvements</h3>
+                  <h3 className="font-semibold text-[#0A3C1F]">
+                    AI Assistant Improvements
+                  </h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Helps enhance Sgt. Ken's AI capabilities with updated information and improved response accuracy to
-                  better assist potential recruits with their questions.
+                  Helps enhance Sgt. Ken&apos;s AI capabilities with updated
+                  information and improved response accuracy to better assist
+                  potential recruits with their questions.
                 </p>
               </div>
             </div>
@@ -726,11 +876,14 @@ export default function DonatePage() {
                   <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                     $50
                   </div>
-                  <h3 className="font-semibold text-[#0A3C1F]">Community Outreach</h3>
+                  <h3 className="font-semibold text-[#0A3C1F]">
+                    Community Outreach
+                  </h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Supports a community outreach event to connect with diverse neighborhoods and share information about
-                  careers in law enforcement with underrepresented groups.
+                  Supports a community outreach event to connect with diverse
+                  neighborhoods and share information about careers in law
+                  enforcement with underrepresented groups.
                 </p>
               </div>
 
@@ -739,11 +892,14 @@ export default function DonatePage() {
                   <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                     $100
                   </div>
-                  <h3 className="font-semibold text-[#0A3C1F]">Recruitment Workshop</h3>
+                  <h3 className="font-semibold text-[#0A3C1F]">
+                    Recruitment Workshop
+                  </h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Funds a recruitment workshop that provides hands-on training for physical fitness tests, interview
-                  preparation, and written exam strategies for up to 10 potential recruits.
+                  Funds a recruitment workshop that provides hands-on training
+                  for physical fitness tests, interview preparation, and written
+                  exam strategies for up to 10 potential recruits.
                 </p>
               </div>
             </div>
@@ -754,11 +910,14 @@ export default function DonatePage() {
                   <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                     $250
                   </div>
-                  <h3 className="font-semibold text-[#0A3C1F]">Mentorship Program</h3>
+                  <h3 className="font-semibold text-[#0A3C1F]">
+                    Mentorship Program
+                  </h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Supports our mentorship program that pairs experienced deputies with recruits throughout the
-                  application process, providing guidance and support for up to 5 recruits.
+                  Supports our mentorship program that pairs experienced
+                  deputies with recruits throughout the application process,
+                  providing guidance and support for up to 5 recruits.
                 </p>
               </div>
 
@@ -767,11 +926,14 @@ export default function DonatePage() {
                   <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                     $500+
                   </div>
-                  <h3 className="font-semibold text-[#0A3C1F]">Scholarship Support</h3>
+                  <h3 className="font-semibold text-[#0A3C1F]">
+                    Scholarship Support
+                  </h3>
                 </div>
                 <p className="text-sm text-gray-600">
-                  Contributes to our scholarship fund that helps promising candidates with training costs, equipment,
-                  and educational expenses as they prepare for a career in law enforcement.
+                  Contributes to our scholarship fund that helps promising
+                  candidates with training costs, equipment, and educational
+                  expenses as they prepare for a career in law enforcement.
                 </p>
               </div>
             </div>
@@ -779,8 +941,9 @@ export default function DonatePage() {
 
           <div className="mt-8 text-center">
             <p className="text-sm text-gray-600 italic">
-              Your donation of any amount makes a difference in our mission to build a stronger, more diverse Sheriff's
-              Department for San Francisco.
+              Your donation of any amount makes a difference in our mission to
+              build a stronger, more diverse Sheriff&apos;s Department for San
+              Francisco.
             </p>
           </div>
         </div>
@@ -795,8 +958,9 @@ export default function DonatePage() {
               <div>
                 <h3 className="font-medium">Diverse Recruitment</h3>
                 <p className="text-gray-600 text-sm">
-                  We're committed to building a Sheriff's Department that reflects the diversity of San Francisco,
-                  recruiting qualified candidates from all communities.
+                  We&apos;re committed to building a Sheriff&apos;s Department
+                  that reflects the diversity of San Francisco, recruiting
+                  qualified candidates from all communities.
                 </p>
               </div>
             </div>
@@ -807,8 +971,8 @@ export default function DonatePage() {
               <div>
                 <h3 className="font-medium">Education & Preparation</h3>
                 <p className="text-gray-600 text-sm">
-                  We provide resources, training, and mentorship to help candidates prepare for a successful career in
-                  law enforcement.
+                  We provide resources, training, and mentorship to help
+                  candidates prepare for a successful career in law enforcement.
                 </p>
               </div>
             </div>
@@ -819,8 +983,9 @@ export default function DonatePage() {
               <div>
                 <h3 className="font-medium">Community Connection</h3>
                 <p className="text-gray-600 text-sm">
-                  We foster stronger connections between the Sheriff's Department and the communities it serves through
-                  outreach and education.
+                  We foster stronger connections between the Sheriff&apos;s
+                  Department and the communities it serves through outreach and
+                  education.
                 </p>
               </div>
             </div>
@@ -831,8 +996,9 @@ export default function DonatePage() {
               <div>
                 <h3 className="font-medium">Excellence in Service</h3>
                 <p className="text-gray-600 text-sm">
-                  We support initiatives that promote the highest standards of professionalism, integrity, and service
-                  within the Sheriff's Department.
+                  We support initiatives that promote the highest standards of
+                  professionalism, integrity, and service within the
+                  Sheriff&apos;s Department.
                 </p>
               </div>
             </div>
@@ -841,11 +1007,12 @@ export default function DonatePage() {
 
         <div className="mt-12 text-center">
           <p className="text-gray-600 mb-4">
-            Protecting San Francisco is a 501(c)(3) non-profit organization. All donations are tax-deductible.
+            Protecting San Francisco is a 501(c)(3) non-profit organization. All
+            donations are tax-deductible.
           </p>
           <p className="text-sm text-gray-500">Tax ID: 12-3456789</p>
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,33 +1,46 @@
-import { DonorCard } from "@/components/donor-card"
-import type { ReactNode } from "react"
+import { DonorCard } from "@/components/donor-card";
+import type { ReactNode } from "react";
 
 type Donor = {
-  id: string
-  name: string
-  amount: number
-  message?: string
-  donation_date: string
-  tier: "benefactor" | "champion" | "supporter" | "friend"
-  is_recurring: boolean
-  organization?: string
-}
+  id: string;
+  name: string;
+  amount: number;
+  message?: string;
+  donation_date: string;
+  tier: "benefactor" | "champion" | "supporter" | "friend";
+  is_recurring: boolean;
+  organization?: string;
+};
 
 interface DonorTierProps {
-  title: string
-  description: string
-  donors: Donor[]
-  tierColor: string
-  icon: ReactNode
-  showTitle?: boolean
+  title: string;
+  description: string;
+  donors: Donor[];
+  tierColor: string;
+  icon: ReactNode;
+  showTitle?: boolean;
 }
 
-export function DonorTier({ title, description, donors, tierColor, icon, showTitle = true }: DonorTierProps) {
+export function DonorTier({
+  title,
+  description,
+  donors,
+  tierColor,
+  icon,
+  showTitle = true,
+}: DonorTierProps) {
   return (
     <div className="space-y-4">
       {showTitle && (
         <div className="flex items-center gap-2 mb-2">
-          <div className="p-2 rounded-full" style={{ backgroundColor: `${tierColor}20` }}>
-            <div className="text-white p-1 rounded-full" style={{ backgroundColor: tierColor }}>
+          <div
+            className="p-2 rounded-full"
+            style={{ backgroundColor: `${tierColor}20` }}
+          >
+            <div
+              className="text-white p-1 rounded-full"
+              style={{ backgroundColor: tierColor }}
+            >
               {icon}
             </div>
           </div>
@@ -44,5 +57,5 @@ export function DonorTier({ title, description, donors, tierColor, icon, showTit
         ))}
       </div>
     </div>
-  )
+  );
 }

@@ -1,15 +1,13 @@
 interface ContactedTemplateProps {
-  firstName: string
-  lastName: string
-  trackingNumber: string
-  dashboardUrl: string
-  contactDate?: string
-  contactMethod?: string
+  firstName: string;
+  trackingNumber: string;
+  dashboardUrl: string;
+  contactDate?: string;
+  contactMethod?: string;
 }
 
 export function contacted({
   firstName,
-  lastName,
   trackingNumber,
   dashboardUrl,
   contactDate = "recently",
@@ -117,5 +115,5 @@ export function contacted({
       </div>
     </body>
     </html>
-  `
+  `;
 }

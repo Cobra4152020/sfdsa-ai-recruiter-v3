@@ -1,26 +1,26 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import { redirect } from 'next/navigation'
-import { Database } from '@/types/supabase'
-import AdminDashboard from '@/components/admin-dashboard'
+import { createClient } from "@/app/lib/supabase/server";
+import { redirect } from "next/navigation";
+import AdminDashboard from "@/components/admin-dashboard";
 
 export default async function AdminPage() {
-  const supabase = createServerComponentClient<Database>({ cookies })
+  const supabase = await createClient();
 
-  const { data: { session } } = await supabase.auth.getSession()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
   if (!session) {
-    redirect('/login')
+    redirect("/login");
   }
 
   const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', session.user.id)
-    .single()
+    .from("profiles")
+    .select("role")
+    .eq("id", session.user.id)
+    .single();
 
-  if (!profile || profile.role !== 'admin') {
-    redirect('/')
+  if (!profile || profile.role !== "admin") {
+    redirect("/");
   }
 
   return (
@@ -28,5 +28,5 @@ export default async function AdminPage() {
       <h1 className="mb-8 text-3xl font-bold">Admin Dashboard</h1>
       <AdminDashboard />
     </div>
-  )
-} 
+  );
+}

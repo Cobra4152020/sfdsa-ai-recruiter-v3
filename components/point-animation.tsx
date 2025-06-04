@@ -1,17 +1,21 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import confetti from "canvas-confetti"
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 
 interface PointAnimationProps {
-  points: number
-  message?: string
-  onComplete?: () => void
+  points: number;
+  message?: string;
+  onComplete?: () => void;
 }
 
-export function PointAnimation({ points, message, onComplete }: PointAnimationProps) {
-  const [isVisible, setIsVisible] = useState(true)
+export function PointAnimation({
+  points,
+  message,
+  onComplete,
+}: PointAnimationProps) {
+  const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
     // Trigger confetti for significant point gains
@@ -21,19 +25,19 @@ export function PointAnimation({ points, message, onComplete }: PointAnimationPr
         spread: 70,
         origin: { y: 0.6 },
         colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
-      })
+      });
     }
 
     // Auto-hide after animation
     const timer = setTimeout(() => {
-      setIsVisible(false)
+      setIsVisible(false);
       if (onComplete) {
-        setTimeout(onComplete, 300) // Wait for exit animation to complete
+        setTimeout(onComplete, 300); // Wait for exit animation to complete
       }
-    }, 2000)
+    }, 2000);
 
-    return () => clearTimeout(timer)
-  }, [points, onComplete])
+    return () => clearTimeout(timer);
+  }, [points, onComplete]);
 
   return (
     <AnimatePresence>
@@ -74,5 +78,5 @@ export function PointAnimation({ points, message, onComplete }: PointAnimationPr
         </motion.div>
       )}
     </AnimatePresence>
-  )
+  );
 }

@@ -1,24 +1,30 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CheckCircle, XCircle, AlertTriangle, Search } from "lucide-react"
-import type { UserDiagnosticResult } from "@/lib/auth-diagnostic"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle, XCircle, AlertTriangle, Search } from "lucide-react";
+import type { UserDiagnosticResult } from "@/lib/auth-diagnostic";
 
 export default function AuthDiagnosticPage() {
-  const [email, setEmail] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [result, setResult] = useState<UserDiagnosticResult | null>(null)
-  const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [result, setResult] = useState<UserDiagnosticResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const runDiagnostic = async () => {
-    if (!email) return
+    if (!email) return;
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch("/api/admin/auth-diagnostic", {
@@ -27,27 +33,29 @@ export default function AuthDiagnosticPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to run diagnostic")
+        throw new Error(data.message || "Failed to run diagnostic");
       }
 
-      setResult(data.result)
+      setResult(data.result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred")
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleFix = async () => {
-    if (!result) return
+    if (!result) return;
 
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
 
     try {
       const response = await fetch("/api/admin/auth-fix", {
@@ -56,31 +64,37 @@ export default function AuthDiagnosticPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email: result.email }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to fix auth issues")
+        throw new Error(data.message || "Failed to fix auth issues");
       }
 
       // Re-run diagnostic to see the changes
-      await runDiagnostic()
+      await runDiagnostic();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred")
+      setError(
+        err instanceof Error ? err.message : "An unexpected error occurred",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-2xl font-bold mb-6">Authentication Diagnostic Tool</h1>
+      <h1 className="text-2xl font-bold mb-6">
+        Authentication Diagnostic Tool
+      </h1>
 
       <Card className="mb-6">
         <CardHeader>
           <CardTitle>User Authentication Diagnostic</CardTitle>
-          <CardDescription>Check user authentication status across different systems</CardDescription>
+          <CardDescription>
+            Check user authentication status across different systems
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex gap-4 mb-4">
@@ -130,7 +144,11 @@ export default function AuthDiagnosticPage() {
                       )}
                       <span>User in auth.users</span>
                     </div>
-                    {result.authUserExists && <div className="text-sm text-gray-500 ml-7">ID: {result.authUserId}</div>}
+                    {result.authUserExists && (
+                      <div className="text-sm text-gray-500 ml-7">
+                        ID: {result.authUserId}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -147,14 +165,18 @@ export default function AuthDiagnosticPage() {
                     </div>
                     {result.userProfileExists && (
                       <>
-                        <div className="text-sm text-gray-500 ml-7">ID: {result.userProfileId}</div>
+                        <div className="text-sm text-gray-500 ml-7">
+                          ID: {result.userProfileId}
+                        </div>
                         <div className="flex items-center ml-7">
                           {result.isVolunteerRecruiter ? (
                             <CheckCircle className="h-4 w-4 text-green-500 mr-2" />
                           ) : (
                             <XCircle className="h-4 w-4 text-red-500 mr-2" />
                           )}
-                          <span className="text-sm">Is Volunteer Recruiter</span>
+                          <span className="text-sm">
+                            Is Volunteer Recruiter
+                          </span>
                         </div>
                         <div className="flex items-center ml-7">
                           {result.isEmailConfirmed ? (
@@ -231,7 +253,9 @@ export default function AuthDiagnosticPage() {
               {result.discrepancies.length > 0 && (
                 <Alert className="bg-amber-50 border-amber-200">
                   <AlertTriangle className="h-4 w-4 text-amber-600" />
-                  <AlertTitle className="text-amber-800">Discrepancies Found</AlertTitle>
+                  <AlertTitle className="text-amber-800">
+                    Discrepancies Found
+                  </AlertTitle>
                   <AlertDescription className="text-amber-700">
                     <ul className="list-disc pl-5 mt-2">
                       {result.discrepancies.map((discrepancy, index) => (
@@ -256,5 +280,5 @@ export default function AuthDiagnosticPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

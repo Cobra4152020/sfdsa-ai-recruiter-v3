@@ -1,10 +1,21 @@
-"use client"
+"use client";
 
-import { PageWrapper } from "@/components/page-wrapper"
-import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
-import Link from "next/link"
+import { PageWrapper } from "@/components/page-wrapper";
+import {
+  Card,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import Link from "next/link";
 import {
   Trophy,
   ClubIcon as Football,
@@ -21,19 +32,19 @@ import {
   CheckCircle2,
   Info,
   Medal,
-} from "lucide-react"
-import Image from "next/image"
-import { useState } from "react"
-import { useTriviaHistory } from "@/hooks/use-trivia-history"
-import { useUser } from "@/context/user-context"
-import { formatDistanceToNow } from "date-fns"
+} from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { useTriviaHistory } from "@/hooks/use-trivia-history";
+import { useUser } from "@/context/user-context";
+import { formatDistanceToNow } from "date-fns";
 
 type Category = {
-  name: string
-  icon: JSX.Element
-  bgColor: string
-  textColor: string
-}
+  name: string;
+  icon: JSX.Element;
+  bgColor: string;
+  textColor: string;
+};
 
 const categories: Record<string, Category> = {
   sports: {
@@ -72,13 +83,14 @@ const categories: Record<string, Category> = {
     bgColor: "bg-emerald-500",
     textColor: "text-white",
   },
-}
+};
 
 const triviaGames = [
   {
     id: "sf-football",
     name: "SF Football Trivia",
-    description: "Test your knowledge about San Francisco football history and the 49ers.",
+    description:
+      "Test your knowledge about San Francisco football history and the 49ers.",
     icon: <Football className="h-6 w-6 text-[#0A3C1F]" />,
     image: "/levis-stadium-49ers.png",
     color: "bg-red-50 border-red-200",
@@ -89,7 +101,8 @@ const triviaGames = [
   {
     id: "sf-baseball",
     name: "SF Baseball Trivia",
-    description: "How much do you know about the San Francisco Giants and baseball in the Bay Area?",
+    description:
+      "How much do you know about the San Francisco Giants and baseball in the Bay Area?",
     icon: <Baseball className="h-6 w-6 text-[#0A3C1F]" />,
     image: "/oracle-park-giants.png",
     color: "bg-orange-50 border-orange-200",
@@ -100,7 +113,8 @@ const triviaGames = [
   {
     id: "sf-basketball",
     name: "SF Basketball Trivia",
-    description: "Challenge yourself with questions about the Golden State Warriors and basketball in San Francisco.",
+    description:
+      "Challenge yourself with questions about the Golden State Warriors and basketball in San Francisco.",
     icon: <Basketball className="h-6 w-6 text-[#0A3C1F]" />,
     image: "/chase-center-gsw.png",
     color: "bg-blue-50 border-blue-200",
@@ -111,7 +125,8 @@ const triviaGames = [
   {
     id: "sf-districts",
     name: "SF District Trivia",
-    description: "Test your knowledge of San Francisco's unique and diverse neighborhoods and districts.",
+    description:
+      "Test your knowledge of San Francisco&apos;s unique and diverse neighborhoods and districts.",
     icon: <MapPin className="h-6 w-6 text-[#0A3C1F]" />,
     image: "/mission-district-sf.png",
     color: "bg-purple-50 border-purple-200",
@@ -122,7 +137,8 @@ const triviaGames = [
   {
     id: "sf-tourist-spots",
     name: "SF Most Popular Tourist Spots",
-    description: "How well do you know San Francisco's famous landmarks and tourist attractions?",
+    description:
+      "How well do you know San Francisco&apos;s famous landmarks and tourist attractions?",
     icon: <Landmark className="h-6 w-6 text-[#0A3C1F]" />,
     image: "/golden-gate-bridge.png",
     color: "bg-green-50 border-green-200",
@@ -133,7 +149,8 @@ const triviaGames = [
   {
     id: "sf-day-trips",
     name: "SF Best Places to Visit",
-    description: "Test your knowledge about the best day trips and places to visit around San Francisco.",
+    description:
+      "Test your knowledge about the best day trips and places to visit around San Francisco.",
     icon: <Compass className="h-6 w-6 text-[#0A3C1F]" />,
     image: "/muir-woods-day-trip.png",
     color: "bg-amber-50 border-amber-200",
@@ -141,32 +158,34 @@ const triviaGames = [
     hoverColor: "shadow-amber-300/50",
     categories: ["geography", "nature", "landmarks"],
   },
-]
+];
 
 export default function TriviaHubPage() {
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null)
-  const { gameHistory, isLoading: isHistoryLoading } = useTriviaHistory()
-  const { isLoggedIn } = useUser()
+  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+  const { gameHistory } = useTriviaHistory();
+  const { isLoggedIn } = useUser();
 
   // Function to get score percentage
   const getScorePercentage = (score: number, total: number) => {
-    return Math.round((score / total) * 100)
-  }
+    return Math.round((score / total) * 100);
+  };
 
   // Function to get appropriate badge color based on score percentage
   const getScoreBadgeColor = (percentage: number) => {
-    if (percentage >= 90) return "bg-yellow-500 text-white" // Gold
-    if (percentage >= 70) return "bg-gray-400 text-white" // Silver
-    if (percentage >= 50) return "bg-amber-700 text-white" // Bronze
-    return "bg-blue-500 text-white" // Default blue
-  }
+    if (percentage >= 90) return "bg-yellow-500 text-white"; // Gold
+    if (percentage >= 70) return "bg-gray-400 text-white"; // Silver
+    if (percentage >= 50) return "bg-amber-700 text-white"; // Bronze
+    return "bg-blue-500 text-white"; // Default blue
+  };
 
   return (
     <PageWrapper>
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-            <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2 md:mb-0">San Francisco Trivia Games</h1>
+            <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2 md:mb-0">
+              San Francisco Trivia Games
+            </h1>
             <div className="flex items-center gap-2">
               <TooltipProvider>
                 <Tooltip>
@@ -182,7 +201,11 @@ export default function TriviaHubPage() {
                       <div className="grid grid-cols-2 gap-2">
                         {Object.entries(categories).map(([id, category]) => (
                           <div key={id} className="flex items-center gap-1">
-                            <div className={`p-1 rounded-full ${category.bgColor}`}>{category.icon}</div>
+                            <div
+                              className={`p-1 rounded-full ${category.bgColor}`}
+                            >
+                              {category.icon}
+                            </div>
                             <span>{category.name}</span>
                           </div>
                         ))}
@@ -206,8 +229,8 @@ export default function TriviaHubPage() {
                         <h3 className="font-semibold">Your Trivia Progress</h3>
                         <p className="text-sm text-gray-500">
                           {Object.keys(gameHistory).length > 0
-                            ? `You've played ${Object.keys(gameHistory).length} out of ${triviaGames.length} games.`
-                            : "You haven't played any games yet. Start playing to track your progress!"}
+                            ? `You&apos;ve played ${Object.keys(gameHistory).length} out of ${triviaGames.length} games.`
+                            : "You haven&apos;t played any games yet. Start playing to track your progress!"}
                         </p>
                         <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                           <div
@@ -225,16 +248,21 @@ export default function TriviaHubPage() {
             </div>
           </div>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto text-center">
-            Test your knowledge about San Francisco with these fun trivia games hosted by Sgt. Ken. Earn points, badges,
-            and climb the leaderboard!
+            Test your knowledge about San Francisco with these fun trivia games
+            hosted by Sgt. Ken. Earn points, badges, and climb the leaderboard!
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {triviaGames.map((game) => {
-            const gameResult = gameHistory[game.id]
-            const hasPlayed = !!gameResult
-            const scorePercentage = hasPlayed ? getScorePercentage(gameResult.bestScore, gameResult.totalQuestions) : 0
+            const gameResult = gameHistory[game.id];
+            const hasPlayed = !!gameResult;
+            const scorePercentage = hasPlayed
+              ? getScorePercentage(
+                  gameResult.bestScore,
+                  gameResult.totalQuestions,
+                )
+              : 0;
 
             return (
               <Card
@@ -252,7 +280,9 @@ export default function TriviaHubPage() {
                     className={`object-cover transition-transform duration-500 ease-in-out
                       ${hoveredCard === game.id ? "scale-110" : ""}`}
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                    priority={game.id === "sf-football" || game.id === "sf-baseball"}
+                    priority={
+                      game.id === "sf-football" || game.id === "sf-baseball"
+                    }
                   />
                   <div
                     className={`absolute inset-0 bg-black opacity-0 transition-opacity duration-300
@@ -262,7 +292,7 @@ export default function TriviaHubPage() {
                   {/* Category Badges */}
                   <div className="absolute top-2 right-2 flex flex-wrap justify-end gap-1 max-w-[70%]">
                     {game.categories.map((categoryId) => {
-                      const category = categories[categoryId]
+                      const category = categories[categoryId];
                       return (
                         <div
                           key={categoryId}
@@ -273,7 +303,7 @@ export default function TriviaHubPage() {
                           {category.icon}
                           <span>{category.name}</span>
                         </div>
-                      )
+                      );
                     })}
                   </div>
 
@@ -290,20 +320,27 @@ export default function TriviaHubPage() {
                             >
                               <CheckCircle2 className="h-3 w-3" />
                               <span>
-                                {gameResult.bestScore}/{gameResult.totalQuestions}
+                                {gameResult.bestScore}/
+                                {gameResult.totalQuestions}
                               </span>
                             </div>
                           </TooltipTrigger>
                           <TooltipContent>
                             <div className="space-y-1">
                               <p className="font-medium">
-                                Best Score: {gameResult.bestScore}/{gameResult.totalQuestions} ({scorePercentage}%)
+                                Best Score: {gameResult.bestScore}/
+                                {gameResult.totalQuestions} ({scorePercentage}%)
                               </p>
                               <p className="text-xs text-gray-500">
-                                Played {gameResult.timesPlayed} time{gameResult.timesPlayed !== 1 ? "s" : ""}
+                                Played {gameResult.timesPlayed} time
+                                {gameResult.timesPlayed !== 1 ? "s" : ""}
                               </p>
                               <p className="text-xs text-gray-500">
-                                Last played: {formatDistanceToNow(new Date(gameResult.lastPlayed))} ago
+                                Last played:{" "}
+                                {formatDistanceToNow(
+                                  new Date(gameResult.lastPlayed),
+                                )}{" "}
+                                ago
                               </p>
                             </div>
                           </TooltipContent>
@@ -314,7 +351,9 @@ export default function TriviaHubPage() {
                 </div>
                 <CardHeader className="pb-2">
                   <div className="flex items-center gap-2">
-                    <div className={`transition-transform duration-300 ${hoveredCard === game.id ? "scale-110" : ""}`}>
+                    <div
+                      className={`transition-transform duration-300 ${hoveredCard === game.id ? "scale-110" : ""}`}
+                    >
                       {game.icon}
                     </div>
                     <CardTitle
@@ -341,10 +380,10 @@ export default function TriviaHubPage() {
                   </Link>
                 </CardFooter>
               </Card>
-            )
+            );
           })}
         </div>
       </main>
     </PageWrapper>
-  )
+  );
 }

@@ -1,44 +1,48 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { cn } from "@/lib/utils"
-import ReactMarkdown from "react-markdown"
-import { Check, CheckCheck } from "lucide-react"
-import { useState } from "react"
-import Image from "next/image"
-import { motion } from "framer-motion"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
+import ReactMarkdown from "react-markdown";
+import { Check, CheckCheck } from "lucide-react";
+import { useState } from "react";
+import Image from "next/image";
+import { motion } from "framer-motion";
 
 export interface Message {
-  content: string
-  role: "user" | "assistant"
-  timestamp: string
-  status?: "sent" | "delivered" | "read"
+  content: string;
+  role: "user" | "assistant";
+  timestamp: string;
+  status?: "sent" | "delivered" | "read";
   attachments?: Array<{
-    type: "image" | "file"
-    url: string
-    name: string
-  }>
+    type: "image" | "file";
+    url: string;
+    name: string;
+  }>;
 }
 
 interface ChatMessageProps {
-  message: Message
+  message: Message;
 }
 
 const StatusIndicator = ({ status }: { status?: string }) => {
-  if (!status) return null
+  if (!status) return null;
   return (
     <span className="ml-2">
       {status === "delivered" && <Check className="h-4 w-4 text-gray-400" />}
       {status === "read" && <CheckCheck className="h-4 w-4 text-blue-500" />}
     </span>
-  )
-}
+  );
+};
 
-const Attachment = ({ attachment }: { attachment: Message["attachments"][0] }) => {
-  const [isExpanded, setIsExpanded] = useState(false)
+const Attachment = ({
+  attachment,
+}: {
+  attachment: Message["attachments"][0];
+}) => {
+  const [isExpanded, setIsExpanded] = useState(false);
 
   if (attachment.type === "image") {
     return (
-      <div 
-        className="relative mt-2 cursor-pointer" 
+      <div
+        className="relative mt-2 cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <motion.div
@@ -54,11 +58,11 @@ const Attachment = ({ attachment }: { attachment: Message["attachments"][0] }) =
           />
         </motion.div>
       </div>
-    )
+    );
   }
 
   return (
-    <a 
+    <a
       href={attachment.url}
       target="_blank"
       rel="noopener noreferrer"
@@ -66,17 +70,19 @@ const Attachment = ({ attachment }: { attachment: Message["attachments"][0] }) =
     >
       📎 {attachment.name}
     </a>
-  )
-}
+  );
+};
 
 export function ChatMessage({ message }: ChatMessageProps) {
-  const isUser = message.role === "user"
+  const isUser = message.role === "user";
 
   return (
-    <div className={cn(
-      "flex gap-3 items-start",
-      isUser ? "flex-row-reverse" : "flex-row"
-    )}>
+    <div
+      className={cn(
+        "flex gap-3 items-start",
+        isUser ? "flex-row-reverse" : "flex-row",
+      )}
+    >
       <Avatar className="w-8 h-8">
         {isUser ? (
           <>
@@ -90,14 +96,16 @@ export function ChatMessage({ message }: ChatMessageProps) {
           </>
         )}
       </Avatar>
-      <div className={cn(
-        "rounded-lg px-4 py-2 max-w-[80%]",
-        isUser ? "bg-[#0A3C1F] text-white" : "bg-gray-100 text-gray-900"
-      )}>
+      <div
+        className={cn(
+          "rounded-lg px-4 py-2 max-w-[80%]",
+          isUser ? "bg-[#0A3C1F] text-white" : "bg-gray-100 text-gray-900",
+        )}
+      >
         <div className="prose prose-sm dark:prose-invert">
           <ReactMarkdown>{message.content}</ReactMarkdown>
         </div>
-        
+
         {message.attachments?.map((attachment, index) => (
           <Attachment key={index} attachment={attachment} />
         ))}
@@ -108,5 +116,5 @@ export function ChatMessage({ message }: ChatMessageProps) {
         </div>
       </div>
     </div>
-  )
-} 
+  );
+}

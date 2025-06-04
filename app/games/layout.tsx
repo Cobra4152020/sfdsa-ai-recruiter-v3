@@ -6,4 +6,4 @@ export default function GamesLayout({ children }: { children: ReactNode }) {
       <body>{children}</body>
     </html>
   );
-} 
+}

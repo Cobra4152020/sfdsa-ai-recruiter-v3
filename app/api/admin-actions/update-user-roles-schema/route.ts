@@ -1,9 +1,9 @@
-import { NextResponse } from "next/server"
-import { getServiceSupabase } from "@/app/lib/supabase/server"
+import { NextResponse } from "next/server";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function updateUserRolesSchema() {
   try {
-    const supabase = getServiceSupabase()
+    const supabase = getServiceSupabase();
 
     // Get the SQL from the migration file
     const migrationSql = `
@@ -20,29 +20,32 @@ export async function updateUserRolesSchema() {
     SET assigned_at = created_at, 
         is_active = TRUE 
     WHERE assigned_at IS NULL;
-    `
+    `;
 
     // Execute the SQL migration
-    const { error } = await supabase.rpc("exec_sql", { sql_query: migrationSql })
+    const { error } = await supabase.rpc("exec_sql", {
+      sql_query: migrationSql,
+    });
 
     if (error) {
-      console.error("Error updating user_roles schema:", error)
-      return { success: false, error: error.message }
+      console.error("Error updating user_roles schema:", error);
+      return { success: false, error: error.message };
     }
 
     // Revalidate paths that might be affected
-        
-    return { success: true }
+
+    return { success: true };
   } catch (error) {
-    console.error("Unexpected error updating user_roles schema:", error)
+    console.error("Unexpected error updating user_roles schema:", error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
-    }
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
+    };
   }
 }
 
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
 export async function POST(request: Request) {
@@ -52,9 +55,15 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error(`Error in updateUserRolesSchema:`, error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred"
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : "An unexpected error occurred",
+      },
+      { status: 500 },
+    );
   }
 }

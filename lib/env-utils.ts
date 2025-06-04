@@ -3,7 +3,10 @@
  * Safe to use on client side
  */
 export function isSupabaseConfigured(): boolean {
-  return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  return !!(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  );
 }
 
 /**
@@ -12,14 +15,14 @@ export function isSupabaseConfigured(): boolean {
  */
 export function getBaseUrl(): string {
   if (process.env.NEXT_PUBLIC_VERCEL_URL) {
-    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
+    return `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`;
   }
 
   if (process.env.NEXT_PUBLIC_SITE_URL) {
-    return process.env.NEXT_PUBLIC_SITE_URL
+    return process.env.NEXT_PUBLIC_SITE_URL;
   }
 
-  return "http://localhost:3000"
+  return "http://localhost:3000";
 }
 
 /**
@@ -31,25 +34,29 @@ export function getBaseUrl(): string {
  */
 export function clientEnv(key: string, fallback = ""): string {
   if (!key.startsWith("NEXT_PUBLIC_") && typeof window !== "undefined") {
-    console.warn(`Trying to access non-public env var '${key}' on the client. This will not work.`)
-    return fallback
+    console.warn(
+      `Trying to access non-public env var '${key}' on the client. This will not work.`,
+    );
+    return fallback;
   }
-  return process.env[key] || fallback
+  return process.env[key] || fallback;
 }
 
 // For backward compatibility
 export function env(key: string, fallback = ""): string {
   if (typeof window !== "undefined" && !key.startsWith("NEXT_PUBLIC_")) {
-    console.warn(`Using env() with '${key}' on client side. This may not work as expected.`)
+    console.warn(
+      `Using env() with '${key}' on client side. This may not work as expected.`,
+    );
   }
-  return process.env[key] || fallback
+  return process.env[key] || fallback;
 }
 
 /**
  * Checks if the application is running in development mode
  */
 export function isDevelopment(): boolean {
-  return process.env.NODE_ENV === "development"
+  return process.env.NODE_ENV === "development";
 }
 
 /**
@@ -57,7 +64,7 @@ export function isDevelopment(): boolean {
  * Should only be used server-side
  */
 export function isSupabaseServiceConfigured(): boolean {
-  return !!process.env.SUPABASE_SERVICE_ROLE_KEY
+  return !!process.env.SUPABASE_SERVICE_ROLE_KEY;
 }
 
 /**
@@ -70,7 +77,7 @@ export const serverEnvUtils = {
    * Server-side only
    */
   isSupabaseServiceConfigured: (): boolean => {
-    return !!process.env.SUPABASE_SERVICE_ROLE_KEY
+    return !!process.env.SUPABASE_SERVICE_ROLE_KEY;
   },
 
   /**
@@ -78,7 +85,7 @@ export const serverEnvUtils = {
    * Server-side only
    */
   isDevelopment: (): boolean => {
-    return process.env.NODE_ENV === "development"
+    return process.env.NODE_ENV === "development";
   },
 
   /**
@@ -86,6 +93,6 @@ export const serverEnvUtils = {
    * Server-side only
    */
   env: (key: string, fallback = ""): string => {
-    return process.env[key] || fallback
+    return process.env[key] || fallback;
   },
-}
+};

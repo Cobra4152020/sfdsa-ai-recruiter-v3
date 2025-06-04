@@ -1,4 +1,4 @@
-export async function fixAdminProfile(params: any) {
+export async function fixAdminProfile(params: unknown) {
   try {
     const response = await fetch(`/api/admin-actions/fix-admin-profile`, {
       method: "POST",
@@ -19,7 +19,8 @@ export async function fixAdminProfile(params: any) {
     console.error(`Error in fixAdminProfile:`, error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : "An unexpected error occurred",
+      error:
+        error instanceof Error ? error.message : "An unexpected error occurred",
     };
   }
 }

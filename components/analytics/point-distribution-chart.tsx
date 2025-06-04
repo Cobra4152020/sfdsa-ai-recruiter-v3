@@ -1,73 +1,95 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { BarChart } from "@/components/ui/charts"
-import { DateRangeSelector } from "@/components/analytics/date-range-selector"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { AlertTriangle, Loader2 } from "lucide-react"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { BarChart } from "@/components/ui/charts";
+import { DateRangeSelector } from "@/components/analytics/date-range-selector";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AlertTriangle, Loader2 } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export type PointDistribution = {
-  pointRange: string
-  donationCount: number
-  totalPoints: number
-  avgAmount: number
-}
+  pointRange: string;
+  donationCount: number;
+  totalPoints: number;
+  avgAmount: number;
+};
 
 export function PointDistributionChart() {
-  const [distributionData, setDistributionData] = useState<PointDistribution[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [distributionData, setDistributionData] = useState<PointDistribution[]>(
+    [],
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState({
     from: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     to: new Date(),
     preset: "last30",
-  })
+  });
 
   useEffect(() => {
-    fetchDistributionData()
-  }, [dateRange])
+    fetchDistributionData();
+  }, [dateRange]);
 
   const fetchDistributionData = async () => {
-    setIsLoading(true)
-    setError(null)
+    setIsLoading(true);
+    setError(null);
     try {
       const params = new URLSearchParams({
         startDate: dateRange.from.toISOString(),
         endDate: dateRange.to.toISOString(),
-      })
+      });
 
-      const response = await fetch(`/api/analytics/donations/points/distribution?${params}`)
+      const response = await fetch(
+        `/api/analytics/donations/points/distribution?${params}`,
+      );
 
       if (!response.ok) {
-        throw new Error(`Error fetching point distribution: ${response.statusText}`)
+        throw new Error(
+          `Error fetching point distribution: ${response.statusText}`,
+        );
       }
 
-      const data = await response.json()
-      setDistributionData(data.distribution || [])
+      const data = await response.json();
+      setDistributionData(data.distribution || []);
     } catch (error) {
-      console.error("Failed to fetch point distribution:", error)
-      setError(error instanceof Error ? error.message : "Failed to fetch point distribution")
+      console.error("Failed to fetch point distribution:", error);
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch point distribution",
+      );
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const handleDateRangeChange = (range: { from: Date; to: Date; preset?: string }) => {
-    setDateRange(range)
-  }
+  const handleDateRangeChange = (range: {
+    from: Date;
+    to: Date;
+    preset?: string;
+  }) => {
+    setDateRange(range);
+  };
 
-  const formatCurrency = (value: number) => `$${value.toFixed(2)}`
-  const formatCount = (value: number) => `${value}`
-  const formatPoints = (value: number) => `${value.toLocaleString()} pts`
+  const formatCurrency = (value: number) => `$${value.toFixed(2)}`;
+  const formatCount = (value: number) => `${value}`;
+  const formatPoints = (value: number) => `${value.toLocaleString()} pts`;
 
   if (error) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>Point Distribution</CardTitle>
-          <CardDescription>Analyze how donation points are distributed</CardDescription>
+          <CardDescription>
+            Analyze how donation points are distributed
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive">
@@ -77,7 +99,7 @@ export function PointDistributionChart() {
           </Alert>
         </CardContent>
       </Card>
-    )
+    );
   }
 
   return (
@@ -86,9 +108,14 @@ export function PointDistributionChart() {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <CardTitle>Point Distribution</CardTitle>
-            <CardDescription>Analyze how donation points are distributed</CardDescription>
+            <CardDescription>
+              Analyze how donation points are distributed
+            </CardDescription>
           </div>
-          <DateRangeSelector onChange={handleDateRangeChange} defaultPreset="last30" />
+          <DateRangeSelector
+            onChange={handleDateRangeChange}
+            defaultPreset="last30"
+          />
         </div>
       </CardHeader>
       <CardContent>
@@ -161,5 +188,5 @@ export function PointDistributionChart() {
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }

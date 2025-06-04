@@ -1,8 +1,17 @@
-"use client"
+"use client";
 
-import { PageWrapper } from "@/components/page-wrapper"
-import { Card, CardContent } from "@/components/ui/card"
-import { DollarSign, Heart, GraduationCap, Calendar, Shield, Clock, Briefcase, Trophy } from "lucide-react"
+import { PageWrapper } from "@/components/page-wrapper";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  DollarSign,
+  Heart,
+  GraduationCap,
+  Calendar,
+  Shield,
+  Clock,
+  Briefcase,
+  Trophy,
+} from "lucide-react";
 
 export default function BenefitsClient() {
   const benefitCategories = [
@@ -94,36 +103,49 @@ export default function BenefitsClient() {
         "Recognition and awards program",
       ],
     },
-  ]
+  ];
 
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">Comprehensive Benefits Package</h1>
+            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+              Comprehensive Benefits Package
+            </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              As a San Francisco Deputy Sheriff, you'll enjoy a rewarding career with excellent benefits designed to support
-              your professional growth, health, and financial security.
+              As a San Francisco Deputy Sheriff, you&apos;ll enjoy a rewarding
+              career with excellent benefits designed to support your
+              professional growth, health, and financial security.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {benefitCategories.map((category) => {
-              const Icon = category.icon
+              const Icon = category.icon;
               return (
-                <Card key={category.title} className="hover:shadow-lg transition-shadow">
+                <Card
+                  key={category.title}
+                  className="hover:shadow-lg transition-shadow"
+                >
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
                       <div className="flex-shrink-0 w-12 h-12 bg-[#0A3C1F]/10 rounded-full flex items-center justify-center">
                         <Icon className="h-6 w-6 text-[#0A3C1F]" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-semibold text-[#0A3C1F] mb-3">{category.title}</h2>
+                        <h2 className="text-xl font-semibold text-[#0A3C1F] mb-3">
+                          {category.title}
+                        </h2>
                         <ul className="space-y-2">
                           {category.benefits.map((benefit) => (
-                            <li key={benefit} className="flex items-start gap-2 text-gray-700">
-                              <span className="text-[#0A3C1F] font-bold">•</span>
+                            <li
+                              key={benefit}
+                              className="flex items-start gap-2 text-gray-700"
+                            >
+                              <span className="text-[#0A3C1F] font-bold">
+                                •
+                              </span>
                               <span>{benefit}</span>
                             </li>
                           ))}
@@ -132,16 +154,19 @@ export default function BenefitsClient() {
                     </div>
                   </CardContent>
                 </Card>
-              )
+              );
             })}
           </div>
 
           <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-8">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-2xl font-semibold text-blue-800 mb-4">Start Your Career Today</h2>
+              <h2 className="text-2xl font-semibold text-blue-800 mb-4">
+                Start Your Career Today
+              </h2>
               <p className="text-blue-700 mb-6">
-                Join the San Francisco Sheriff's Department and enjoy these comprehensive benefits while making a difference
-                in your community.
+                Join the San Francisco Sheriff&apos;s Department and enjoy these
+                comprehensive benefits while making a difference in your
+                community.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <a
@@ -162,5 +187,5 @@ export default function BenefitsClient() {
         </div>
       </div>
     </PageWrapper>
-  )
-} 
+  );
+}

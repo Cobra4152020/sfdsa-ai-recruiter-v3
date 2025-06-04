@@ -1,15 +1,15 @@
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
 
-export const dynamic = 'force-static'
+export const dynamic = "force-static";
 
 interface LeaderboardEntry {
-  id: string
-  name: string
-  points: number
-  rank: number
-  avatar_url: string | null
-  badges: number
-  last_active: string
+  id: string;
+  name: string;
+  points: number;
+  rank: number;
+  avatar_url: string | null;
+  badges: number;
+  last_active: string;
 }
 
 // Mock leaderboard data
@@ -21,7 +21,7 @@ const STATIC_LEADERBOARD: LeaderboardEntry[] = [
     rank: 1,
     avatar_url: null,
     badges: 8,
-    last_active: "2024-01-01T00:00:00Z"
+    last_active: "2024-01-01T00:00:00Z",
   },
   {
     id: "2",
@@ -30,7 +30,7 @@ const STATIC_LEADERBOARD: LeaderboardEntry[] = [
     rank: 2,
     avatar_url: null,
     badges: 6,
-    last_active: "2024-01-02T00:00:00Z"
+    last_active: "2024-01-02T00:00:00Z",
   },
   {
     id: "3",
@@ -39,7 +39,7 @@ const STATIC_LEADERBOARD: LeaderboardEntry[] = [
     rank: 3,
     avatar_url: null,
     badges: 5,
-    last_active: "2024-01-03T00:00:00Z"
+    last_active: "2024-01-03T00:00:00Z",
   },
   {
     id: "4",
@@ -48,7 +48,7 @@ const STATIC_LEADERBOARD: LeaderboardEntry[] = [
     rank: 4,
     avatar_url: null,
     badges: 4,
-    last_active: "2024-01-04T00:00:00Z"
+    last_active: "2024-01-04T00:00:00Z",
   },
   {
     id: "5",
@@ -57,45 +57,46 @@ const STATIC_LEADERBOARD: LeaderboardEntry[] = [
     rank: 5,
     avatar_url: null,
     badges: 3,
-    last_active: "2024-01-05T00:00:00Z"
-  }
-]
+    last_active: "2024-01-05T00:00:00Z",
+  },
+];
 
 export async function GET(request: Request) {
   try {
-    const url = new URL(request.url)
-    const timeframe = url.searchParams.get("timeframe") || "all"
-    const category = url.searchParams.get("category") || "points"
-    const limit = Number(url.searchParams.get("limit") || "10")
-    const offset = Number(url.searchParams.get("offset") || "0")
-    const search = url.searchParams.get("search") || ""
+    const url = new URL(request.url);
+    const limit = Number(url.searchParams.get("limit") || "10");
+    const offset = Number(url.searchParams.get("offset") || "0");
+    const search = url.searchParams.get("search") || "";
 
-    let entries = [...STATIC_LEADERBOARD]
+    let entries = [...STATIC_LEADERBOARD];
 
     // Apply search filter if provided
     if (search) {
-      entries = entries.filter(entry => 
-        entry.name.toLowerCase().includes(search.toLowerCase())
-      )
+      entries = entries.filter((entry) =>
+        entry.name.toLowerCase().includes(search.toLowerCase()),
+      );
     }
 
     // Get total count before pagination
-    const total = entries.length
+    const total = entries.length;
 
     // Apply pagination
-    entries = entries.slice(offset, offset + limit)
+    entries = entries.slice(offset, offset + limit);
 
     return NextResponse.json({
       success: true,
       entries,
       total,
-      source: 'static'
-    })
+      source: "static",
+    });
   } catch (error) {
-    console.error("Error fetching leaderboard:", error)
+    console.error("Error fetching leaderboard:", error);
     return NextResponse.json(
-      { success: false, message: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    )
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 },
+    );
   }
 }

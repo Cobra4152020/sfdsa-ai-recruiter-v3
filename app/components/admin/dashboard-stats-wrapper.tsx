@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Users, Award, Calendar, TrendingUp } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card";
+import { Users, Award, Calendar, TrendingUp } from "lucide-react";
 
 export function DashboardStatsWrapper() {
   const stats = [
@@ -29,18 +29,20 @@ export function DashboardStatsWrapper() {
       icon: TrendingUp,
       change: "+2% improvement",
     },
-  ]
+  ];
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => {
-        const Icon = stat.icon
+        const Icon = stat.icon;
         return (
           <Card key={stat.title}>
             <CardContent className="p-6">
               <div className="flex items-center space-x-2">
                 <Icon className="h-4 w-4 text-gray-500" />
-                <h3 className="text-sm font-medium text-gray-600">{stat.title}</h3>
+                <h3 className="text-sm font-medium text-gray-600">
+                  {stat.title}
+                </h3>
               </div>
               <div className="mt-2">
                 <p className="text-2xl font-bold">{stat.value}</p>
@@ -48,8 +50,8 @@ export function DashboardStatsWrapper() {
               </div>
             </CardContent>
           </Card>
-        )
+        );
       })}
     </div>
-  )
-} 
+  );
+}

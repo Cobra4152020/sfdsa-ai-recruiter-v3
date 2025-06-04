@@ -1,35 +1,47 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BadgeCollectionGrid } from "@/components/badges/badge-collection-grid"
-import { BadgeLeaderboard } from "@/components/badges/badge-leaderboard"
-import { BadgeStats } from "@/components/badges/badge-stats"
-import { BadgeTimeline } from "@/components/badges/badge-timeline"
-import { BadgeFilter, type BadgeFilters } from "@/components/badges/badge-filter"
-import { BadgeSearch } from "@/components/badges/badge-search"
-import { useUser } from "@/context/user-context"
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BadgeCollectionGrid } from "@/components/badges/badge-collection-grid";
+import { BadgeLeaderboard } from "@/components/badges/badge-leaderboard";
+import { BadgeStats } from "@/components/badges/badge-stats";
+import { BadgeTimeline } from "@/components/badges/badge-timeline";
+import {
+  BadgeFilter,
+  type BadgeFilters,
+} from "@/components/badges/badge-filter";
+import { BadgeSearch } from "@/components/badges/badge-search";
+import { useUser } from "@/context/user-context";
 
 export function BadgesContent() {
-  const { currentUser } = useUser()
-  const [activeTab, setActiveTab] = useState("all")
-  const [searchQuery, setSearchQuery] = useState("")
+  const { currentUser } = useUser();
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<BadgeFilters>({
-    type: 'all',
-    rarity: 'all',
-    status: 'all',
-    sortBy: 'newest'
-  })
+    type: "all",
+    rarity: "all",
+    status: "all",
+    sortBy: "newest",
+  });
 
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">Badge Gallery</h1>
+          <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+            Badge Gallery
+          </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-            Earn badges by completing challenges, participating in events, and contributing to the SFDSA community.
-            Track your progress and compete with other recruits.
+            Earn badges by completing challenges, participating in events, and
+            contributing to the SFDSA community. Track your progress and compete
+            with other recruits.
           </p>
         </div>
 
@@ -42,11 +54,16 @@ export function BadgesContent() {
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
               <div>
                 <CardTitle>Your Badges</CardTitle>
-                <CardDescription>View and track your badge collection</CardDescription>
+                <CardDescription>
+                  View and track your badge collection
+                </CardDescription>
               </div>
               <div className="flex flex-col sm:flex-row gap-4">
                 <BadgeSearch value={searchQuery} onChange={setSearchQuery} />
-                <BadgeFilter onFilterChange={setFilters} defaultFilters={filters} />
+                <BadgeFilter
+                  onFilterChange={setFilters}
+                  defaultFilters={filters}
+                />
               </div>
             </div>
           </CardHeader>
@@ -102,7 +119,9 @@ export function BadgesContent() {
           <Card>
             <CardHeader>
               <CardTitle>Badge Leaderboard</CardTitle>
-              <CardDescription>Top badge collectors in the community</CardDescription>
+              <CardDescription>
+                Top badge collectors in the community
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <BadgeLeaderboard />
@@ -121,5 +140,5 @@ export function BadgesContent() {
         </div>
       </div>
     </main>
-  )
-} 
+  );
+}

@@ -1,30 +1,38 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { ArrowRight } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface HeroSectionProps {
-  onGetStarted: () => void
-  showOptInForm: (isApplying?: boolean) => void
+  showOptInForm?: (isApplying?: boolean) => void;
 }
 
-export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
-  const router = useRouter()
+export function HeroSection(
+  { showOptInForm }: HeroSectionProps = {} as HeroSectionProps,
+) {
+  const router = useRouter();
 
   const handleApplyNow = () => {
-    showOptInForm(true)
-  }
+    if (showOptInForm) {
+      showOptInForm(true);
+    } else {
+      router.push("/apply");
+    }
+  };
 
   const handleMoreInfo = () => {
-    showOptInForm(false)
-  }
+    if (showOptInForm) {
+      showOptInForm(false);
+    } else {
+      router.push("/about");
+    }
+  };
 
   const handleSignUp = () => {
-    router.push('/register')
-  }
+    router.push("/register");
+  };
 
   return (
     <section className="bg-[#0A3C1F] text-white pt-24 pb-16 relative mt-12 md:mt-16">
@@ -42,16 +50,18 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-            Join the <span className="text-[#FFD700]">San Francisco</span> Sheriff's Office
+            Join the <span className="text-[#FFD700]">San Francisco</span>{" "}
+            Sheriff&apos;s Office
           </h1>
           <p className="text-xl md:text-2xl text-white/80 max-w-3xl mx-auto">
-            Embark on a rewarding career in law enforcement. Protect our community with honor and integrity.
+            Embark on a rewarding career in law enforcement. Protect our
+            community with honor and integrity.
           </p>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-7xl mx-auto items-stretch">
           {/* Benefits Box */}
-          <div 
+          <div
             className="transform-gpu bg-[#0A3C1F]/50 backdrop-blur-sm p-8 rounded-xl border border-white/20 
             shadow-[4px_4px_10px_0px_rgba(0,0,0,0.3),0_8px_10px_-6px_rgba(0,0,0,0.3),0_-2px_6px_0px_rgba(255,215,0,0.1)] 
             hover:shadow-[8px_8px_20px_0px_rgba(0,0,0,0.4),0_12px_16px_-8px_rgba(0,0,0,0.4),0_-4px_12px_0px_rgba(255,215,0,0.15)] 
@@ -65,23 +75,33 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
             </h2>
             <ul className="space-y-4">
               <li className="flex items-start">
-                <span className="text-[#FFD700] mr-2" aria-hidden="true">✓</span>
+                <span className="text-[#FFD700] mr-2" aria-hidden="true">
+                  ✓
+                </span>
                 <span>Full medical, dental, and vision benefits</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#FFD700] mr-2" aria-hidden="true">✓</span>
+                <span className="text-[#FFD700] mr-2" aria-hidden="true">
+                  ✓
+                </span>
                 <span>Paid academy training (23 weeks)</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#FFD700] mr-2" aria-hidden="true">✓</span>
+                <span className="text-[#FFD700] mr-2" aria-hidden="true">
+                  ✓
+                </span>
                 <span>Career advancement opportunities</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#FFD700] mr-2" aria-hidden="true">✓</span>
+                <span className="text-[#FFD700] mr-2" aria-hidden="true">
+                  ✓
+                </span>
                 <span>Retirement plan with pension</span>
               </li>
               <li className="flex items-start">
-                <span className="text-[#FFD700] mr-2" aria-hidden="true">✓</span>
+                <span className="text-[#FFD700] mr-2" aria-hidden="true">
+                  ✓
+                </span>
                 <span>Tuition reimbursement program</span>
               </li>
             </ul>
@@ -108,7 +128,7 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
 
           {/* Image Box */}
           <div className="transform-gpu h-full">
-            <div 
+            <div
               className="relative rounded-xl overflow-hidden h-full min-h-[500px]
               shadow-[4px_4px_10px_0px_rgba(0,0,0,0.3),0_8px_10px_-6px_rgba(0,0,0,0.3),0_-2px_6px_0px_rgba(255,215,0,0.1)]
               hover:shadow-[8px_8px_20px_0px_rgba(0,0,0,0.4),0_12px_16px_-8px_rgba(0,0,0,0.4),0_-4px_12px_0px_rgba(255,215,0,0.15)]
@@ -135,7 +155,9 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
         </div>
 
         <div className="text-center mt-16">
-          <p className="text-white/90 mb-2">Already interested? Take the first step today</p>
+          <p className="text-white/90 mb-2">
+            Ready to serve your community? Let&apos;s get started!
+          </p>
           <button
             onClick={handleSignUp}
             className="text-[#FFD700] hover:text-[#FFD700]/80 flex items-center justify-center mx-auto"
@@ -145,5 +167,5 @@ export function HeroSection({ onGetStarted, showOptInForm }: HeroSectionProps) {
         </div>
       </div>
     </section>
-  )
+  );
 }

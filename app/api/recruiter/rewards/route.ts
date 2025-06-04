@@ -1,19 +1,21 @@
-
-export const dynamic = 'force-static';
+export const dynamic = "force-static";
 export const revalidate = 3600; // Revalidate every hour;
 
-import { NextResponse } from "next/server"
-import { getAvailableRewards } from "@/lib/recruiter-rewards-service"
+import { NextResponse } from "next/server";
+import { getAvailableRewards } from "@/lib/recruiter-rewards-service";
 
 export async function GET() {
   try {
-    const result = await getAvailableRewards()
-    return NextResponse.json(result)
+    const result = await getAvailableRewards();
+    return NextResponse.json(result);
   } catch (error) {
-    console.error("Error in recruiter rewards GET:", error)
+    console.error("Error in recruiter rewards GET:", error);
     return NextResponse.json(
-      { success: false, message: error instanceof Error ? error.message : "Unknown error" },
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
-    )
+    );
   }
 }

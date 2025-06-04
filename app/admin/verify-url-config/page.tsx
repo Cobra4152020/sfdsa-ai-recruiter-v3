@@ -1,49 +1,72 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { CheckCircle, AlertCircle, RefreshCw } from "lucide-react"
+import { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
+
+interface UrlConfigData {
+  environmentVariables: Record<string, string>;
+  databaseSettings: Record<string, unknown>;
+  computedUrls: Record<string, string>;
+  success: boolean;
+  error?: string;
+}
 
 export default function VerifyUrlConfigPage() {
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [data, setData] = useState<any>(null)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<UrlConfigData | null>(null);
 
   const fetchConfig = async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
 
     try {
-      const response = await fetch("/api/admin/verify-url-config")
-      const result = await response.json()
+      const response = await fetch("/api/admin/verify-url-config");
+      const result = await response.json();
 
       if (!result.success) {
-        throw new Error(result.error || "Failed to fetch URL configuration")
+        throw new Error(result.error || "Failed to fetch URL configuration");
       }
 
-      setData(result)
+      setData(result);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unknown error occurred")
+      setError(
+        err instanceof Error ? err.message : "An unknown error occurred",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   useEffect(() => {
-    fetchConfig()
-  }, [])
+    fetchConfig();
+  }, []);
 
-  const isProduction = data?.environmentVariables?.NODE_ENV === "production"
-  const hasCorrectSiteUrl = data?.environmentVariables?.NEXT_PUBLIC_SITE_URL?.includes("sfdeputysheriff.com")
+  const isProduction = data?.environmentVariables?.NODE_ENV === "production";
+  const hasCorrectSiteUrl =
+    data?.environmentVariables?.NEXT_PUBLIC_SITE_URL?.includes(
+      "sfdeputysheriff.com",
+    );
   const allRedirectsCorrect =
     data?.computedUrls &&
-    Object.values(data.computedUrls).every((url: any) => typeof url === "string" && url.includes("sfdeputysheriff.com"))
+    Object.values(data?.computedUrls ?? {}).every(
+      (url) => typeof url === "string" && url.includes("sfdeputysheriff.com"),
+    );
 
   return (
     <div className="container mx-auto py-8">
-      <h1 className="text-3xl font-bold mb-6 text-green-900">URL Configuration Verification</h1>
+      <h1 className="text-3xl font-bold mb-6 text-green-900">
+        URL Configuration Verification
+      </h1>
 
       {loading ? (
         <div className="flex items-center justify-center p-8">
@@ -61,7 +84,9 @@ export default function VerifyUrlConfigPage() {
           <div className="grid gap-6 mb-6">
             <Card
               className={
-                isProduction && hasCorrectSiteUrl && allRedirectsCorrect ? "border-green-500" : "border-red-500"
+                isProduction && hasCorrectSiteUrl && allRedirectsCorrect
+                  ? "border-green-500"
+                  : "border-red-500"
               }
             >
               <CardHeader>
@@ -103,7 +128,8 @@ export default function VerifyUrlConfigPage() {
                     ) : (
                       <AlertCircle className="h-4 w-4 text-red-500 mr-2" />
                     )}
-                    Redirect URLs: {allRedirectsCorrect ? "All correct" : "Some incorrect"}
+                    Redirect URLs:{" "}
+                    {allRedirectsCorrect ? "All correct" : "Some incorrect"}
                   </li>
                 </ul>
               </CardContent>
@@ -146,7 +172,10 @@ export default function VerifyUrlConfigPage() {
           </div>
 
           <div className="mt-6 flex justify-end">
-            <Button onClick={fetchConfig} className="bg-yellow-500 hover:bg-yellow-600 text-white">
+            <Button
+              onClick={fetchConfig}
+              className="bg-yellow-500 hover:bg-yellow-600 text-white"
+            >
               <RefreshCw className="h-4 w-4 mr-2" />
               Refresh Configuration
             </Button>
@@ -154,5 +183,5 @@ export default function VerifyUrlConfigPage() {
         </>
       )}
     </div>
-  )
+  );
 }
