@@ -7,7 +7,6 @@ import { FAQSection } from "@/components/faq-section";
 import { CTASection } from "@/components/cta-section";
 import { DebugUser } from "@/components/debug-user";
 import TopRecruitsScroll from "@/components/top-recruits-scroll";
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
 import { ApplicationProgressGamification } from "@/components/application-progress-gamification";
 import { PointsIntroduction } from "@/components/points-introduction";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -91,8 +90,6 @@ function HomeContent() {
       process.env.NEXT_PUBLIC_ENABLE_DEBUG === "true" ? (
         <DebugUser />
       ) : null}
-
-      <AskSgtKenButton position="fixed" variant="secondary" />
     </ErrorBoundary>
   );
 }

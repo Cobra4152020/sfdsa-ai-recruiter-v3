@@ -30,7 +30,7 @@ export default function ChatWithSgtKenPage() {
   const { addMessage } = useMessageHistory();
   useScrollToBottom(scrollAreaRef, messages);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (!input.trim()) return;
 
     if (!currentUser) {
@@ -38,28 +38,78 @@ export default function ChatWithSgtKenPage() {
       return;
     }
 
+    const messageText = input.trim();
+
     const userMessage: Message = {
-      content: input,
+      content: messageText,
       role: "user",
       timestamp: new Date().toISOString(),
     };
-    addMessage(userMessage);
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     setInput("");
     setIsLoading(true);
     setError(null);
 
-    setTimeout(() => {
+    try {
+      // Prepare chat history for context
+      const chatHistory = messages.slice(-5).map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }));
+
+      // Call the enhanced chat API
+      const response = await fetch("/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: messageText,
+          userId: currentUser?.id,
+          chatHistory,
+          sessionId: "chat-page-session",
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error || "Unknown error");
+      }
+
       const botMessage: Message = {
-        content: "This is a simulated response from Sgt. Ken.",
+        content: data.message,
         role: "assistant",
         timestamp: new Date().toISOString(),
       };
-      addMessage(botMessage);
+      
       setMessages((prevMessages) => [...prevMessages, botMessage]);
+
+      // Show indicator if web search was used
+      if (data.searchUsed) {
+        console.log("✅ Sgt. Ken used current information for this response");
+      }
+
+    } catch (err) {
+      console.error("Chat error:", err);
+      setError(err instanceof Error ? err.message : "Failed to send message");
+      
+      // Add fallback message
+      const fallbackMessage: Message = {
+        content: "Hey there! I'm having a bit of trouble connecting right now, but I'm still here to help with your questions about the San Francisco Sheriff's Office. The department offers competitive salaries, excellent benefits, and rewarding career opportunities. What would you like to know?",
+        role: "assistant",
+        timestamp: new Date().toISOString(),
+      };
+      
+      setMessages((prevMessages) => [...prevMessages, fallbackMessage]);
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   return (

@@ -4,7 +4,6 @@ import type React from "react";
 
 import { useState } from "react";
 import { OptInForm } from "@/components/opt-in-form";
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
 
 interface PageWrapperProps {
   children: React.ReactNode;
@@ -36,9 +35,6 @@ export function PageWrapper({ children }: PageWrapperProps) {
           isOpen={isOptInFormOpen}
         />
       )}
-      <div className="fixed bottom-6 right-6 z-50">
-        <AskSgtKenButton position="fixed" variant="secondary" />
-      </div>
     </>
   );
 }

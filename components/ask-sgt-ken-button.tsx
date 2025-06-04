@@ -17,6 +17,7 @@ import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/context/user-context";
 import { generateResponse } from "@/lib/sgt-ken-knowledge-base";
+import { generateChatResponse } from "@/lib/openai-service";
 
 interface AskSgtKenButtonProps {
   variant?:
@@ -371,102 +372,18 @@ export function AskSgtKenButton({
       ]);
 
       try {
-        let response: string;
+        // Prepare chat history for the AI service
+        const chatHistory = messages.slice(-5).map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }));
 
-        // If we're already in offline mode or have retried multiple times, use local response generation
-        if (offlineMode || retryCount > 1) {
-          // Generate response locally using our knowledge base
-          response = generateResponse(userMessage);
-        } else {
-          // Try the API first
-          try {
-            // Call the API endpoint with timeout
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+        // Use the enhanced OpenAI service with web search capabilities
+        const result = await generateChatResponse(userMessage, chatHistory);
+        
+        let response = result.response;
 
-            const apiResponse = await fetch("/api/chat", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                message: userMessage,
-                userId: currentUser?.id,
-                sessionId,
-              }),
-              signal: controller.signal,
-            });
-
-            clearTimeout(timeoutId);
-
-            if (!apiResponse.ok) {
-              // If API fails with 500, increment retry count and throw error
-              if (apiResponse.status === 500) {
-                setRetryCount((prev) => prev + 1);
-                throw new Error(
-                  `API responded with status: ${apiResponse.status}`,
-                );
-              }
-
-              // For other errors, also throw but with specific message
-              throw new Error(
-                `API responded with status: ${apiResponse.status}`,
-              );
-            }
-
-            const data = await apiResponse.json();
-
-            if (!data || !data.message) {
-              throw new Error("Invalid response format from API");
-            }
-
-            response = data.message;
-
-            // Replace salary information with the updated range
-            response = response.replace(
-              /\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g,
-              "$116,428 to $184,362",
-            );
-            response = response.replace(
-              /salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g,
-              "salary of $116,428 to $184,362",
-            );
-            response = response.replace(
-              /salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g,
-              "salary ranges from $116,428 to $184,362",
-            );
-            response = response.replace(
-              /pay (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g,
-              "pay of $116,428 to $184,362",
-            );
-
-            // Reset retry count on success
-            if (retryCount > 0) {
-              setRetryCount(0);
-            }
-          } catch (apiError) {
-            console.error(
-              "API error, falling back to local response:",
-              apiError,
-            );
-
-            // If API call fails, generate response locally
-            response = generateResponse(userMessage);
-
-            // Set offline mode if this is a repeated failure
-            if (retryCount > 0) {
-              setOfflineMode(true);
-              toast({
-                title: "Switching to offline mode",
-                description: "Using local responses due to connection issues.",
-                variant: "destructive",
-                duration: 5000,
-              });
-            }
-          }
-        }
-
-        // Replace any salary mentions with the updated range
+        // Update salary information to latest figures
         response = response.replace(
           /\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g,
           "$116,428 to $184,362",
@@ -479,20 +396,14 @@ export function AskSgtKenButton({
           /salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g,
           "salary ranges from $116,428 to $184,362",
         );
-        response = response.replace(
-          /pay (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g,
-          "pay of $116,428 to $184,362",
-        );
 
-        // Generate contextual quick replies based on the user's message and the response
-        const quickReplies = getContextualQuickReplies(
-          userMessage + " " + response,
-        );
+        // Generate contextual quick replies based on the conversation
+        const quickReplies = getContextualQuickReplies(userMessage + " " + response);
 
         // Check if we should show a donation prompt
         const showDonation = shouldShowDonationPrompt();
 
-        // Add assistant response
+        // Add assistant response with enhanced metadata
         setMessages((prev) => [
           ...prev,
           {
@@ -504,57 +415,64 @@ export function AskSgtKenButton({
             showDonation,
           },
         ]);
+
+        // Show success indicator if web search was used
+        if (result.searchUsed) {
+          toast({
+            title: "Current Information Retrieved",
+            description: "Sgt. Ken found the latest information for you!",
+            duration: 3000,
+          });
+        }
+
+        // Track successful interaction in the database
+        try {
+          await fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              message: userMessage,
+              response: response,
+              userId: currentUser?.id,
+              sessionId,
+              searchUsed: result.searchUsed,
+            }),
+          });
+        } catch (dbError) {
+          console.error("Database logging error (non-fatal):", dbError);
+        }
+
       } catch (error) {
-        console.error("Error in chat flow:", error);
+        console.error("Error in enhanced chat flow:", error);
 
-        // Generate a response using our knowledge base as fallback
+        // Fallback to local knowledge base
         const fallbackResponse = generateResponse(userMessage);
-
-        // Replace any salary mentions with the updated range
+        
+        // Update salary information
         const updatedResponse = fallbackResponse
-          .replace(
-            /\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g,
-            "$116,428 to $184,362",
-          )
-          .replace(
-            /salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g,
-            "salary of $116,428 to $184,362",
-          )
-          .replace(
-            /salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g,
-            "salary ranges from $116,428 to $184,362",
-          )
-          .replace(
-            /pay (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g,
-            "pay of $116,428 to $184,362",
-          );
+          .replace(/\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g, "$116,428 to $184,362")
+          .replace(/salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g, "salary of $116,428 to $184,362")
+          .replace(/salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g, "salary ranges from $116,428 to $184,362");
 
         // Add fallback response
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
-            content: updatedResponse,
-            quickReplies: getContextualQuickReplies(
-              userMessage + " " + updatedResponse,
-            ),
-            id: `error-${Date.now()}`,
+            content: `Hey there! ${updatedResponse}`,
+            quickReplies: getContextualQuickReplies(userMessage + " " + updatedResponse),
+            id: `fallback-${Date.now()}`,
             timestamp: new Date(),
           },
         ]);
 
-        // Show toast notification only if not already in offline mode
-        if (!offlineMode) {
-          toast({
-            title: "Connection issue",
-            description:
-              "Using offline response mode. Some features may be limited.",
-            variant: "destructive",
-            duration: 5000,
-          });
-
-          setOfflineMode(true);
-        }
+        // Show user-friendly error message
+        toast({
+          title: "Using offline responses",
+          description: "Sgt. Ken is temporarily using stored knowledge. Responses are still accurate!",
+          variant: "default",
+          duration: 3000,
+        });
       } finally {
         setIsLoading(false);
       }

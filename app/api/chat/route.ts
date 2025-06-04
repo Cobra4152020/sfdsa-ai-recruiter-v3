@@ -3,6 +3,7 @@ export const revalidate = 3600; // Revalidate every hour;
 
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
+import { generateChatResponse } from "@/lib/openai-service";
 import { generateResponse } from "@/lib/sgt-ken-knowledge-base";
 import { v4 as uuidv4 } from "uuid";
 
@@ -11,7 +12,7 @@ export const runtime = "nodejs";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { message, userId, sessionId } = body;
+    const { message, userId, sessionId, chatHistory, searchUsed } = body;
 
     if (!message) {
       return NextResponse.json(
@@ -20,8 +21,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generate a detailed, contextually relevant response using our knowledge base
-    const responseText = generateResponse(message);
+    let responseText: string;
+    let actualSearchUsed = false;
+
+    // Try enhanced OpenAI service first
+    try {
+      const result = await generateChatResponse(message, chatHistory || []);
+      responseText = result.response;
+      actualSearchUsed = result.searchUsed || false;
+    } catch (error) {
+      console.error("OpenAI service error, falling back to knowledge base:", error);
+      // Fallback to local knowledge base
+      responseText = `Hey there! ${generateResponse(message)}`;
+      actualSearchUsed = false;
+    }
 
     // Log the interaction to the database (but don't fail if this fails)
     try {
@@ -35,23 +48,30 @@ export async function POST(req: NextRequest) {
         // Create Supabase client directly with the environment variables
         const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
 
-        // Log the interaction
+        // Log the interaction with enhanced metadata
         await supabase.from("chat_interactions").insert({
           user_id: userId || null,
           message,
           response: responseText,
           session_id: sessionId || uuidv4(),
+          search_used: actualSearchUsed,
           created_at: new Date().toISOString(),
         });
 
         // Award participation points if user is logged in
         if (userId) {
           try {
+            const basePoints = 5;
+            const bonusPoints = actualSearchUsed ? 2 : 0; // Bonus for current info
+            const totalPoints = basePoints + bonusPoints;
+
             await supabase.rpc("add_participation_points", {
               user_id_param: userId,
-              points_param: 5,
+              points_param: totalPoints,
               activity_type_param: "chat_interaction",
-              description_param: "Interacted with Sgt. Ken AI",
+              description_param: actualSearchUsed 
+                ? "Interacted with Sgt. Ken AI (with current info)" 
+                : "Interacted with Sgt. Ken AI",
             });
           } catch (pointsError) {
             console.error("Error awarding participation points:", pointsError);
@@ -68,21 +88,22 @@ export async function POST(req: NextRequest) {
       // Continue even if database operations fail
     }
 
-    // Return the response
+    // Return the response with enhanced metadata
     return NextResponse.json({
       message: responseText,
       success: true,
+      searchUsed: actualSearchUsed,
     });
   } catch (error) {
     console.error("Error in chat API route:", error);
 
     // Generate a fallback response even if there's an error
     let fallbackResponse =
-      "I apologize, but I'm having trouble processing your request right now. ";
+      "Hey there! I'm having trouble processing your request right now, but I'm still here to help! ";
     fallbackResponse +=
-      "The San Francisco Sheriff's Department offers rewarding careers with competitive salaries, excellent benefits, and opportunities for advancement. ";
+      "The San Francisco Sheriff's Department offers rewarding careers with competitive salaries starting at $116,428 to $184,362, excellent benefits, and opportunities for advancement. ";
     fallbackResponse +=
-      "Please try asking your question again, or visit sfsheriff.com for more information.";
+      "Please try asking your question again, or check out sfsheriff.com for more information. What can I help you with?";
 
     // Return a fallback response
     return NextResponse.json(
@@ -91,6 +112,7 @@ export async function POST(req: NextRequest) {
         message: fallbackResponse,
         success: false,
         offline: true,
+        searchUsed: false,
       },
       { status: 200 }, // Return 200 even for errors to prevent client-side error handling
     );
