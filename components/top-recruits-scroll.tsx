@@ -1,10 +1,18 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
-import Image from "next/image"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Trophy, Star, Award } from "lucide-react"
+import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Trophy, Star, Award } from "lucide-react";
+
+interface TopRecruit {
+  id: number;
+  name: string;
+  title: string;
+  points: number;
+  badges: number;
+}
 
 // Sample data to use as fallback
 const sampleRecruits = [
@@ -64,15 +72,16 @@ const sampleRecruits = [
     points: 820,
     badges: 3,
   },
-]
+];
 
-export function TopRecruitsScroll() {
-  // Use sample data as fallback
-  const [recruits, setRecruits] = useState(sampleRecruits)
-  const scrollRef = useRef<HTMLDivElement>(null)
-  const [scrollDirection, setScrollDirection] = useState<"left" | "right">("left")
-  const [isPaused, setIsPaused] = useState(false)
-  const animationRef = useRef<number>()
+export default function TopRecruitsScroll() {
+  const [recruits] = useState<TopRecruit[]>(sampleRecruits);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [scrollDirection, setScrollDirection] = useState<"left" | "right">(
+    "left",
+  );
+  const [isPaused, setIsPaused] = useState(false);
+  const animationRef = useRef<number>();
 
   // Get profile image based on user ID
   const getProfileImage = (userId: number) => {
@@ -82,54 +91,57 @@ export function TopRecruitsScroll() {
       2: "/female-law-enforcement-headshot.png",
       3: "/male-law-enforcement-headshot.png",
       4: "/san-francisco-deputy-sheriff.png",
-    }
+    };
 
     // Use the mapped image or fall back to a default based on user ID modulo
-    return imageMap[userId] || `/placeholder.svg?height=64&width=64&query=profile ${userId}`
-  }
+    return (
+      imageMap[userId] ||
+      `/placeholder.svg?height=64&width=64&query=profile ${userId}`
+    );
+  };
 
   // Auto-scroll animation
   useEffect(() => {
-    if (!scrollRef.current) return
+    if (!scrollRef.current) return;
 
-    const scrollContainer = scrollRef.current
-    const scrollWidth = scrollContainer.scrollWidth
-    const clientWidth = scrollContainer.clientWidth
+    const scrollContainer = scrollRef.current;
+    const scrollWidth = scrollContainer.scrollWidth;
+    const clientWidth = scrollContainer.clientWidth;
 
     const scroll = () => {
-      if (!scrollContainer || isPaused) return
+      if (!scrollContainer || isPaused) return;
 
-      const currentScroll = scrollContainer.scrollLeft
-      const maxScroll = scrollWidth - clientWidth
+      const currentScroll = scrollContainer.scrollLeft;
+      const maxScroll = scrollWidth - clientWidth;
 
       // Change direction when reaching the end
       if (currentScroll >= maxScroll - 1) {
-        setScrollDirection("right")
+        setScrollDirection("right");
       } else if (currentScroll <= 1) {
-        setScrollDirection("left")
+        setScrollDirection("left");
       }
 
       // Scroll by 1px in the current direction
-      scrollContainer.scrollLeft += scrollDirection === "left" ? 1 : -1
+      scrollContainer.scrollLeft += scrollDirection === "left" ? 1 : -1;
 
       // Continue animation
-      animationRef.current = requestAnimationFrame(scroll)
-    }
+      animationRef.current = requestAnimationFrame(scroll);
+    };
 
     // Start animation
-    animationRef.current = requestAnimationFrame(scroll)
+    animationRef.current = requestAnimationFrame(scroll);
 
     // Cleanup
     return () => {
       if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
+        cancelAnimationFrame(animationRef.current);
       }
-    }
-  }, [scrollDirection, isPaused])
+    };
+  }, [scrollDirection, isPaused]);
 
   // Pause scrolling on hover/touch
-  const handleMouseEnter = () => setIsPaused(true)
-  const handleMouseLeave = () => setIsPaused(false)
+  const handleMouseEnter = () => setIsPaused(true);
+  const handleMouseLeave = () => setIsPaused(false);
 
   return (
     <section className="w-full py-8 bg-[#0A3C1F] text-white">
@@ -145,7 +157,10 @@ export function TopRecruitsScroll() {
         >
           <div className="flex space-x-4 px-2 md:space-x-6">
             {recruits.map((user, index) => (
-              <Card key={user.id} className="min-w-[280px] md:min-w-[320px] bg-white border border-[#0A3C1F]/10">
+              <Card
+                key={user.id}
+                className="min-w-[280px] md:min-w-[320px] bg-white border border-[#0A3C1F]/10"
+              >
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-4">
                     <div className="relative">
@@ -173,12 +188,20 @@ export function TopRecruitsScroll() {
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#0A3C1F]">{user.name || `Recruit #${user.id}`}</h3>
-                      <p className="text-sm text-[#0A3C1F]/70">{user.title || "Recruit Applicant"}</p>
+                      <h3 className="font-semibold text-[#0A3C1F]">
+                        {user.name || `Recruit #${user.id}`}
+                      </h3>
+                      <p className="text-sm text-[#0A3C1F]/70">
+                        {user.title || "Recruit Applicant"}
+                      </p>
                       <div className="flex items-center mt-2">
-                        <Badge className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90">{user.points || 0} points</Badge>
+                        <Badge className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90">
+                          {user.points || 0} points
+                        </Badge>
                         {user.badges && user.badges > 0 && (
-                          <Badge className="ml-2 bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90">{user.badges} badges</Badge>
+                          <Badge className="ml-2 bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90">
+                            {user.badges} badges
+                          </Badge>
                         )}
                       </div>
                     </div>
@@ -190,5 +213,5 @@ export function TopRecruitsScroll() {
         </div>
       </div>
     </section>
-  )
+  );
 }
