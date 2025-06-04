@@ -215,3 +215,6 @@ export default function TopRecruitsScroll() {
     </section>
   );
 }
+
+// Named export for compatibility
+export { TopRecruitsScroll };
