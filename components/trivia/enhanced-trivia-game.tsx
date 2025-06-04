@@ -1215,47 +1215,73 @@ export function EnhancedTriviaGame({
           </h3>
 
           {/* Answer options */}
-          <div className="space-y-3">
-            {currentQuestion.options.map((option, index) => (
-              <button
-                key={index}
-                onClick={() => handleAnswerSelect(index)}
-                disabled={isAnswerSubmitted}
-                className={`w-full text-left p-4 rounded-lg border transition-all ${
-                  selectedAnswer === index
-                    ? isAnswerSubmitted
-                      ? index === currentQuestion.correctAnswer
-                        ? "bg-green-100 border-green-500 dark:bg-green-900/30 dark:border-green-500"
-                        : "bg-red-100 border-red-500 dark:bg-red-900/30 dark:border-red-500"
-                      : "bg-[#0A3C1F]/10 border-[#0A3C1F] dark:bg-[#0A3C1F]/30"
-                    : isAnswerSubmitted &&
-                        index === currentQuestion.correctAnswer
-                      ? "bg-green-100 border-green-500 dark:bg-green-900/30 dark:border-green-500"
-                      : "hover:bg-gray-100 dark:hover:bg-gray-800 border-gray-200 dark:border-gray-700"
-                }`}
-              >
-                <div className="flex items-start">
-                  <div className="mr-3 mt-0.5">
-                    {isAnswerSubmitted ? (
-                      index === currentQuestion.correctAnswer ? (
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                      ) : selectedAnswer === index ? (
-                        <XCircle className="h-5 w-5 text-red-500" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {currentQuestion.options.map((option, index) => {
+              // Kahoot-style colors
+              const colorClasses = [
+                'bg-red-500 hover:bg-red-600 border-red-600 text-white shadow-lg shadow-red-500/25', // Red
+                'bg-blue-500 hover:bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-500/25', // Blue  
+                'bg-yellow-500 hover:bg-yellow-600 border-yellow-600 text-white shadow-lg shadow-yellow-500/25', // Yellow
+                'bg-green-500 hover:bg-green-600 border-green-600 text-white shadow-lg shadow-green-500/25' // Green
+              ];
+              
+              // Selected state styling
+              const selectedClass = selectedAnswer === index
+                ? 'ring-4 ring-white ring-offset-4 ring-offset-gray-200 scale-105 transform'
+                : 'hover:scale-102 transform';
+              
+              // Post-answer feedback styling
+              let feedbackClass = '';
+              if (isAnswerSubmitted) {
+                if (index === currentQuestion.correctAnswer) {
+                  feedbackClass = 'ring-4 ring-green-300 ring-offset-2';
+                } else if (selectedAnswer === index && index !== currentQuestion.correctAnswer) {
+                  feedbackClass = 'ring-4 ring-red-300 ring-offset-2 opacity-75';
+                }
+              }
+              
+              return (
+                <motion.button
+                  key={index}
+                  whileHover={{ scale: isAnswerSubmitted ? 1 : (selectedAnswer === index ? 1.05 : 1.02) }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleAnswerSelect(index)}
+                  disabled={isAnswerSubmitted}
+                  className={`p-6 text-left rounded-xl border-2 transition-all duration-200 ${colorClasses[index]} ${selectedClass} ${feedbackClass} ${
+                    isAnswerSubmitted ? 'cursor-default' : 'cursor-pointer'
+                  }`}
+                >
+                  <div className="flex items-start">
+                    <div className="mr-4 mt-0.5">
+                      {isAnswerSubmitted ? (
+                        index === currentQuestion.correctAnswer ? (
+                          <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center">
+                            <CheckCircle className="h-6 w-6 text-white" />
+                          </div>
+                        ) : selectedAnswer === index ? (
+                          <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center">
+                            <XCircle className="h-6 w-6 text-white" />
+                          </div>
+                        ) : (
+                          <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center">
+                            <span className="font-bold text-2xl text-white">
+                              {String.fromCharCode(65 + index)}
+                            </span>
+                          </div>
+                        )
                       ) : (
-                        <span className="h-5 w-5 inline-block text-center font-medium text-gray-500">
-                          {String.fromCharCode(65 + index)}
-                        </span>
-                      )
-                    ) : (
-                      <span className="h-5 w-5 inline-block text-center font-medium text-gray-500">
-                        {String.fromCharCode(65 + index)}
-                      </span>
-                    )}
+                        <div className="bg-white/20 w-10 h-10 rounded-full flex items-center justify-center">
+                          <span className="font-bold text-2xl text-white">
+                            {String.fromCharCode(65 + index)}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-lg font-semibold leading-relaxed text-white">{option}</span>
                   </div>
-                  <span>{option}</span>
-                </div>
-              </button>
-            ))}
+                </motion.button>
+              );
+            })}
           </div>
 
           {/* Explanation (shown after answering) */}

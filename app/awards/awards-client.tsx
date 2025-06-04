@@ -42,7 +42,7 @@ export default function AwardsClient() {
       </div>
 
       <div className="mt-12">
-        <AdvancedLeaderboard />
+        <AdvancedLeaderboard useMockData={true} />
       </div>
     </main>
   );

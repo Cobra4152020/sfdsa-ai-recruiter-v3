@@ -1,3 +1,7 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { PageWrapper } from "@/components/page-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -15,6 +19,14 @@ import {
 } from "lucide-react";
 
 export default function GamificationPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Redirect to the new leaderboard page
+    router.replace("/leaderboard");
+  }, [router]);
+
+  // Fallback content in case redirect doesn't work immediately
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 py-8">

@@ -105,24 +105,30 @@ export default function TopRecruitsScroll() {
     if (!scrollRef.current) return;
 
     const scrollContainer = scrollRef.current;
-    const scrollWidth = scrollContainer.scrollWidth;
-    const clientWidth = scrollContainer.clientWidth;
+    let currentDirection = scrollDirection;
 
     const scroll = () => {
-      if (!scrollContainer || isPaused) return;
+      if (!scrollContainer || isPaused) {
+        animationRef.current = requestAnimationFrame(scroll);
+        return;
+      }
 
+      const scrollWidth = scrollContainer.scrollWidth;
+      const clientWidth = scrollContainer.clientWidth;
       const currentScroll = scrollContainer.scrollLeft;
       const maxScroll = scrollWidth - clientWidth;
 
       // Change direction when reaching the end
       if (currentScroll >= maxScroll - 1) {
+        currentDirection = "right";
         setScrollDirection("right");
       } else if (currentScroll <= 1) {
+        currentDirection = "left";
         setScrollDirection("left");
       }
 
       // Scroll by 1px in the current direction
-      scrollContainer.scrollLeft += scrollDirection === "left" ? 1 : -1;
+      scrollContainer.scrollLeft += currentDirection === "left" ? 1 : -1;
 
       // Continue animation
       animationRef.current = requestAnimationFrame(scroll);
@@ -137,7 +143,7 @@ export default function TopRecruitsScroll() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [scrollDirection, isPaused]);
+  }, [isPaused]);
 
   // Pause scrolling on hover/touch
   const handleMouseEnter = () => setIsPaused(true);

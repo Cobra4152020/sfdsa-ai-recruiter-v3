@@ -100,18 +100,34 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
   };
 
   const handleLogin = () => {
-    if (typeof openModal === "function") {
-      openModal("signin", "recruit");
-    } else if (showOptInForm) {
-      showOptInForm(false);
+    try {
+      if (typeof openModal === "function") {
+        openModal("signin", "recruit");
+      } else if (showOptInForm) {
+        showOptInForm(false);
+      } else {
+        console.error("Authentication modal is not available");
+        // You could show a toast here if you have access to it
+      }
+    } catch (error) {
+      console.error("Error opening login modal:", error);
+      // Handle gracefully - could redirect to a login page instead
     }
   };
 
   const handleApplyNow = () => {
-    if (typeof openModal === "function") {
-      openModal("optin", "recruit");
-    } else if (showOptInForm) {
-      showOptInForm(true);
+    try {
+      if (typeof openModal === "function") {
+        openModal("optin", "recruit");
+      } else if (showOptInForm) {
+        showOptInForm(true);
+      } else {
+        console.error("Authentication modal is not available");
+        // You could show a toast here if you have access to it
+      }
+    } catch (error) {
+      console.error("Error opening application modal:", error);
+      // Handle gracefully - could redirect to an application page instead
     }
   };
 
@@ -147,6 +163,11 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       icon: <Trophy className="w-4 h-4" />,
       items: [
         {
+          label: "Awards",
+          href: "/awards",
+          icon: <Trophy className="w-4 h-4" />,
+        },
+        {
           label: "Badges Gallery",
           href: "/badges",
           icon: <Shield className="w-4 h-4" />,
@@ -158,7 +179,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
         },
         {
           label: "Leaderboard",
-          href: "/gamification",
+          href: "/leaderboard",
           icon: <Trophy className="w-4 h-4" />,
         },
       ],
@@ -167,6 +188,16 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       label: "Challenges",
       icon: <Gamepad2 className="w-4 h-4" />,
       items: [
+        {
+          label: "Sgt. Ken Says...",
+          href: "/sgt-ken-says",
+          icon: <Gamepad2 className="w-4 h-4" />,
+        },
+        {
+          label: "Could You Make the Cut?",
+          href: "/could-you-make-the-cut",
+          icon: <Gamepad2 className="w-4 h-4" />,
+        },
         {
           label: "Daily Trivia",
           href: "/trivia",

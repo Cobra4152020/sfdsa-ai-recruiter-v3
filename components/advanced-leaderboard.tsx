@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -45,6 +45,15 @@ import { useUser } from "@/context/user-context";
 import { useToast } from "@/components/ui/use-toast";
 import { AnimatePresence, motion } from "framer-motion";
 import confetti from "canvas-confetti";
+
+// Define avatar mapping for consistent images outside component to prevent re-renders
+const AVATAR_MAPPING: Record<number, string> = {
+  0: "/male-law-enforcement-headshot.png",
+  1: "/female-law-enforcement-headshot.png",
+  2: "/asian-male-officer-headshot.png",
+  3: "/female-law-enforcement-headshot.png",
+  4: "/male-law-enforcement-headshot.png",
+};
 
 interface LeaderboardUser {
   id: string;
@@ -108,17 +117,8 @@ export function AdvancedLeaderboard({
   const { toast } = useToast();
   const spotlightRef = useRef<HTMLDivElement>(null);
 
-  // Define avatar mapping for consistent images
-  const avatarMapping: Record<number, string> = {
-    0: "/male-law-enforcement-headshot.png",
-    1: "/female-law-enforcement-headshot.png",
-    2: "/asian-male-officer-headshot.png",
-    3: "/female-law-enforcement-headshot.png",
-    4: "/male-law-enforcement-headshot.png",
-  };
-
   // Generate mock data
-  const generateMockData = () => {
+  const generateMockData = useCallback(() => {
     const names = [
       "John Smith",
       "Maria Garcia",
@@ -155,7 +155,7 @@ export function AdvancedLeaderboard({
         const isSpotlight = i === 0; // First user is spotlight
 
         // Use consistent avatar images
-        const avatarUrl = avatarMapping[i % 5];
+        const avatarUrl = AVATAR_MAPPING[i % 5];
 
         return {
           id: `user-${i + 1}`,
@@ -180,7 +180,7 @@ export function AdvancedLeaderboard({
     );
 
     return mockData;
-  };
+  }, [limit, currentUserId, offset]);
 
   // Set the spotlight user
   useEffect(() => {
@@ -213,7 +213,7 @@ export function AdvancedLeaderboard({
   }, [spotlightUser]);
 
   // Fetch data or use mock data
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
 
@@ -293,7 +293,7 @@ export function AdvancedLeaderboard({
           trending: index === 0 || index === 2, // First and third users are trending
           spotlight: index === 0, // First user is spotlight
           referrals: Math.floor(Math.random() * 10),
-          avatar_url: avatarMapping[index % 5], // Use consistent avatar images
+          avatar_url: AVATAR_MAPPING[index % 5], // Use consistent avatar images
         }));
 
         setLeaderboardData(enhancedData);
@@ -315,20 +315,12 @@ export function AdvancedLeaderboard({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeTab, timeframe, offset, searchQuery, currentUserId, useMockData]);
 
   // Fetch data on initial load and when filters change
   useEffect(() => {
     fetchData();
-  }, [
-    activeTab,
-    timeframe,
-    offset,
-    searchQuery,
-    currentUserId,
-    useMockData,
-    fetchData,
-  ]);
+  }, [fetchData]);
 
   const handleTabChange = (value: string) => {
     setActiveTab(value);

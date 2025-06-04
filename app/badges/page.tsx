@@ -1,11 +1,28 @@
 "use client";
 
 import { PageWrapper } from "@/components/page-wrapper";
+import { BadgeShowcase } from "@/components/badge-showcase";
+import { BadgeDisplay } from "@/components/badge-display";
+import BadgeCollection from "@/components/badge-collection";
+import BadgeStats from "@/components/badges/badge-stats";
+import { BadgeCollectionGrid } from "@/components/badges/badge-collection-grid";
+import { BadgeLeaderboard } from "@/components/badges/badge-leaderboard";
+import { BadgeErrorBoundary } from "@/components/badges/badge-error-boundary";
+import { useUser } from "@/context/user-context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Award, Trophy, Star, Shield } from "lucide-react";
+import { useState } from "react";
 
 export default function BadgesPage() {
+  const { currentUser } = useUser();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filters, setFilters] = useState({
+    type: 'all',
+    rarity: 'all', 
+    status: 'all'
+  });
+
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 py-8">
@@ -21,61 +38,68 @@ export default function BadgesPage() {
             </p>
           </div>
 
-          <Tabs defaultValue="all" className="space-y-6">
+          {/* Badge Stats */}
+          <BadgeErrorBoundary>
+            <div className="mb-8">
+              <BadgeStats />
+            </div>
+          </BadgeErrorBoundary>
+
+          <Tabs defaultValue="showcase" className="space-y-6">
             <TabsList className="grid grid-cols-4 gap-4">
-              <TabsTrigger value="all" className="flex items-center">
+              <TabsTrigger value="showcase" className="flex items-center">
                 <Award className="h-4 w-4 mr-2" />
-                All Badges
+                Showcase
               </TabsTrigger>
-              <TabsTrigger value="achievements" className="flex items-center">
+              <TabsTrigger value="collection" className="flex items-center">
                 <Trophy className="h-4 w-4 mr-2" />
-                Achievements
+                My Collection
               </TabsTrigger>
-              <TabsTrigger value="special" className="flex items-center">
+              <TabsTrigger value="available" className="flex items-center">
                 <Star className="h-4 w-4 mr-2" />
-                Special
+                Available
               </TabsTrigger>
-              <TabsTrigger value="process" className="flex items-center">
+              <TabsTrigger value="leaderboard" className="flex items-center">
                 <Shield className="h-4 w-4 mr-2" />
-                Process
+                Leaderboard
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all" className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Badge cards will be dynamically populated */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center">
-                      <Award className="h-5 w-5 mr-2 text-[#FFD700]" />
-                      First Response
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-gray-600">
-                      Awarded for your first interaction with our platform.
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
+            <TabsContent value="showcase" className="space-y-6">
+              <BadgeErrorBoundary>
+                <BadgeShowcase />
+              </BadgeErrorBoundary>
             </TabsContent>
 
-            <TabsContent value="achievements">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Achievement badges will be dynamically populated */}
-              </div>
+            <TabsContent value="collection" className="space-y-6">
+              <BadgeErrorBoundary>
+                {currentUser ? (
+                  <BadgeCollection user={currentUser as any} />
+                ) : (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Sign In Required</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-gray-600">
+                        Please sign in to view your badge collection.
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </BadgeErrorBoundary>
             </TabsContent>
 
-            <TabsContent value="special">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Special badges will be dynamically populated */}
-              </div>
+            <TabsContent value="available" className="space-y-6">
+              <BadgeErrorBoundary>
+                <BadgeDisplay />
+              </BadgeErrorBoundary>
             </TabsContent>
 
-            <TabsContent value="process">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {/* Process badges will be dynamically populated */}
-              </div>
+            <TabsContent value="leaderboard" className="space-y-6">
+              <BadgeErrorBoundary>
+                <BadgeLeaderboard />
+              </BadgeErrorBoundary>
             </TabsContent>
           </Tabs>
         </div>

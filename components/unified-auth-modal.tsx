@@ -28,11 +28,19 @@ export function UnifiedAuthModal() {
   const [lastName, setLastName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [configError, setConfigError] = useState<string | null>(null);
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
     setMounted(true);
+    
+    // Check if Supabase is properly configured
+    try {
+      getClientSideSupabase();
+    } catch (error) {
+      setConfigError(error instanceof Error ? error.message : "Authentication service configuration error");
+    }
   }, []);
 
   useEffect(() => {
@@ -47,29 +55,93 @@ export function UnifiedAuthModal() {
     return null;
   }
 
+  // Show configuration error if present
+  if (configError) {
+    return (
+      <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle className="text-xl">Configuration Error</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <h3 className="text-red-800 font-medium mb-2">Authentication Unavailable</h3>
+              <p className="text-red-700 text-sm mb-3">{configError}</p>
+              <p className="text-red-600 text-xs">
+                If you're a developer, please check your environment variables. 
+                If you're a user, please contact support.
+              </p>
+            </div>
+            <Button 
+              onClick={closeModal} 
+              className="w-full mt-4"
+              variant="outline"
+            >
+              Close
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
       const supabase = getClientSideSupabase();
-      const data = await supabase.auth.signInWithPassword(email, password); // eslint-disable-line @typescript-eslint/no-unused-vars
+      
+      // Check if Supabase is properly configured
+      if (!supabase) {
+        throw new Error("Authentication service is not properly configured");
+      }
 
-      if (data.error) throw data.error;
+      // Validate form inputs
+      if (!email || !password) {
+        throw new Error("Please enter both email and password");
+      }
 
-      toast({
-        title: "Success",
-        description: "Successfully signed in!",
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
       });
 
+      if (error) {
+        // Handle specific Supabase errors
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error("Invalid email or password. Please check your credentials and try again.");
+        } else if (error.message.includes('Email not confirmed')) {
+          throw new Error("Please check your email and click the confirmation link before signing in.");
+        } else if (error.message.includes('Too many requests')) {
+          throw new Error("Too many login attempts. Please wait a few minutes and try again.");
+        }
+        throw error;
+      }
+
+      if (!data.user) {
+        throw new Error("Sign in failed. Please try again.");
+      }
+
+      toast({
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
+      });
+
+      // Clear form
+      setEmail("");
+      setPassword("");
+      
       closeModal();
-      router.refresh();
+      
+      // The auth state change will be handled by the UserProvider
     } catch (error) {
       console.error("Sign in error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Failed to sign in. Please try again.";
+      
       toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to sign in",
+        title: "Sign In Failed",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -84,7 +156,6 @@ export function UnifiedAuthModal() {
     try {
       const supabase = getClientSideSupabase();
       const { data, error } = await supabase.auth.signUp({
-        // eslint-disable-line @typescript-eslint/no-unused-vars
         email,
         password,
         options: {
@@ -92,6 +163,7 @@ export function UnifiedAuthModal() {
             first_name: firstName,
             last_name: lastName,
             full_name: `${firstName} ${lastName}`.trim(),
+            user_type: 'recruit',
           },
         },
       });
@@ -100,10 +172,24 @@ export function UnifiedAuthModal() {
 
       toast({
         title: "Success",
-        description: "Please check your email to verify your account.",
+        description: data.user?.email_confirmed_at ? 
+          "Account created successfully! You are now signed in." :
+          "Please check your email to verify your account before signing in.",
       });
 
-      setActiveTab("signin");
+      // Clear form
+      setEmail("");
+      setPassword("");
+      setFirstName("");
+      setLastName("");
+
+      if (data.user?.email_confirmed_at) {
+        // If email is already confirmed, close modal (user is signed in)
+        closeModal();
+      } else {
+        // If email needs confirmation, switch to sign in tab
+        setActiveTab("signin");
+      }
     } catch (error) {
       console.error("Sign up error:", error);
       toast({

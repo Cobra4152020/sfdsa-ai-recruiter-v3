@@ -15,6 +15,7 @@ import { BriefingShareDialog } from "./briefing-share-dialog";
 import { useUser } from "@/context/user-context";
 import { useToast } from "@/components/ui/use-toast";
 import { motion } from "framer-motion";
+import { getClientSideSupabase } from "@/lib/supabase";
 
 interface BriefingCardProps {
   briefing?: {
@@ -58,14 +59,35 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
   const handleAttend = async () => {
     if (isAttended || isLoading) return;
 
+    // Check if user is logged in
+    if (!currentUser) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to mark attendance.",
+        variant: "default",
+      });
+      return;
+    }
+
     try {
       setIsLoading(true);
 
       // Attempt to mark attendance
       if (validBriefing?.id) {
+        // Get the access token from Supabase
+        const supabase = getClientSideSupabase();
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        if (!session?.access_token) {
+          throw new Error("No valid session found");
+        }
+
         const response = await fetch("/api/daily-briefing/attend", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session.access_token}`
+          },
           body: JSON.stringify({ briefingId: validBriefing.id }),
         });
 
@@ -78,7 +100,8 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
             variant: "default",
           });
         } else {
-          throw new Error("Failed to mark attendance");
+          const errorData = await response.json();
+          throw new Error(errorData.error || "Failed to mark attendance");
         }
       } else {
         // If we don't have a valid briefing ID, still mark as attended on the UI
@@ -95,7 +118,7 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
       toast({
         title: "Error",
         description:
-          "There was a problem recording your attendance. Please try again.",
+          err instanceof Error ? err.message : "There was a problem recording your attendance. Please try again.",
         variant: "destructive",
       });
     } finally {
