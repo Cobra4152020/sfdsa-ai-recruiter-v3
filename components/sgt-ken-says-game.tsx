@@ -300,29 +300,32 @@ export function SgtKenSaysGame() {
 
   // Generate share text
   const generateShareText = () => {
-    const attempts = gameState.attempts;
-    const rank = SGT_KEN_PHRASES.ranks[attempts as keyof typeof SGT_KEN_PHRASES.ranks] || "🚨 Rookie";
-    const phrase = gameState.gameStatus === 'won' 
-      ? SGT_KEN_PHRASES.success[Math.floor(Math.random() * SGT_KEN_PHRASES.success.length)]
-      : SGT_KEN_PHRASES.failure[Math.floor(Math.random() * SGT_KEN_PHRASES.failure.length)];
+    const grid = gameState.guesses.map(guess => {
+      if (!guess) return '';
+      return getLetterStates(guess, dailyWord)
+        .map(state => {
+          switch (state.status) {
+            case 'correct': return '🟩';
+            case 'present': return '🟨';
+            case 'absent': return '⬜';
+            default: return '⬜';
+          }
+        })
+        .join('');
+    }).filter(row => row).join('\n');
 
-    const grid = gameState.guesses.map(guess => 
-      getLetterStates(guess, dailyWord).map(state => 
-        state.status === 'correct' ? '🟩' : 
-        state.status === 'present' ? '🟨' : '⬜'
-      ).join('')
-    ).join('\n');
-
-    return `🎯 Sgt. Ken Says... ${todayDate}
-${gameState.gameStatus === 'won' ? `Solved in ${attempts}/6 tries!` : `Failed in ${attempts}/6 tries`}
-Rank: ${rank}
+    const phrase = getCurrentPhrase();
+    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
+    
+    return `Sgt. Ken Says Daily Challenge - ${todayDate}
+${gameState.gameStatus === 'won' ? `Solved in ${gameState.attempts}/6 tries!` : 'Failed to solve'}
 
 ${grid}
 
 "${phrase}"
 
 Think you can outsmart Sgt. Ken? Join the SFDSA recruitment challenge! 
-🚔 Play daily at: https://sfdsa-recruit.com/sgt-ken-says
+🚔 Play daily at: ${currentDomain}/sgt-ken-says
 #SgtKenSays #SFDSA #WordChallenge #LawEnforcement`;
   };
 
@@ -334,11 +337,13 @@ Think you can outsmart Sgt. Ken? Join the SFDSA recruitment challenge!
 
   const shareToLinkedIn = () => {
     const text = encodeURIComponent(generateShareText());
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=https://sfdsa-recruit.com/sgt-ken-says&summary=${text}`, '_blank');
+    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${currentDomain}/sgt-ken-says&summary=${text}`, '_blank');
   };
 
   const shareToFacebook = () => {
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=https://sfdsa-recruit.com/sgt-ken-says`, '_blank');
+    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${currentDomain}/sgt-ken-says`, '_blank');
   };
 
   const copyToClipboard = () => {

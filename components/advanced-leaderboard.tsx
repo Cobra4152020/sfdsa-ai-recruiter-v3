@@ -120,67 +120,60 @@ export function AdvancedLeaderboard({
   // Generate mock data
   const generateMockData = useCallback(() => {
     const names = [
-      "John Smith",
-      "Maria Garcia",
-      "James Johnson",
-      "David Williams",
-      "Sarah Brown",
-      "Michael Jones",
-      "Jessica Miller",
-      "Robert Davis",
-      "Jennifer Wilson",
-      "Thomas Moore",
-      "Lisa Taylor",
-      "Daniel Anderson",
-      "Patricia Thomas",
-      "Christopher Jackson",
-      "Margaret White",
+      "John Smith", "Maria Garcia", "James Johnson", "David Williams", "Sarah Brown",
+      "Michael Jones", "Jessica Miller", "Robert Davis", "Jennifer Wilson", "Thomas Moore",
+      "Lisa Taylor", "Daniel Anderson", "Patricia Thomas", "Christopher Jackson", "Margaret White",
+      "Richard Martinez", "Linda Rodriguez", "Matthew Wilson", "Elizabeth Lewis", "Mark Thompson",
+      "Nancy Walker", "Steven Clark", "Karen Hall", "Paul Allen", "Betty Young",
+      "Andrew Hernandez", "Helen King", "Joshua Wright", "Carol Lopez", "Kenneth Hill",
+      "Donna Scott", "Anthony Green", "Emily Adams", "Brian Baker", "Michelle Nelson",
+      "Ronald Carter", "Ashley Mitchell", "Kevin Perez", "Amanda Roberts", "Ryan Turner",
+      "Sharon Phillips", "Jason Campbell", "Deborah Parker", "Jacob Evans", "Kimberly Edwards",
+      "Gary Collins", "Lisa Stewart", "Nicholas Sanchez", "Mary Morris", "Eric Rogers"
     ];
 
-    const mockData = Array.from(
-      { length: Math.min(limit, names.length) },
-      (_, i) => {
-        const isCurrentUser = !!(currentUserId && i === 2); // Always boolean
-        const randomLikes = Math.floor(Math.random() * 50) + 5;
-        const randomShares = Math.floor(Math.random() * 20) + 2;
-        const randomReferrals = Math.floor(Math.random() * 10);
-        const randomProgress = {
-          total: 100,
-          current: Math.floor(Math.random() * 100) + 1,
-          label: ["Next Rank", "Next Badge", "Level Up"][
-            Math.floor(Math.random() * 3)
-          ],
-        };
-        const isTrending = Math.random() > 0.8;
-        const isSpotlight = i === 0; // First user is spotlight
+    // Generate a full dataset of 50 users, then apply pagination in fetchData
+    const fullDataset = Array.from({ length: 50 }, (_, i) => {
+      const isCurrentUser = !!(currentUserId && i === 2); // Always boolean
+      const randomLikes = Math.floor(Math.random() * 50) + 5;
+      const randomShares = Math.floor(Math.random() * 20) + 2;
+      const randomReferrals = Math.floor(Math.random() * 10);
+      const randomProgress = {
+        total: 100,
+        current: Math.floor(Math.random() * 100) + 1,
+        label: ["Next Rank", "Next Badge", "Level Up"][
+          Math.floor(Math.random() * 3)
+        ],
+      };
+      const isTrending = Math.random() > 0.8;
+      const isSpotlight = i === 0; // First user is spotlight
 
-        // Use consistent avatar images
-        const avatarUrl = AVATAR_MAPPING[i % 5];
+      // Use consistent avatar images
+      const avatarUrl = AVATAR_MAPPING[i % 5];
 
-        return {
-          id: `user-${i + 1}`,
-          name: names[i],
-          participation_count: Math.floor(Math.random() * 1000) + 100,
-          badge_count: Math.floor(Math.random() * 5),
-          nft_count: Math.floor(Math.random() * 3),
-          has_applied: Math.random() > 0.7,
-          avatar_url: avatarUrl,
-          is_current_user: isCurrentUser, // Always boolean
-          rank: i + 1 + offset,
-          likes: randomLikes,
-          shares: randomShares,
-          liked_by_user: Math.random() > 0.7,
-          shared_by_user: Math.random() > 0.8,
-          progress: randomProgress,
-          trending: isTrending,
-          spotlight: isSpotlight,
-          referrals: randomReferrals,
-        };
-      },
-    );
+      return {
+        id: `user-${i + 1}`,
+        name: names[i % names.length], // Cycle through names if we have more users than names
+        participation_count: Math.floor(Math.random() * 1000) + 100,
+        badge_count: Math.floor(Math.random() * 5),
+        nft_count: Math.floor(Math.random() * 3),
+        has_applied: Math.random() > 0.7,
+        avatar_url: avatarUrl,
+        is_current_user: isCurrentUser, // Always boolean
+        rank: i + 1,
+        likes: randomLikes,
+        shares: randomShares,
+        liked_by_user: Math.random() > 0.7,
+        shared_by_user: Math.random() > 0.8,
+        progress: randomProgress,
+        trending: isTrending,
+        spotlight: isSpotlight,
+        referrals: randomReferrals,
+      };
+    });
 
-    return mockData;
-  }, [limit, currentUserId, offset]);
+    return fullDataset;
+  }, [currentUserId]);
 
   // Set the spotlight user
   useEffect(() => {
@@ -220,9 +213,22 @@ export function AdvancedLeaderboard({
     try {
       if (useMockData) {
         // Use mock data directly
-        const mockData = generateMockData();
-        setLeaderboardData(mockData);
-        setTotalUsers(50); // Simulate 50 total users
+        let mockData = generateMockData();
+        
+        // Apply search filter if there's a search query
+        if (searchQuery.trim()) {
+          mockData = mockData.filter(user => 
+            user.name.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        
+        // Apply pagination for search results
+        const startIndex = offset;
+        const endIndex = offset + limit;
+        const paginatedData = mockData.slice(startIndex, endIndex);
+        
+        setLeaderboardData(paginatedData);
+        setTotalUsers(mockData.length); // Use filtered total for search results
         setIsLoading(false);
         return;
       }
@@ -300,22 +306,38 @@ export function AdvancedLeaderboard({
         setTotalUsers(total);
       } else {
         // Fall back to mock data if no results
-        const mockData = generateMockData();
+        let mockData = generateMockData();
+        
+        // Apply search filter for fallback data too
+        if (searchQuery.trim()) {
+          mockData = mockData.filter(user => 
+            user.name.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+        }
+        
         setLeaderboardData(mockData);
-        setTotalUsers(50);
+        setTotalUsers(mockData.length);
       }
     } catch (err) {
       console.error("Error fetching leaderboard:", err);
       setError(err instanceof Error ? err : new Error(String(err)));
 
       // Fall back to mock data on error
-      const mockData = generateMockData();
+      let mockData = generateMockData();
+      
+      // Apply search filter for error fallback data too
+      if (searchQuery.trim()) {
+        mockData = mockData.filter(user => 
+          user.name.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+      
       setLeaderboardData(mockData);
-      setTotalUsers(50);
+      setTotalUsers(mockData.length);
     } finally {
       setIsLoading(false);
     }
-  }, [activeTab, timeframe, offset, searchQuery, currentUserId, useMockData]);
+  }, [activeTab, timeframe, offset, searchQuery, currentUserId, useMockData, limit]);
 
   // Fetch data on initial load and when filters change
   useEffect(() => {
@@ -385,9 +407,11 @@ export function AdvancedLeaderboard({
       }),
     );
 
+    const isLiking = !leaderboardData.find(u => u.id === userId)?.liked_by_user;
+
     toast({
-      title: "Thanks for your support!",
-      description: "Your like has been recorded.",
+      title: isLiking ? "Thanks for your support!" : "Like removed",
+      description: isLiking ? "Your like has been recorded. You earned 5 points!" : "Your like has been removed.",
       duration: 3000,
     });
   };
@@ -401,49 +425,119 @@ export function AdvancedLeaderboard({
 
     // Show share dialog
     setShowShareDialog(true);
+    
+    // Store the userId for sharing
+    setPendingAction({ type: "share", userId });
+  };
 
-    // Update the shared status after a delay (simulating a share)
-    setTimeout(() => {
-      setLeaderboardData((prev) =>
-        prev.map((user) => {
-          if (user.id === userId && !user.shared_by_user) {
-            return {
-              ...user,
-              shares: (user.shares || 0) + 1,
-              shared_by_user: true,
-            };
-          }
-          return user;
-        }),
-      );
-
-      // 25% chance to trigger a "share to unlock" opportunity
-      if (Math.random() > 0.75) {
-        const badges = [
-          {
-            badge: "Social Advocate",
-            description: "Share content to earn this exclusive badge!",
-          },
-          {
-            badge: "Community Builder",
-            description: "Help grow our community by sharing!",
-          },
-          {
-            badge: "Recruitment Champion",
-            description:
-              "Share to earn recruitment points and this special badge!",
-          },
-        ];
-        setShareForUnlock(badges[Math.floor(Math.random() * badges.length)]);
+  const shareToSocialMedia = (platform: string) => {
+    const user = leaderboardData.find(u => u.id === (pendingAction?.userId || ''));
+    const shareText = `Check out ${user?.name || 'this top recruit'}'s amazing achievements in the San Francisco Deputy Sheriff's Association recruitment program! Join us in serving and protecting our community. #SFDSA #LawEnforcement #SanFrancisco`;
+    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
+    const shareUrl = `${currentDomain}/profile/${pendingAction?.userId || "share"}`;
+    
+    let shareLink = '';
+    
+    switch (platform) {
+      case 'Facebook':
+        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+        break;
+      case 'Twitter':
+        shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+        break;
+      case 'LinkedIn':
+        shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent('SFDSA Top Recruit')}&summary=${encodeURIComponent(shareText)}`;
+        break;
+      case 'WhatsApp':
+        shareLink = `https://wa.me/?text=${encodeURIComponent(`${shareText} ${shareUrl}`)}`;
+        break;
+      default:
+        // For other platforms or if sharing fails, copy to clipboard
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+          toast({
+            title: "Link copied!",
+            description: "Share link copied to clipboard",
+            duration: 3000,
+          });
+        }
+        setShowShareDialog(false);
+        return;
+    }
+    
+    // Open the share link if available
+    if (shareLink) {
+      try {
+        window.open(shareLink, '_blank', 'width=600,height=400');
+      } catch (error) {
+        console.error('Error opening share link:', error);
+        // Fallback: copy to clipboard
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+          toast({
+            title: "Share link copied",
+            description: "Couldn't open sharing window, but link was copied to clipboard",
+            variant: "default",
+          });
+        }
       }
+    }
 
+    // Update the shared status and award points
+    setLeaderboardData((prev) =>
+      prev.map((user) => {
+        if (user.id === pendingAction?.userId && !user.shared_by_user) {
+          return {
+            ...user,
+            shares: (user.shares || 0) + 1,
+            shared_by_user: true,
+          };
+        }
+        return user;
+      }),
+    );
+
+    // 25% chance to trigger a "share to unlock" opportunity
+    if (Math.random() > 0.75) {
+      const badges = [
+        {
+          badge: "Social Advocate",
+          description: "Share content to earn this exclusive badge!",
+        },
+        {
+          badge: "Community Builder",
+          description: "Help grow our community by sharing!",
+        },
+        {
+          badge: "Recruitment Champion",
+          description:
+            "Share to earn recruitment points and this special badge!",
+        },
+      ];
+      setShareForUnlock(badges[Math.floor(Math.random() * badges.length)]);
+    }
+
+    toast({
+      title: `Shared on ${platform}!`,
+      description: "Thanks for spreading the word about our recruitment program. You earned 10 points!",
+      duration: 3000,
+    });
+
+    setShowShareDialog(false);
+  };
+
+  const copyShareLink = () => {
+    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
+    const shareUrl = `${currentDomain}/profile/${pendingAction?.userId || "share"}`;
+    
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
       toast({
-        title: "Content shared!",
-        description:
-          "Thanks for spreading the word about our recruitment program.",
+        title: "Link copied!",
+        description: "Share link copied to clipboard",
         duration: 3000,
       });
-    }, 1000);
+    }
   };
 
   const handleAuthSuccess = () => {
@@ -701,6 +795,34 @@ export function AdvancedLeaderboard({
                       Try Again
                     </Button>
                   </div>
+                ) : leaderboardData.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    {searchQuery.trim() ? (
+                      <div>
+                        <Search className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <p className="text-lg font-medium">No results found</p>
+                        <p className="text-sm">
+                          No users found matching "{searchQuery}". Try a different search term.
+                        </p>
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setSearchQuery("");
+                            setOffset(0);
+                          }}
+                          className="mt-4"
+                        >
+                          Clear Search
+                        </Button>
+                      </div>
+                    ) : (
+                      <div>
+                        <Trophy className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                        <p className="text-lg font-medium">No data available</p>
+                        <p className="text-sm">Try refreshing or changing your filters.</p>
+                      </div>
+                    )}
+                  </div>
                 ) : (
                   <div className="space-y-3">
                     {leaderboardData.map((user, index) => (
@@ -853,9 +975,22 @@ export function AdvancedLeaderboard({
                   <div className="text-sm text-gray-500">
                     {!isLoading && !error && (
                       <>
-                        Showing {offset + 1}-
-                        {Math.min(offset + leaderboardData.length, totalUsers)}{" "}
-                        of {totalUsers}
+                        {searchQuery.trim() ? (
+                          totalUsers > 0 ? (
+                            <>
+                              Found {totalUsers} result{totalUsers !== 1 ? 's' : ''} for "{searchQuery}"
+                              {leaderboardData.length > 0 && (
+                                <> • Showing {offset + 1}-{Math.min(offset + leaderboardData.length, totalUsers)}</>
+                              )}
+                            </>
+                          ) : null
+                        ) : (
+                          <>
+                            Showing {offset + 1}-
+                            {Math.min(offset + leaderboardData.length, totalUsers)}{" "}
+                            of {totalUsers}
+                          </>
+                        )}
                       </>
                     )}
                   </div>
@@ -1000,25 +1135,25 @@ export function AdvancedLeaderboard({
           <div className="grid grid-cols-2 gap-4 my-4">
             <Button
               className="bg-[#1877F2] hover:bg-[#1877F2]/90"
-              onClick={() => setShowShareDialog(false)}
+              onClick={() => shareToSocialMedia('Facebook')}
             >
               Facebook
             </Button>
             <Button
               className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90"
-              onClick={() => setShowShareDialog(false)}
+              onClick={() => shareToSocialMedia('Twitter')}
             >
               Twitter
             </Button>
             <Button
               className="bg-[#0A66C2] hover:bg-[#0A66C2]/90"
-              onClick={() => setShowShareDialog(false)}
+              onClick={() => shareToSocialMedia('LinkedIn')}
             >
               LinkedIn
             </Button>
             <Button
               className="bg-[#25D366] hover:bg-[#25D366]/90"
-              onClick={() => setShowShareDialog(false)}
+              onClick={() => shareToSocialMedia('WhatsApp')}
             >
               WhatsApp
             </Button>
@@ -1026,23 +1161,14 @@ export function AdvancedLeaderboard({
 
           <div className="relative mt-2">
             <Input
-              value={`https://sfdsa-recruit.com/profile/${pendingAction?.userId || "share"}`}
+              value={`${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002'}/profile/${pendingAction?.userId || "share"}`}
               readOnly
             />
             <Button
               className="absolute right-1 top-1 h-7"
               variant="outline"
               size="sm"
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  `https://sfdsa-recruit.com/profile/${pendingAction?.userId || "share"}`,
-                );
-                toast({
-                  title: "Link copied!",
-                  description: "Share link copied to clipboard",
-                  duration: 3000,
-                });
-              }}
+              onClick={copyShareLink}
             >
               Copy
             </Button>

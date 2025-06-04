@@ -58,7 +58,60 @@ export function ShareToUnlock({
   const { isLoggedIn } = useUser();
 
   const handleShare = (platform: string) => {
-    // Simulate sharing
+    // Create share content
+    const shareText = `Join the San Francisco Deputy Sheriff's Association recruitment program! Help serve and protect our community. #SFDSA #LawEnforcement #SanFrancisco`;
+    const shareUrl = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
+    
+    // Open actual social media sharing URLs
+    let shareLink = '';
+    
+    switch (platform) {
+      case 'Facebook':
+        shareLink = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+        break;
+      case 'Twitter':
+        shareLink = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+        break;
+      case 'LinkedIn':
+        shareLink = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}&title=${encodeURIComponent('SFDSA Recruitment Program')}&summary=${encodeURIComponent(shareText)}`;
+        break;
+      case 'Email':
+        const emailSubject = 'Join the SFDSA Recruitment Program';
+        const emailBody = `${shareText}\n\nLearn more and apply: ${shareUrl}`;
+        shareLink = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        break;
+      default:
+        // For other platforms or if sharing fails, copy to clipboard
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+          toast({
+            title: "Link copied!",
+            description: "Share link copied to clipboard",
+            duration: 3000,
+          });
+        }
+        break;
+    }
+    
+    // Open the share link if available
+    if (shareLink) {
+      try {
+        window.open(shareLink, '_blank', 'width=600,height=400');
+      } catch (error) {
+        console.error('Error opening share link:', error);
+        // Fallback: copy to clipboard
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(`${shareText} ${shareUrl}`);
+          toast({
+            title: "Share link copied",
+            description: "Couldn't open sharing window, but link was copied to clipboard",
+            variant: "default",
+          });
+        }
+      }
+    }
+    
+    // Update share progress
     setSharesCompleted((prev) => {
       const newCount = prev + 1;
 

@@ -41,7 +41,8 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
   const generateReferralLink = () => {
     // Generate a unique referral link
     const uniqueCode = Math.random().toString(36).substring(2, 8);
-    const refLink = `https://sfdsa-recruiter.com/join?ref=${currentUser?.id || "demo"}-${uniqueCode}`;
+    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
+    const refLink = `${currentDomain}/join?ref=${currentUser?.id || "demo"}-${uniqueCode}`;
     setReferralLink(refLink);
     return refLink;
   };
