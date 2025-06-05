@@ -281,14 +281,14 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
             <div className="hidden md:block">
               <AskSgtKenButton 
                 variant="ghost" 
-                className="text-white hover:text-[#FFD700] bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 px-3 py-1 rounded-md font-semibold text-sm transition-all duration-200"
+                className="bg-[#0A3C1F] text-white border-2 border-[#FFD700] hover:bg-[#FFD700] hover:text-[#0A3C1F] px-3 py-1 rounded-md font-semibold text-sm transition-all duration-200"
               />
             </div>
             <div className="md:hidden">
               <AskSgtKenButton 
                 variant="ghost" 
                 size="sm"
-                className="text-white hover:text-[#FFD700] bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 px-2 py-1 rounded-md font-semibold text-xs transition-all duration-200"
+                className="bg-[#0A3C1F] text-white border-2 border-[#FFD700] hover:bg-[#FFD700] hover:text-[#0A3C1F] px-2 py-1 rounded-md font-semibold text-xs transition-all duration-200"
               />
             </div>
             <a

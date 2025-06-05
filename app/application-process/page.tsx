@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import { PageWrapper } from "@/components/page-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,13 +30,6 @@ import {
 import { motion } from "framer-motion";
 import Link from "next/link";
 import type { Route } from "next";
-
-export const metadata: Metadata = {
-  title: "Application Process | SFDSA Recruitment",
-  description:
-    "Complete step-by-step guide to becoming a San Francisco Deputy Sheriff. Learn about testing, interviews, background investigation, and academy training.",
-  keywords: "deputy sheriff application, testing process, oral board interview, polygraph test, background investigation, psychological evaluation",
-};
 
 export default function ApplicationProcessPage() {
   const steps = [

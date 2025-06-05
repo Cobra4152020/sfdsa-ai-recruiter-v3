@@ -9,6 +9,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Send, MessageSquare, Gamepad2, Coffee } from "lucide-react";
@@ -574,11 +575,11 @@ export function AskSgtKenButton({
   };
 
   // For ghost variant in the header, we want to render just text with an icon
-  if (variant === "ghost" && className?.includes("text-white")) {
+  if (variant === "ghost" && (className?.includes("bg-[#0A3C1F]") || className?.includes("text-white"))) {
     return (
       <button
         onClick={() => setIsDialogOpen(true)}
-        className={`${className} rounded-md px-3 py-1 sgt-ken-button-hover subtle-glow relative`}
+        className={`${className} sgt-ken-button-hover subtle-glow relative`}
         aria-label="Chat with Sergeant Ken"
         type="button"
       >
@@ -655,6 +656,9 @@ export function AskSgtKenButton({
                 </Link>
               </div>
             </DialogTitle>
+            <DialogDescription className="text-gray-600 dark:text-gray-400">
+              Chat with Sgt. Ken, your AI assistant for San Francisco Deputy Sheriff recruitment questions.
+            </DialogDescription>
           </DialogHeader>
 
           <div className="h-[60vh] sm:h-[400px] flex flex-col border rounded-md overflow-hidden">

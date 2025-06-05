@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+"use client";
+
 import { PageWrapper } from "@/components/page-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -22,13 +23,6 @@ import {
 import { motion } from "framer-motion";
 import Link from "next/link";
 import type { Route } from "next";
-
-export const metadata: Metadata = {
-  title: "Deputy Sheriff Requirements | SFDSA Recruitment",
-  description:
-    "Learn about the requirements and qualifications needed to become a San Francisco Deputy Sheriff. Complete guide to eligibility, testing, and application process.",
-  keywords: "deputy sheriff requirements, San Francisco, law enforcement, qualifications, eligibility, police officer, corrections",
-};
 
 export default function RequirementsPage() {
   const requirements = [
