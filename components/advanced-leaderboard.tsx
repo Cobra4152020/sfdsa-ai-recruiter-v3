@@ -77,6 +77,7 @@ interface LeaderboardUser {
   trending: boolean;
   spotlight?: boolean;
   referrals: number;
+  is_mock?: boolean;
 }
 
 interface AdvancedLeaderboardProps {
@@ -113,11 +114,14 @@ export function AdvancedLeaderboard({
   } | null>(null);
   const limit = 10;
 
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn, currentUser } = useUser();
   const { toast } = useToast();
   const spotlightRef = useRef<HTMLDivElement>(null);
 
-  // Generate mock data
+  // Use the current user ID from context if not provided as prop
+  const effectiveCurrentUserId = currentUserId || currentUser?.id;
+
+  // Generate mock data - remove dependency array to prevent re-renders
   const generateMockData = useCallback(() => {
     const names = [
       "John Smith", "Maria Garcia", "James Johnson", "David Williams", "Sarah Brown",
@@ -169,11 +173,12 @@ export function AdvancedLeaderboard({
         trending: isTrending,
         spotlight: isSpotlight,
         referrals: randomReferrals,
+        is_mock: true, // All generated mock data should be marked as mock
       };
     });
 
     return fullDataset;
-  }, [currentUserId]);
+  }, []); // Empty dependency array to prevent re-renders
 
   // Set the spotlight user
   useEffect(() => {
@@ -205,7 +210,7 @@ export function AdvancedLeaderboard({
     }
   }, [spotlightUser]);
 
-  // Fetch data or use mock data
+  // Fetch data or use mock data - fix dependencies
   const fetchData = useCallback(async () => {
     setIsLoading(true);
     setError(null);
@@ -242,8 +247,8 @@ export function AdvancedLeaderboard({
         search: searchQuery,
       });
 
-      if (currentUserId) {
-        params.append("currentUserId", currentUserId);
+      if (effectiveCurrentUserId) {
+        params.append("currentUserId", effectiveCurrentUserId);
       }
 
       // Add cache busting parameter
@@ -276,22 +281,30 @@ export function AdvancedLeaderboard({
         throw new Error("Invalid response format");
       }
 
-      const data =
-        result.leaderboard?.users || result.leaderboard || result.users || [];
-      const total =
-        result.leaderboard?.total || result.total || data.length || 0;
+      // Handle the new API response format
+      const data = result.entries || [];
+      const total = result.total || 0;
 
       if (Array.isArray(data) && data.length > 0) {
-        // Enhance the data with mock social stats and consistent avatars
+        // Transform API data to match our component format
         const enhancedData = data.map((user, index) => ({
-          ...user,
+          id: user.id,
+          name: user.name,
+          avatar_url: user.avatar_url || (user.is_mock ? user.avatar_url : AVATAR_MAPPING[index % 5]),
+          participation_count: user.participation_count || user.points || 0,
+          badge_count: user.badge_count || user.badges || 0,
+          nft_count: user.nft_count || 0,
+          has_applied: user.has_applied || false,
+          rank: user.rank || (index + 1 + offset),
+          is_current_user: user.is_current_user || false,
+          // Add social interaction mock data for now
           likes: Math.floor(Math.random() * 50) + 5,
           shares: Math.floor(Math.random() * 20) + 2,
           liked_by_user: Math.random() > 0.7,
           shared_by_user: Math.random() > 0.8,
           progress: {
             total: 100,
-            current: Math.floor(Math.random() * 100) + 1,
+            current: Math.floor(((user.participation_count || user.points || 0) % 100)) + 1,
             label: ["Next Rank", "Next Badge", "Level Up"][
               Math.floor(Math.random() * 3)
             ],
@@ -299,11 +312,13 @@ export function AdvancedLeaderboard({
           trending: index === 0 || index === 2, // First and third users are trending
           spotlight: index === 0, // First user is spotlight
           referrals: Math.floor(Math.random() * 10),
-          avatar_url: AVATAR_MAPPING[index % 5], // Use consistent avatar images
+          is_mock: user.is_mock || false,
         }));
 
         setLeaderboardData(enhancedData);
         setTotalUsers(total);
+
+        console.log(`📊 Loaded leaderboard: ${result.realUserCount || 0} real users, ${result.mockUserCount || 0} example users`);
       } else {
         // Fall back to mock data if no results
         let mockData = generateMockData();
@@ -337,7 +352,7 @@ export function AdvancedLeaderboard({
     } finally {
       setIsLoading(false);
     }
-  }, [activeTab, timeframe, offset, searchQuery, currentUserId, useMockData, limit]);
+  }, [activeTab, timeframe, offset, searchQuery, effectiveCurrentUserId, useMockData, generateMockData]); // Fixed dependencies
 
   // Fetch data on initial load and when filters change
   useEffect(() => {
@@ -882,6 +897,17 @@ export function AdvancedLeaderboard({
                                   >
                                     Applied
                                   </Badge>
+                                )}
+                                {/* Add indicator for real vs example users */}
+                                {user.is_mock === true && (
+                                  <div className="ml-2 flex items-center">
+                                    <div className="w-2 h-2 bg-blue-400 rounded-full" title="Example User"></div>
+                                  </div>
+                                )}
+                                {user.is_mock === false && (
+                                  <div className="ml-2 flex items-center">
+                                    <div className="w-2 h-2 bg-green-400 rounded-full" title="Real User"></div>
+                                  </div>
                                 )}
                               </div>
 
