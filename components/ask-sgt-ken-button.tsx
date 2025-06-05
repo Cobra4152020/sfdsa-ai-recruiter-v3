@@ -577,23 +577,200 @@ export function AskSgtKenButton({
   // For ghost variant in the header, we want to render just text with an icon
   if (variant === "ghost" && (className?.includes("bg-[#0A3C1F]") || className?.includes("text-white"))) {
     return (
-      <button
-        onClick={() => setIsDialogOpen(true)}
-        className={`${className} sgt-ken-button-hover subtle-glow relative`}
-        aria-label="Chat with Sergeant Ken"
-        type="button"
-      >
-        <span className="flex items-center relative">
-          <span className="wiggle-icon">
-            <MessageSquare className="mr-1 h-4 w-4" />
+      <>
+        <button
+          onClick={() => setIsDialogOpen(true)}
+          className={`${className} sgt-ken-button-hover subtle-glow relative`}
+          aria-label="Chat with Sergeant Ken"
+          type="button"
+        >
+          <span className="flex items-center relative">
+            <span className="wiggle-icon">
+              <MessageSquare className="mr-1 h-4 w-4" />
+            </span>
+            Ask Sgt. Ken
+            <span className="absolute -right-4 -top-1 h-2 w-2 rounded-full bg-[#FFD700] animate-pulse-yellow"></span>
+            <span className="absolute -right-10 top-0 text-xs bg-[#FFD700] text-[#0A3C1F] px-1.5 py-0.5 rounded-full font-bold animate-pulse-yellow">
+              Ask!
+            </span>
           </span>
-          Ask Sgt. Ken
-          <span className="absolute -right-4 -top-1 h-2 w-2 rounded-full bg-[#FFD700] animate-pulse-yellow"></span>
-          <span className="absolute -right-10 top-0 text-xs bg-[#FFD700] text-[#0A3C1F] px-1.5 py-0.5 rounded-full font-bold animate-pulse-yellow">
-            Ask!
-          </span>
-        </span>
-      </button>
+        </button>
+
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogContent className="sm:max-w-[500px] max-w-[95vw] max-h-[85vh] sm:max-h-[80vh] w-full mx-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center justify-between text-[#0A3C1F] flex-wrap gap-2">
+                <div className="flex items-center">
+                  <MessageSquare className="mr-2 h-5 w-5 text-[#0A3C1F]" />
+                  <span className="text-base sm:text-lg">Chat with Sgt. Ken</span>
+                  {offlineMode && (
+                    <Badge
+                      variant="outline"
+                      className="ml-2 bg-yellow-100 text-yellow-800 border-yellow-300 text-xs"
+                    >
+                      Offline Mode
+                    </Badge>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Link
+                    href="/donate"
+                    className="flex items-center text-xs sm:text-sm text-[#0A3C1F] hover:underline"
+                  >
+                    <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                    Donate
+                  </Link>
+                  <Link
+                    href="/daily-briefing"
+                    className="flex items-center text-xs sm:text-sm bg-[#FFD700] text-[#0A3C1F] px-2 py-1 sm:px-3 sm:py-1 rounded-full hover:bg-[#FFD700]/80 transition-colors"
+                  >
+                    <Gamepad2 className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                    <span className="hidden sm:inline">Attend Briefing</span>
+                    <span className="sm:hidden">Briefing</span>
+                  </Link>
+                </div>
+              </DialogTitle>
+              <DialogDescription className="text-gray-600 dark:text-gray-400">
+                Chat with Sgt. Ken, your AI assistant for San Francisco Deputy Sheriff recruitment questions.
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className="h-[60vh] sm:h-[400px] flex flex-col border rounded-md overflow-hidden">
+              <div className="flex-1 p-3 sm:p-4 overflow-y-auto">
+                <div className="space-y-3 sm:space-y-4">
+                  {messages.map((message, _index) => (
+                    <div key={message.id || _index}>
+                      <div
+                        className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}
+                      >
+                        <div
+                          className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 ${
+                            message.role === "assistant"
+                              ? "bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white"
+                              : "bg-[#0A3C1F] text-white"
+                          }`}
+                        >
+                          <div className="whitespace-pre-wrap text-sm sm:text-base">
+                            {message.displayedContent || message.content}
+                            {message.isTyping && typingMessageId === message.id && (
+                              <span className="inline-block w-2 h-4 bg-current ml-1 animate-pulse">|</span>
+                            )}
+                          </div>
+
+                          {message.quickReplies &&
+                            message.quickReplies.length > 0 && 
+                            !message.isTyping && (
+                              <div className="mt-2 sm:mt-3 flex flex-wrap gap-1 sm:gap-2">
+                                {message.quickReplies.map((reply, i) => (
+                                  <button
+                                    key={i}
+                                    onClick={() => handleQuickReply(reply)}
+                                    disabled={isLoading || typingMessageId !== null}
+                                    className="text-xs px-2 py-1 sm:px-3 sm:py-1 rounded-full bg-[#FFD700] text-[#0A3C1F] font-medium hover:bg-[#FFD700]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {reply}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                        </div>
+                      </div>
+
+                      {/* Show donation prompt if this message is flagged to show it */}
+                      {message.role === "assistant" && message.showDonation && (
+                        <div className="mt-2 sm:mt-3">
+                          <div className="max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
+                            <p className="text-sm sm:text-base">
+                              If you appreciate this site and my assistance,
+                              consider buying me a coffee!
+                            </p>
+                            <div className="mt-2 flex flex-wrap gap-1 sm:gap-2">
+                              <Link href="/donate?amount=10">
+                                <Button
+                                  size="sm"
+                                  className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
+                                >
+                                  <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                                  $10
+                                </Button>
+                              </Link>
+                              <Link href="/donate?amount=25">
+                                <Button
+                                  size="sm"
+                                  className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
+                                >
+                                  <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                                  $25
+                                </Button>
+                              </Link>
+                              <Link href="/donate">
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="border-[#FFD700] text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
+                                >
+                                  Other Amount
+                                </Button>
+                              </Link>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+
+                  {isLoading && (
+                    <div className="flex justify-start">
+                      <div className="max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
+                        <div className="flex space-x-1">
+                          <div
+                            className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+                            style={{ animationDelay: "0ms" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+                            style={{ animationDelay: "150ms" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+                            style={{ animationDelay: "300ms" }}
+                          ></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </div>
+              </div>
+
+              <div className="border-t dark:border-gray-700 p-2 sm:p-3">
+                <form
+                  onSubmit={handleSubmit}
+                  className="flex items-center space-x-2"
+                >
+                  <input
+                    type="text"
+                    value={input}
+                    onChange={(e) => setInput(e.target.value)}
+                    placeholder="Type your message..."
+                    className="flex-1 px-2 py-2 sm:px-3 sm:py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A3C1F] dark:bg-[#2A2A2A] dark:text-white dark:border-gray-600 text-sm sm:text-base"
+                    disabled={isLoading || typingMessageId !== null}
+                  />
+                  <Button
+                    type="submit"
+                    disabled={isLoading || !input.trim() || typingMessageId !== null}
+                    className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white p-2 rounded-lg flex-shrink-0 disabled:opacity-50"
+                    aria-label="Send message"
+                  >
+                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </Button>
+                </form>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </>
     );
   }
 

@@ -277,7 +277,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               🌟 Start Your Hero Journey - Become a San Francisco Deputy Sheriff Today! 🌟
             </span>
           </div>
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-4">
             <div className="hidden md:block">
               <AskSgtKenButton 
                 variant="ghost" 
@@ -291,52 +291,54 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                 className="bg-[#0A3C1F] text-white border-2 border-[#FFD700] hover:bg-[#FFD700] hover:text-[#0A3C1F] px-2 py-1 rounded-md font-semibold text-xs transition-all duration-200"
               />
             </div>
-            <a
-              href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Facebook"
-              className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-            >
-              <Facebook size={16} />
-            </a>
-            <a
-              href="https://twitter.com/sanfranciscodsa"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Twitter"
-              className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-            >
-              <Twitter size={16} />
-            </a>
-            <a
-              href="https://www.youtube.com/channel/UCgyW7q86c-Mua4bS1a9wBWA"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="YouTube"
-              className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-            >
-              <Youtube size={16} />
-            </a>
-            <a
-              href="https://www.instagram.com/sfdeputysheriffsassociation/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-            >
-              <Instagram size={16} />
-            </a>
-            <a
-              href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs%E2%80%99-association"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="LinkedIn"
-              className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-            >
-              <Linkedin size={16} />
-            </a>
-            <ThemeToggle />
+            <div className="flex items-center space-x-3">
+              <a
+                href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              >
+                <Facebook size={16} />
+              </a>
+              <a
+                href="https://twitter.com/sanfranciscodsa"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Twitter"
+                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              >
+                <Twitter size={16} />
+              </a>
+              <a
+                href="https://www.youtube.com/channel/UCgyW7q86c-Mua4bS1a9wBWA"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              >
+                <Youtube size={16} />
+              </a>
+              <a
+                href="https://www.instagram.com/sfdeputysheriffsassociation/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              >
+                <Instagram size={16} />
+              </a>
+              <a
+                href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs%E2%80%99-association"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="LinkedIn"
+                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+              >
+                <Linkedin size={16} />
+              </a>
+              <ThemeToggle />
+            </div>
           </div>
         </div>
       </div>
