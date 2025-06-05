@@ -517,45 +517,63 @@ export function ProcessExplainer() {
   const applicationSteps = [
     {
       step: 1,
-      title: "Online Application",
+      title: "Initial Application",
       description:
-        "Complete the initial application form with your personal information and qualifications.",
+        "Submit your comprehensive online application through the SF Sheriff's Department portal with complete personal information, education history, employment background, and character references.",
     },
     {
       step: 2,
       title: "Written Examination",
       description:
-        "Take the written test to assess your basic skills and aptitude for law enforcement work.",
+        "Complete a comprehensive written test evaluating reading comprehension, writing skills, mathematical reasoning, and basic law enforcement knowledge. Passing score is 70%.",
     },
     {
       step: 3,
-      title: "Physical Ability Test",
+      title: "Physical Agility Test (PAT)",
       description:
-        "Complete the physical fitness assessment to ensure you meet the physical requirements.",
+        "Demonstrate physical fitness through standardized exercises including push-ups, sit-ups, 1.5-mile run, and job-specific agility tasks. Must meet minimum standards in all categories.",
     },
     {
       step: 4,
-      title: "Oral Interview",
+      title: "Oral Board Interview",
       description:
-        "Participate in an interview with department representatives to assess your suitability.",
+        "Face a panel of experienced law enforcement professionals in a structured interview. Panel evaluates communication skills, decision-making, ethics, and job knowledge. Passing score is 70%.",
     },
     {
       step: 5,
       title: "Background Investigation",
       description:
-        "Undergo a thorough background check of your personal and professional history.",
+        "Undergo extensive background check including criminal history, employment verification, financial review, reference interviews, and social media screening. Complete honesty is essential.",
     },
     {
       step: 6,
-      title: "Medical & Psychological Exams",
+      title: "Polygraph Examination",
       description:
-        "Complete medical and psychological evaluations to ensure fitness for duty.",
+        "Complete a polygraph (lie detector) test to verify integrity and truthfulness regarding your background information, criminal history, drug use, and other relevant matters.",
     },
     {
       step: 7,
-      title: "Final Selection",
+      title: "Medical Examination",
       description:
-        "Receive a conditional offer of employment if you successfully complete all steps.",
+        "Complete comprehensive medical examination by department-approved physician including vision, hearing, cardiovascular, and general health assessment. Drug screening included.",
+    },
+    {
+      step: 8,
+      title: "Psychological Evaluation",
+      description:
+        "Undergo psychological testing and clinical interview with licensed psychologist to assess mental health, personality traits, and suitability for law enforcement work.",
+    },
+    {
+      step: 9,
+      title: "Final Interview & Appointment",
+      description:
+        "Meet with department leadership for final interview and conditional job offer. Discuss salary, benefits, academy start date, and complete pre-employment paperwork.",
+    },
+    {
+      step: 10,
+      title: "Sheriff's Academy Training",
+      description:
+        "Complete intensive 16-20 week training program covering law enforcement, corrections, firearms, defensive tactics, emergency response, and department policies. Paid training position.",
     },
   ];
 
@@ -563,61 +581,70 @@ export function ProcessExplainer() {
     <div className="space-y-6">
       <div className="grid gap-4">
         {applicationSteps.map((step) => (
-          <Card key={step.step} className="overflow-hidden">
-            <CardHeader className="bg-primary/5 pb-4">
+          <Card key={step.step} className="overflow-hidden bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+            <CardHeader className="bg-primary/5 dark:bg-[#FFD700]/10 pb-4">
               <div className="flex items-center">
-                <div className="bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center mr-3">
+                <div className="bg-primary dark:bg-[#FFD700] text-primary-foreground dark:text-black w-8 h-8 rounded-full flex items-center justify-center mr-3 font-bold">
                   {step.step}
                 </div>
-                <CardTitle>{step.title}</CardTitle>
+                <CardTitle className="text-gray-900 dark:text-[#FFD700]">{step.title}</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="pt-4">
-              <p className="text-gray-600">{step.description}</p>
+            <CardContent className="pt-4 bg-white dark:bg-black">
+              <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{step.description}</p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-        <h3 className="font-semibold text-lg mb-2 text-primary">
+      <div className="bg-primary/5 dark:bg-[#FFD700]/10 p-4 rounded-lg border border-primary/20 dark:border-[#FFD700]/30">
+        <h3 className="font-semibold text-lg mb-2 text-primary dark:text-[#FFD700]">
           Tips for Success
         </h3>
         <ul className="space-y-2">
           <li className="flex items-start">
-            <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-              <Shield className="h-4 w-4 text-primary" />
+            <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary dark:text-[#FFD700]" />
             </div>
-            <span>
+            <span className="text-gray-700 dark:text-gray-300">
               <strong>Prepare thoroughly</strong> for each step of the process,
-              especially the written and physical tests.
+              especially the written examination, physical agility test, and oral board interview.
             </span>
           </li>
           <li className="flex items-start">
-            <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-              <Shield className="h-4 w-4 text-primary" />
+            <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary dark:text-[#FFD700]" />
             </div>
-            <span>
-              <strong>Be honest</strong> throughout the entire process,
-              particularly during the background investigation.
+            <span className="text-gray-700 dark:text-gray-300">
+              <strong>Be completely honest</strong> throughout the entire process,
+              particularly during the background investigation and polygraph examination.
             </span>
           </li>
           <li className="flex items-start">
-            <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-              <Shield className="h-4 w-4 text-primary" />
+            <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary dark:text-[#FFD700]" />
             </div>
-            <span>
+            <span className="text-gray-700 dark:text-gray-300">
               <strong>Stay in touch</strong> with your background investigator
-              and respond promptly to requests for information.
+              and respond promptly to all requests for information and documentation.
             </span>
           </li>
           <li className="flex items-start">
-            <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-              <Shield className="h-4 w-4 text-primary" />
+            <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary dark:text-[#FFD700]" />
             </div>
-            <span>
-              <strong>Maintain physical fitness</strong> throughout the process
-              to ensure you&apos;re ready for the academy.
+            <span className="text-gray-700 dark:text-gray-300">
+              <strong>Maintain physical fitness</strong> throughout the entire process
+              to ensure you&apos;re ready for both the agility test and academy training.
+            </span>
+          </li>
+          <li className="flex items-start">
+            <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+              <Shield className="h-4 w-4 text-primary dark:text-[#FFD700]" />
+            </div>
+            <span className="text-gray-700 dark:text-gray-300">
+              <strong>Practice interview skills</strong> and research law enforcement scenarios
+              to prepare for the oral board interview with experienced professionals.
             </span>
           </li>
         </ul>

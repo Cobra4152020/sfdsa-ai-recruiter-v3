@@ -76,23 +76,30 @@ export default function RootLayout({
           <UserProvider>
             <RegistrationProvider>
               <AuthModalProvider>
-                <div className="min-h-screen flex flex-col w-full overflow-x-hidden">
-                  <ImprovedHeader />
-                  <main
-                    id="main-content"
-                    className="flex-1 pt-16 pb-12 bg-background dark:bg-black w-full"
-                  >
-                    <WebSocketErrorHandler />
-                    <ErrorMonitor />
-                    <PerformanceMonitor />
-                    {children}
-                  </main>
-                  <ImprovedFooter />
-                  <div className="fixed-mobile-safe z-50">
-                    <AskSgtKenButton position="fixed" variant="secondary" />
-                  </div>
-                  <UnifiedAuthModal />
-                </div>
+                <WebSocketErrorHandler>
+                  <ErrorMonitor>
+                    <PerformanceMonitor>
+                      <div className="min-h-screen flex flex-col w-full overflow-x-hidden">
+                        <ImprovedHeader />
+                        <main
+                          id="main-content"
+                          className="flex-1 pt-16 pb-12 bg-background dark:bg-black w-full"
+                        >
+                          {children}
+                        </main>
+                        <ImprovedFooter />
+                        <div className="fixed right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col space-y-4">
+                          <AskSgtKenButton 
+                            position="fixed" 
+                            variant="secondary"
+                            className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+                          />
+                        </div>
+                        <UnifiedAuthModal />
+                      </div>
+                    </PerformanceMonitor>
+                  </ErrorMonitor>
+                </WebSocketErrorHandler>
               </AuthModalProvider>
             </RegistrationProvider>
           </UserProvider>

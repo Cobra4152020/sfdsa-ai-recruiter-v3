@@ -25,6 +25,7 @@ import { ShieldLogo } from "@/components/shield-logo";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-provider";
 import { UserNav } from "@/components/user-nav";
+import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
 import { cn } from "@/lib/utils";
 import { useClientOnly } from "@/hooks/use-client-only";
 import { getWindowDimensions } from "@/lib/utils";
@@ -272,11 +273,24 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       <div className="bg-[#0A3C1F] dark:bg-black text-white dark:text-[#FFD700] py-2">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
-            <span className="text-sm">
+            <span className="text-xs sm:text-sm">
               🌟 Start Your Hero Journey - Become a San Francisco Deputy Sheriff Today! 🌟
             </span>
           </div>
           <div className="flex items-center space-x-3">
+            <div className="hidden md:block">
+              <AskSgtKenButton 
+                variant="ghost" 
+                className="text-white hover:text-[#FFD700] bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 px-3 py-1 rounded-md font-semibold text-sm transition-all duration-200"
+              />
+            </div>
+            <div className="md:hidden">
+              <AskSgtKenButton 
+                variant="ghost" 
+                size="sm"
+                className="text-white hover:text-[#FFD700] bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 px-2 py-1 rounded-md font-semibold text-xs transition-all duration-200"
+              />
+            </div>
             <a
               href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
               target="_blank"
@@ -478,8 +492,17 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                   </div>
                 </div>
               ))}
+              <div className="mt-8 border-t border-gray-200 dark:border-[#FFD700]/30 pt-6">
+                <div className="mb-4">
+                  <AskSgtKenButton 
+                    variant="secondary"
+                    className="w-full bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 py-3 text-lg font-semibold"
+                    fullWidth
+                  />
+                </div>
+              </div>
               {!currentUser && (
-                <div className="mt-8 space-y-4 border-t border-gray-200 dark:border-[#FFD700]/30 pt-6">
+                <div className="space-y-4">
                   <Button
                     variant="ghost"
                     onClick={handleLogin}
