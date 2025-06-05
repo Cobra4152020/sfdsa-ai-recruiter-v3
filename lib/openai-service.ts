@@ -17,10 +17,16 @@ function getOpenAIClient(): OpenAI | null {
       openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
       });
+      console.log('✅ OpenAI client initialized successfully');
+      console.log('API Key length:', process.env.OPENAI_API_KEY.length);
+      console.log('API Key starts with:', process.env.OPENAI_API_KEY.substring(0, 20) + '...');
     } catch (error) {
-      console.error('Failed to initialize OpenAI client:', error);
+      console.error('❌ Failed to initialize OpenAI client:', error);
       return null;
     }
+  } else if (!process.env.OPENAI_API_KEY) {
+    console.error('❌ No OpenAI API key found in environment variables');
+    return null;
   }
   
   return openai;

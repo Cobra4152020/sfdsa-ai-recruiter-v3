@@ -14,6 +14,10 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { message, userId, sessionId, chatHistory, searchUsed } = body;
 
+    console.log('🔍 Chat API called with message:', message?.substring(0, 50) + '...');
+    console.log('🔍 OpenAI API Key available:', !!process.env.OPENAI_API_KEY);
+    console.log('🔍 Environment:', process.env.NODE_ENV);
+
     if (!message) {
       return NextResponse.json(
         { error: "Message is required" },
@@ -26,11 +30,18 @@ export async function POST(req: NextRequest) {
 
     // Try enhanced OpenAI service first
     try {
+      console.log('🤖 Attempting OpenAI API call...');
       const result = await generateChatResponse(message, chatHistory || []);
       responseText = result.response;
       actualSearchUsed = result.searchUsed || false;
+      
+      if (result.success) {
+        console.log('✅ OpenAI API call successful');
+      } else {
+        console.log('⚠️ OpenAI API call failed, using fallback');
+      }
     } catch (error) {
-      console.error("OpenAI service error, falling back to knowledge base:", error);
+      console.error("❌ OpenAI service error, falling back to knowledge base:", error);
       // Fallback to local knowledge base
       responseText = `Hey there! ${generateResponse(message)}`;
       actualSearchUsed = false;
