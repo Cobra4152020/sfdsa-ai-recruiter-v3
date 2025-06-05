@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function MissionBriefingPage() {
   return (
     <PageWrapper>
-      <main className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
+      <main className="flex-1 bg-white dark:bg-black pt-8 pb-12">
         <MissionBriefingContent />
       </main>
     </PageWrapper>

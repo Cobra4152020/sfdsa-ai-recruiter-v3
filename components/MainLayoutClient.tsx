@@ -12,7 +12,7 @@ export default function MainLayoutClient({
   return (
     <div className="flex flex-col min-h-screen">
       <ImprovedHeader />
-      <main id="main-content" className="flex-1 bg-white dark:bg-gray-900">
+      <main id="main-content" className="flex-1 bg-white dark:bg-black">
         {children}
       </main>
       <ImprovedFooter />

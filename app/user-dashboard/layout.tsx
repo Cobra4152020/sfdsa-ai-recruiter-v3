@@ -15,7 +15,7 @@ export default function UserDashboardLayout({
 }) {
   return (
     <PageWrapper>
-      <main className="flex-1 bg-[#F8F5EE] dark:bg-[#121212] pt-20">
+      <main className="flex-1 bg-[#F8F5EE] dark:bg-black pt-20">
         {children}
       </main>
     </PageWrapper>

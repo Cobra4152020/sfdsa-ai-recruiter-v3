@@ -64,7 +64,7 @@ export function ErrorMonitorClient({
   return (
     <div className="fixed bottom-4 right-4 z-50">
       {isExpanded ? (
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-red-200 dark:border-red-900/50 w-[600px] max-h-[500px] flex flex-col overflow-hidden">
+        <div className="bg-white dark:bg-black rounded-lg shadow-lg border border-red-200 dark:border-red-900/50 w-[600px] max-h-[500px] flex flex-col overflow-hidden">
           <div className="bg-red-100 dark:bg-red-900/30 p-3 flex items-center justify-between">
             <div className="flex items-center text-red-800 dark:text-red-300">
               <AlertTriangle className="h-5 w-5 mr-2" />

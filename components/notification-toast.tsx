@@ -92,7 +92,7 @@ export function NotificationToast({
       initial={{ opacity: 0, y: 50, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 20, scale: 0.95 }}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 p-4 max-w-md w-full pointer-events-auto"
+      className="bg-white dark:bg-black rounded-lg shadow-lg border border-gray-200 dark:border-[#FFD700]/30 p-4 max-w-md w-full pointer-events-auto"
     >
       <div className="flex items-start">
         <div className="flex-shrink-0 mr-3">

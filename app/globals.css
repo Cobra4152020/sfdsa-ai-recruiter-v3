@@ -7,7 +7,7 @@
     /* Sheriff's Department Colors */
     --sheriff-green: #0a3c1f;
     --sheriff-gold: #ffd700;
-    --sheriff-black: #121212;
+    --sheriff-black: #000000; /* True black instead of dark gray */
     --sheriff-tan: #f8f5ee;
 
     /* Light mode */
@@ -43,32 +43,32 @@
   }
 
   .dark {
-    --background: 0 0% 7%; /* sheriff's black */
+    --background: 0 0% 0%; /* True black */
     --foreground: 48 100% 50%; /* sheriff's gold/yellow */
 
-    --card: 0 0% 7%; /* sheriff's black */
+    --card: 0 0% 0%; /* True black */
     --card-foreground: 48 100% 50%; /* sheriff's gold/yellow */
 
-    --popover: 0 0% 7%;
+    --popover: 0 0% 0%; /* True black */
     --popover-foreground: 48 100% 50%;
 
     --primary: 48 100% 50%; /* sheriff's gold/yellow */
-    --primary-foreground: 0 0% 7%; /* sheriff's black */
+    --primary-foreground: 0 0% 0%; /* True black */
 
-    --secondary: 0 0% 7%;
+    --secondary: 0 0% 0%; /* True black */
     --secondary-foreground: 48 100% 50%;
 
-    --muted: 0 0% 7%;
+    --muted: 0 0% 5%; /* Very dark for subtle backgrounds */
     --muted-foreground: 48 100% 50%;
 
     --accent: 48 100% 50%;
-    --accent-foreground: 0 0% 7%;
+    --accent-foreground: 0 0% 0%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 48 100% 50%;
 
-    --border: 0 0% 15%;
-    --input: 0 0% 15%;
+    --border: 0 0% 10%; /* Dark border but visible */
+    --input: 0 0% 8%; /* Slightly lighter for input fields */
     --ring: 48 100% 50%;
   }
 }
@@ -152,7 +152,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-gray-100 dark:bg-black;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -173,7 +173,7 @@
 
 /* Selection styles */
 ::selection {
-  @apply bg-[#0A3C1F] text-white dark:bg-[#FFD700] dark:text-[#121212];
+  @apply bg-[#0A3C1F] text-white dark:bg-[#FFD700] dark:text-black;
 }
 
 /* Focus outline styles */
@@ -188,11 +188,11 @@ a:not(.no-underline):hover {
 
 /* Code block styles */
 pre {
-  @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto;
+  @apply bg-gray-100 dark:bg-black border dark:border-[#FFD700]/20 p-4 rounded-lg overflow-x-auto;
 }
 
 code {
-  @apply font-mono text-sm;
+  @apply font-mono text-sm bg-gray-100 dark:bg-black dark:text-[#FFD700] px-1 py-0.5 rounded;
 }
 
 /* Table styles */
@@ -202,11 +202,11 @@ table {
 
 th,
 td {
-  @apply border border-gray-200 dark:border-gray-700 p-2;
+  @apply border border-gray-200 dark:border-[#FFD700]/30 p-2;
 }
 
 th {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-gray-100 dark:bg-black dark:text-[#FFD700];
 }
 
 /* Mobile-responsive table */
@@ -225,7 +225,7 @@ th {
 input,
 textarea,
 select {
-  @apply bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2;
+  @apply bg-white dark:bg-black border border-gray-300 dark:border-[#FFD700]/50 dark:text-[#FFD700] rounded-md px-3 py-2;
   /* Improve mobile input experience */
   font-size: 16px; /* Prevent zoom on iOS */
 }
@@ -322,7 +322,7 @@ button:not(.no-hover):hover {
 
 /* Loading states for mobile */
 .mobile-loading {
-  @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+  @apply animate-pulse bg-gray-200 dark:bg-black rounded;
 }
 
 /* Ensure fixed elements don't interfere with mobile navigation */

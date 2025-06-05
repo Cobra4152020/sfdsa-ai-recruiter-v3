@@ -6,7 +6,7 @@ export function Leaderboard() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Engagement Champions */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white dark:bg-black rounded-lg shadow-md overflow-hidden">
         <div className="bg-[#0A3C1F] dark:bg-[#0A3C1F] p-4 flex items-center justify-between">
           <div className="flex items-center">
             <Trophy className="h-6 w-6 text-[#FFD700] mr-2" />
@@ -45,7 +45,7 @@ export function Leaderboard() {
       </div>
 
       {/* Top Applicants */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+      <div className="bg-white dark:bg-black rounded-lg shadow-md overflow-hidden">
         <div className="bg-[#0A3C1F] dark:bg-[#0A3C1F] p-4 flex items-center justify-between">
           <div className="flex items-center">
             <Trophy className="h-6 w-6 text-[#FFD700] mr-2" />
