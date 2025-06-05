@@ -278,7 +278,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
           </div>
           <div className="flex items-center space-x-3">
             <a
-              href="https://www.facebook.com/SFDeputySheriff"
+              href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Facebook"
@@ -287,7 +287,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               <Facebook size={16} />
             </a>
             <a
-              href="https://twitter.com/SFDeputySheriff"
+              href="https://twitter.com/sanfranciscodsa"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Twitter"
@@ -296,7 +296,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               <Twitter size={16} />
             </a>
             <a
-              href="https://www.youtube.com/@SFDeputySheriff"
+              href="https://www.youtube.com/channel/UCgyW7q86c-Mua4bS1a9wBWA"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="YouTube"
@@ -305,7 +305,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               <Youtube size={16} />
             </a>
             <a
-              href="https://www.instagram.com/sfdeputysheriff"
+              href="https://www.instagram.com/sfdeputysheriffsassociation/"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="Instagram"
@@ -314,7 +314,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               <Instagram size={16} />
             </a>
             <a
-              href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs-association"
+              href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs%E2%80%99-association"
               target="_blank"
               rel="noopener noreferrer"
               aria-label="LinkedIn"
@@ -419,7 +419,6 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
 
             {/* Mobile menu button */}
             <div className="flex items-center space-x-4 md:hidden">
-              <ThemeToggle />
               <Button
                 variant="ghost"
                 size="icon"

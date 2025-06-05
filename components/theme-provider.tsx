@@ -5,7 +5,7 @@ import {
   ThemeProvider as NextThemesProvider,
   useTheme as useNextTheme,
 } from "next-themes";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Palette } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { isBrowser } from "@/lib/utils";
 
@@ -43,9 +43,9 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   if (!mounted) {
     return (
       <Button
-        variant="outline"
+        variant="ghost"
         size="icon"
-        className={className}
+        className={`${className} bg-white/10 hover:bg-white/20 border-white/20`}
         aria-label="Toggle theme"
         disabled
       >
@@ -58,15 +58,15 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
   return (
     <Button
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      variant="outline"
+      variant="ghost"
       size="icon"
-      className={className}
+      className={`${className} bg-white/10 hover:bg-white/20 border-white/20 transition-all duration-200`}
       aria-label="Toggle theme"
     >
       {theme === "dark" ? (
-        <Sun className="h-4 w-4 text-yellow-400" />
+        <Sun className="h-4 w-4 text-[#FFD700]" />
       ) : (
-        <Moon className="h-4 w-4" />
+        <Moon className="h-4 w-4 text-white" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>

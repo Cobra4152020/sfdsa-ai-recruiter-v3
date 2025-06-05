@@ -25,8 +25,8 @@ export function UserNav() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-        <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse" />
+      <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
+        <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse border-2 border-gray-300 dark:border-gray-600" />
       </Button>
     );
   }
@@ -40,8 +40,11 @@ export function UserNav() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-[#0A3C1F] dark:bg-[#FFD700] text-white dark:text-black">
+        <Button 
+          variant="ghost" 
+          className="relative h-10 w-10 rounded-full p-0 hover:scale-110 transition-all duration-200 ring-2 ring-white/20 hover:ring-white/40"
+        >
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-[#FFD700] text-[#0A3C1F] border-2 border-white/50 shadow-lg font-bold text-sm">
             {currentUser.name?.[0]?.toUpperCase() || "U"}
           </div>
         </Button>
