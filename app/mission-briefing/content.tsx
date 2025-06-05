@@ -26,7 +26,7 @@ import type { Route } from "next";
 
 export default function MissionBriefingContent() {
   return (
-    <div className="container mx-auto px-4 py-4">
+    <div className="container mx-auto px-4 py-8">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-primary mb-2">
@@ -135,24 +135,35 @@ function RoleExplainer() {
     {
       title: "Jail Operations",
       description:
-        "Supervise inmates in county jails, ensuring safety and security",
+        "Supervise inmates in county jails, ensuring safety and security for staff, inmates, and visitors",
       icon: <Shield className="h-6 w-6 text-primary" />,
     },
     {
       title: "Court Security",
-      description: "Maintain order in courtrooms and protect judicial officers",
+      description: "Maintain order in courtrooms and protect judicial officers, staff, and the public",
       icon: <Briefcase className="h-6 w-6 text-primary" />,
+    },
+    {
+      title: "Patrol Division",
+      description:
+        "Conduct patrols in assigned areas, respond to emergency calls, and provide community policing services",
+      icon: <Shield className="h-6 w-6 text-primary" />,
     },
     {
       title: "Inmate Transportation",
       description:
-        "Safely transport inmates to and from court appearances and medical appointments",
+        "Safely transport inmates to and from court appearances, medical appointments, and other facilities",
       icon: <Users className="h-6 w-6 text-primary" />,
     },
     {
       title: "Civil Process",
-      description: "Serve legal documents and enforce civil judgments",
+      description: "Serve legal documents, enforce civil judgments, and conduct evictions",
       icon: <FileText className="h-6 w-6 text-primary" />,
+    },
+    {
+      title: "Field Training Unit",
+      description: "Train new deputies and provide ongoing education to department personnel",
+      icon: <GraduationCap className="h-6 w-6 text-primary" />,
     },
   ];
 
@@ -163,7 +174,7 @@ function RoleExplainer() {
           <Shield className="h-5 w-5 text-accent mr-2" />
           The Deputy Sheriff Role
         </CardTitle>
-        <CardDescription className="text-gray-200">
+        <CardDescription className="text-primary-foreground/80">
           Learn about the duties and responsibilities of a San Francisco Deputy
           Sheriff
         </CardDescription>
@@ -173,18 +184,18 @@ function RoleExplainer() {
           <div className="flex flex-col md:flex-row gap-6">
             <div className="md:w-2/3">
               <h3 className="text-xl font-semibold mb-4">Overview</h3>
-              <p className="mb-4">
+              <p className="mb-4 text-gray-600 dark:text-gray-300">
                 San Francisco Deputy Sheriffs play a vital role in maintaining
                 public safety and upholding the law within the city and county.
                 As a Deputy Sheriff, you&apos;ll be responsible for a variety of
-                duties related to law enforcement, corrections, and court
-                services.
+                duties related to law enforcement, corrections, court services, and community patrol.
               </p>
-              <p className="mb-4">
+              <p className="mb-4 text-gray-600 dark:text-gray-300">
                 The San Francisco Sheriff&apos;s Department is committed to
                 progressive law enforcement practices, community engagement, and
                 rehabilitation programs that help reduce recidivism and promote
-                public safety.
+                public safety. Our deputies serve in multiple capacities, from jail operations
+                to street patrol, making this one of the most diverse law enforcement careers available.
               </p>
             </div>
             <div className="md:w-1/3 relative h-48 md:h-auto rounded-lg overflow-hidden">
@@ -202,12 +213,12 @@ function RoleExplainer() {
             <h3 className="text-xl font-semibold mb-4">Key Responsibilities</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {responsibilities.map((item, index) => (
-                <div key={index} className="border rounded-lg p-4">
+                <div key={index} className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
                   <div className="flex items-center mb-2">
                     {item.icon}
-                    <h4 className="font-semibold ml-2">{item.title}</h4>
+                    <h4 className="font-semibold ml-2 text-gray-900 dark:text-[#FFD700]">{item.title}</h4>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     {item.description}
                   </p>
                 </div>
@@ -215,27 +226,38 @@ function RoleExplainer() {
             </div>
           </div>
 
-          <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-            <h3 className="font-semibold text-lg mb-2 text-primary">
-              Career Growth
+          <div className="bg-primary/5 dark:bg-[#FFD700]/10 p-4 rounded-lg border border-primary/20 dark:border-[#FFD700]/30">
+            <h3 className="font-semibold text-lg mb-2 text-primary dark:text-[#FFD700]">
+              Career Growth & Specializations
             </h3>
-            <p className="mb-2">
+            <p className="mb-2 text-gray-600 dark:text-gray-300">
               The San Francisco Sheriff&apos;s Department offers excellent
               opportunities for career advancement. Deputies can specialize in
               various areas, including:
             </p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700">
-              <li>Investigations</li>
-              <li>Training</li>
-              <li>K-9 Units</li>
-              <li>Emergency Response Team</li>
-              <li>Community Engagement</li>
-              <li>Administration</li>
-            </ul>
-            <p className="mt-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                <li>Criminal Investigations Unit</li>
+                <li>Field Training Unit (FTU)</li>
+                <li>K-9 Units</li>
+                <li>Emergency Response Team</li>
+                <li>Community Policing Division</li>
+                <li>Court Security Unit</li>
+              </ul>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                <li>Patrol Division</li>
+                <li>Transportation Unit</li>
+                <li>Civil Division</li>
+                <li>Training & Professional Standards</li>
+                <li>Administrative Operations</li>
+                <li>Special Operations Group</li>
+              </ul>
+            </div>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">
               With experience and additional training, deputies can advance to
-              supervisory and management positions, including Sergeant,
-              Lieutenant, Captain, and beyond.
+              supervisory and management positions, including Senior Deputy,
+              Sergeant, Lieutenant, Captain, and beyond. Our Field Training Unit provides
+              ongoing education and mentorship opportunities for career development.
             </p>
           </div>
         </div>
@@ -246,7 +268,7 @@ function RoleExplainer() {
 
 export function RequirementsExplainer() {
   const basicRequirements = [
-    "Must be at least 18 years old",
+    "Must be at least 21 years old",
     "U.S. citizenship or permanent resident alien status",
     "High school diploma or equivalent (GED)",
     "Valid California driver&apos;s license",
@@ -261,7 +283,7 @@ export function RequirementsExplainer() {
       <Card>
         <CardHeader className="bg-primary text-primary-foreground">
           <CardTitle>Requirements</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-primary-foreground/80">
             These are the basic requirements to become a San Francisco Deputy
             Sheriff
           </CardDescription>
@@ -270,10 +292,10 @@ export function RequirementsExplainer() {
           <ul className="space-y-2">
             {basicRequirements.map((req, index) => (
               <li key={index} className="flex items-start">
-                <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-                  <Shield className="h-4 w-4 text-primary" />
+                <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+                  <Shield className="h-4 w-4 text-primary dark:text-[#FFD700]" />
                 </div>
-                <span>{req}</span>
+                <span className="text-gray-700 dark:text-gray-300">{req}</span>
               </li>
             ))}
           </ul>
@@ -283,37 +305,37 @@ export function RequirementsExplainer() {
       <Card>
         <CardHeader>
           <CardTitle>Testing Requirements</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-600 dark:text-gray-400">
             These tests are required to become a San Francisco Deputy Sheriff
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="border rounded-lg p-4">
-              <h4 className="font-semibold mb-2">Written Exam</h4>
-              <p className="text-sm text-gray-600">
+            <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Written Exam</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Tests basic reading comprehension, writing skills, and
                 problem-solving abilities. Preparation materials are available
                 through our platform.
               </p>
             </div>
-            <div className="border rounded-lg p-4">
-              <h4 className="font-semibold mb-2">Physical Ability Test</h4>
-              <p className="text-sm text-gray-600">
+            <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Physical Ability Test</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Includes push-ups, sit-ups, and a 1.5-mile run to assess
                 physical fitness and endurance.
               </p>
             </div>
-            <div className="border rounded-lg p-4">
-              <h4 className="font-semibold mb-2">Oral Interview</h4>
-              <p className="text-sm text-gray-600">
+            <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Oral Interview</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Evaluates communication skills, judgment, and suitability for
                 law enforcement work.
               </p>
             </div>
-            <div className="border rounded-lg p-4">
-              <h4 className="font-semibold mb-2">Background Check</h4>
-              <p className="text-sm text-gray-600">
+            <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Background Check</h4>
+              <p className="text-sm text-gray-600 dark:text-gray-300">
                 Thorough investigation of personal history, employment,
                 education, and criminal record.
               </p>
@@ -325,35 +347,35 @@ export function RequirementsExplainer() {
       <Card>
         <CardHeader>
           <CardTitle>Preferred Qualifications</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-600 dark:text-gray-400">
             These qualities will strengthen your application
           </CardDescription>
         </CardHeader>
         <CardContent>
           <ul className="space-y-2">
             <li className="flex items-start">
-              <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-                <GraduationCap className="h-4 w-4 text-primary" />
+              <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+                <GraduationCap className="h-4 w-4 text-primary dark:text-[#FFD700]" />
               </div>
-              <span>College degree in Criminal Justice or related field</span>
+              <span className="text-gray-700 dark:text-gray-300">College degree in Criminal Justice or related field</span>
             </li>
             <li className="flex items-start">
-              <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-                <Briefcase className="h-4 w-4 text-primary" />
+              <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+                <Briefcase className="h-4 w-4 text-primary dark:text-[#FFD700]" />
               </div>
-              <span>Prior law enforcement or military experience</span>
+              <span className="text-gray-700 dark:text-gray-300">Prior law enforcement or military experience</span>
             </li>
             <li className="flex items-start">
-              <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-                <Users className="h-4 w-4 text-primary" />
+              <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+                <Users className="h-4 w-4 text-primary dark:text-[#FFD700]" />
               </div>
-              <span>Community service or volunteer experience</span>
+              <span className="text-gray-700 dark:text-gray-300">Community service or volunteer experience</span>
             </li>
             <li className="flex items-start">
-              <div className="rounded-full bg-primary/10 p-1 mr-3 mt-0.5">
-                <FileText className="h-4 w-4 text-primary" />
+              <div className="rounded-full bg-primary/10 dark:bg-[#FFD700]/20 p-1 mr-3 mt-0.5">
+                <FileText className="h-4 w-4 text-primary dark:text-[#FFD700]" />
               </div>
-              <span>Bilingual abilities</span>
+              <span className="text-gray-700 dark:text-gray-300">Bilingual abilities (especially Spanish, Chinese, or other languages common in San Francisco)</span>
             </li>
           </ul>
         </CardContent>
@@ -370,7 +392,7 @@ function BenefitsExplainer() {
           <DollarSign className="h-5 w-5 text-accent mr-2" />
           Benefits & Compensation
         </CardTitle>
-        <CardDescription className="text-gray-200">
+        <CardDescription className="text-primary-foreground/80">
           Learn about the competitive salary and benefits package for San
           Francisco Deputy Sheriffs
         </CardDescription>
@@ -379,19 +401,20 @@ function BenefitsExplainer() {
         <div className="space-y-6">
           <div>
             <h3 className="text-xl font-semibold mb-4">Salary</h3>
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
-              <h4 className="font-semibold mb-2">Competitive Compensation</h4>
-              <p className="mb-2">
+            <div className="bg-primary/5 dark:bg-[#FFD700]/10 p-4 rounded-lg border border-primary/20 dark:border-[#FFD700]/30">
+              <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Competitive Compensation</h4>
+              <p className="mb-2 text-gray-600 dark:text-gray-300">
                 San Francisco Deputy Sheriffs enjoy one of the most competitive
                 salary packages in law enforcement:
               </p>
-              <ul className="list-disc list-inside space-y-1 text-gray-700">
-                <li>Starting salary range: $116,428 to $184,362</li>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                <li>Starting salary range: $116,428 to $184,362 annually</li>
                 <li>Regular step increases based on years of service</li>
-                <li>Additional pay for specialized assignments</li>
-                <li>Overtime opportunities</li>
+                <li>Additional pay for specialized assignments and patrol duty</li>
+                <li>Overtime opportunities with premium pay rates</li>
                 <li>Night shift differential pay</li>
-                <li>Bilingual pay for qualified deputies</li>
+                <li>Bilingual pay for qualified deputies (up to $200/month)</li>
+                <li>Court appearance compensation</li>
               </ul>
             </div>
           </div>
@@ -401,23 +424,25 @@ function BenefitsExplainer() {
               Health & Retirement Benefits
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Health Benefits</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Comprehensive medical coverage</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Health Benefits</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Comprehensive medical coverage (CalPERS)</li>
                   <li>Dental and vision plans</li>
-                  <li>Mental health services</li>
-                  <li>Life insurance</li>
-                  <li>Disability coverage</li>
+                  <li>Mental health services and EAP</li>
+                  <li>Life insurance coverage</li>
+                  <li>Short and long-term disability coverage</li>
+                  <li>Workers' compensation</li>
                 </ul>
               </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Retirement Benefits</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Defined benefit pension plan</li>
-                  <li>Deferred compensation options</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Retirement Benefits</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>CalPERS defined benefit pension plan</li>
+                  <li>3% at 50 safety retirement formula</li>
+                  <li>457 deferred compensation options</li>
                   <li>Retiree health benefits</li>
-                  <li>Safety retirement formula</li>
+                  <li>Social Security benefits</li>
                 </ul>
               </div>
             </div>
@@ -426,51 +451,56 @@ function BenefitsExplainer() {
           <div>
             <h3 className="text-xl font-semibold mb-4">Additional Benefits</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Time Off</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Paid vacation</li>
-                  <li>Sick leave</li>
-                  <li>Holidays</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Time Off</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Paid vacation (starts at 2 weeks)</li>
+                  <li>Sick leave accrual</li>
+                  <li>13 paid holidays annually</li>
                   <li>Personal days</li>
+                  <li>Family and medical leave</li>
                 </ul>
               </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Education</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Tuition reimbursement</li>
-                  <li>Continuing education</li>
-                  <li>Training opportunities</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Education & Training</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Tuition reimbursement programs</li>
+                  <li>Continuing education opportunities</li>
+                  <li>Professional development training</li>
+                  <li>Conference and seminar attendance</li>
                 </ul>
               </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Special Programs</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Housing assistance</li>
-                  <li>Commuter benefits</li>
-                  <li>Wellness programs</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Special Programs</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>City employee housing assistance</li>
+                  <li>Transit subsidies and parking</li>
+                  <li>Wellness and fitness programs</li>
+                  <li>Employee assistance programs</li>
                 </ul>
               </div>
             </div>
           </div>
 
-          <div className="bg-accent/10 p-4 rounded-lg border border-accent/20">
-            <h3 className="font-semibold text-lg mb-2 text-primary">
+          <div className="bg-accent/10 dark:bg-[#FFD700]/10 p-4 rounded-lg border border-accent/20 dark:border-[#FFD700]/30">
+            <h3 className="font-semibold text-lg mb-2 text-primary dark:text-[#FFD700]">
               Special Opportunities
             </h3>
-            <p className="mb-2">
-              San Francisco Deputy Sheriffs may qualify for special programs:
+            <p className="mb-2 text-gray-600 dark:text-gray-300">
+              San Francisco Deputy Sheriffs may qualify for special programs and benefits:
             </p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700">
+            <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
               <li>G.I. Bill benefits for veterans</li>
-              <li>Discounted housing programs for law enforcement</li>
-              <li>Special loan forgiveness programs</li>
+              <li>Below-market rate housing programs for law enforcement</li>
+              <li>Student loan forgiveness programs</li>
+              <li>Professional development stipends</li>
+              <li>Career advancement opportunities in patrol, investigations, and training</li>
             </ul>
             <div className="mt-4">
               <Link href="/deputy-launchpad">
                 <Button
                   variant="outline"
-                  className="border-primary text-primary"
+                  className="border-primary text-primary dark:border-[#FFD700] dark:text-[#FFD700] dark:hover:bg-[#FFD700]/10"
                 >
                   Learn More in Deputy Launchpad
                 </Button>
@@ -604,8 +634,8 @@ function TrainingExplainer() {
           <GraduationCap className="h-5 w-5 text-accent mr-2" />
           Academy & Training
         </CardTitle>
-        <CardDescription className="text-gray-200">
-          Learn about the training you&apos;ll receive as a San Francisco Deputy
+        <CardDescription className="text-primary-foreground/80">
+          Learn about the comprehensive training you&apos;ll receive as a San Francisco Deputy
           Sheriff
         </CardDescription>
       </CardHeader>
@@ -614,16 +644,16 @@ function TrainingExplainer() {
           <div className="flex flex-col md:flex-row gap-6">
             <div className="md:w-2/3">
               <h3 className="text-xl font-semibold mb-4">Academy Overview</h3>
-              <p className="mb-4">
+              <p className="mb-4 text-gray-600 dark:text-gray-300">
                 After receiving a conditional offer of employment, you&apos;ll
                 attend the San Francisco Sheriff&apos;s Department Academy, a
                 comprehensive training program designed to prepare you for the
-                challenges of law enforcement.
+                challenges of law enforcement and corrections.
               </p>
-              <p className="mb-4">
+              <p className="mb-4 text-gray-600 dark:text-gray-300">
                 The academy is a full-time, paid position. During this time,
                 you&apos;ll be a Deputy Sheriff Trainee, receiving instruction
-                in all aspects of law enforcement and corrections.
+                in all aspects of law enforcement, corrections, patrol operations, and court security.
               </p>
             </div>
             <div className="md:w-1/3 relative h-48 md:h-auto rounded-lg overflow-hidden">
@@ -640,44 +670,44 @@ function TrainingExplainer() {
           <div>
             <h3 className="text-xl font-semibold mb-4">Academy Curriculum</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Law & Legal Procedures</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Criminal law</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Law & Legal Procedures</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Criminal law and procedures</li>
                   <li>Constitutional law</li>
-                  <li>Search and seizure</li>
-                  <li>Evidence handling</li>
-                  <li>Court procedures</li>
+                  <li>Search and seizure protocols</li>
+                  <li>Evidence handling and preservation</li>
+                  <li>Court procedures and testimony</li>
                 </ul>
               </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Tactical Training</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Defensive tactics</li>
-                  <li>Firearms training</li>
-                  <li>Use of force</li>
-                  <li>Officer safety</li>
-                  <li>Emergency response</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Tactical Training</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Defensive tactics and self-defense</li>
+                  <li>Firearms training and safety</li>
+                  <li>Use of force continuum</li>
+                  <li>Officer safety protocols</li>
+                  <li>Emergency response procedures</li>
                 </ul>
               </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Corrections Operations</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Inmate supervision</li>
-                  <li>Jail security</li>
-                  <li>Classification procedures</li>
-                  <li>Contraband control</li>
-                  <li>Crisis intervention</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Corrections Operations</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Inmate supervision techniques</li>
+                  <li>Jail security procedures</li>
+                  <li>Classification and housing</li>
+                  <li>Contraband detection and control</li>
+                  <li>Crisis intervention and de-escalation</li>
                 </ul>
               </div>
-              <div className="border rounded-lg p-4">
-                <h4 className="font-semibold mb-2">Professional Development</h4>
-                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                  <li>Ethics and professionalism</li>
-                  <li>Cultural diversity</li>
-                  <li>Communication skills</li>
-                  <li>Report writing</li>
-                  <li>Stress management</li>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Patrol Operations</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Community policing strategies</li>
+                  <li>Traffic enforcement and control</li>
+                  <li>Emergency response protocols</li>
+                  <li>Report writing and documentation</li>
+                  <li>Public interaction and service</li>
                 </ul>
               </div>
             </div>
@@ -685,27 +715,27 @@ function TrainingExplainer() {
 
           <div>
             <h3 className="text-xl font-semibold mb-4">Academy Structure</h3>
-            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+            <div className="bg-primary/5 dark:bg-[#FFD700]/10 p-4 rounded-lg border border-primary/20 dark:border-[#FFD700]/30">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <h4 className="font-semibold mb-2">Duration</h4>
-                  <p className="text-sm text-gray-600">
-                    The academy typically lasts 16 weeks, with full-time
-                    training Monday through Friday.
+                  <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Duration</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                    The academy typically lasts 16-20 weeks, with full-time
+                    training Monday through Friday, including both classroom and practical exercises.
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Physical Training</h4>
-                  <p className="text-sm text-gray-600">
+                  <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Physical Training</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     Regular physical training sessions to build strength,
-                    endurance, and fitness.
+                    endurance, and fitness required for law enforcement duties.
                   </p>
                 </div>
                 <div>
-                  <h4 className="font-semibold mb-2">Testing</h4>
-                  <p className="text-sm text-gray-600">
+                  <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Testing & Evaluation</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     Regular written and practical exams to assess knowledge and
-                    skills.
+                    skills, with continuous performance evaluation.
                   </p>
                 </div>
               </div>
@@ -713,45 +743,64 @@ function TrainingExplainer() {
           </div>
 
           <div>
-            <h3 className="text-xl font-semibold mb-4">After the Academy</h3>
-            <p className="mb-4">
-              Upon successful completion of the academy, you&apos;ll begin a
-              field training program where you&apos;ll work alongside
-              experienced deputies to apply your training in real-world
-              situations.
+            <h3 className="text-xl font-semibold mb-4">Field Training Unit (FTU)</h3>
+            <p className="mb-4 text-gray-600 dark:text-gray-300">
+              Upon successful completion of the academy, you&apos;ll be assigned to our
+              Field Training Unit, where experienced Field Training Officers (FTOs)
+              will mentor you as you apply your training in real-world situations.
             </p>
-            <div className="border rounded-lg p-4">
-              <h4 className="font-semibold mb-2">Field Training Program</h4>
-              <ul className="list-disc list-inside space-y-1 text-sm text-gray-600">
-                <li>Typically lasts 12-16 weeks</li>
-                <li>Hands-on experience in various assignments</li>
-                <li>Regular evaluation and feedback</li>
-                <li>Gradual increase in responsibilities</li>
-                <li>Mentorship from experienced deputies</li>
-              </ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Field Training Program</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Duration: 12-16 weeks of supervised field experience</li>
+                  <li>One-on-one mentorship with certified FTOs</li>
+                  <li>Rotation through different assignments and shifts</li>
+                  <li>Weekly evaluations and skill assessments</li>
+                  <li>Gradual increase in independence and responsibility</li>
+                </ul>
+              </div>
+              <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Training Assignments</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
+                  <li>Jail operations and inmate supervision</li>
+                  <li>Court security and courthouse operations</li>
+                  <li>Patrol division community policing</li>
+                  <li>Civil process service and enforcement</li>
+                  <li>Transportation unit operations</li>
+                </ul>
+              </div>
             </div>
           </div>
 
-          <div className="bg-accent/10 p-4 rounded-lg border border-accent/20">
-            <h3 className="font-semibold text-lg mb-2 text-primary">
-              Continuing Education
+          <div className="bg-accent/10 dark:bg-[#FFD700]/10 p-4 rounded-lg border border-accent/20 dark:border-[#FFD700]/30">
+            <h3 className="font-semibold text-lg mb-2 text-primary dark:text-[#FFD700]">
+              Continuing Education & Career Development
             </h3>
-            <p className="mb-2">
-              Your training doesn&apos;t end with the academy. The San Francisco
+            <p className="mb-2 text-gray-600 dark:text-gray-300">
+              Your training doesn&apos;t end with the Field Training Unit. The San Francisco
               Sheriff&apos;s Department offers ongoing professional development
               opportunities:
             </p>
-            <ul className="list-disc list-inside space-y-1 text-gray-700">
-              <li>Specialized training courses</li>
-              <li>Advanced certifications</li>
-              <li>Leadership development programs</li>
-              <li>Tuition assistance for higher education</li>
-            </ul>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                <li>Advanced specialized training courses</li>
+                <li>Leadership development programs</li>
+                <li>Professional certifications</li>
+                <li>Cross-training in different divisions</li>
+              </ul>
+              <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
+                <li>Tuition assistance for higher education</li>
+                <li>Conference and seminar attendance</li>
+                <li>Field Training Officer certification</li>
+                <li>Promotional exam preparation</li>
+              </ul>
+            </div>
             <div className="mt-4">
               <Link href="/deputy-launchpad">
                 <Button
                   variant="outline"
-                  className="border-primary text-primary"
+                  className="border-primary text-primary dark:border-[#FFD700] dark:text-[#FFD700] dark:hover:bg-[#FFD700]/10"
                 >
                   Learn More in Deputy Launchpad
                 </Button>

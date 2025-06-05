@@ -25,7 +25,7 @@ export function PageWrapper({ children }: PageWrapperProps) {
 
   return (
     <>
-      <main id="main-content" className="flex-1 pt-16 pb-12">
+      <main id="main-content" className="flex-1 pt-16 pb-12 bg-white dark:bg-black">
         {children}
       </main>
       {isOptInFormOpen && (
