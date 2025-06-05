@@ -273,7 +273,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <span className="text-sm">
-              Join the San Francisco Deputy Sheriff&apos;s Department
+              🌟 Start Your Hero Journey - Become a San Francisco Deputy Sheriff Today! 🌟
             </span>
           </div>
           <div className="flex items-center space-x-3">
@@ -443,51 +443,60 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       {isMobileMenuOpen && (
         <div
           id="mobile-menu"
-          className="md:hidden fixed inset-x-0 top-[calc(4rem+2.5rem)] bottom-0 bg-white dark:bg-[#121212] border-t border-gray-200 dark:border-gray-800"
+          className="md:hidden fixed inset-0 top-[120px] bottom-0 bg-white dark:bg-[#121212] z-50 overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation menu"
         >
-          <div className="container mx-auto px-4 py-6">
-            {Object.values(mainNavItems).map((section) => (
-              <div key={section.label} className="mb-6">
-                <h3 className="text-[#0A3C1F] dark:text-[#FFD700] font-semibold mb-3 flex items-center text-lg">
-                  {section.icon && <span className="mr-2">{section.icon}</span>}
-                  {section.label}
-                </h3>
-                <div className="space-y-3 pl-6">
-                  {section.items.map((item) => (
-                    <button
-                      key={item.href}
-                      onClick={() => handleNavigation(item.href)}
-                      className="w-full text-left text-gray-600 dark:text-gray-300 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] py-2 flex items-center text-base transition-all duration-200 hover:translate-x-1"
-                    >
-                      {item.icon && (
-                        <span className="mr-3 opacity-75">{item.icon}</span>
-                      )}
-                      {item.label}
-                    </button>
-                  ))}
+          {/* Mobile menu backdrop */}
+          <div 
+            className="absolute inset-0 bg-black/50 z-40"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          
+          {/* Mobile menu content */}
+          <div className="relative z-50 bg-white dark:bg-[#121212] min-h-full">
+            <div className="container mx-auto px-4 py-6">
+              {Object.values(mainNavItems).map((section) => (
+                <div key={section.label} className="mb-6">
+                  <h3 className="text-[#0A3C1F] dark:text-[#FFD700] font-semibold mb-3 flex items-center text-lg border-b border-gray-200 dark:border-gray-700 pb-2">
+                    {section.icon && <span className="mr-2">{section.icon}</span>}
+                    {section.label}
+                  </h3>
+                  <div className="space-y-1 pl-6">
+                    {section.items.map((item) => (
+                      <button
+                        key={item.href}
+                        onClick={() => handleNavigation(item.href)}
+                        className="w-full text-left text-gray-600 dark:text-gray-300 hover:text-[#0A3C1F] dark:hover:text-[#FFD700] py-3 flex items-center text-base transition-all duration-200 hover:translate-x-1 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-md px-2"
+                      >
+                        {item.icon && (
+                          <span className="mr-3 opacity-75">{item.icon}</span>
+                        )}
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
-            {!currentUser && (
-              <div className="mt-6 space-y-3">
-                <Button
-                  variant="ghost"
-                  onClick={handleLogin}
-                  className="w-full text-[#0A3C1F] dark:text-[#FFD700]"
-                >
-                  Login
-                </Button>
-                <Button
-                  onClick={handleApplyNow}
-                  className="w-full bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-black dark:hover:bg-[#FFD700]/90"
-                >
-                  Apply Now
-                </Button>
-              </div>
-            )}
+              ))}
+              {!currentUser && (
+                <div className="mt-8 space-y-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+                  <Button
+                    variant="ghost"
+                    onClick={handleLogin}
+                    className="w-full text-[#0A3C1F] dark:text-[#FFD700] justify-center py-3 text-lg"
+                  >
+                    Login
+                  </Button>
+                  <Button
+                    onClick={handleApplyNow}
+                    className="w-full bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-black dark:hover:bg-[#FFD700]/90 py-3 text-lg"
+                  >
+                    Apply Now
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

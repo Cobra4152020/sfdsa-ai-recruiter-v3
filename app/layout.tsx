@@ -47,6 +47,12 @@ export const metadata: Metadata = {
       "Join the San Francisco Deputy Sheriff&apos;s Department and make a difference in your community",
     images: ["/images/twitter-image.jpg"],
   },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+  },
 };
 
 export default function RootLayout({
@@ -62,6 +68,7 @@ export default function RootLayout({
           name="description"
           content="San Francisco Deputy Sheriffs' Association AI Recruiter"
         />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <meta name="generator" content="v0.dev" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
@@ -69,11 +76,11 @@ export default function RootLayout({
           <UserProvider>
             <RegistrationProvider>
               <AuthModalProvider>
-                <div className="min-h-screen flex flex-col">
+                <div className="min-h-screen flex flex-col w-full overflow-x-hidden">
                   <ImprovedHeader />
                   <main
                     id="main-content"
-                    className="flex-1 pt-16 pb-12 bg-background dark:bg-[#121212]"
+                    className="flex-1 pt-16 pb-12 bg-background dark:bg-[#121212] w-full"
                   >
                     <WebSocketErrorHandler />
                     <ErrorMonitor />
@@ -81,7 +88,7 @@ export default function RootLayout({
                     {children}
                   </main>
                   <ImprovedFooter />
-                  <div className="fixed bottom-6 right-6 z-50">
+                  <div className="fixed-mobile-safe z-50">
                     <AskSgtKenButton position="fixed" variant="secondary" />
                   </div>
                   <UnifiedAuthModal />

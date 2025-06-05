@@ -40,6 +40,8 @@ type MessageType = {
   timestamp: Date;
   feedbackGiven?: "positive" | "negative";
   showDonation?: boolean;
+  isTyping?: boolean;
+  displayedContent?: string;
 };
 
 // interface Faq { // Commented out unused interface
@@ -99,6 +101,7 @@ export function AskSgtKenButton({
   const [offlineMode, setOfflineMode] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [messageCount, setMessageCount] = useState(0);
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { currentUser, incrementParticipation } = useUser();
   const { toast } = useToast();
@@ -254,12 +257,42 @@ export function AskSgtKenButton({
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  // Typing effect function
+  const startTypingEffect = (messageId: string, content: string, delay: number = 30) => {
+    setTypingMessageId(messageId);
+    let currentIndex = 0;
+    
+    const typeInterval = setInterval(() => {
+      if (currentIndex <= content.length) {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, displayedContent: content.substring(0, currentIndex) }
+              : msg
+          )
+        );
+        currentIndex++;
+      } else {
+        clearInterval(typeInterval);
+        setTypingMessageId(null);
+        // Mark typing as complete
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, isTyping: false, displayedContent: content }
+              : msg
+          )
+        );
+      }
+    }, delay);
+  };
+
   // Function to generate quick replies based on the message content
   const getContextualQuickReplies = (message: string): string[] => {
     const lowerMessage = message.toLowerCase();
 
-    // Always include trivia game as an option
-    const triviaOption = "Play SF Trivia with Sgt. Ken";
+    // Always include daily briefing as an option
+    const briefingOption = "Attend Sgt. Ken's Daily Briefing";
 
     // Requirements-related quick replies
     if (
@@ -271,7 +304,7 @@ export function AskSgtKenButton({
         "What education is required?",
         "Are there age requirements?",
         "What about criminal history?",
-        triviaOption,
+        briefingOption,
       ];
     }
 
@@ -285,7 +318,7 @@ export function AskSgtKenButton({
         "How long is the process?",
         "What tests are involved?",
         "Tell me about the academy",
-        triviaOption,
+        briefingOption,
       ];
     }
 
@@ -299,7 +332,7 @@ export function AskSgtKenButton({
         "What about overtime?",
         "Are there pay increases?",
         "What benefits come with the job?",
-        triviaOption,
+        briefingOption,
       ];
     }
 
@@ -313,7 +346,7 @@ export function AskSgtKenButton({
         "How long is the academy?",
         "What will I learn?",
         "Is it physically demanding?",
-        triviaOption,
+        briefingOption,
       ];
     }
 
@@ -327,7 +360,7 @@ export function AskSgtKenButton({
         "How fast can I get promoted?",
         "What specialized units exist?",
         "What's the retirement plan?",
-        triviaOption,
+        briefingOption,
       ];
     }
 
@@ -336,7 +369,7 @@ export function AskSgtKenButton({
       "What are the requirements?",
       "Tell me about the salary",
       "How's the work schedule?",
-      triviaOption,
+      briefingOption,
     ];
   };
 
@@ -422,17 +455,25 @@ export function AskSgtKenButton({
         const showDonation = shouldShowDonationPrompt();
 
         // Add assistant response with enhanced metadata
+        const assistantMessageId = `assistant-${Date.now()}`;
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
             content: response,
             quickReplies: quickReplies,
-            id: `assistant-${Date.now()}`,
+            id: assistantMessageId,
             timestamp: new Date(),
             showDonation,
+            isTyping: true,
+            displayedContent: "",
           },
         ]);
+
+        // Start typing effect for the response
+        setTimeout(() => {
+          startTypingEffect(assistantMessageId, response);
+        }, 500); // Small delay before starting to type
 
         // Show success indicator if web search was used
         if (result.searchUsed) {
@@ -458,16 +499,24 @@ export function AskSgtKenButton({
           .replace(/salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g, "salary ranges from $116,428 to $184,362");
 
         // Add fallback response
+        const fallbackMessageId = `fallback-${Date.now()}`;
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
             content: `Hey there! ${updatedResponse}`,
             quickReplies: getContextualQuickReplies(userMessage + " " + updatedResponse),
-            id: `fallback-${Date.now()}`,
+            id: fallbackMessageId,
             timestamp: new Date(),
+            isTyping: true,
+            displayedContent: "",
           },
         ]);
+
+        // Start typing effect for fallback response
+        setTimeout(() => {
+          startTypingEffect(fallbackMessageId, `Hey there! ${updatedResponse}`);
+        }, 500);
 
         // Show user-friendly error message
         toast({
@@ -484,12 +533,12 @@ export function AskSgtKenButton({
 
   const handleQuickReply = (reply: string) => {
     if (!isLoading) {
-      // Special handling for trivia game link
+      // Special handling for daily briefing link
       if (
-        reply.toLowerCase().includes("trivia") ||
-        reply.toLowerCase().includes("play sf trivia")
+        reply.toLowerCase().includes("briefing") ||
+        reply.toLowerCase().includes("attend briefing")
       ) {
-        window.location.href = "/trivia";
+        window.location.href = "/daily-briefing";
         return;
       }
 
@@ -573,68 +622,73 @@ export function AskSgtKenButton({
       </Button>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] max-h-[80vh]">
+        <DialogContent className="sm:max-w-[500px] max-w-[95vw] max-h-[85vh] sm:max-h-[80vh] w-full mx-auto">
           <DialogHeader>
-            <DialogTitle className="flex items-center justify-between text-[#0A3C1F]">
+            <DialogTitle className="flex items-center justify-between text-[#0A3C1F] flex-wrap gap-2">
               <div className="flex items-center">
                 <MessageSquare className="mr-2 h-5 w-5 text-[#0A3C1F]" />
-                Chat with Sgt. Ken
+                <span className="text-base sm:text-lg">Chat with Sgt. Ken</span>
                 {offlineMode && (
                   <Badge
                     variant="outline"
-                    className="ml-2 bg-yellow-100 text-yellow-800 border-yellow-300"
+                    className="ml-2 bg-yellow-100 text-yellow-800 border-yellow-300 text-xs"
                   >
                     Offline Mode
                   </Badge>
                 )}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href="/donate"
-                  className="flex items-center text-sm text-[#0A3C1F] hover:underline"
+                  className="flex items-center text-xs sm:text-sm text-[#0A3C1F] hover:underline"
                 >
-                  <Coffee className="mr-1 h-4 w-4" />
+                  <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                   Donate
                 </Link>
                 <Link
-                  href="/trivia"
-                  className="flex items-center text-sm bg-[#FFD700] text-[#0A3C1F] px-3 py-1 rounded-full hover:bg-[#FFD700]/80 transition-colors"
+                  href="/daily-briefing"
+                  className="flex items-center text-xs sm:text-sm bg-[#FFD700] text-[#0A3C1F] px-2 py-1 sm:px-3 sm:py-1 rounded-full hover:bg-[#FFD700]/80 transition-colors"
                 >
-                  <Gamepad2 className="mr-1 h-4 w-4" />
-                  Play SF Trivia
+                  <Gamepad2 className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Attend Briefing</span>
+                  <span className="sm:hidden">Briefing</span>
                 </Link>
               </div>
             </DialogTitle>
           </DialogHeader>
 
-          <div className="h-[400px] flex flex-col border rounded-md overflow-hidden">
-            <div className="flex-1 p-4 overflow-y-auto">
-              <div className="space-y-4">
+          <div className="h-[60vh] sm:h-[400px] flex flex-col border rounded-md overflow-hidden">
+            <div className="flex-1 p-3 sm:p-4 overflow-y-auto">
+              <div className="space-y-3 sm:space-y-4">
                 {messages.map((message, _index) => (
                   <div key={message.id || _index}>
                     <div
                       className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}
                     >
                       <div
-                        className={`max-w-[80%] rounded-lg p-3 ${
+                        className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 ${
                           message.role === "assistant"
                             ? "bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white"
                             : "bg-[#0A3C1F] text-white"
                         }`}
                       >
-                        <div className="whitespace-pre-wrap">
-                          {message.content}
+                        <div className="whitespace-pre-wrap text-sm sm:text-base">
+                          {message.displayedContent || message.content}
+                          {message.isTyping && typingMessageId === message.id && (
+                            <span className="inline-block w-2 h-4 bg-current ml-1 animate-pulse">|</span>
+                          )}
                         </div>
 
                         {message.quickReplies &&
-                          message.quickReplies.length > 0 && (
-                            <div className="mt-3 flex flex-wrap gap-2">
+                          message.quickReplies.length > 0 && 
+                          !message.isTyping && (
+                            <div className="mt-2 sm:mt-3 flex flex-wrap gap-1 sm:gap-2">
                               {message.quickReplies.map((reply, i) => (
                                 <button
                                   key={i}
                                   onClick={() => handleQuickReply(reply)}
-                                  disabled={isLoading}
-                                  className="text-xs px-3 py-1 rounded-full bg-[#FFD700] text-[#0A3C1F] font-medium hover:bg-[#FFD700]/80 transition-colors"
+                                  disabled={isLoading || typingMessageId !== null}
+                                  className="text-xs px-2 py-1 sm:px-3 sm:py-1 rounded-full bg-[#FFD700] text-[#0A3C1F] font-medium hover:bg-[#FFD700]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {reply}
                                 </button>
@@ -646,28 +700,28 @@ export function AskSgtKenButton({
 
                     {/* Show donation prompt if this message is flagged to show it */}
                     {message.role === "assistant" && message.showDonation && (
-                      <div className="mt-3">
-                        <div className="max-w-[80%] rounded-lg p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
-                          <p>
+                      <div className="mt-2 sm:mt-3">
+                        <div className="max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
+                          <p className="text-sm sm:text-base">
                             If you appreciate this site and my assistance,
                             consider buying me a coffee!
                           </p>
-                          <div className="mt-2 flex space-x-2">
+                          <div className="mt-2 flex flex-wrap gap-1 sm:gap-2">
                             <Link href="/donate?amount=10">
                               <Button
                                 size="sm"
-                                className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F]"
+                                className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
                               >
-                                <Coffee className="mr-1 h-4 w-4" />
+                                <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                                 $10
                               </Button>
                             </Link>
                             <Link href="/donate?amount=25">
                               <Button
                                 size="sm"
-                                className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F]"
+                                className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
                               >
-                                <Coffee className="mr-1 h-4 w-4" />
+                                <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                                 $25
                               </Button>
                             </Link>
@@ -675,7 +729,7 @@ export function AskSgtKenButton({
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="border-[#FFD700] text-[#0A3C1F]"
+                                className="border-[#FFD700] text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
                               >
                                 Other Amount
                               </Button>
@@ -689,7 +743,7 @@ export function AskSgtKenButton({
 
                 {isLoading && (
                   <div className="flex justify-start">
-                    <div className="max-w-[80%] rounded-lg p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
+                    <div className="max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
                       <div className="flex space-x-1">
                         <div
                           className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
@@ -712,7 +766,7 @@ export function AskSgtKenButton({
               </div>
             </div>
 
-            <div className="border-t dark:border-gray-700 p-3">
+            <div className="border-t dark:border-gray-700 p-2 sm:p-3">
               <form
                 onSubmit={handleSubmit}
                 className="flex items-center space-x-2"
@@ -722,16 +776,16 @@ export function AskSgtKenButton({
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Type your message..."
-                  className="flex-1 px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A3C1F] dark:bg-[#2A2A2A] dark:text-white dark:border-gray-600"
-                  disabled={isLoading}
+                  className="flex-1 px-2 py-2 sm:px-3 sm:py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A3C1F] dark:bg-[#2A2A2A] dark:text-white dark:border-gray-600 text-sm sm:text-base"
+                  disabled={isLoading || typingMessageId !== null}
                 />
                 <Button
                   type="submit"
-                  disabled={isLoading || !input.trim()}
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white p-2 rounded-lg"
+                  disabled={isLoading || !input.trim() || typingMessageId !== null}
+                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white p-2 rounded-lg flex-shrink-0 disabled:opacity-50"
                   aria-label="Send message"
                 >
-                  <Send className="h-5 w-5" />
+                  <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                 </Button>
               </form>
             </div>

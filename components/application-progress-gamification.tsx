@@ -192,11 +192,38 @@ export function ApplicationProgressGamification() {
               variant="outline"
               className="text-[#0A3C1F] border-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
               onClick={() => {
-                toast({
-                  title: "Share Your Progress",
-                  description:
-                    "Share your application journey with friends and earn referral points!",
-                });
+                const shareText = `🎯 I'm ${progressPercentage}% through my San Francisco Deputy Sheriff recruitment journey! ${totalPointsEarned} points earned and ${applicationSteps.filter((step) => step.completed && step.badgeAwarded).length} badges unlocked! 🏆 Join me at ${window.location.origin} #SFDSA #LawEnforcement #Career`;
+                
+                if (navigator.share) {
+                  // Use native share API if available
+                  navigator.share({
+                    title: 'My SFDSA Recruitment Progress',
+                    text: shareText,
+                    url: window.location.origin
+                  }).catch(console.error);
+                } else {
+                  // Fallback to copying to clipboard
+                  navigator.clipboard.writeText(shareText).then(() => {
+                    toast({
+                      title: "Progress Shared!",
+                      description: "Your progress has been copied to clipboard. Paste it on your favorite social media!",
+                      duration: 3000,
+                    });
+                  }).catch(() => {
+                    // If clipboard fails, show manual share options
+                    const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+                    const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.origin)}&quote=${encodeURIComponent(shareText)}`;
+                    
+                    const shareWindow = window.open(twitterUrl, '_blank', 'width=600,height=400');
+                    if (shareWindow) {
+                      toast({
+                        title: "Share Your Progress",
+                        description: "Share window opened! You can also try Facebook or copy the text manually.",
+                        duration: 5000,
+                      });
+                    }
+                  });
+                }
               }}
             >
               <Share2 className="mr-2 h-4 w-4" />
