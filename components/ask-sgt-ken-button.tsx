@@ -259,7 +259,7 @@ export function AskSgtKenButton({
   }, [messages]);
 
   // Typing effect function
-  const startTypingEffect = (messageId: string, content: string, delay: number = 30) => {
+  const startTypingEffect = (messageId: string, content: string, delay: number = 50) => {
     setTypingMessageId(messageId);
     let currentIndex = 0;
     
@@ -490,22 +490,27 @@ export function AskSgtKenButton({
       } catch (error) {
         console.error("Error in enhanced chat flow:", error);
 
-        // Fallback to local knowledge base
-        const fallbackResponse = generateResponse(userMessage);
+        // Fallback to local knowledge base with enhanced personalization
+        let fallbackResponse = generateResponse(userMessage);
         
-        // Update salary information
+        // Make the fallback response more conversational and acknowledge the question
+        if (!fallbackResponse.startsWith("Hey") && !fallbackResponse.startsWith("Listen")) {
+          fallbackResponse = `Hey there! I'm having some technical issues with my main systems, but let me answer your question about "${userMessage}". ${fallbackResponse}`;
+        }
+        
+        // Update salary information in fallback response
         const updatedResponse = fallbackResponse
           .replace(/\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g, "$116,428 to $184,362")
           .replace(/salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g, "salary of $116,428 to $184,362")
           .replace(/salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g, "salary ranges from $116,428 to $184,362");
 
-        // Add fallback response
+        // Add fallback response with enhanced metadata
         const fallbackMessageId = `fallback-${Date.now()}`;
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
-            content: `Hey there! ${updatedResponse}`,
+            content: updatedResponse,
             quickReplies: getContextualQuickReplies(userMessage + " " + updatedResponse),
             id: fallbackMessageId,
             timestamp: new Date(),
@@ -516,15 +521,15 @@ export function AskSgtKenButton({
 
         // Start typing effect for fallback response
         setTimeout(() => {
-          startTypingEffect(fallbackMessageId, `Hey there! ${updatedResponse}`);
+          startTypingEffect(fallbackMessageId, updatedResponse);
         }, 500);
 
-        // Show user-friendly error message
+        // Show user-friendly error message that explains the situation
         toast({
-          title: "Using offline responses",
-          description: "Sgt. Ken is temporarily using stored knowledge. Responses are still accurate!",
+          title: "Using my backup knowledge",
+          description: "I'm having trouble connecting to my main systems, but I'm still here to help with your questions!",
           variant: "default",
-          duration: 3000,
+          duration: 4000,
         });
       } finally {
         setIsLoading(false);

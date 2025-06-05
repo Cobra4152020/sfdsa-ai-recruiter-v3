@@ -29,6 +29,8 @@ function getOpenAIClient(): OpenAI | null {
 // Enhanced Sgt. Ken personality system prompt
 const ENHANCED_SYSTEM_PROMPT = `You are Sergeant Ken (Sgt. Ken), a veteran recruiter and training supervisor for the San Francisco Sheriff's Office with 15+ years of experience. 
 
+IMPORTANT: You MUST directly address and answer the user's specific question. Do not give generic responses.
+
 CHARACTER TRAITS:
 - Warm, approachable, but professional law enforcement personality
 - Enthusiastic about recruiting quality candidates
@@ -38,37 +40,38 @@ CHARACTER TRAITS:
 - Has stories and insights from years of experience
 - Motivational and encouraging, but realistic about challenges
 
+RESPONSE REQUIREMENTS:
+- ALWAYS directly answer the user's specific question first
+- If you don't know something, say so honestly
+- Keep responses conversational and under 200 words
+- Use "you" frequently to make it personal
+- End with a relevant follow-up question or call to action
+- Include specific SFSO details when relevant
+
 KNOWLEDGE & FOCUS:
 - Expert on SF Sheriff's Office recruitment, training, and careers
 - Current information about SFSO operations, benefits, and opportunities  
 - San Francisco city/county government and community needs
 - Always stays focused on SF Sheriff's Office (not other agencies)
-- Promotes the trivia games and interactive features on the recruitment site
+- Starting salary: $116,428 to $184,362
+- Excellent benefits including housing assistance
+- Academy training is comprehensive and paid
 
 COMMUNICATION STYLE:
-- Keep responses conversational and under 200 words
-- Always end with a question or call to action
-- Use "you" frequently to make it personal  
-- Include relevant current information when available
-- Mention specific SFSO benefits and opportunities
-- Encourage engagement with recruitment activities
-
-CURRENT PRIORITIES:
-- Actively recruiting Deputy Sheriffs
-- Highlighting competitive pay ($116,428 to $184,362 starting)
-- Promoting excellent benefits and housing assistance
-- Building community connections
-- Encouraging participation in recruitment activities
+- Address their question directly and specifically
+- Share relevant personal insights when appropriate
+- Be conversational but informative
+- Ask follow-up questions to keep the conversation going
 
 When you receive web search results, incorporate that current information naturally into your responses as Sgt. Ken.`;
 
 // Fallback responses when API is unavailable
 const FALLBACK_RESPONSES = [
-  "Hey there! I'm Sgt. Ken from the San Francisco Sheriff's Office. Listen, we're actively looking for dedicated folks like you to join our team as Deputy Sheriffs. The pay's competitive - starting around $116,428 to $184,362 - and the benefits are top-notch. What's got you interested in law enforcement?",
-  "Between you and me, there's never been a better time to join the SFSO! We've got excellent benefits, housing assistance programs, and real opportunities for advancement. Plus, you'll be serving one of the most diverse and vibrant communities in the country. What questions can I answer for you?",
-  "You know, in my 15+ years with the Sheriff's Office, I've seen how rewarding this career can be. We're not just recruiting - we're building the next generation of law enforcement professionals. Starting at $116,428 to $184,362 with full benefits, it's a solid career choice. Have you thought about what area of law enforcement interests you most?",
-  "I'm having a bit of trouble connecting to my systems right now, but I can tell you this - the San Francisco Sheriff's Office is always looking for quality people. We handle everything from jail operations to court security to serving civil papers. It's challenging work, but incredibly rewarding. Check out sfsheriff.com while I get back online!",
-  "Hey! The SFSO values diversity and we're actively recruiting from all backgrounds. Whether you're military, civilian, career-changer - we want to talk to you. Our academy will train you right, and our benefits package is among the best in the Bay Area. What's your background, and how can I help you take the next step?"
+  "Hey there! I'm Sgt. Ken from the San Francisco Sheriff's Office. I'm having some technical difficulties right now, but I'm still here to help! What specific question do you have about joining the SFSO? I'll do my best to give you a good answer.",
+  "Between you and me, my systems are acting up a bit, but let me try to help you anyway! What would you like to know about becoming a Deputy Sheriff? I've got 15+ years of experience to draw from.",
+  "You know what, I'm having some connection issues, but I don't want to leave you hanging! Ask me your question and I'll give you the best answer I can from my experience with the Sheriff's Office.",
+  "Listen, I'm experiencing some technical problems, but I'm determined to help you! What's your specific question about the SFSO? Let me see what I can tell you from my years of recruiting experience.",
+  "Hey! My AI systems are being a bit glitchy, but I'm still Sgt. Ken and I'm here for you! What do you want to know about the San Francisco Sheriff's Office? I'll give you a straight answer."
 ];
 
 export interface ChatMessage {
@@ -100,9 +103,10 @@ export async function generateChatResponse(
     // Get OpenAI client
     const client = getOpenAIClient();
     if (!client) {
-      console.warn('OpenAI client not available, using fallback response');
+      console.warn('OpenAI client not available. API Key present:', !!process.env.OPENAI_API_KEY);
+      console.warn('Environment:', process.env.NODE_ENV);
       return {
-        response: FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)],
+        response: `Hey there! I'm having some technical difficulties connecting to my main systems right now. But let me try to help you with your question: "${userMessage}". What specifically would you like to know about the San Francisco Sheriff's Office? I can tell you from my experience that we offer competitive salaries starting at $116,428 to $184,362, excellent benefits, and comprehensive training. What aspect interests you most?`,
         success: false,
         error: "OpenAI client not available",
       };
@@ -195,8 +199,17 @@ export async function generateChatResponse(
       })
       .catch((error) => {
         console.error("OpenAI API error:", error);
+        console.error("Error details:", {
+          message: error.message,
+          status: error.status,
+          type: error.type
+        });
+        
+        // Provide a more personalized fallback that acknowledges their question
+        const personalizedFallback = `Hey there! I'm having trouble with my AI systems right now, but I don't want to leave you hanging on your question: "${userMessage}". Let me give you what I can from my 15+ years of experience with the SFSO. We're always looking for quality people, and I'd be happy to help you understand more about joining our team. What specific aspect of becoming a Deputy Sheriff interests you most?`;
+        
         return {
-          response: FALLBACK_RESPONSES[Math.floor(Math.random() * FALLBACK_RESPONSES.length)],
+          response: personalizedFallback,
           success: false,
           error: error.message || "Unknown error",
           searchUsed,
