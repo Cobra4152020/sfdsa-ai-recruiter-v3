@@ -6,19 +6,19 @@ export default function VolunteerRegisterPage() {
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white">
         <div className="absolute inset-0 bg-black opacity-10"></div>
-        <div className="relative container mx-auto px-4 py-16 md:py-24">
+        <div className="relative container mx-auto px-4 py-12 md:py-24">
           <div className="text-center max-w-4xl mx-auto">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-yellow-100 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-yellow-100 bg-clip-text text-transparent">
               Join Our Community of Hero Builders
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-green-100 leading-relaxed">
+            <p className="text-lg sm:text-xl md:text-2xl mb-8 text-green-100 leading-relaxed">
               Become a volunteer recruiter for the San Francisco Sheriff's Department. 
               Share opportunities, earn rewards, and help build safer communities through gamified recruitment.
             </p>
-            <div className="flex flex-wrap justify-center gap-4 text-sm font-medium">
-              <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full">🎯 Share Job Links</span>
-              <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full">🏆 Earn Points & Badges</span>
-              <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full">🌟 Build Communities</span>
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-4 text-xs sm:text-sm font-medium">
+              <span className="bg-white bg-opacity-20 px-3 sm:px-4 py-2 rounded-full">🎯 Share Job Links</span>
+              <span className="bg-white bg-opacity-20 px-3 sm:px-4 py-2 rounded-full">🏆 Earn Points & Badges</span>
+              <span className="bg-white bg-opacity-20 px-3 sm:px-4 py-2 rounded-full">🌟 Build Communities</span>
             </div>
           </div>
         </div>

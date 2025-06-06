@@ -439,7 +439,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
                 variant="ghost"
                 size="icon"
                 onClick={toggleMobileMenu}
-                className="text-[#0A3C1F] dark:text-[#FFD700]"
+                className="text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/10 dark:hover:bg-[#FFD700]/10 p-2 rounded-lg"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"
               >
@@ -458,19 +458,19 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       {isMobileMenuOpen && (
         <div
           id="mobile-menu"
-          className="md:hidden fixed inset-0 top-[120px] bottom-0 bg-white dark:bg-black z-50 overflow-y-auto"
+          className="md:hidden fixed inset-0 top-[120px] bottom-0 z-[9999] overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation menu"
         >
           {/* Mobile menu backdrop */}
           <div 
-            className="absolute inset-0 bg-black/50 z-40"
+            className="absolute inset-0 bg-black/50 z-[9998]"
             onClick={() => setIsMobileMenuOpen(false)}
           />
           
           {/* Mobile menu content */}
-          <div className="relative z-50 bg-white dark:bg-black min-h-full">
+          <div className="relative z-[9999] bg-white dark:bg-black min-h-full shadow-2xl">
             <div className="container mx-auto px-4 py-6">
               {Object.values(mainNavItems).map((section) => (
                 <div key={section.label} className="mb-6">

@@ -89,7 +89,7 @@ export default function RootLayout({
                           {children}
                         </main>
                         <ImprovedFooter />
-                        <div className="fixed right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col space-y-4">
+                        <div className="hidden md:block fixed right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col space-y-4">
                           <AskSgtKenButton 
                             position="fixed" 
                             variant="secondary"
