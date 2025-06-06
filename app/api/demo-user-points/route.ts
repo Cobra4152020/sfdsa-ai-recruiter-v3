@@ -20,6 +20,7 @@ export async function POST(request: Request) {
     // Award points based on action
     const pointsMap: Record<string, number> = {
       'chat_participation': 5,
+      'contact_form_submission': 10,
       'resource_download': 10, 
       'practice_test': 20,
       'referral': 50,
@@ -111,6 +112,7 @@ export async function GET() {
     message: "Demo user points endpoint ready",
     available_actions: [
       { action: 'chat_participation', points: 5 },
+      { action: 'contact_form_submission', points: 10 },
       { action: 'resource_download', points: 10 },
       { action: 'practice_test', points: 20 },
       { action: 'referral', points: 50 },

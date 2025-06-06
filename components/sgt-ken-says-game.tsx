@@ -11,17 +11,13 @@ import { useUser } from "@/context/user-context";
 import {
   Trophy,
   Share2,
-  RotateCcw,
   Clock,
   Target,
   Star,
   Facebook,
   Twitter,
   Linkedin,
-  Instagram,
   Copy,
-  Lightbulb,
-  Flame,
 } from "lucide-react";
 import {
   Dialog,
@@ -30,7 +26,17 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import confetti from "canvas-confetti";
+
+// Confetti type declaration
+declare global {
+  interface Window {
+    confetti?: (options: {
+      particleCount: number;
+      spread: number;
+      origin: { x: number; y: number };
+    }) => void;
+  }
+}
 
 // Law enforcement themed 5-letter words
 const LAW_ENFORCEMENT_WORDS = [
@@ -95,7 +101,7 @@ interface LetterState {
   status: 'correct' | 'present' | 'absent' | 'empty';
 }
 
-export default function SgtKenSaysGame() {
+export function SgtKenSaysGame() {
   const { currentUser } = useUser();
   const { toast } = useToast();
   
@@ -156,10 +162,15 @@ export default function SgtKenSaysGame() {
     // Load saved game state
     const savedGame = localStorage.getItem('sgt-ken-says-game');
     if (savedGame) {
-      const parsed = JSON.parse(savedGame);
-      if (parsed.lastPlayedDate === today) {
-        setGameState(parsed);
-        return;
+      try {
+        const parsed = JSON.parse(savedGame);
+        if (parsed.lastPlayedDate === today) {
+          setGameState(parsed);
+          return;
+        }
+      } catch (error) {
+        console.error('Error parsing saved game:', error);
+        localStorage.removeItem('sgt-ken-says-game');
       }
     }
 
@@ -180,7 +191,11 @@ export default function SgtKenSaysGame() {
   // Save game state
   useEffect(() => {
     if (gameState.currentWord) {
-      localStorage.setItem('sgt-ken-says-game', JSON.stringify(gameState));
+      try {
+        localStorage.setItem('sgt-ken-says-game', JSON.stringify(gameState));
+      } catch (error) {
+        console.error('Error saving game state:', error);
+      }
     }
   }, [gameState]);
 
@@ -228,7 +243,7 @@ export default function SgtKenSaysGame() {
     return basePoints + (bonusMultiplier * 20);
   };
 
-  // Handle guess submission
+  // Submit guess
   const submitGuess = () => {
     if (!isValidGuess(gameState.currentGuess)) {
       toast({
@@ -241,47 +256,48 @@ export default function SgtKenSaysGame() {
 
     const newGuesses = [...gameState.guesses, gameState.currentGuess];
     const newAttempts = gameState.attempts + 1;
+    const isCorrect = gameState.currentGuess === dailyWord;
+    const maxAttemptsReached = newAttempts >= gameState.maxAttempts;
     
-    let newGameStatus = gameState.gameStatus;
-    let points = gameState.points;
+    let newGameStatus: 'playing' | 'won' | 'lost' = 'playing';
+    let points = 0;
     let newStreak = gameState.streak;
     let newTotalWins = gameState.totalWins;
-
-    if (gameState.currentGuess === dailyWord) {
-      // Win!
+    
+    if (isCorrect) {
       newGameStatus = 'won';
       points = calculatePoints(newAttempts);
       newStreak = gameState.streak + 1;
       newTotalWins = gameState.totalWins + 1;
       
-      // Integrate with live points system
-      if (currentUser?.id) {
+      // Show confetti
+      setTimeout(() => {
+        if (typeof window !== 'undefined' && window.confetti) {
+          window.confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { x: 0.5, y: 0.6 }
+          });
+        }
+      }, 100);
+      
+      // Award live points
+      if (currentUser) {
         awardLivePoints(currentUser.id, points, newAttempts);
       }
       
-      // Celebrate with confetti
-      confetti({
-        particleCount: 100,
-        spread: 70,
-        origin: { x: 0.5, y: 0.6 },
-        colors: ['#0A3C1F', '#FFD700', '#FF6B6B']
-      });
-      
       toast({
-        title: "Outstanding work, cadet!",
-        description: `You solved it in ${newAttempts} tries! Earned ${points} points.`,
-        duration: 5000,
+        title: "Excellent work, cadet!",
+        description: `You solved it in ${newAttempts} attempts! +${points} points`,
       });
-    } else if (newAttempts >= gameState.maxAttempts) {
-      // Loss
+    } else if (maxAttemptsReached) {
       newGameStatus = 'lost';
-      newStreak = 0;
+      newStreak = 0; // Reset streak on failure
       
       toast({
         title: "Mission failed, cadet",
-        description: `The word was ${dailyWord}. Better luck tomorrow!`,
+        description: `The word was ${dailyWord}. Try again tomorrow!`,
         variant: "destructive",
-        duration: 5000,
       });
     }
 
@@ -332,28 +348,26 @@ export default function SgtKenSaysGame() {
     }
   };
 
-  // Award streak badge for consistent play
+  // Award streak badge
   const awardStreakBadge = async (userId: string, streak: number) => {
     try {
-      const badgeType = streak >= 7 ? 'hard-charger' : 'frequent-user';
-      
-      const response = await fetch('/api/badges', {
+      const response = await fetch('/api/demo-user-points', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
-          badgeType,
-          source: 'sgt_ken_game_streak',
+          action: 'badge_earned',
+          points: 50,
+          badge: `${streak}_day_sgt_ken_streak`
         }),
       });
 
       if (response.ok) {
         toast({
-          title: "🏅 Badge Earned!",
-          description: `Congratulations! You've earned the ${badgeType === 'hard-charger' ? 'Elite Performer' : 'Platform Explorer'} badge for your winning streak!`,
-          duration: 6000,
+          title: "Streak Badge Earned!",
+          description: `${streak} day winning streak! +50 bonus points`,
         });
       }
     } catch (error) {
@@ -363,40 +377,27 @@ export default function SgtKenSaysGame() {
 
   // Handle input change
   const handleInputChange = (value: string) => {
-    if (gameState.gameStatus === 'playing' && value.length <= 5) {
-      setGameState(prev => ({ ...prev, currentGuess: value.toUpperCase() }));
-    }
+    setGameState(prev => ({
+      ...prev,
+      currentGuess: value.toUpperCase().slice(0, 5)
+    }));
   };
 
   // Generate share text
   const generateShareText = () => {
-    const grid = gameState.guesses.map(guess => {
-      if (!guess) return '';
-      return getLetterStates(guess, dailyWord)
-        .map(state => {
-          switch (state.status) {
-            case 'correct': return '🟩';
-            case 'present': return '🟨';
-            case 'absent': return '⬜';
-            default: return '⬜';
-          }
-        })
-        .join('');
-    }).filter(row => row).join('\n');
+    const attempts = gameState.gameStatus === 'won' ? gameState.attempts : 'X';
+    const squares = gameState.guesses.map(guess => {
+      return getLetterStates(guess, dailyWord).map(state => {
+        switch (state.status) {
+          case 'correct': return '🟩';
+          case 'present': return '🟨';
+          case 'absent': return '⬜';
+          default: return '⬜';
+        }
+      }).join('');
+    }).join('\n');
 
-    const phrase = getCurrentPhrase();
-    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
-    
-    return `Sgt. Ken Says Daily Challenge - ${todayDate}
-${gameState.gameStatus === 'won' ? `Solved in ${gameState.attempts}/6 tries!` : 'Failed to solve'}
-
-${grid}
-
-"${phrase}"
-
-Think you can outsmart Sgt. Ken? Join the SFDSA recruitment challenge! 
-🚔 Play daily at: ${currentDomain}/sgt-ken-says
-#SgtKenSays #SFDSA #WordChallenge #LawEnforcement`;
+    return `Sgt. Ken Says ${todayDate}\n${attempts}/6\n\n${squares}\n\nJoin the SFSO recruitment challenge!\nhttps://sfdeputysheriff.com/sgt-ken-says`;
   };
 
   // Share functions
@@ -407,25 +408,23 @@ Think you can outsmart Sgt. Ken? Join the SFDSA recruitment challenge!
 
   const shareToLinkedIn = () => {
     const text = encodeURIComponent(generateShareText());
-    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${currentDomain}/sgt-ken-says&summary=${text}`, '_blank');
+    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent('https://sfdeputysheriff.com/sgt-ken-says')}&summary=${text}`, '_blank');
   };
 
   const shareToFacebook = () => {
-    const currentDomain = typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3002';
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${currentDomain}/sgt-ken-says`, '_blank');
+    const url = encodeURIComponent('https://sfdeputysheriff.com/sgt-ken-says');
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
   };
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(generateShareText());
     toast({
       title: "Copied to clipboard!",
-      description: "Share your results anywhere you'd like.",
-      duration: 3000,
+      description: "Share your results with the squad.",
     });
   };
 
-  // Get current Sgt. Ken phrase
+  // Get current phrase
   const getCurrentPhrase = () => {
     if (gameState.gameStatus === 'playing') {
       return SGT_KEN_PHRASES.start[Math.floor(Math.random() * SGT_KEN_PHRASES.start.length)];
@@ -436,6 +435,7 @@ Think you can outsmart Sgt. Ken? Join the SFDSA recruitment challenge!
     }
   };
 
+  // Get rank based on attempts
   const getRank = () => {
     const attempts = gameState.gameStatus === 'won' ? gameState.attempts : 6;
     return SGT_KEN_PHRASES.ranks[attempts as keyof typeof SGT_KEN_PHRASES.ranks] || "🚨 Rookie";
@@ -525,8 +525,8 @@ Think you can outsmart Sgt. Ken? Join the SFDSA recruitment challenge!
                   
                   if (guess) {
                     const letterStates = getLetterStates(guess, dailyWord);
-                    letter = letterStates[colIndex].letter;
-                    status = letterStates[colIndex].status;
+                    letter = letterStates[colIndex]?.letter || '';
+                    status = letterStates[colIndex]?.status || 'empty';
                   }
                   
                   return (
@@ -669,4 +669,6 @@ Think you can outsmart Sgt. Ken? Join the SFDSA recruitment challenge!
       </Card>
     </div>
   );
-} 
+}
+
+export default SgtKenSaysGame; 

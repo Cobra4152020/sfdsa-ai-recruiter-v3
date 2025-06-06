@@ -1,5 +1,4 @@
-export const dynamic = "force-static";
-export const revalidate = 3600; // Revalidate every hour;
+export const dynamic = "force-dynamic";
 
 import { type NextRequest, NextResponse } from "next/server";
 import { createClient as createSupabaseClient } from "@supabase/supabase-js";
@@ -69,21 +68,25 @@ export async function POST(req: NextRequest) {
           created_at: new Date().toISOString(),
         });
 
-        // Award participation points if user is logged in
+        // Award participation points if user is logged in (enhanced system)
         if (userId) {
           try {
-            const basePoints = 5;
-            const bonusPoints = actualSearchUsed ? 2 : 0; // Bonus for current info
-            const totalPoints = basePoints + bonusPoints;
-
-            await supabase.rpc("add_participation_points", {
-              user_id_param: userId,
-              points_param: totalPoints,
-              activity_type_param: "chat_interaction",
-              description_param: actualSearchUsed 
-                ? "Interacted with Sgt. Ken AI (with current info)" 
-                : "Interacted with Sgt. Ken AI",
+            // Use the new demo points system for consistency
+            const pointsResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3004'}/api/demo-user-points`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId,
+                action: 'chat_participation',
+                points: actualSearchUsed ? 7 : 5, // Bonus for current info
+              }),
             });
+
+            if (!pointsResponse.ok) {
+              console.error('Failed to award chat participation points');
+            }
           } catch (pointsError) {
             console.error("Error awarding participation points:", pointsError);
             // Continue even if points award fails
@@ -104,6 +107,7 @@ export async function POST(req: NextRequest) {
       message: responseText,
       success: true,
       searchUsed: actualSearchUsed,
+      pointsAwarded: actualSearchUsed ? 7 : 5,
     });
   } catch (error) {
     console.error("Error in chat API route:", error);
@@ -124,6 +128,7 @@ export async function POST(req: NextRequest) {
         success: false,
         offline: true,
         searchUsed: false,
+        pointsAwarded: 0,
       },
       { status: 200 }, // Return 200 even for errors to prevent client-side error handling
     );

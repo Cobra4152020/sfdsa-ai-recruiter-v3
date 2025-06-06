@@ -13,8 +13,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, Filter, Calendar, Heart } from "lucide-react";
+import { Search, Filter, Calendar, Heart, Info, Shield } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type Donor = {
   id: string;
@@ -34,6 +36,12 @@ export function DonorRecognitionWall() {
   const [searchTerm, setSearchTerm] = useState("");
   const [timeframe, setTimeframe] = useState<"all" | "month" | "year">("all");
   const [showFilters, setShowFilters] = useState(false);
+  const [dataSource, setDataSource] = useState<"live" | "mixed" | "fallback">("live");
+  const [sourceInfo, setSourceInfo] = useState<{
+    realDonorCount?: number;
+    fallbackDonorCount?: number;
+    message?: string;
+  }>({});
 
   useEffect(() => {
     fetchDonors();
@@ -46,13 +54,30 @@ export function DonorRecognitionWall() {
   async function fetchDonors() {
     setIsLoading(true);
     try {
-      // In a real implementation, this would fetch from the database
-      // For now, we'll use mock data
-      const mockDonors = generateMockDonors();
-      setDonors(mockDonors);
-      setFilteredDonors(mockDonors);
+      // Try to fetch from API first
+      const response = await fetch(`/api/donors?timeframe=${timeframe}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setDonors(data.donors || []);
+        setFilteredDonors(data.donors || []);
+        setDataSource(data.source || "live");
+        setSourceInfo({
+          realDonorCount: data.realDonorCount,
+          fallbackDonorCount: data.fallbackDonorCount,
+          message: data.message
+        });
+      } else {
+        throw new Error('API response not ok');
+      }
     } catch (error) {
       console.error("Error fetching donors:", error);
+      // Fallback to reduced mock data
+      const fallbackDonors = generateFallbackDonors();
+      setDonors(fallbackDonors);
+      setFilteredDonors(fallbackDonors);
+      setDataSource("fallback");
+      setSourceInfo({ message: "Using sample data - API connection unavailable" });
     } finally {
       setIsLoading(false);
     }
@@ -102,8 +127,63 @@ export function DonorRecognitionWall() {
   );
   const friends = filteredDonors.filter((donor) => donor.tier === "friend");
 
+  // Calculate total stats
+  const totalAmount = filteredDonors.reduce((sum, donor) => sum + donor.amount, 0);
+  const totalDonors = filteredDonors.length;
+  const recurringDonors = filteredDonors.filter(donor => donor.is_recurring).length;
+
   return (
     <div className="space-y-8">
+      {/* Header with enhanced design */}
+      <div className="text-center mb-10">
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
+          🏆 Donor Recognition Wall
+        </h1>
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+          Recognizing the generous supporters who make our mission possible. 
+          Every contribution, no matter the size, helps us build a stronger, safer San Francisco.
+        </p>
+
+        {/* Stats Dashboard */}
+        <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <div className="text-3xl font-bold text-[#0A3C1F]">{totalDonors}</div>
+              <div className="text-sm text-gray-600 font-medium">Total Donors</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-[#0A3C1F]">${totalAmount.toLocaleString()}</div>
+              <div className="text-sm text-gray-600 font-medium">Total Donations</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-[#0A3C1F]">{recurringDonors}</div>
+              <div className="text-sm text-gray-600 font-medium">Recurring Donors</div>
+            </div>
+            <div>
+              <div className="text-3xl font-bold text-[#0A3C1F]">${Math.round(totalAmount / (totalDonors || 1))}</div>
+              <div className="text-sm text-gray-600 font-medium">Average Gift</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Data Source Info */}
+        {sourceInfo.message && (
+          <Card className="bg-blue-50 border-blue-200 mb-8">
+            <CardContent className="p-4">
+              <div className="flex items-center justify-center">
+                <Info className="h-4 w-4 text-blue-600 mr-2" />
+                <span className="text-sm text-blue-800">{sourceInfo.message}</span>
+                {dataSource === "mixed" && sourceInfo.realDonorCount && (
+                  <Badge variant="outline" className="ml-2 text-blue-700 border-blue-300">
+                    {sourceInfo.realDonorCount} real + {sourceInfo.fallbackDonorCount} sample
+                  </Badge>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="relative w-full md:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
@@ -395,6 +475,86 @@ export function DonorRecognitionWall() {
       </div>
     </div>
   );
+}
+
+// Reduced fallback donors for when API is unavailable
+function generateFallbackDonors(): Donor[] {
+  const mockData = [
+    {
+      id: "mock-1",
+      name: "San Francisco Community Foundation",
+      amount: 2500,
+      message: "Proud to support the Sheriff's Department and their community outreach.",
+      donation_date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+      tier: "benefactor" as const,
+      is_recurring: false,
+      organization: "San Francisco Community Foundation"
+    },
+    {
+      id: "mock-2", 
+      name: "Maria Rodriguez",
+      amount: 750,
+      message: "Thank you for your service to our community!",
+      donation_date: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000).toISOString(),
+      tier: "champion" as const,
+      is_recurring: true
+    },
+    {
+      id: "mock-3",
+      name: "David Chen",
+      amount: 250,
+      message: "Keep up the great work protecting our city.",
+      donation_date: new Date(Date.now() - 8 * 24 * 60 * 60 * 1000).toISOString(),
+      tier: "supporter" as const,
+      is_recurring: false
+    },
+    {
+      id: "mock-4",
+      name: "Golden Gate Rotary Club",
+      amount: 1500,
+      donation_date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      tier: "benefactor" as const,
+      is_recurring: false,
+      organization: "Golden Gate Rotary Club"
+    },
+    {
+      id: "mock-5",
+      name: "Sarah Johnson",
+      amount: 150,
+      message: "Happy to contribute to this important cause.",
+      donation_date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
+      tier: "supporter" as const,
+      is_recurring: true
+    },
+    {
+      id: "mock-6",
+      name: "Anonymous Donor",
+      amount: 50,
+      donation_date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
+      tier: "friend" as const,
+      is_recurring: false
+    },
+    {
+      id: "mock-7",
+      name: "Bay Area Business Association",
+      amount: 3000,
+      message: "Supporting our local law enforcement heroes.",
+      donation_date: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000).toISOString(),
+      tier: "benefactor" as const,
+      is_recurring: false,
+      organization: "Bay Area Business Association"
+    },
+    {
+      id: "mock-8",
+      name: "Michael Wong",
+      amount: 75,
+      donation_date: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString(),
+      tier: "friend" as const,
+      is_recurring: false
+    }
+  ];
+
+  return mockData;
 }
 
 // Helper function to generate mock donors for demonstration
