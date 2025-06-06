@@ -1,136 +1,128 @@
 import { NextResponse } from "next/server";
-import type { BadgeType } from "@/lib/badge-utils";
+import { getServiceSupabase } from "@/app/lib/supabase/server";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
-// Static mock data for badges
-const mockBadges = [
-  {
-    id: "1",
-    user_id: "test-user",
-    badge_type: "written" as BadgeType,
-    earned_at: "2024-01-01T00:00:00Z",
-    name: "Written Test",
-    description: "Completed written test preparation",
-    category: "application",
-    color: "bg-blue-500",
-    icon: "/placeholder.svg?key=t6kke",
-  },
-  {
-    id: "2",
-    user_id: "test-user",
-    badge_type: "oral" as BadgeType,
-    earned_at: "2024-01-02T00:00:00Z",
-    name: "Oral Board",
-    description: "Prepared for oral board interviews",
-    category: "application",
-    color: "bg-green-700",
-    icon: "/placeholder.svg?key=409vx",
-  },
-  {
-    id: "3",
-    user_id: "test-user",
-    badge_type: "physical" as BadgeType,
-    earned_at: "2024-01-03T00:00:00Z",
-    name: "Physical Test",
-    description: "Completed physical test preparation",
-    category: "application",
-    color: "bg-blue-700",
-    icon: "/placeholder.svg?key=j0utq",
-  },
-];
-
-// Generate static paths for all user IDs
-export function generateStaticParams() {
-  return [
-    { id: "test-user" },
-    { id: "user1" },
-    { id: "user2" },
-    { id: "user3" },
-  ];
+interface UserBadge {
+  id: string;
+  user_id: string;
+  badge_type: string;
+  badge_name: string;
+  badge_description: string;
+  points_awarded: number;
+  source: string;
+  created_at: string;
 }
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   try {
     const userId = params.id;
 
     if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "User ID is required" },
-        { status: 400 },
-      );
+      return NextResponse.json({
+        success: false,
+        message: "User ID is required",
+      }, { status: 400 });
     }
 
-    // Filter badges for this user
-    const userBadges = mockBadges.filter((badge) => badge.user_id === userId);
+    const supabase = getServiceSupabase();
+
+    // Fetch user's earned badges
+    const { data: userBadges, error } = await supabase
+      .from('user_badges')
+      .select('*')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Database error fetching user badges:', error);
+      return NextResponse.json({
+        success: false,
+        message: "Error fetching user badges",
+        badges: [],
+      }, { status: 500 });
+    }
+
+    // Calculate user badge statistics
+    const totalBadges = userBadges?.length || 0;
+    const totalPoints = userBadges?.reduce((sum, badge) => sum + (badge.points_awarded || 0), 0) || 0;
+    
+    // Group badges by category/source
+    const badgesBySource = userBadges?.reduce((acc, badge) => {
+      const source = badge.source || 'manual';
+      acc[source] = (acc[source] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>) || {};
+
+    // Recent badges (last 7 days)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    const recentBadges = userBadges?.filter(badge => 
+      new Date(badge.created_at) > sevenDaysAgo
+    ) || [];
 
     return NextResponse.json({
       success: true,
-      badges: userBadges,
-      source: "static",
-    });
-  } catch (error) {
-    console.error("Error fetching user badges:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
+      badges: userBadges || [],
+      statistics: {
+        total_badges: totalBadges,
+        total_points: totalPoints,
+        recent_badges: recentBadges.length,
+        badges_by_source: badgesBySource,
       },
-      { status: 500 },
-    );
+      recent_activity: recentBadges.slice(0, 5), // Last 5 recent badges
+    });
+
+  } catch (error) {
+    console.error('Error in user badges API:', error);
+    return NextResponse.json({
+      success: false,
+      message: "Internal server error",
+      badges: [],
+    }, { status: 500 });
   }
 }
 
+// POST endpoint to award a badge to this specific user
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: { id: string } }
 ) {
   try {
     const userId = params.id;
+    const { badgeType, source = 'manual' } = await request.json();
 
-    if (!userId) {
-      return NextResponse.json(
-        { success: false, message: "User ID is required" },
-        { status: 400 },
-      );
-    }
-
-    const { badge_type } = await request.json();
-
-    if (!badge_type) {
-      return NextResponse.json(
-        { success: false, message: "Badge type is required" },
-        { status: 400 },
-      );
-    }
-
-    // Create a new badge based on the type
-    const newBadge = {
-      id: (mockBadges.length + 1).toString(),
-      user_id: userId,
-      badge_type,
-      earned_at: new Date().toISOString(),
-      name: "New Badge",
-      description: "Badge description",
-      category: "participation",
-      color: "bg-blue-500",
-      icon: "/placeholder.svg",
-    };
-
-    mockBadges.push(newBadge);
-
-    return NextResponse.json({ success: true, badge: newBadge });
-  } catch (error) {
-    console.error("Error awarding badge:", error);
-    return NextResponse.json(
-      {
+    if (!userId || !badgeType) {
+      return NextResponse.json({
         success: false,
-        message: error instanceof Error ? error.message : "Unknown error",
+        message: "User ID and badge type are required",
+      }, { status: 400 });
+    }
+
+    // Forward to the main badges endpoint
+    const response = await fetch(new URL('/api/badges', request.url), {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-      { status: 500 },
-    );
+      body: JSON.stringify({
+        userId,
+        badgeType,
+        source,
+      }),
+    });
+
+    const result = await response.json();
+    return NextResponse.json(result, { status: response.status });
+
+  } catch (error) {
+    console.error('Error awarding badge to user:', error);
+    return NextResponse.json({
+      success: false,
+      message: "Internal server error",
+    }, { status: 500 });
   }
 }
