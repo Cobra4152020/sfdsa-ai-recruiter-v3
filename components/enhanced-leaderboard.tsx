@@ -90,36 +90,30 @@ export function EnhancedLeaderboard({
   const { isLoggedIn } = useUser();
   const { toast } = useToast();
 
-  // Generate mock data
+  // Generate mock data with lower scores for easy replacement by real users
   const generateMockData = () => {
     const names = [
       "John Smith",
-      "Maria Garcia",
+      "Maria Garcia", 
       "James Johnson",
       "David Williams",
       "Sarah Brown",
       "Michael Jones",
-      "Jessica Miller",
-      "Robert Davis",
-      "Jennifer Wilson",
-      "Thomas Moore",
-      "Lisa Taylor",
-      "Daniel Anderson",
-      "Patricia Thomas",
-      "Christopher Jackson",
-      "Margaret White",
     ];
+
+    // Lower scores so real users can easily surpass mock data
+    const baseScores = [85, 65, 45, 35, 25, 15];
 
     const mockData = Array.from(
       { length: Math.min(limit, names.length) },
       (_, i) => {
         const isCurrentUser = currentUserId && i === 2; // Make the 3rd user the current user if currentUserId is provided
 
-        const randomLikes = Math.floor(Math.random() * 50) + 5;
-        const randomShares = Math.floor(Math.random() * 20) + 2;
+        const randomLikes = Math.floor(Math.random() * 15) + 2;
+        const randomShares = Math.floor(Math.random() * 8) + 1;
         const randomProgress = {
           total: 100,
-          current: Math.floor(Math.random() * 100) + 1,
+          current: Math.floor(Math.random() * 40) + 10,
           label: ["Next Rank", "Next Badge", "Level Up"][
             Math.floor(Math.random() * 3)
           ],
@@ -129,12 +123,12 @@ export function EnhancedLeaderboard({
         return {
           id: `user-${i + 1}`,
           name: names[i],
-          participation_count: Math.floor(Math.random() * 1000) + 100,
-          badge_count: Math.floor(Math.random() * 5),
-          nft_count: Math.floor(Math.random() * 3),
-          has_applied: Math.random() > 0.7,
+          participation_count: baseScores[i] || 10,
+          badge_count: Math.floor((baseScores[i] || 10) / 30), // 1-2 badges max
+          nft_count: Math.floor((baseScores[i] || 10) / 80), // 0-1 NFTs
+          has_applied: i < 3, // First 3 have applied
           avatar_url: `/placeholder.svg?height=40&width=40&query=avatar ${i + 1}`,
-          is_current_user: isCurrentUser,
+          is_current_user: !!isCurrentUser,
           rank: i + 1 + offset,
           likes: randomLikes,
           shares: randomShares,

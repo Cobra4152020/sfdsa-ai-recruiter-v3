@@ -20,16 +20,17 @@ interface LeaderboardEntry {
 }
 
 // Mock users to use as examples when there aren't enough real users
+// Updated with lower scores so real users can easily surpass them
 const MOCK_USERS: Omit<LeaderboardEntry, 'rank'>[] = [
   {
     id: "mock-1",
     name: "John Smith",
-    points: 1500,
+    points: 85,
     avatar_url: "/male-law-enforcement-headshot.png",
-    badges: 8,
-    participation_count: 1500,
-    badge_count: 8,
-    nft_count: 3,
+    badges: 2,
+    participation_count: 85,
+    badge_count: 2,
+    nft_count: 0,
     has_applied: true,
     last_active: "2024-01-01T00:00:00Z",
     is_mock: true,
@@ -37,12 +38,12 @@ const MOCK_USERS: Omit<LeaderboardEntry, 'rank'>[] = [
   {
     id: "mock-2", 
     name: "Maria Garcia",
-    points: 1200,
+    points: 65,
     avatar_url: "/female-law-enforcement-headshot.png",
-    badges: 6,
-    participation_count: 1200,
-    badge_count: 6,
-    nft_count: 2,
+    badges: 2,
+    participation_count: 65,
+    badge_count: 2,
+    nft_count: 0,
     has_applied: true,
     last_active: "2024-01-02T00:00:00Z",
     is_mock: true,
@@ -50,12 +51,12 @@ const MOCK_USERS: Omit<LeaderboardEntry, 'rank'>[] = [
   {
     id: "mock-3",
     name: "James Johnson", 
-    points: 1000,
+    points: 45,
     avatar_url: "/asian-male-officer-headshot.png",
-    badges: 5,
-    participation_count: 1000,
-    badge_count: 5,
-    nft_count: 2,
+    badges: 1,
+    participation_count: 45,
+    badge_count: 1,
+    nft_count: 0,
     has_applied: false,
     last_active: "2024-01-03T00:00:00Z",
     is_mock: true,
@@ -63,12 +64,12 @@ const MOCK_USERS: Omit<LeaderboardEntry, 'rank'>[] = [
   {
     id: "mock-4",
     name: "Sarah Brown",
-    points: 800,
+    points: 35,
     avatar_url: "/female-law-enforcement-headshot.png",
-    badges: 4,
-    participation_count: 800,
-    badge_count: 4,
-    nft_count: 1,
+    badges: 1,
+    participation_count: 35,
+    badge_count: 1,
+    nft_count: 0,
     has_applied: true,
     last_active: "2024-01-04T00:00:00Z",
     is_mock: true,
@@ -76,12 +77,12 @@ const MOCK_USERS: Omit<LeaderboardEntry, 'rank'>[] = [
   {
     id: "mock-5",
     name: "Michael Jones",
-    points: 600,
+    points: 25,
     avatar_url: "/male-law-enforcement-headshot.png",
-    badges: 3,
-    participation_count: 600,
-    badge_count: 3,
-    nft_count: 1,
+    badges: 1,
+    participation_count: 25,
+    badge_count: 1,
+    nft_count: 0,
     has_applied: false,
     last_active: "2024-01-05T00:00:00Z",
     is_mock: true,
@@ -100,7 +101,7 @@ export async function GET(request: Request) {
 
     const supabase = getServiceSupabase();
     
-    // Fetch real users from the database
+    // Fetch real users from the database with badge integration
     let query = supabase
       .from("users")
       .select(`
@@ -110,7 +111,8 @@ export async function GET(request: Request) {
         participation_count,
         has_applied,
         created_at,
-        updated_at
+        updated_at,
+        total_points
       `)
       .not("participation_count", "is", null)
       .gte("participation_count", 1); // Only users with at least 1 point
@@ -142,8 +144,9 @@ export async function GET(request: Request) {
       query = query.gte("updated_at", dateFilter.toISOString());
     }
 
-    // Order by participation count
-    query = query.order("participation_count", { ascending: false });
+    // Order by total points or participation count
+    const orderColumn = category === 'badges' ? 'total_points' : 'participation_count';
+    query = query.order(orderColumn, { ascending: false });
 
     const { data: realUsers, error } = await query;
 
@@ -172,22 +175,47 @@ export async function GET(request: Request) {
       });
     }
 
-    // Transform real users to leaderboard format
-    const transformedRealUsers: LeaderboardEntry[] = (realUsers || []).map((user, index) => ({
-      id: user.id,
-      name: user.name || user.email?.split('@')[0] || 'Anonymous User',
-      points: user.participation_count || 0,
-      participation_count: user.participation_count || 0,
-      badge_count: Math.floor((user.participation_count || 0) / 100), // Estimated badges
-      nft_count: Math.floor((user.participation_count || 0) / 500), // Estimated NFTs
-      has_applied: user.has_applied || false,
-      avatar_url: null, // Real users don't have avatars set yet
-      badges: Math.floor((user.participation_count || 0) / 100),
-      last_active: user.updated_at || user.created_at || new Date().toISOString(),
-      rank: index + 1,
-      email: user.email,
-      is_mock: false,
-    }));
+    // Transform real users to leaderboard format with badge integration
+    const transformedRealUsers: LeaderboardEntry[] = await Promise.all(
+      (realUsers || []).map(async (user, index) => {
+        // Fetch user's badge count from the live badge system
+        let realBadgeCount = 0;
+        let totalBadgePoints = 0;
+        
+        try {
+          const badgeResponse = await supabase
+            .from('user_badges')
+            .select('points_awarded')
+            .eq('user_id', user.id);
+            
+          if (badgeResponse.data) {
+            realBadgeCount = badgeResponse.data.length;
+            totalBadgePoints = badgeResponse.data.reduce((sum, badge) => sum + (badge.points_awarded || 0), 0);
+          }
+        } catch (badgeError) {
+          console.warn('Could not fetch badge data for user:', user.id);
+        }
+
+        // Calculate total points: participation + badge points
+        const totalPoints = (user.total_points || user.participation_count || 0) + totalBadgePoints;
+
+        return {
+          id: user.id,
+          name: user.name || user.email?.split('@')[0] || 'Anonymous User',
+          points: totalPoints,
+          participation_count: user.participation_count || 0,
+          badge_count: realBadgeCount,
+          nft_count: Math.floor(totalPoints / 500), // Estimated NFTs based on total points
+          has_applied: user.has_applied || false,
+          avatar_url: null, // Real users don't have avatars set yet
+          badges: realBadgeCount,
+          last_active: user.updated_at || user.created_at || new Date().toISOString(),
+          rank: index + 1,
+          email: user.email,
+          is_mock: false,
+        };
+      })
+    );
 
     // Combine real users with mock users if we don't have enough real users
     let allUsers: LeaderboardEntry[] = [...transformedRealUsers];
@@ -196,15 +224,15 @@ export async function GET(request: Request) {
     const mockUsersToAdd = MOCK_USERS.filter(mockUser => {
       // Only add mock users if their score would fit naturally in the ranking
       const lowestRealUserScore = transformedRealUsers.length > 0 
-        ? transformedRealUsers[transformedRealUsers.length - 1].participation_count 
+        ? transformedRealUsers[transformedRealUsers.length - 1].points 
         : 0;
-      return mockUser.participation_count > lowestRealUserScore || transformedRealUsers.length < 3;
+      return mockUser.points > lowestRealUserScore || transformedRealUsers.length < 3;
     });
 
     // Insert mock users at appropriate positions based on their scores
     mockUsersToAdd.forEach(mockUser => {
       const mockUserEntry: LeaderboardEntry = { ...mockUser, rank: 0 };
-      const insertIndex = allUsers.findIndex(user => user.participation_count < mockUser.participation_count);
+      const insertIndex = allUsers.findIndex(user => user.points < mockUser.points);
       
       if (insertIndex === -1) {
         allUsers.push(mockUserEntry);
