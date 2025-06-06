@@ -270,74 +270,75 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       )}
     >
       {/* Top bar */}
-      <div className="bg-[#0A3C1F] dark:bg-black text-white dark:text-[#FFD700] py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center space-x-4">
-            <span className="text-xs sm:text-sm">
-              🌟 Start Your Hero Journey - Become a San Francisco Deputy Sheriff Today! 🌟
-            </span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="hidden md:block">
-              <AskSgtKenButton 
-                variant="ghost" 
-                className="bg-[#0A3C1F] text-white border-2 border-[#FFD700] hover:bg-[#FFD700] hover:text-[#0A3C1F] px-3 py-1 rounded-md font-semibold text-sm transition-all duration-200"
-              />
+      <div className="bg-[#0A3C1F] dark:bg-black text-white dark:text-[#FFD700] py-1 sm:py-2">
+        <div className="container mx-auto px-4">
+          <div className="flex justify-between items-center">
+            {/* Mobile: Just the tagline, no extra space */}
+            <div className="flex-1 min-w-0 md:flex md:items-center md:space-x-4">
+              <span className="text-xs sm:text-sm whitespace-nowrap overflow-hidden text-ellipsis block">
+                🌟 Start Your Hero Journey - Become a San Francisco Deputy Sheriff Today! 🌟
+              </span>
             </div>
-            <div className="md:hidden">
-              <AskSgtKenButton 
-                variant="ghost" 
-                size="sm"
-                className="bg-[#0A3C1F] text-white border-2 border-[#FFD700] hover:bg-[#FFD700] hover:text-[#0A3C1F] px-2 py-1 rounded-md font-semibold text-xs transition-all duration-200"
-              />
-            </div>
-            <div className="flex items-center space-x-3">
-              <a
-                href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook"
-                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              >
-                <Facebook size={16} />
-              </a>
-              <a
-                href="https://twitter.com/sanfranciscodsa"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Twitter"
-                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              >
-                <Twitter size={16} />
-              </a>
-              <a
-                href="https://www.youtube.com/channel/UCgyW7q86c-Mua4bS1a9wBWA"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="YouTube"
-                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              >
-                <Youtube size={16} />
-              </a>
-              <a
-                href="https://www.instagram.com/sfdeputysheriffsassociation/"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram"
-                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              >
-                <Instagram size={16} />
-              </a>
-              <a
-                href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs%E2%80%99-association"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="LinkedIn"
-                className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
-              >
-                <Linkedin size={16} />
-              </a>
-              <ThemeToggle />
+            {/* Social and actions - hide some on mobile */}
+            <div className="flex items-center space-x-2 sm:space-x-4 ml-2">
+              {/* Hide Ask Sgt Ken button on mobile to save space */}
+              <div className="hidden sm:block">
+                <AskSgtKenButton 
+                  variant="ghost" 
+                  className="bg-[#0A3C1F] text-white border-2 border-[#FFD700] hover:bg-[#FFD700] hover:text-[#0A3C1F] px-3 py-1 rounded-md font-semibold text-sm transition-all duration-200"
+                />
+              </div>
+              {/* Social icons - hide some on mobile */}
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <a
+                  href="https://www.facebook.com/SanFranciscoDeputySheriffsAssociation"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+                >
+                  <Facebook size={14} className="sm:w-4 sm:h-4" />
+                </a>
+                <a
+                  href="https://twitter.com/sanfranciscodsa"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Twitter"
+                  className="hidden xs:block text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+                >
+                  <Twitter size={14} className="sm:w-4 sm:h-4" />
+                </a>
+                <a
+                  href="https://www.youtube.com/channel/UCgyW7q86c-Mua4bS1a9wBWA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="hidden sm:block text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+                >
+                  <Youtube size={14} className="sm:w-4 sm:h-4" />
+                </a>
+                <a
+                  href="https://www.instagram.com/sfdeputysheriffsassociation/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="hidden sm:block text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+                >
+                  <Instagram size={14} className="sm:w-4 sm:h-4" />
+                </a>
+                <a
+                  href="https://www.linkedin.com/company/san-francisco-deputy-sheriffs%E2%80%99-association"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="LinkedIn"
+                  className="hidden md:block text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200"
+                >
+                  <Linkedin size={14} className="sm:w-4 sm:h-4" />
+                </a>
+                <div className="hidden sm:block">
+                  <ThemeToggle />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -346,7 +347,7 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       {/* Main navigation */}
       <div
         className={cn(
-          "py-4 transition-colors duration-200",
+          "py-3 sm:py-4 transition-colors duration-200",
           scrolled
             ? "bg-white dark:bg-black"
             : "bg-white/0 dark:bg-transparent",
@@ -358,8 +359,8 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               href="/"
               className="flex items-center space-x-2 group transition-transform duration-200 hover:scale-105"
             >
-              <ShieldLogo className="w-8 h-8" />
-              <span className="text-xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+              <ShieldLogo className="w-6 h-6 sm:w-8 sm:h-8" />
+              <span className="text-lg sm:text-xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
                 SFDSA
               </span>
             </Link>
@@ -433,20 +434,20 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               )}
             </div>
 
-            {/* Mobile menu button */}
-            <div className="flex items-center space-x-4 md:hidden">
+            {/* Mobile menu button - Make it VERY visible */}
+            <div className="flex items-center space-x-2 md:hidden">
               <Button
-                variant="ghost"
+                variant="outline"
                 size="icon"
                 onClick={toggleMobileMenu}
-                className="text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/10 dark:hover:bg-[#FFD700]/10 p-2 rounded-lg"
+                className="text-[#0A3C1F] dark:text-[#FFD700] border-2 border-[#0A3C1F] dark:border-[#FFD700] hover:bg-[#0A3C1F] hover:text-white dark:hover:bg-[#FFD700] dark:hover:text-black bg-white dark:bg-black shadow-lg"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"
               >
                 {isMobileMenuOpen ? (
-                  <X className="w-6 h-6" />
+                  <X className="w-5 h-5" />
                 ) : (
-                  <Menu className="w-6 h-6" />
+                  <Menu className="w-5 h-5" />
                 )}
               </Button>
             </div>
@@ -458,19 +459,19 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       {isMobileMenuOpen && (
         <div
           id="mobile-menu"
-          className="md:hidden fixed inset-0 top-[120px] bottom-0 z-[9999] overflow-y-auto"
+          className="md:hidden fixed inset-0 top-[90px] bottom-0 z-[9999] overflow-y-auto"
           role="dialog"
           aria-modal="true"
           aria-label="Mobile navigation menu"
         >
           {/* Mobile menu backdrop */}
           <div 
-            className="absolute inset-0 bg-black/50 z-[9998]"
+            className="absolute inset-0 bg-black/75 z-[9998]"
             onClick={() => setIsMobileMenuOpen(false)}
           />
           
           {/* Mobile menu content */}
-          <div className="relative z-[9999] bg-white dark:bg-black min-h-full shadow-2xl">
+          <div className="relative z-[9999] bg-white dark:bg-black min-h-full shadow-2xl border-t-4 border-[#0A3C1F] dark:border-[#FFD700]">
             <div className="container mx-auto px-4 py-6">
               {Object.values(mainNavItems).map((section) => (
                 <div key={section.label} className="mb-6">

@@ -6,7 +6,7 @@ import { UserProvider } from "@/context/user-context";
 import { RegistrationProvider } from "@/context/registration-context";
 import { AuthModalProvider } from "@/context/auth-modal-context";
 import { ImprovedHeader } from "@/components/improved-header";
-import { ImprovedFooter } from "@/components/improved-footer";
+import { MobileOptimizedFooter } from "@/components/mobile-optimized-footer";
 import { UnifiedAuthModal } from "@/components/unified-auth-modal";
 import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler";
@@ -84,11 +84,11 @@ export default function RootLayout({
                         <ImprovedHeader />
                         <main
                           id="main-content"
-                          className="flex-1 pt-16 pb-12 bg-background dark:bg-black w-full"
+                          className="flex-1 pt-20 sm:pt-24 md:pt-28 pb-12 bg-background dark:bg-black w-full"
                         >
                           {children}
                         </main>
-                        <ImprovedFooter />
+                        <MobileOptimizedFooter />
                         <div className="hidden md:block fixed right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col space-y-4">
                           <AskSgtKenButton 
                             position="fixed" 

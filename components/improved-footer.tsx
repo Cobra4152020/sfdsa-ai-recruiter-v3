@@ -23,7 +23,7 @@ export function ImprovedFooter() {
   if (!mounted) {
     return (
       <footer className="bg-[#0A3C1F] text-white">
-        <div className="container mx-auto px-4 py-12">
+        <div className="container mx-auto px-4 py-4 md:py-12">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
             <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8">
               <div className="w-32 h-8 bg-gray-700 animate-pulse rounded" />
@@ -87,29 +87,29 @@ export function ImprovedFooter() {
       role="contentinfo"
       aria-label="Site footer"
     >
-      <div className="container mx-auto px-4 py-12">
-        {/* Brand Section */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between mb-12 space-y-6 md:space-y-0">
-          <div className="flex flex-col md:flex-row md:items-center space-y-4 md:space-y-0 md:space-x-8">
+      <div className="container mx-auto px-4 py-3 md:py-12">
+        {/* Brand Section - Compact on mobile */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between mb-4 md:mb-12 space-y-3 md:space-y-0">
+          <div className="flex flex-col md:flex-row md:items-center space-y-2 md:space-y-0 md:space-x-8">
             <button
               onClick={() => handleNavigation("/")}
               className="flex items-center group transition-transform duration-200 hover:scale-105"
               aria-label="Go to homepage"
             >
               <div className="mr-2 text-[#FFD700]">
-                <ShieldLogo className="w-8 h-8" />
+                <ShieldLogo className="w-6 h-6 md:w-8 md:h-8" />
               </div>
               <div>
-                <div className="font-bold">SF Deputy Sheriff</div>
-                <div className="text-[#FFD700] text-sm">AI Recruitment</div>
+                <div className="font-bold text-sm md:text-base">SF Deputy Sheriff</div>
+                <div className="text-[#FFD700] text-xs md:text-sm">AI Recruitment</div>
               </div>
             </button>
-            <p className="text-sm text-white/80 max-w-md">
+            <p className="text-xs md:text-sm text-white/80 max-w-md hidden md:block">
               Serving the City and County of San Francisco with honor,
               integrity, and commitment to public safety.
             </p>
           </div>
-          <div className="flex space-x-4 justify-center md:justify-end">
+          <div className="flex space-x-3 md:space-x-4 justify-center md:justify-end">
             {[
               {
                 href: "https://www.facebook.com/SFDeputySheriff",
