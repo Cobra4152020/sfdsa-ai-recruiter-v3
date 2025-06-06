@@ -229,8 +229,8 @@ export default function TriviaHubPage() {
                         <h3 className="font-semibold">Your Trivia Progress</h3>
                         <p className="text-sm text-gray-500">
                           {Object.keys(gameHistory).length > 0
-                            ? `You&apos;ve played ${Object.keys(gameHistory).length} out of ${triviaGames.length} games.`
-                            : "You haven&apos;t played any games yet. Start playing to track your progress!"}
+                            ? `You've played ${Object.keys(gameHistory).length} out of ${triviaGames.length} games.`
+                            : "You haven't played any games yet. Start playing to track your progress!"}
                         </p>
                         <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                           <div
@@ -247,6 +247,31 @@ export default function TriviaHubPage() {
               )}
             </div>
           </div>
+          
+          {/* Quick Stats */}
+          <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-4 mb-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+              <div>
+                <div className="text-2xl font-bold text-[#0A3C1F]">{triviaGames.length}</div>
+                <div className="text-sm text-gray-600">Games Available</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-[#0A3C1F]">
+                  {triviaGames.reduce((total, game) => total + 8, 0)}
+                </div>
+                <div className="text-sm text-gray-600">Total Questions</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-[#0A3C1F]">60-120</div>
+                <div className="text-sm text-gray-600">Points Per Game</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-[#0A3C1F]">🏆</div>
+                <div className="text-sm text-gray-600">Badges Available</div>
+              </div>
+            </div>
+          </div>
+          
           <p className="text-lg text-gray-600 max-w-3xl mx-auto text-center">
             Test your knowledge about San Francisco with these fun trivia games
             hosted by Sgt. Ken. Earn points, badges, and climb the leaderboard!

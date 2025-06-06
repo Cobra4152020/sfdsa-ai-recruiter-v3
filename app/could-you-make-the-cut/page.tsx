@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { PageWrapper } from "@/components/page-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -57,10 +58,23 @@ export default function CouldYouMakeTheCutPage() {
 
   // Auto-complete when time runs out
   useEffect(() => {
-    if (gameState.timeRemaining === 0 && !gameState.isComplete) {
+    if (gameState.timeRemaining === 0 && !gameState.isComplete && hasStarted) {
+      const finalAnswers = [...gameState.answers];
+      
+      // Fill in remaining answers with -1 (no answer)
+      while (finalAnswers.length < gameScenarios.length) {
+        finalAnswers.push(-1);
+      }
+      
+      setGameState(prev => ({
+        ...prev,
+        answers: finalAnswers,
+        isComplete: true,
+      }));
+      
       completeGame();
     }
-  }, [gameState.timeRemaining]);
+  }, [gameState.timeRemaining, gameState.isComplete, hasStarted]);
 
   const startGame = () => {
     setHasStarted(true);
@@ -107,18 +121,97 @@ export default function CouldYouMakeTheCutPage() {
     }
   };
 
-  const completeGame = () => {
+  const completeGame = async () => {
     setShowResults(true);
     
     // Award points to user if logged in
-    if (currentUser) {
-      const finalScore = Math.round((gameState.score / 100) * 100);
-      // You can integrate with your points system here
+    if (currentUser?.id) {
+      const finalScore = gameState.score;
+      const percentage = Math.round((finalScore / (gameScenarios.length * 10)) * 100);
+      const timeBonus = Math.max(0, Math.floor((600 - (600 - gameState.timeRemaining)) / 60) * 5); // 5 points per minute saved
+      const totalPoints = finalScore + timeBonus;
+      
+      // Award live points
+      await awardLivePoints(currentUser.id, totalPoints, percentage);
+      
       toast({
         title: "Game Complete!",
-        description: `You scored ${finalScore}% and earned points!`,
+        description: `You scored ${percentage}% and earned ${totalPoints} points! ${timeBonus > 0 ? `(+${timeBonus} time bonus)` : ''}`,
         variant: "default",
       });
+      
+      // Award badges based on performance
+      if (percentage >= 90) {
+        await awardPerformanceBadge(currentUser.id, 'expert-level');
+      } else if (percentage >= 80) {
+        await awardPerformanceBadge(currentUser.id, 'hard-charger');
+      } else if (percentage >= 70) {
+        await awardPerformanceBadge(currentUser.id, 'frequent-user');
+      }
+    }
+  };
+
+  // Award points to live user system
+  const awardLivePoints = async (userId: string, points: number, percentage: number) => {
+    try {
+      const response = await fetch('/api/demo-user-points', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          action: 'deputy_skills_test',
+          points,
+          gameDetails: {
+            score: gameState.score,
+            percentage,
+            timeUsed: 600 - gameState.timeRemaining,
+            totalQuestions: gameScenarios.length,
+            date: new Date().toISOString(),
+          }
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Live points awarded:', result);
+      }
+    } catch (error) {
+      console.error('Failed to award live points:', error);
+    }
+  };
+
+  // Award performance badge for high scores
+  const awardPerformanceBadge = async (userId: string, badgeType: string) => {
+    try {
+      const response = await fetch('/api/badges', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          badgeType,
+          source: 'deputy_skills_challenge',
+        }),
+      });
+
+      if (response.ok) {
+        const badgeNames = {
+          'expert-level': 'Elite Performer',
+          'hard-charger': 'Deputy Material', 
+          'frequent-user': 'Academy Ready'
+        };
+        
+        toast({
+          title: "🏅 Badge Earned!",
+          description: `Outstanding! You've earned the ${badgeNames[badgeType as keyof typeof badgeNames]} badge for your exceptional performance!`,
+          duration: 6000,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to award performance badge:', error);
     }
   };
 
@@ -145,6 +238,25 @@ export default function CouldYouMakeTheCutPage() {
   const currentScenario = gameScenarios[gameState.currentQuestion];
   const progress = ((gameState.currentQuestion) / gameScenarios.length) * 100;
 
+  // Safety check for missing scenarios
+  if (hasStarted && !currentScenario && !gameState.isComplete) {
+    return (
+      <PageWrapper>
+        <Card className="text-center">
+          <CardContent className="p-8">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Challenge</h2>
+            <p className="text-gray-600 mb-4">
+              Sorry, there was an issue loading the challenge scenarios. Please try refreshing the page.
+            </p>
+            <Button onClick={() => window.location.reload()}>
+              Refresh Page
+            </Button>
+          </CardContent>
+        </Card>
+      </PageWrapper>
+    );
+  }
+
   if (showResults) {
     return (
       <GameResults
@@ -158,7 +270,7 @@ export default function CouldYouMakeTheCutPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <PageWrapper>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -324,6 +436,6 @@ export default function CouldYouMakeTheCutPage() {
           </div>
         )}
       </motion.div>
-    </div>
+    </PageWrapper>
   );
 } 

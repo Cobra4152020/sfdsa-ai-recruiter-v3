@@ -14,42 +14,42 @@ interface TopRecruit {
   badges: number;
 }
 
-// Sample data to use as fallback
+// Sample data to use as fallback - reduced scores so real users can easily replace them
 const sampleRecruits = [
   {
     id: 1,
     name: "Michael Chen",
     title: "Top Applicant",
-    points: 1250,
-    badges: 8,
+    points: 85,
+    badges: 2,
   },
   {
     id: 2,
     name: "Sarah Johnson",
     title: "Rising Star",
-    points: 1180,
-    badges: 7,
+    points: 65,
+    badges: 2,
   },
   {
     id: 3,
     name: "David Rodriguez",
     title: "Dedicated Recruit",
-    points: 1050,
-    badges: 6,
+    points: 45,
+    badges: 1,
   },
   {
     id: 4,
     name: "Jessica Williams",
     title: "Community Leader",
-    points: 980,
-    badges: 5,
+    points: 35,
+    badges: 1,
   },
   {
     id: 5,
     name: "Robert Kim",
     title: "Engaged Applicant",
-    points: 920,
-    badges: 5,
+    points: 25,
+    badges: 1,
   },
   {
     id: 6,

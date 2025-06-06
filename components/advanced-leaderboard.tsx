@@ -121,30 +121,28 @@ export function AdvancedLeaderboard({
   // Use the current user ID from context if not provided as prop
   const effectiveCurrentUserId = currentUserId || currentUser?.id;
 
-  // Generate mock data - remove dependency array to prevent re-renders
+  // Generate minimal mock data with low scores for easy replacement by real users
   const generateMockData = useCallback(() => {
     const names = [
-      "John Smith", "Maria Garcia", "James Johnson", "David Williams", "Sarah Brown",
-      "Michael Jones", "Jessica Miller", "Robert Davis", "Jennifer Wilson", "Thomas Moore",
-      "Lisa Taylor", "Daniel Anderson", "Patricia Thomas", "Christopher Jackson", "Margaret White",
-      "Richard Martinez", "Linda Rodriguez", "Matthew Wilson", "Elizabeth Lewis", "Mark Thompson",
-      "Nancy Walker", "Steven Clark", "Karen Hall", "Paul Allen", "Betty Young",
-      "Andrew Hernandez", "Helen King", "Joshua Wright", "Carol Lopez", "Kenneth Hill",
-      "Donna Scott", "Anthony Green", "Emily Adams", "Brian Baker", "Michelle Nelson",
-      "Ronald Carter", "Ashley Mitchell", "Kevin Perez", "Amanda Roberts", "Ryan Turner",
-      "Sharon Phillips", "Jason Campbell", "Deborah Parker", "Jacob Evans", "Kimberly Edwards",
-      "Gary Collins", "Lisa Stewart", "Nicholas Sanchez", "Mary Morris", "Eric Rogers"
+      "John Smith", 
+      "Maria Garcia", 
+      "James Johnson", 
+      "Sarah Brown",
+      "Michael Jones"
     ];
 
-    // Generate a full dataset of 50 users, then apply pagination in fetchData
-    const fullDataset = Array.from({ length: 50 }, (_, i) => {
+    // Much lower scores (matching our leaderboard API) so real users can easily surpass them
+    const baseScores = [85, 65, 45, 35, 25];
+
+    // Generate only 5 mock users instead of 50
+    const fullDataset = Array.from({ length: 5 }, (_, i) => {
       const isCurrentUser = !!(currentUserId && i === 2); // Always boolean
-      const randomLikes = Math.floor(Math.random() * 50) + 5;
-      const randomShares = Math.floor(Math.random() * 20) + 2;
-      const randomReferrals = Math.floor(Math.random() * 10);
+      const randomLikes = Math.floor(Math.random() * 15) + 2; // Lower likes
+      const randomShares = Math.floor(Math.random() * 8) + 1; // Lower shares
+      const randomReferrals = Math.floor(Math.random() * 3); // Lower referrals
       const randomProgress = {
         total: 100,
-        current: Math.floor(Math.random() * 100) + 1,
+        current: Math.floor(Math.random() * 40) + 10, // Lower progress
         label: ["Next Rank", "Next Badge", "Level Up"][
           Math.floor(Math.random() * 3)
         ],
@@ -156,12 +154,12 @@ export function AdvancedLeaderboard({
       const avatarUrl = AVATAR_MAPPING[i % 5];
 
       return {
-        id: `user-${i + 1}`,
-        name: names[i % names.length], // Cycle through names if we have more users than names
-        participation_count: Math.floor(Math.random() * 1000) + 100,
-        badge_count: Math.floor(Math.random() * 5),
-        nft_count: Math.floor(Math.random() * 3),
-        has_applied: Math.random() > 0.7,
+        id: `mock-user-${i + 1}`,
+        name: names[i],
+        participation_count: baseScores[i],
+        badge_count: Math.floor(baseScores[i] / 30), // 1-2 badges max
+        nft_count: Math.floor(baseScores[i] / 80), // 0-1 NFTs max
+        has_applied: i < 3, // Only first 3 have applied
         avatar_url: avatarUrl,
         is_current_user: isCurrentUser, // Always boolean
         rank: i + 1,
@@ -297,9 +295,9 @@ export function AdvancedLeaderboard({
           has_applied: user.has_applied || false,
           rank: user.rank || (index + 1 + offset),
           is_current_user: user.is_current_user || false,
-          // Add social interaction mock data for now
-          likes: Math.floor(Math.random() * 50) + 5,
-          shares: Math.floor(Math.random() * 20) + 2,
+          // Add social interaction mock data for now (lower values)
+          likes: Math.floor(Math.random() * 15) + 2, // Reduced from 50 to 15
+          shares: Math.floor(Math.random() * 8) + 1,  // Reduced from 20 to 8
           liked_by_user: Math.random() > 0.7,
           shared_by_user: Math.random() > 0.8,
           progress: {
@@ -309,9 +307,9 @@ export function AdvancedLeaderboard({
               Math.floor(Math.random() * 3)
             ],
           },
-          trending: index === 0 || index === 2, // First and third users are trending
+          trending: (user.participation_count || user.points || 0) > 50, // Mark higher scoring users as trending
           spotlight: index === 0, // First user is spotlight
-          referrals: Math.floor(Math.random() * 10),
+          referrals: Math.floor(Math.random() * 3), // Reduced from 10 to 3
           is_mock: user.is_mock || false,
         }));
 

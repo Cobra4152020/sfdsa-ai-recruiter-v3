@@ -1,42 +1,7 @@
-export const dynamic = "force-static";
-export const revalidate = 3600; // Revalidate every hour;
+export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/app/lib/supabase/server";
-
-// Badge types for each game
-const gameBadgeTypes = {
-  "sf-football": {
-    participant: "sf-football-participant",
-    enthusiast: "sf-football-enthusiast",
-    master: "sf-football-master",
-  },
-  "sf-baseball": {
-    participant: "sf-baseball-participant",
-    enthusiast: "sf-baseball-enthusiast",
-    master: "sf-baseball-master",
-  },
-  "sf-basketball": {
-    participant: "sf-basketball-participant",
-    enthusiast: "sf-basketball-enthusiast",
-    master: "sf-basketball-master",
-  },
-  "sf-districts": {
-    participant: "sf-districts-participant",
-    enthusiast: "sf-districts-enthusiast",
-    master: "sf-districts-master",
-  },
-  "sf-tourist-spots": {
-    participant: "sf-tourist-spots-participant",
-    enthusiast: "sf-tourist-spots-enthusiast",
-    master: "sf-tourist-spots-master",
-  },
-  "sf-day-trips": {
-    participant: "sf-day-trips-participant",
-    enthusiast: "sf-day-trips-enthusiast",
-    master: "sf-day-trips-master",
-  },
-};
 
 export async function POST(req: Request) {
   try {
@@ -79,163 +44,101 @@ export async function POST(req: Request) {
       );
     }
 
-    // Calculate points to award
-    // Base points for each correct answer
+    // Calculate points to award based on performance
     const pointsPerQuestion = 10;
-    // Bonus points for completing the game
-    const completionBonus = 50;
-    // Total points
-    const pointsToAward = score * pointsPerQuestion + completionBonus;
+    const completionBonus = 30; // Reduced to match other games
+    const perfectBonus = score === totalQuestions ? 20 : 0; // Extra bonus for perfect score
+    const pointsToAward = (score * pointsPerQuestion) + completionBonus + perfectBonus;
 
-    // Award points to the user
-    const { error: pointsError } = await supabase.from("user_points").insert({
-      user_id: userId,
-      points: pointsToAward,
-      activity: "trivia_game",
-      description: `Completed ${gameId} trivia game with score ${score}/${totalQuestions}`,
-    });
+    // Integrate with our live points system
+    try {
+      const pointsResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3004'}/api/demo-user-points`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          action: 'trivia_game_completion',
+          points: pointsToAward,
+          gameDetails: {
+            gameId,
+            score,
+            totalQuestions,
+            correctAnswers,
+            timeSpent,
+            percentage: Math.round((score / totalQuestions) * 100),
+          }
+        }),
+      });
 
-    if (pointsError) {
-      console.error("Error awarding points:", pointsError);
-      // Continue execution even if points award fails
+      if (!pointsResponse.ok) {
+        console.error('Failed to award live points for trivia');
+      }
+    } catch (pointsError) {
+      console.error('Error awarding live points:', pointsError);
     }
 
-    // Check if user should earn any badges
+    // Check for badge eligibility using our main badge system
     let badgeAwarded = null;
+    const percentage = Math.round((score / totalQuestions) * 100);
 
-    // Get user's previous attempts for this game
-    const { data: attempts, error: attemptsError } = await supabase
-      .from("trivia_attempts")
-      .select("*")
-      .eq("user_id", userId)
-      .eq("game_id", gameId);
+    // Award badges based on performance (using our main badge types)
+    let badgeType = null;
+    if (percentage === 100) {
+      badgeType = 'expert-level'; // Perfect score gets expert badge
+    } else if (percentage >= 80) {
+      badgeType = 'hard-charger'; // High score gets hard charger badge
+    } else if (percentage >= 60) {
+      badgeType = 'frequent-user'; // Decent score gets frequent user badge
+    }
 
-    if (attemptsError) {
-      console.error("Error fetching user attempts:", attemptsError);
-    } else {
-      // Check for participant badge (first attempt)
-      if (attempts.length === 1) {
-        // This is their first attempt, award participant badge
-        const badgeType = gameBadgeTypes[gameId]?.participant;
+    if (badgeType) {
+      try {
+        const badgeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3004'}/api/badges`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            badgeType,
+            source: `trivia_${gameId}`,
+          }),
+        });
 
-        if (badgeType) {
-          const { data: existingBadge, error: badgeCheckError } = await supabase
-            .from("badges")
-            .select("*")
-            .eq("user_id", userId)
-            .eq("badge_type", badgeType)
-            .single();
-
-          if (!badgeCheckError && !existingBadge) {
-            // User doesn't have this badge yet, award it
-            const { data: newBadge, error: badgeError } = await supabase
-              .from("badges")
-              .insert({
-                user_id: userId,
-                badge_type: badgeType,
-                earned_at: new Date().toISOString(),
-              })
-              .select()
-              .single();
-
-            if (!badgeError && newBadge) {
-              badgeAwarded = {
-                id: newBadge.id,
-                badge_type: badgeType,
-                earned_at: newBadge.earned_at,
-              };
-            }
+        if (badgeResponse.ok) {
+          const badgeResult = await badgeResponse.json();
+          if (badgeResult.badge) {
+            badgeAwarded = {
+              id: badgeResult.badge.id,
+              badge_type: badgeType,
+              earned_at: badgeResult.badge.earned_at,
+            };
           }
         }
-      }
-
-      // Check for enthusiast badge (5 attempts)
-      else if (attempts.length === 5) {
-        // This is their fifth attempt, award enthusiast badge
-        const badgeType = gameBadgeTypes[gameId]?.enthusiast;
-
-        if (badgeType) {
-          const { data: existingBadge, error: badgeCheckError } = await supabase
-            .from("badges")
-            .select("*")
-            .eq("user_id", userId)
-            .eq("badge_type", badgeType)
-            .single();
-
-          if (!badgeCheckError && !existingBadge) {
-            // User doesn't have this badge yet, award it
-            const { data: newBadge, error: badgeError } = await supabase
-              .from("badges")
-              .insert({
-                user_id: userId,
-                badge_type: badgeType,
-                earned_at: new Date().toISOString(),
-              })
-              .select()
-              .single();
-
-            if (!badgeError && newBadge) {
-              badgeAwarded = {
-                id: newBadge.id,
-                badge_type: badgeType,
-                earned_at: newBadge.earned_at,
-              };
-            }
-          }
-        }
-      }
-
-      // Check for master badge (3 perfect scores)
-      const perfectScores = attempts.filter(
-        (a) => a.score === a.total_questions,
-      ).length;
-
-      if (score === totalQuestions && perfectScores === 3) {
-        // This is their third perfect score, award master badge
-        const badgeType = gameBadgeTypes[gameId]?.master;
-
-        if (badgeType) {
-          const { data: existingBadge, error: badgeCheckError } = await supabase
-            .from("badges")
-            .select("*")
-            .eq("user_id", userId)
-            .eq("badge_type", badgeType)
-            .single();
-
-          if (!badgeCheckError && !existingBadge) {
-            // User doesn't have this badge yet, award it
-            const { data: newBadge, error: badgeError } = await supabase
-              .from("badges")
-              .insert({
-                user_id: userId,
-                badge_type: badgeType,
-                earned_at: new Date().toISOString(),
-              })
-              .select()
-              .single();
-
-            if (!badgeError && newBadge) {
-              badgeAwarded = {
-                id: newBadge.id,
-                badge_type: badgeType,
-                earned_at: newBadge.earned_at,
-              };
-            }
-          }
-        }
+      } catch (badgeError) {
+        console.error('Error awarding badge:', badgeError);
       }
     }
 
+    // Return success response
     return NextResponse.json({
       success: true,
-      message: "Trivia attempt recorded successfully",
+      score,
+      totalQuestions,
       pointsAwarded: pointsToAward,
-      badgeAwarded: badgeAwarded,
+      badgeAwarded,
+      message: `Game completed! Earned ${pointsToAward} points${badgeAwarded ? ' and a badge' : ''}.`,
     });
+
   } catch (error) {
-    console.error("Error in trivia submit API:", error);
+    console.error("Error submitting trivia game:", error);
     return NextResponse.json(
-      { success: false, message: "An error occurred" },
+      {
+        success: false,
+        message: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 },
     );
   }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,8 @@ import {
   Linkedin,
   Instagram,
   Copy,
+  Lightbulb,
+  Flame,
 } from "lucide-react";
 import {
   Dialog,
@@ -93,7 +95,7 @@ interface LetterState {
   status: 'correct' | 'present' | 'absent' | 'empty';
 }
 
-export function SgtKenSaysGame() {
+export default function SgtKenSaysGame() {
   const { currentUser } = useUser();
   const { toast } = useToast();
   
@@ -252,6 +254,11 @@ export function SgtKenSaysGame() {
       newStreak = gameState.streak + 1;
       newTotalWins = gameState.totalWins + 1;
       
+      // Integrate with live points system
+      if (currentUser?.id) {
+        awardLivePoints(currentUser.id, points, newAttempts);
+      }
+      
       // Celebrate with confetti
       confetti({
         particleCount: 100,
@@ -289,6 +296,69 @@ export function SgtKenSaysGame() {
       totalGamesPlayed: newGameStatus !== 'playing' ? prev.totalGamesPlayed + 1 : prev.totalGamesPlayed,
       totalWins: newTotalWins,
     }));
+  };
+
+  // Award points to live user system
+  const awardLivePoints = async (userId: string, points: number, attempts: number) => {
+    try {
+      const response = await fetch('/api/demo-user-points', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          action: 'sgt_ken_game_win',
+          points,
+          gameDetails: {
+            attempts,
+            maxAttempts: gameState.maxAttempts,
+            date: todayDate,
+          }
+        }),
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log('Live points awarded:', result);
+        
+        // Check if user should get a badge for consecutive wins
+        if (gameState.streak + 1 >= 3) {
+          awardStreakBadge(userId, gameState.streak + 1);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to award live points:', error);
+    }
+  };
+
+  // Award streak badge for consistent play
+  const awardStreakBadge = async (userId: string, streak: number) => {
+    try {
+      const badgeType = streak >= 7 ? 'hard-charger' : 'frequent-user';
+      
+      const response = await fetch('/api/badges', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId,
+          badgeType,
+          source: 'sgt_ken_game_streak',
+        }),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "🏅 Badge Earned!",
+          description: `Congratulations! You've earned the ${badgeType === 'hard-charger' ? 'Elite Performer' : 'Platform Explorer'} badge for your winning streak!`,
+          duration: 6000,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to award streak badge:', error);
+    }
   };
 
   // Handle input change
