@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
@@ -47,12 +47,14 @@ export const metadata: Metadata = {
       "Join the San Francisco Deputy Sheriff&apos;s Department and make a difference in your community",
     images: ["/images/twitter-image.jpg"],
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
+};
+
+// Separate viewport export (Next.js 15 requirement)
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export default function RootLayout({
@@ -68,7 +70,6 @@ export default function RootLayout({
           name="description"
           content="San Francisco Deputy Sheriffs' Association AI Recruiter"
         />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <meta name="generator" content="v0.dev" />
       </head>
       <body className={inter.className} suppressHydrationWarning>

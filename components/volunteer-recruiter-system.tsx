@@ -30,9 +30,11 @@ export function VolunteerRecruiterSystem() {
     return <RecruiterOnboarding />;
   }
 
-  // If user exists but may not be verified as volunteer recruiter, show info
-  const isVolunteerRecruiter = currentUser.user_metadata?.is_volunteer_recruiter || 
-                              currentUser.app_metadata?.user_type === "volunteer";
+  // Check if user is an approved volunteer recruiter
+  // Only approved applications should have access
+  const isVolunteerRecruiter = currentUser.user_metadata?.volunteer_status === "approved" || 
+                              currentUser.app_metadata?.user_type === "volunteer" ||
+                              currentUser.user_metadata?.is_volunteer_recruiter === true;
 
   if (!isVolunteerRecruiter) {
     return (

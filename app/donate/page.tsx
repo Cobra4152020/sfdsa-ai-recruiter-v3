@@ -270,10 +270,10 @@ export default function DonatePage() {
                   Contact Support
                 </Button>
               </Link>
-              <Link href="/volunteer-recruiter">
+              <Link href="/volunteer-register">
                 <Button variant="outline" className="w-full justify-start border-blue-300 text-blue-800 hover:bg-blue-200">
                   <Users className="h-4 w-4 mr-2" />
-                  Volunteer Recruiter
+                  Volunteer Application
                 </Button>
               </Link>
             </div>

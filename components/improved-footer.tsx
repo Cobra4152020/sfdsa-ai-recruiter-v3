@@ -187,7 +187,7 @@ export function ImprovedFooter() {
               {[
                 { href: "/trivia", label: "SF Trivia" },
                 { href: "/donor-recognition", label: "Donor Recognition" },
-                { href: "/volunteer-recruiter", label: "Volunteer Recruiter" },
+                { href: "/volunteer-register", label: "Volunteer Application" },
                 { href: "/contact", label: "Contact Support" },
               ].map(({ href, label }) => (
                 <button
