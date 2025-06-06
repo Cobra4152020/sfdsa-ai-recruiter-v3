@@ -27,7 +27,8 @@ async function buildProject() {
 
     // Set environment variables to skip problematic checks
     process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS = "true";
-    process.env.NEXT_PUBLIC_STATIC_BUILD = "true";
+    // Temporarily disable static build to fix API routes issue
+    // process.env.NEXT_PUBLIC_STATIC_BUILD = "true";
     process.env.SKIP_DATABASE_VALIDATION = "true";
     process.env.DISABLE_DB_DURING_BUILD = "true";
 
@@ -38,7 +39,7 @@ async function buildProject() {
       env: {
         ...process.env,
         NEXT_PUBLIC_DISABLE_DATABASE_CHECKS: "true",
-        NEXT_PUBLIC_STATIC_BUILD: "true",
+        // NEXT_PUBLIC_STATIC_BUILD: "true",
         SKIP_DATABASE_VALIDATION: "true",
         DISABLE_DB_DURING_BUILD: "true",
       },

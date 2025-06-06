@@ -1,5 +1,5 @@
-export const dynamic = "force-static";
-export const revalidate = 3600; // Revalidate every hour;
+export const dynamic = "force-dynamic";
+// Remove revalidate for dynamic routes
 
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/app/lib/supabase/server";
@@ -8,16 +8,18 @@ import { getSystemSetting } from "@/lib/system-settings";
 
 export async function POST(request: Request) {
   try {
-    // Get data from the request
-    const {
-      firstName,
-      lastName,
-      email,
-      phone,
-      message,
-      recruiterId,
-      recruiterName,
-    } = await request.json();
+    // Handle FormData for file uploads
+    const formData = await request.formData();
+    
+    // Extract form fields
+    const firstName = formData.get('firstName') as string;
+    const lastName = formData.get('lastName') as string;
+    const email = formData.get('email') as string;
+    const phone = formData.get('phone') as string;
+    const message = formData.get('message') as string;
+    const recruiterId = formData.get('recruiterId') as string;
+    const recruiterName = formData.get('recruiterName') as string;
+    const resumeFile = formData.get('resume') as File | null;
 
     // Validate required fields
     if (!firstName || !lastName || !email) {
@@ -25,6 +27,55 @@ export async function POST(request: Request) {
         { success: false, message: "Missing required fields" },
         { status: 400 },
       );
+    }
+
+    // Handle resume file upload if present
+    let resumeUrl = null;
+    let resumeFileName = null;
+    
+    if (resumeFile && resumeFile.size > 0) {
+      try {
+        const supabase = getServiceSupabase();
+        
+        // Generate unique filename
+        const fileExtension = resumeFile.name.split('.').pop();
+        const uniqueFileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExtension}`;
+        const filePath = `volunteer-resumes/${uniqueFileName}`;
+        
+        // Convert File to ArrayBuffer for upload
+        const fileBuffer = await resumeFile.arrayBuffer();
+        
+        // Upload to Supabase Storage
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('volunteer-documents')
+          .upload(filePath, fileBuffer, {
+            contentType: resumeFile.type,
+            upsert: false
+          });
+
+        if (uploadError) {
+          console.error('Resume upload error:', uploadError);
+          return NextResponse.json(
+            { success: false, message: "Failed to upload resume" },
+            { status: 500 },
+          );
+        }
+
+        // Get public URL for the uploaded file
+        const { data: { publicUrl } } = supabase.storage
+          .from('volunteer-documents')
+          .getPublicUrl(filePath);
+
+        resumeUrl = publicUrl;
+        resumeFileName = resumeFile.name;
+        
+      } catch (uploadError) {
+        console.error('Resume processing error:', uploadError);
+        return NextResponse.json(
+          { success: false, message: "Failed to process resume file" },
+          { status: 500 },
+        );
+      }
     }
 
     // Format personalized message
@@ -45,7 +96,7 @@ export async function POST(request: Request) {
       "no-reply@sfdeputysheriff.com",
     );
 
-    // In a real implementation, we would save this to a database
+    // Save referral to database
     const supabase = getServiceSupabase();
     const { error: dbError } = await supabase
       .from("volunteer_referrals")
@@ -57,6 +108,8 @@ export async function POST(request: Request) {
         status: "contacted",
         tracking_id: trackingId,
         notes: message || "Initial contact from volunteer recruiter program",
+        resume_url: resumeUrl,
+        resume_filename: resumeFileName,
         created_at: new Date().toISOString(),
       });
 
@@ -69,6 +122,9 @@ export async function POST(request: Request) {
     }
 
     // Html email template
+    const resumeSection = resumeUrl ? 
+      `<p><strong>Resume:</strong> The volunteer has provided their resume, which has been forwarded to our recruitment team for review.</p>` : '';
+
     const htmlEmail = `
       <!DOCTYPE html>
       <html>
@@ -78,7 +134,6 @@ export async function POST(request: Request) {
         <style>
           body {
             font-family: Arial, sans-serif;
-
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -129,6 +184,8 @@ export async function POST(request: Request) {
             
             ${formattedMessage}
             
+            ${resumeSection}
+            
             <p>Some of the benefits of joining the San Francisco Sheriff's Department include:</p>
             <ul>
               <li>Competitive starting salary</li>
@@ -159,7 +216,7 @@ export async function POST(request: Request) {
       </html>
     `;
 
-    // Send email
+    // Send email to the volunteer
     try {
       await sendEmail({
         to: email,
@@ -169,19 +226,23 @@ export async function POST(request: Request) {
         replyTo: adminEmail,
       });
 
+      // Prepare admin notification email
+      const adminNotificationHtml = `
+        <h2>New Recruit Referral</h2>
+        <p><strong>Tracking ID:</strong> ${trackingId}</p>
+        <p><strong>Recruit Name:</strong> ${firstName} ${lastName}</p>
+        <p><strong>Recruit Email:</strong> ${email}</p>
+        <p><strong>Recruit Phone:</strong> ${phone || "Not provided"}</p>
+        ${recruiterId ? `<p><strong>Referred by:</strong> ${recruiterName} (ID: ${recruiterId})</p>` : ""}
+        <p><strong>Notes:</strong> ${message || "No additional notes"}</p>
+        ${resumeUrl ? `<p><strong>Resume:</strong> <a href="${resumeUrl}">Download Resume (${resumeFileName})</a></p>` : ""}
+      `;
+
       // Forward the recruit information to the admin email
       await sendEmail({
         to: adminEmail,
-        subject: "New Recruit Referral",
-        html: `
-          <h2>New Recruit Referral</h2>
-          <p><strong>Tracking ID:</strong> ${trackingId}</p>
-          <p><strong>Recruit Name:</strong> ${firstName} ${lastName}</p>
-          <p><strong>Recruit Email:</strong> ${email}</p>
-          <p><strong>Recruit Phone:</strong> ${phone || "Not provided"}</p>
-          ${recruiterId ? `<p><strong>Referred by:</strong> ${recruiterName} (ID: ${recruiterId})</p>` : ""}
-          <p><strong>Notes:</strong> ${message || "No additional notes"}</p>
-        `,
+        subject: "New Recruit Referral" + (resumeFile ? " (with Resume)" : ""),
+        html: adminNotificationHtml,
       });
     } catch (emailError) {
       console.error("Email error:", emailError);
@@ -193,8 +254,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       success: true,
-      message: "Contact email sent successfully",
+      message: "Contact email sent successfully" + (resumeFile ? " with resume attachment" : ""),
       trackingId,
+      resumeUploaded: !!resumeFile,
     });
   } catch (error) {
     console.error("Error in send-contact route:", error);

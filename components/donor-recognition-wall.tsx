@@ -17,6 +17,7 @@ import { Search, Filter, Calendar, Heart, Info, Shield } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { isStaticBuild, safeApiFetch, handleStaticBuildError } from "@/lib/static-build-utils";
 
 type Donor = {
   id: string;
@@ -53,6 +54,21 @@ export function DonorRecognitionWall() {
 
   async function fetchDonors() {
     setIsLoading(true);
+    
+    // Check if we're in a static build - skip API calls
+    const isStaticBuild = process.env.NEXT_PUBLIC_STATIC_BUILD === "true";
+    
+    if (isStaticBuild) {
+      // Use fallback data for static builds
+      const fallbackDonors = generateFallbackDonors();
+      setDonors(fallbackDonors);
+      setFilteredDonors(fallbackDonors);
+      setDataSource("fallback");
+      setSourceInfo({ message: "Using sample data for demonstration" });
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       // Try to fetch from API first
       const response = await fetch(`/api/donors?timeframe=${timeframe}`);

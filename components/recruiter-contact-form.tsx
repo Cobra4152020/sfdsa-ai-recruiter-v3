@@ -15,7 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { CheckCircle, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle, Loader2, AlertCircle, Paperclip, FileText, X } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
@@ -27,6 +27,7 @@ export function RecruiterContactForm() {
     phone: "",
     message: "",
   });
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
@@ -36,6 +37,53 @@ export function RecruiterContactForm() {
   ) => {
     const { name, value } = e.target;
     setFormState((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type (PDF, DOC, DOCX)
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      ];
+      
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a PDF, DOC, or DOCX file.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+      if (file.size > maxSize) {
+        toast({
+          title: "File too large",
+          description: "Please upload a file smaller than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setResumeFile(file);
+      toast({
+        title: "Resume attached",
+        description: `${file.name} has been attached successfully.`,
+      });
+    }
+  };
+
+  const removeResumeFile = () => {
+    setResumeFile(null);
+    // Reset the file input
+    const fileInput = document.getElementById('resume-upload') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,22 +104,22 @@ export function RecruiterContactForm() {
     setSuccessMessage("");
 
     try {
-      // API call to send email
+      // Prepare form data for file upload
+      const formData = new FormData();
+      formData.append('firstName', formState.firstName);
+      formData.append('lastName', formState.lastName);
+      formData.append('email', formState.email);
+      formData.append('phone', formState.phone);
+      formData.append('message', formState.message);
+      
+      if (resumeFile) {
+        formData.append('resume', resumeFile);
+      }
+
+      // API call to send email with resume attachment
       const response = await fetch("/api/volunteer-recruiter/send-contact", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          firstName: formState.firstName,
-          lastName: formState.lastName,
-          email: formState.email,
-          phone: formState.phone,
-          message: formState.message,
-          // Include the recruiter's information
-          // recruiterId: currentUser?.id,
-          // recruiterName: currentUser?.name,
-        }),
+        body: formData, // Send as FormData to handle file upload
       });
 
       const data = await response.json();
@@ -82,7 +130,7 @@ export function RecruiterContactForm() {
 
       // Success
       setSuccessMessage(
-        `Your message has been sent to ${formState.firstName} ${formState.lastName} from our official email address. We've also saved their information to your dashboard.`,
+        `Your message has been sent to ${formState.firstName} ${formState.lastName} from our official email address${resumeFile ? ' with their resume attached' : ''}. We've also saved their information to your dashboard.`,
       );
       setFormState({
         firstName: "",
@@ -91,6 +139,12 @@ export function RecruiterContactForm() {
         phone: "",
         message: "",
       });
+      setResumeFile(null);
+      // Reset file input
+      const fileInput = document.getElementById('resume-upload') as HTMLInputElement;
+      if (fileInput) {
+        fileInput.value = '';
+      }
     } catch (error) {
       console.error("Error sending email:", error);
       setErrorMessage(
@@ -108,8 +162,8 @@ export function RecruiterContactForm() {
           <CardTitle>Contact Potential Recruits</CardTitle>
           <CardDescription>
             Send a personalized email directly from our official email address
-            (email@protectingsanfrancisco.com). The recipient will be
-            automatically added to your dashboard for easy follow-up.
+            (email@protectingsanfrancisco.com). You can also attach the volunteer's resume
+            which will be stored securely and forwarded to the recruitment team.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -208,6 +262,58 @@ export function RecruiterContactForm() {
               />
             </div>
 
+            {/* Resume Upload Section */}
+            <div className="space-y-2">
+              <Label htmlFor="resume-upload">
+                Attach Resume (Optional)
+              </Label>
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-4">
+                {resumeFile ? (
+                  <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
+                    <div className="flex items-center space-x-2">
+                      <FileText className="h-5 w-5 text-blue-600" />
+                      <span className="text-sm font-medium">{resumeFile.name}</span>
+                      <span className="text-xs text-gray-500">
+                        ({(resumeFile.size / 1024 / 1024).toFixed(2)} MB)
+                      </span>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={removeResumeFile}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="text-center">
+                    <Paperclip className="mx-auto h-8 w-8 text-gray-400" />
+                    <div className="mt-2">
+                      <Label
+                        htmlFor="resume-upload"
+                        className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-gray-50 h-10 px-4 py-2"
+                      >
+                        <Paperclip className="h-4 w-4 mr-2" />
+                        Choose Resume File
+                      </Label>
+                      <Input
+                        id="resume-upload"
+                        type="file"
+                        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        onChange={handleResumeUpload}
+                        className="hidden"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      PDF, DOC, or DOCX files up to 5MB
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <Button
               type="submit"
               disabled={isSubmitting}
@@ -219,7 +325,10 @@ export function RecruiterContactForm() {
                   Sending...
                 </>
               ) : (
-                "Send Email & Save Contact"
+                <>
+                  <Paperclip className="mr-2 h-4 w-4" />
+                  Send Email & Save Contact
+                </>
               )}
             </Button>
           </form>
@@ -229,7 +338,8 @@ export function RecruiterContactForm() {
             <p className="mb-2">
               <strong>Note:</strong> The email will be sent from our official
               email address (email@protectingsanfrancisco.com) with your name in
-              the signature to ensure the recipient recognizes the sender.
+              the signature. Any attached resume will be securely stored and
+              forwarded to the recruitment team.
             </p>
             <p>
               All information will be stored securely and used only for
