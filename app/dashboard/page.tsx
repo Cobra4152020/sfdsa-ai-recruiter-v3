@@ -126,6 +126,42 @@ export default function DashboardPage() {
         </Card>
       </div>
 
+      {/* Quick Actions */}
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4 text-[#0A3C1F] dark:text-[#FFD700]">
+          Quick Actions
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <Button
+            onClick={() => router.push("/roadmap")}
+            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+          >
+            View Roadmap
+          </Button>
+          <Button
+            onClick={() => router.push("/daily-briefing")}
+            variant="outline"
+            className="border-[#0A3C1F] text-[#0A3C1F]"
+          >
+            Daily Briefing
+          </Button>
+          <Button
+            onClick={() => router.push("/chat-with-sgt-ken")}
+            variant="outline"
+            className="border-[#0A3C1F] text-[#0A3C1F]"
+          >
+            Chat with Sgt. Ken
+          </Button>
+          <Button
+            onClick={() => router.push("/trivia")}
+            variant="outline"
+            className="border-[#0A3C1F] text-[#0A3C1F]"
+          >
+            Play Trivia
+          </Button>
+        </div>
+      </div>
+
       <Tabs defaultValue="overview">
         <TabsList className="mb-6">
           <TabsTrigger value="overview">Overview</TabsTrigger>

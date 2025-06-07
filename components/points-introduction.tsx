@@ -50,12 +50,19 @@ export function PointsIntroduction() {
           </p>
         </div>
       </div>
-      <div className="mt-8 text-center">
-        <Link href="/deputy-launchpad">
-          <Button className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90">
-            <Rocket className="mr-2 h-4 w-4" /> Visit Deputy Launchpad
-          </Button>
-        </Link>
+      <div className="mt-8 text-center space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto">
+          <Link href="/roadmap">
+            <Button className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 w-full">
+              <Trophy className="mr-2 h-4 w-4" /> View Roadmap
+            </Button>
+          </Link>
+          <Link href="/deputy-launchpad">
+            <Button variant="outline" className="border-[#0A3C1F] text-[#0A3C1F] w-full">
+              <Rocket className="mr-2 h-4 w-4" /> Deputy Launchpad
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

@@ -2,12 +2,10 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-interface CTASectionProps {
-  showOptInForm: (isApplying?: boolean) => void;
-}
-
-export function CTASection({ showOptInForm }: CTASectionProps) {
+export function CTASection() {
+  const router = useRouter();
   return (
     <section className="w-full py-12 md:py-20 bg-[#0A3C1F] text-white">
       <div className="container mx-auto px-4 text-center">
@@ -20,14 +18,14 @@ export function CTASection({ showOptInForm }: CTASectionProps) {
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Button
-            onClick={() => showOptInForm(true)}
+            onClick={() => router.push("/apply")}
             size="lg"
             className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold text-lg px-8"
           >
             Apply Now
           </Button>
           <Button
-            onClick={() => showOptInForm(false)}
+            onClick={() => router.push("/mission-briefing")}
             size="lg"
             variant="outline"
             className="border-2 border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700]/10 font-medium text-lg px-8"

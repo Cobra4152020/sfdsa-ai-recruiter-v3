@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { OptInForm } from "@/components/opt-in-form";
+
 import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { getClientSideSupabase } from "@/lib/supabase";
@@ -208,16 +208,11 @@ export function UnifiedAuthModal() {
     closeModal();
   };
 
-  // If showing the opt-in form, render it directly
+  // If showing the opt-in form, redirect to apply page
   if (showOptIn) {
-    return (
-      <OptInForm
-        onClose={handleOptInClose}
-        isApplying={true}
-        isOpen={isOpen}
-        referralCode={referralCode}
-      />
-    );
+    router.push("/apply");
+    closeModal();
+    return null;
   }
 
   // Otherwise render the auth tabs

@@ -5,40 +5,19 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-interface HeroSectionProps {
-  showOptInForm?: (isApplying?: boolean) => void;
-  onGetStarted?: () => void;
-}
-
-export function HeroSection(
-  { showOptInForm }: HeroSectionProps = {} as HeroSectionProps,
-) {
+export function HeroSection() {
   const router = useRouter();
 
   const handleApplyNow = () => {
-    if (showOptInForm) {
-      showOptInForm(true);
-    } else {
-      console.warn("showOptInForm function not provided");
-      router.push("/apply");
-    }
+    router.push("/apply");
   };
 
   const handleMoreInfo = () => {
-    if (showOptInForm) {
-      showOptInForm(false);
-    } else {
-      console.warn("showOptInForm function not provided");
-      router.push("/about");
-    }
+    router.push("/mission-briefing");
   };
 
   const handleSignUp = () => {
-    if (showOptInForm) {
-      showOptInForm(false);
-    } else {
-      router.push("/register");
-    }
+    router.push("/register");
   };
 
   return (

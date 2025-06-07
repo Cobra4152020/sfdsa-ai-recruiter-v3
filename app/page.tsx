@@ -35,21 +35,10 @@ function HomeContent() {
     );
   }
 
-  const showOptInForm = (applying = false) => {
-    if (!openRegistrationPopup) return;
-    openRegistrationPopup({
-      applying,
-      initialTab: applying ? "optin" : "signin",
-    });
-  };
-
   return (
     <ErrorBoundary>
       <main className="flex-1 w-full">
-        <HeroSection
-          onGetStarted={() => showOptInForm(true)}
-          showOptInForm={showOptInForm}
-        />
+        <HeroSection />
 
         <TopRecruitsScroll />
 
@@ -83,7 +72,7 @@ function HomeContent() {
           <FAQSection />
         </section>
 
-        <CTASection showOptInForm={showOptInForm} />
+        <CTASection />
       </main>
 
       {process.env.NODE_ENV === "development" ||

@@ -31,10 +31,6 @@ import { useClientOnly } from "@/hooks/use-client-only";
 import { getWindowDimensions } from "@/lib/utils";
 import Link from "next/link";
 
-interface ImprovedHeaderProps {
-  showOptInForm?: (isApplying?: boolean) => void;
-}
-
 interface NavItem {
   label: string;
   href: string;
@@ -47,7 +43,7 @@ interface NavSection {
   items: NavItem[];
 }
 
-export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
+export function ImprovedHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const { currentUser } = useUser();
@@ -104,32 +100,17 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
     try {
       if (typeof openModal === "function") {
         openModal("signin", "recruit");
-      } else if (showOptInForm) {
-        showOptInForm(false);
       } else {
-        console.error("Authentication modal is not available");
-        // You could show a toast here if you have access to it
+        router.push("/login");
       }
     } catch (error) {
       console.error("Error opening login modal:", error);
-      // Handle gracefully - could redirect to a login page instead
+      router.push("/login");
     }
   };
 
   const handleApplyNow = () => {
-    try {
-      if (typeof openModal === "function") {
-        openModal("optin", "recruit");
-      } else if (showOptInForm) {
-        showOptInForm(true);
-      } else {
-        console.error("Authentication modal is not available");
-        // You could show a toast here if you have access to it
-      }
-    } catch (error) {
-      console.error("Error opening application modal:", error);
-      // Handle gracefully - could redirect to an application page instead
-    }
+    router.push("/apply");
   };
 
   const mainNavItems: Record<string, NavSection> = {
@@ -146,6 +127,16 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
           label: "Daily Briefing",
           href: "/daily-briefing",
           icon: <BookOpen className="w-4 h-4" />,
+        },
+        {
+          label: "Deputy Roadmap",
+          href: "/roadmap",
+          icon: <Trophy className="w-4 h-4" />,
+        },
+        {
+          label: "Apply Now",
+          href: "/apply",
+          icon: <Shield className="w-4 h-4" />,
         },
         {
           label: "Requirements",
@@ -273,9 +264,15 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
       <div className="bg-[#0A3C1F] dark:bg-black text-white dark:text-[#FFD700] py-1 sm:py-2">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center">
-            {/* Mobile: Just the tagline, no extra space */}
+            {/* Mobile: Two-line tagline for better readability */}
             <div className="flex-1 min-w-0 md:flex md:items-center md:space-x-4">
-              <span className="text-xs sm:text-sm whitespace-nowrap overflow-hidden text-ellipsis block">
+              <div className="block md:hidden">
+                <div className="text-xs leading-tight">
+                  <div>🌟 Start Your Hero Journey</div>
+                  <div>Become a San Francisco Deputy Sheriff Today! 🌟</div>
+                </div>
+              </div>
+              <span className="hidden md:block text-sm whitespace-nowrap overflow-hidden text-ellipsis">
                 🌟 Start Your Hero Journey - Become a San Francisco Deputy Sheriff Today! 🌟
               </span>
             </div>
@@ -434,20 +431,20 @@ export function ImprovedHeader({ showOptInForm }: ImprovedHeaderProps) {
               )}
             </div>
 
-            {/* Mobile menu button - Make it VERY visible */}
+            {/* Mobile menu button - MUCH more visible */}
             <div className="flex items-center space-x-2 md:hidden">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={toggleMobileMenu}
-                className="text-[#0A3C1F] dark:text-[#FFD700] border-2 border-[#0A3C1F] dark:border-[#FFD700] hover:bg-[#0A3C1F] hover:text-white dark:hover:bg-[#FFD700] dark:hover:text-black bg-white dark:bg-black shadow-lg"
+                className="text-[#0A3C1F] dark:text-[#FFD700] border-2 border-[#0A3C1F] dark:border-[#FFD700] hover:bg-[#0A3C1F] hover:text-white dark:hover:bg-[#FFD700] dark:hover:text-black bg-white dark:bg-black shadow-lg w-10 h-10"
                 aria-expanded={isMobileMenuOpen}
                 aria-controls="mobile-menu"
               >
                 {isMobileMenuOpen ? (
-                  <X className="w-5 h-5" />
+                  <X className="w-6 h-6 stroke-[3]" />
                 ) : (
-                  <Menu className="w-5 h-5" />
+                  <Menu className="w-6 h-6 stroke-[3]" />
                 )}
               </Button>
             </div>
