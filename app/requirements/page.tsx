@@ -179,7 +179,7 @@ export default function RequirementsPage() {
               </Badge>
               <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50">
                 <Target className="h-3 w-3 mr-1" />
-                Starting Salary: $116K+
+                                    Starting Salary: $118K+
               </Badge>
             </div>
           </motion.div>

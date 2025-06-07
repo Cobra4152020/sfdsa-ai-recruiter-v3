@@ -7,7 +7,7 @@ import {
   type ReactNode,
   useEffect,
 } from "react";
-import { UnifiedRegistrationPopup } from "@/components/unified-registration-popup";
+
 import { useUser } from "@/context/user-context";
 import { getClientSideSupabase } from "@/lib/supabase/index";
 
@@ -90,19 +90,6 @@ export function RegistrationProvider({ children }: { children: ReactNode }) {
     <RegistrationContext.Provider value={{ openRegistrationPopup }}>
       <div className="min-h-screen">
         {children}
-        <UnifiedRegistrationPopup
-          isOpen={isOpen}
-          onClose={closeRegistrationPopup}
-          requiredPoints={requiredPoints}
-          actionName={actionName}
-          referralCode={referralCode}
-          isApplying={isApplying}
-          userType={userType}
-          callbackUrl={callbackUrl}
-          initialTab={initialTab}
-          title={title}
-          description={description}
-        />
       </div>
     </RegistrationContext.Provider>
   );

@@ -19,7 +19,7 @@ export default function BenefitsClient() {
       title: "Competitive Compensation",
       icon: DollarSign,
       benefits: [
-        "Starting salary range: $84,656 - $102,908 annually",
+        "Starting salary range: $118,768 - $184,362 annually (with incentives)",
         "Regular step increases and cost of living adjustments",
         "Premium pay for special assignments and certifications",
         "Overtime opportunities",
@@ -63,7 +63,7 @@ export default function BenefitsClient() {
       title: "Retirement & Security",
       icon: Shield,
       benefits: [
-        "CalPERS pension plan",
+        "SFERS retirement plan - 3% at 58 formula",
         "Deferred compensation options",
         "Retirement health benefits",
         "Survivor benefits",

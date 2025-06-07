@@ -102,9 +102,9 @@ export async function POST(request: Request) {
       age--;
     }
     
-    if (age < 18) {
+    if (age < 20) {
       return NextResponse.json(
-        { message: "Applicant must be at least 18 years old" },
+        { message: "Applicant must be at least 20 years old" },
         { status: 400 }
       );
     }

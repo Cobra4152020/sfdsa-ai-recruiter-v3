@@ -22,7 +22,7 @@ export function FAQSection() {
       question:
         "What is the starting salary for a San Francisco Deputy Sheriff?",
       answer:
-        "The starting salary range for a San Francisco Deputy Sheriff is $116,428 to $184,362, depending on experience and qualifications. This is complemented by excellent benefits including healthcare, retirement plans, and various allowances.",
+        "The starting salary range for a San Francisco Deputy Sheriff is $118,768 to $184,362 (with incentives), depending on experience and qualifications. This is complemented by excellent benefits including healthcare, retirement plans, and various allowances.",
     },
     {
       question: "How long is the training academy?",

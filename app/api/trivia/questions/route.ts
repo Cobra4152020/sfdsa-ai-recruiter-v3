@@ -45,7 +45,7 @@ const fallbackQuestions: TriviaQuestion[] = [
     question:
       "Which of these is a requirement to become a San Francisco Deputy Sheriff?",
     options: [
-      "Must be at least 18 years old",
+              "Must be at least 20 years old",
       "Must be at least 21 years old",
       "Must be at least 25 years old",
       "Must be at least 30 years old",

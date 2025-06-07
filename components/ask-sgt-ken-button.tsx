@@ -438,15 +438,15 @@ export function AskSgtKenButton({
         // Update salary information to latest figures
         response = response.replace(
           /\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g,
-          "$116,428 to $184,362",
+          "$118,768 to $184,362 (with incentives)",
         );
         response = response.replace(
           /salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g,
-          "salary of $116,428 to $184,362",
+          "salary of $118,768 to $184,362 (with incentives)",
         );
         response = response.replace(
           /salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g,
-          "salary ranges from $116,428 to $184,362",
+          "salary ranges from $118,768 to $184,362 (with incentives)",
         );
 
         // Generate contextual quick replies based on the conversation
@@ -500,9 +500,9 @@ export function AskSgtKenButton({
         
         // Update salary information in fallback response
         const updatedResponse = fallbackResponse
-          .replace(/\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g, "$116,428 to $184,362")
-          .replace(/salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g, "salary of $116,428 to $184,362")
-          .replace(/salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g, "salary ranges from $116,428 to $184,362");
+          .replace(/\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g, "$118,768 to $184,362 (with incentives)")
+          .replace(/salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g, "salary of $118,768 to $184,362 (with incentives)")
+          .replace(/salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g, "salary ranges from $118,768 to $184,362 (with incentives)");
 
         // Add fallback response with enhanced metadata
         const fallbackMessageId = `fallback-${Date.now()}`;

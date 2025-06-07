@@ -36,7 +36,7 @@ export default function AdminLoginPage() {
               <UnifiedLoginForm
                 userType="admin"
                 redirectTo="/admin/dashboard"
-                showSocialLogin={false}
+        
               />
               <div className="text-center text-sm text-muted-foreground">
                 <p>This access is for authorized administrators only.</p>

@@ -128,7 +128,7 @@ export class LoginAuditService {
       affectedRoles: ["recruit", "volunteer"],
       recommendation:
         "Expand social login options to include additional popular providers.",
-      fileReferences: ["components/social-login-buttons.tsx"],
+      fileReferences: [],
     });
   }
 

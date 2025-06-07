@@ -408,7 +408,7 @@ function BenefitsExplainer() {
                 salary packages in law enforcement:
               </p>
               <ul className="list-disc list-inside space-y-1 text-gray-700 dark:text-gray-300">
-                <li>Starting salary range: $116,428 to $184,362 annually</li>
+                                  <li>Starting salary range: $118,768 to $184,362 annually (with incentives)</li>
                 <li>Regular step increases based on years of service</li>
                 <li>Additional pay for specialized assignments and patrol duty</li>
                 <li>Overtime opportunities with premium pay rates</li>
@@ -427,7 +427,7 @@ function BenefitsExplainer() {
               <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
                 <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Health Benefits</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
-                  <li>Comprehensive medical coverage (CalPERS)</li>
+                  <li>Comprehensive medical coverage (SFERS)</li>
                   <li>Dental and vision plans</li>
                   <li>Mental health services and EAP</li>
                   <li>Life insurance coverage</li>
@@ -438,8 +438,8 @@ function BenefitsExplainer() {
               <div className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
                 <h4 className="font-semibold mb-2 text-gray-900 dark:text-[#FFD700]">Retirement Benefits</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-gray-600 dark:text-gray-300">
-                  <li>CalPERS defined benefit pension plan</li>
-                  <li>3% at 50 safety retirement formula</li>
+                  <li>SFERS defined benefit pension plan</li>
+                  <li>3% at 58 retirement formula</li>
                   <li>457 deferred compensation options</li>
                   <li>Retiree health benefits</li>
                   <li>Social Security benefits</li>

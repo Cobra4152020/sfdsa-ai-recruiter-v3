@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
     let fallbackResponse =
       "Hey there! I'm having trouble processing your request right now, but I'm still here to help! ";
     fallbackResponse +=
-      "The San Francisco Sheriff's Department offers rewarding careers with competitive salaries starting at $116,428 to $184,362, excellent benefits, and opportunities for advancement. ";
+      "The San Francisco Sheriff's Department offers rewarding careers with competitive salaries starting at $118,768 to $184,362 (with incentives), excellent benefits, and opportunities for advancement. ";
     fallbackResponse +=
       "Please try asking your question again, or check out sfsheriff.com for more information. What can I help you with?";
 

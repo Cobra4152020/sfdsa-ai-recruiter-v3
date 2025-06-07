@@ -117,7 +117,7 @@ async function sendReferralEmail(recipientEmail: string, recipientName: string, 
             <li>Competitive starting salary ($70,000 - $90,000)</li>
             <li>Excellent health and dental benefits</li>
             <li>Comprehensive paid training program</li>
-            <li>Retirement benefits (CalPERS)</li>
+                              <li>Retirement benefits (SFERS - 3% at 58)</li>
             <li>Career advancement opportunities</li>
             <li>Meaningful work serving our community</li>
           </ul>

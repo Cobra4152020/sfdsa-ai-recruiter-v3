@@ -10,7 +10,7 @@ const knowledgeBase: KnowledgeEntry[] = [
   {
     keywords: ["salary", "pay", "money", "compensation", "earn", "income"],
     response:
-      "The San Francisco Sheriff's Department offers a competitive salary range of $116,428 to $184,362 for Deputy Sheriffs, depending on experience and qualifications. This is complemented by excellent benefits including healthcare, retirement plans, and various allowances. Deputies also have opportunities for overtime and special assignment pay.",
+      "The San Francisco Sheriff's Department offers a competitive salary range of $118,768 to $184,362 for Deputy Sheriffs, depending on experience and qualifications (higher end includes incentives and special assignments). This is complemented by excellent benefits including healthcare, retirement plans, and various allowances. Deputies also have opportunities for overtime and special assignment pay.",
   },
   {
     keywords: ["san francisco", "sf", "city", "area", "location", "about san francisco"],
@@ -20,7 +20,7 @@ const knowledgeBase: KnowledgeEntry[] = [
   {
     keywords: ["cost of living", "expensive", "housing", "rent", "afford", "live in sf"],
     response:
-      "Yes, San Francisco has a high cost of living, particularly housing. However, our Deputy Sheriff salary of $116,428 to $184,362 is designed to be competitive in this market. The department offers housing assistance programs, first-time homebuyer programs, and many deputies live in surrounding areas like Daly City, South San Francisco, or the East Bay where housing is more affordable. The excellent public transit system makes commuting feasible, and many deputies find the salary and benefits make it worth it to work in such an amazing city.",
+      "Yes, San Francisco has a high cost of living, particularly housing. However, our Deputy Sheriff salary of $118,768 to $184,362 (with incentives) is designed to be competitive in this market. The department offers housing assistance programs, first-time homebuyer programs, and many deputies live in surrounding areas like Daly City, South San Francisco, or the East Bay where housing is more affordable. The excellent public transit system makes commuting feasible, and many deputies find the salary and benefits make it worth it to work in such an amazing city.",
   },
   {
     keywords: ["weather", "climate", "temperature", "seasons"],
@@ -85,7 +85,7 @@ const knowledgeBase: KnowledgeEntry[] = [
   {
     keywords: ["benefits", "healthcare", "insurance", "retirement", "pension"],
     response:
-      "San Francisco Deputy Sheriffs receive excellent benefits including comprehensive medical, dental, and vision coverage for themselves and their dependents. The retirement plan allows deputies to retire after 25 years of service with up to 75% of their highest salary. Additional benefits include paid vacation, sick leave, tuition reimbursement, and access to housing assistance programs.",
+      "San Francisco Deputy Sheriffs receive excellent benefits including comprehensive medical, dental, and vision coverage for themselves and their dependents. The SFERS (San Francisco Employees' Retirement System) provides a 3% at 58 retirement formula. Additional benefits include paid vacation, sick leave, tuition reimbursement, and access to housing assistance programs.",
   },
   {
     keywords: ["schedule", "hours", "shifts", "work schedule", "days off"],

@@ -132,10 +132,10 @@ export class WebSearchService {
       // In a real implementation, you would scrape the actual SFSO website
       // For now, we'll return structured current information
       const recruitmentData = {
-        salaryRange: '$116,428 to $184,362 annually',
+        salaryRange: '$118,768 to $184,362 annually (with incentives)',
         benefits: [
           'Comprehensive health, dental, and vision coverage',
-          '25-year retirement plan with up to 75% of highest salary',
+          'SFERS retirement plan - 3% at 58 formula',
           'Paid vacation, sick leave, and family medical leave',
           'Housing assistance programs for SF deputies',
           'Tuition reimbursement for continuing education',
@@ -235,7 +235,7 @@ Last Updated: ${governmentData.lastUpdated}`;
 
 🚔 ACTIVE RECRUITMENT:
 • Deputy Sheriff positions available year-round
-• Competitive salary: $116,428 to $184,362 annually
+• Competitive salary: $118,768 to $184,362 annually (with incentives)
 • Comprehensive benefits package
 • 23-week professional training academy
 

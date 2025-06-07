@@ -11,19 +11,17 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/components/ui/use-toast";
 import { Mail, Lock, Eye, EyeOff, AlertCircle, InfoIcon } from "lucide-react";
-import { SocialLoginButtons } from "@/components/social-login-buttons";
+
 import { getClientSideSupabase } from "@/lib/supabase";
 
 interface UnifiedLoginFormProps {
   userType?: "recruit" | "volunteer" | "admin";
   redirectTo?: string;
-  showSocialLogin?: boolean;
 }
 
 export function UnifiedLoginForm({
   userType = "recruit",
   redirectTo = "/dashboard",
-  showSocialLogin = true,
 }: UnifiedLoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -176,25 +174,7 @@ export function UnifiedLoginForm({
         </Alert>
       )}
 
-      {showSocialLogin && (
-        <>
-          <SocialLoginButtons
-            onLoginStart={() => setError(null)}
-            className="mb-6"
-          />
 
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-white px-2 text-gray-500">
-                Or continue with email
-              </span>
-            </div>
-          </div>
-        </>
-      )}
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-2">

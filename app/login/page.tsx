@@ -36,7 +36,7 @@ export default function LoginPage() {
               <UnifiedLoginForm
                 userType="recruit"
                 redirectTo="/dashboard"
-                showSocialLogin={true}
+        
               />
             </CardContent>
           </Card>

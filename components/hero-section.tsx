@@ -58,7 +58,7 @@ export function HeroSection() {
               <span className="text-[#FFD700] mr-0 sm:mr-2 mb-1 sm:mb-0" aria-hidden="true">
                 ✓
               </span>
-              <span className="text-center sm:text-left">Starting Salary: $116,428</span>
+                              <span className="text-center sm:text-left">Starting Salary: $118,768</span>
             </h2>
             <ul className="space-y-3 sm:space-y-4">
               <li className="flex items-start">

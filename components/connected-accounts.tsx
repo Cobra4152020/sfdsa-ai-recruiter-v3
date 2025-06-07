@@ -12,7 +12,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { SocialProvider } from "@/lib/unified-auth-service";
 import { AlertCircle } from "lucide-react";
-import { SocialLoginButtons } from "@/components/social-login-buttons";
+
 
 interface ConnectedAccountsProps {
   userId: string;
@@ -194,10 +194,9 @@ export function ConnectedAccounts({ userId }: ConnectedAccountsProps) {
             )}
 
             <div className="mt-4">
-              <h4 className="text-sm font-medium mb-2">
-                Connect more accounts
-              </h4>
-              <SocialLoginButtons />
+              <p className="text-sm text-gray-500">
+                Connect more accounts via main authentication
+              </p>
             </div>
           </div>
         )}

@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { SocialShareForPoints } from "@/components/social-share-for-points";
 
 interface ApplicationFormData {
   firstName: string;
@@ -53,7 +54,6 @@ interface ApplicationFormData {
   
   // Qualifications
   hasAssociateDegree: boolean;
-  hasBachelorsDegree: boolean;
   hasLawEnforcementExperience: boolean;
   hasMilitaryExperience: boolean;
   hasCorrectionsExperience: boolean;
@@ -101,7 +101,6 @@ export function DeputySheriffApplicationForm() {
     position: "",
     
     hasAssociateDegree: false,
-    hasBachelorsDegree: false,
     hasLawEnforcementExperience: false,
     hasMilitaryExperience: false,
     hasCorrectionsExperience: false,
@@ -188,7 +187,7 @@ export function DeputySheriffApplicationForm() {
 
   const validateForm = (): boolean => {
     const requiredFields: (keyof ApplicationFormData)[] = [
-      'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'motivation', 'position'
+      'firstName', 'lastName', 'email', 'phone', 'dateOfBirth', 'motivation', 'position', 'address', 'city', 'state', 'zipCode'
     ];
 
     for (const field of requiredFields) {
@@ -251,10 +250,10 @@ export function DeputySheriffApplicationForm() {
       age--;
     }
     
-    if (age < 18) {
+    if (age < 20) {
       toast({
         title: "Age requirement",
-        description: "You must be at least 18 years old to apply for a deputy sheriff position.",
+        description: "You must be at least 20 years old to apply for a deputy sheriff position.",
         variant: "destructive",
       });
       return false;
@@ -344,7 +343,6 @@ export function DeputySheriffApplicationForm() {
   // Count qualifications
   const qualificationCount = [
     formData.hasAssociateDegree,
-    formData.hasBachelorsDegree,
     formData.hasLawEnforcementExperience,
     formData.hasMilitaryExperience,
     formData.hasCorrectionsExperience,
@@ -409,6 +407,15 @@ export function DeputySheriffApplicationForm() {
               <li>If qualified, you'll be guided through the official application process</li>
               <li>Continue engaging with our platform to earn points and prepare for assessments</li>
             </ul>
+          </div>
+
+          {/* Social Sharing for Points */}
+          <div className="space-y-4">
+            <SocialShareForPoints 
+              pointsToEarn={500}
+              shareType="application_submitted"
+              customMessage="Just submitted my application to become a San Francisco Deputy Sheriff! 🚔⭐ Join me in making our community safer. Learn more and apply: https://www.sfdeputysheriff.com/apply #SFSheriff #LawEnforcement #PublicSafety"
+            />
           </div>
 
           <div className="space-y-4">
@@ -574,13 +581,13 @@ export function DeputySheriffApplicationForm() {
                   <SelectItem value="8302">
                     <div className="space-y-1">
                       <div className="font-medium">8302 - Entry-Level Deputy Sheriff</div>
-                      <div className="text-sm text-gray-600">No prior law enforcement experience required • $91,182 - $116,428</div>
+                      <div className="text-sm text-gray-600">No prior law enforcement experience required • $118,768</div>
                     </div>
                   </SelectItem>
                   <SelectItem value="8504">
                     <div className="space-y-1">
                       <div className="font-medium">8504 - Academy Graduate/Lateral Officer</div>
-                      <div className="text-sm text-gray-600">Requires POST certification • $91,182 - $141,362</div>
+                      <div className="text-sm text-gray-600">Requires POST certification • $118,768 - $184,362 (with incentives)</div>
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -610,36 +617,38 @@ export function DeputySheriffApplicationForm() {
             </div>
           </div>
 
-          {/* Address Information (Optional) */}
+          {/* Address Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
               <MapPin className="h-5 w-5 inline mr-2" />
-              Address Information (Optional)
+              Address Information
             </h3>
             
             <div className="space-y-2">
-              <Label htmlFor="address">Street Address</Label>
+              <Label htmlFor="address">Street Address <span className="text-red-500">*</span></Label>
               <Input
                 id="address"
                 value={formData.address}
                 onChange={(e) => handleInputChange('address', e.target.value)}
                 placeholder="123 Main Street"
+                required
               />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="city">City</Label>
+                <Label htmlFor="city">City <span className="text-red-500">*</span></Label>
                 <Input
                   id="city"
                   value={formData.city}
                   onChange={(e) => handleInputChange('city', e.target.value)}
                   placeholder="San Francisco"
+                  required
                 />
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="state">State</Label>
+                <Label htmlFor="state">State <span className="text-red-500">*</span></Label>
                 <Select onValueChange={(value) => handleInputChange('state', value)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select state" />
@@ -654,12 +663,13 @@ export function DeputySheriffApplicationForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="zipCode">ZIP Code</Label>
+                <Label htmlFor="zipCode">ZIP Code <span className="text-red-500">*</span></Label>
                 <Input
                   id="zipCode"
                   value={formData.zipCode}
                   onChange={(e) => handleInputChange('zipCode', e.target.value)}
                   placeholder="94102"
+                  required
                 />
               </div>
             </div>
@@ -673,12 +683,12 @@ export function DeputySheriffApplicationForm() {
                 Qualifications & Experience
               </h3>
               <Badge variant="outline" className="text-[#0A3C1F]">
-                {qualificationCount} selected
+                {qualificationCount === 0 ? "None selected" : `${qualificationCount} selected`}
               </Badge>
             </div>
             
             <p className="text-sm text-gray-600 mb-4">
-              Please check all that apply to you. This helps us understand your background and qualifications.
+              Please check all that apply to you (optional). This helps us understand your background and qualifications.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -694,16 +704,7 @@ export function DeputySheriffApplicationForm() {
                   </Label>
                 </div>
 
-                <div className="flex items-start space-x-3">
-                  <Checkbox
-                    id="hasBachelorsDegree"
-                    checked={formData.hasBachelorsDegree}
-                    onCheckedChange={(checked) => handleInputChange('hasBachelorsDegree', checked as boolean)}
-                  />
-                  <Label htmlFor="hasBachelorsDegree" className="font-medium">
-                    Bachelor's Degree or Higher
-                  </Label>
-                </div>
+
 
                 <div className="flex items-start space-x-3">
                   <Checkbox

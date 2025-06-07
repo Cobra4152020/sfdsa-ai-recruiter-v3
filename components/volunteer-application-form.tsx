@@ -28,6 +28,7 @@ import {
   Briefcase 
 } from "lucide-react";
 import { toast } from "@/components/ui/use-toast";
+import { SocialShareForPoints } from "@/components/social-share-for-points";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface ApplicationFormData {
@@ -255,6 +256,15 @@ export function VolunteerApplicationForm() {
               <li>You'll receive an email notification regarding your application status</li>
               <li>If approved, you'll receive login credentials and access to the volunteer recruiter portal</li>
             </ul>
+          </div>
+
+          {/* Social Sharing for Points */}
+          <div className="space-y-4">
+            <SocialShareForPoints 
+              pointsToEarn={500}
+              shareType="application_submitted"
+              customMessage="Just applied to become a volunteer recruiter for the San Francisco Sheriff's Department! 🚔⭐ Help us build a stronger community. Learn more: https://www.sfdeputysheriff.com #SFSheriff #Volunteer #CommunityService"
+            />
           </div>
 
           <div className="flex justify-center">

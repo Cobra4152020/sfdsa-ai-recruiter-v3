@@ -59,7 +59,7 @@ KNOWLEDGE & FOCUS:
 - Current information about SFSO operations, benefits, and opportunities  
 - San Francisco city/county government and community needs
 - Always stays focused on SF Sheriff's Office (not other agencies)
-- Starting salary: $116,428 to $184,362
+- Starting salary: $118,768 to $184,362 (with incentives)
 - Excellent benefits including housing assistance
 - Academy training is comprehensive and paid
 
@@ -112,7 +112,7 @@ export async function generateChatResponse(
       console.warn('OpenAI client not available. API Key present:', !!process.env.OPENAI_API_KEY);
       console.warn('Environment:', process.env.NODE_ENV);
       return {
-        response: `Hey there! I'm having some technical difficulties connecting to my main systems right now. But let me try to help you with your question: "${userMessage}". What specifically would you like to know about the San Francisco Sheriff's Office? I can tell you from my experience that we offer competitive salaries starting at $116,428 to $184,362, excellent benefits, and comprehensive training. What aspect interests you most?`,
+        response: `Hey there! I'm having some technical difficulties connecting to my main systems right now. But let me try to help you with your question: "${userMessage}". What specifically would you like to know about the San Francisco Sheriff's Office? I can tell you from my experience that we offer competitive salaries starting at $118,768 to $184,362 (with incentives), excellent benefits, and comprehensive training. What aspect interests you most?`,
         success: false,
         error: "OpenAI client not available",
       };

@@ -17,7 +17,7 @@ export function BenefitsSection() {
                 </h3>
               </div>
               <p className="text-sm sm:text-base text-[#0A3C1F]/70">
-                Starting salary ranges from $89,648 to $108,914 annually.
+                Starting salary ranges from $118,768 to $184,362 annually (with incentives).
               </p>
             </div>
             <div className="bg-white rounded-lg shadow-md p-4 sm:p-6 border border-[#0A3C1F]/10 transform transition-all duration-300 hover:scale-[1.02] hover:shadow-lg">

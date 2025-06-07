@@ -31,9 +31,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { getClientSideSupabase } from "@/lib/supabase";
 
-export function UnifiedAuthModal() {
+export function ImprovedAuthModal() {
   const { isOpen, modalType, referralCode, closeModal } = useAuthModal();
-  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signup");
+  const [activeTab, setActiveTab] = useState<"signin" | "signup">("signin");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -54,15 +54,9 @@ export function UnifiedAuthModal() {
 
   useEffect(() => {
     if (isOpen) {
-      if (modalType === "optin") {
-        // Redirect opt-in attempts to apply page
-        router.push("/apply");
-        closeModal();
-        return;
-      }
-      setActiveTab(modalType === "signin" ? "signin" : "signup");
+      setActiveTab(modalType === "signup" ? "signup" : "signin");
     }
-  }, [isOpen, modalType, router, closeModal]);
+  }, [isOpen, modalType]);
 
   if (!mounted) return null;
 
@@ -537,4 +531,4 @@ export function UnifiedAuthModal() {
       </DialogContent>
     </Dialog>
   );
-}
+} 

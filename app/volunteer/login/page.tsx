@@ -36,7 +36,7 @@ export default function VolunteerLoginPage() {
               <UnifiedLoginForm
                 userType="volunteer"
                 redirectTo="/volunteer-dashboard"
-                showSocialLogin={false}
+        
               />
             </CardContent>
           </Card>
