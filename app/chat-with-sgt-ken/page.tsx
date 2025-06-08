@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useMessageHistory } from "@/hooks/use-message-history";
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
 import { PageWrapper } from "@/components/page-wrapper";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
 import { 
   MessageSquare, 
   Bot, 
@@ -32,6 +33,9 @@ interface Message {
   timestamp: string;
   pointsAwarded?: number;
   searchUsed?: boolean;
+  id?: string;
+  isTyping?: boolean;
+  displayedContent?: string;
 }
 
 export default function ChatWithSgtKenPage() {
@@ -44,11 +48,42 @@ export default function ChatWithSgtKenPage() {
   const [error, setError] = useState<string | null>(null);
   const [totalPointsEarned, setTotalPointsEarned] = useState(0);
   const [messageCount, setMessageCount] = useState(0);
+  const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   const { addMessage } = useMessageHistory();
   useScrollToBottom(scrollAreaRef, messages);
+
+  // Typing effect function - slowed down for better readability
+  const startTypingEffect = (messageId: string, content: string, delay: number = 90) => {
+    setTypingMessageId(messageId);
+    let currentIndex = 0;
+    
+    const typeInterval = setInterval(() => {
+      if (currentIndex <= content.length) {
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, displayedContent: content.substring(0, currentIndex) }
+              : msg
+          )
+        );
+        currentIndex++;
+      } else {
+        clearInterval(typeInterval);
+        setTypingMessageId(null);
+        // Mark typing as complete
+        setMessages((prevMessages) =>
+          prevMessages.map((msg) =>
+            msg.id === messageId
+              ? { ...msg, isTyping: false, displayedContent: content }
+              : msg
+          )
+        );
+      }
+    }, delay);
+  };
 
   // Suggested questions for quick start
   const suggestedQuestions = [
@@ -64,7 +99,7 @@ export default function ChatWithSgtKenPage() {
     if (!input.trim()) return;
 
     if (!currentUser) {
-      openModal("signin", "recruit");
+      openModal("signup", "recruit");
       return;
     }
 
@@ -74,6 +109,7 @@ export default function ChatWithSgtKenPage() {
       content: messageText,
       role: "user",
       timestamp: new Date().toISOString(),
+      id: `user-${Date.now()}`,
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
@@ -112,15 +148,24 @@ export default function ChatWithSgtKenPage() {
         throw new Error(data.error || "Unknown error");
       }
 
+      const assistantMessageId = `assistant-${Date.now()}`;
       const botMessage: Message = {
         content: data.message,
         role: "assistant",
         timestamp: new Date().toISOString(),
         pointsAwarded: data.pointsAwarded,
         searchUsed: data.searchUsed,
+        id: assistantMessageId,
+        isTyping: true,
+        displayedContent: "",
       };
       
       setMessages((prevMessages) => [...prevMessages, botMessage]);
+
+      // Start typing effect for the response with a small delay
+      setTimeout(() => {
+        startTypingEffect(assistantMessageId, data.message);
+      }, 300);
       setMessageCount(prev => prev + 1);
 
       // Update points earned
@@ -163,7 +208,12 @@ export default function ChatWithSgtKenPage() {
 
   return (
     <PageWrapper>
-      <div className="container mx-auto px-4 py-6 sm:py-8">
+      <AuthRequiredWrapper
+        requiredFeature="sgt_ken_chat"
+        title="Chat with Sgt. Ken"
+        description="Get instant answers about recruitment and earn points for every interaction"
+      >
+        <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-8 sm:mb-10">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
@@ -199,7 +249,7 @@ export default function ChatWithSgtKenPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
             <div className="lg:col-span-3">
-              <Card className="h-[70vh] sm:h-[600px] flex flex-col shadow-lg">
+              <Card className="h-[75vh] sm:h-[650px] flex flex-col shadow-lg">
                 <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white p-4 sm:p-6">
                   <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
                     <div className="flex items-center">
@@ -225,7 +275,7 @@ export default function ChatWithSgtKenPage() {
                 <CardContent className="flex-1 p-4 sm:p-6 flex flex-col">
                   <div
                     ref={scrollAreaRef}
-                    className="flex-1 overflow-y-auto space-y-3 sm:space-y-4 mb-4"
+                    className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 mb-4 px-2"
                   >
                     {/* Welcome message */}
                     {messages.length === 0 && !isLoading && !error && (
@@ -287,7 +337,12 @@ export default function ChatWithSgtKenPage() {
                               : "bg-gradient-to-r from-gray-50 to-gray-100"
                           }`}
                         >
-                          <p className="text-sm sm:text-base">{msg.content}</p>
+                          <p className="text-sm sm:text-base">
+                            {msg.displayedContent || msg.content}
+                            {msg.isTyping && typingMessageId === msg.id && (
+                              <span className="inline-block w-0.5 h-5 bg-current ml-1 animate-pulse">|</span>
+                            )}
+                          </p>
                           <div className="flex items-center justify-between mt-2">
                             <p className="text-xs text-gray-500">
                               {new Date(msg.timestamp).toLocaleTimeString()}
@@ -373,10 +428,10 @@ export default function ChatWithSgtKenPage() {
                       <div className="text-center pt-2">
                         <Button 
                           size="sm" 
-                          onClick={() => openModal("signin", "recruit")}
+                          onClick={() => openModal("signup", "recruit")}
                           className="bg-blue-600 hover:bg-blue-700"
                         >
-                          Sign In to Earn Points
+                          Sign Up to Earn Points
                         </Button>
                       </div>
                     )}
@@ -454,6 +509,7 @@ export default function ChatWithSgtKenPage() {
           </div>
         </div>
       </div>
+      </AuthRequiredWrapper>
     </PageWrapper>
   );
 }

@@ -25,7 +25,7 @@ const AuthModalContext = createContext<AuthModalContextType | undefined>(
 
 export function AuthModalProvider({ children }: { children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(false);
-  const [modalType, setModalType] = useState<ModalType>("signin");
+  const [modalType, setModalType] = useState<ModalType>("signup");
   const [userType, setUserType] = useState<UserType>("recruit");
   const [referralCode, setReferralCode] = useState<string | undefined>(
     undefined,
@@ -78,7 +78,7 @@ export function useAuthModal() {
     console.warn("useAuthModal must be used within an AuthModalProvider");
     return {
       isOpen: false,
-      modalType: "signin" as ModalType,
+      modalType: "signup" as ModalType,
       userType: "recruit" as UserType,
       openModal: () => {},
       closeModal: () => {},

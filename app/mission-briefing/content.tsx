@@ -39,23 +39,26 @@ export default function MissionBriefingContent() {
         </div>
 
         <Tabs defaultValue="role" className="w-full">
-          <TabsList className="grid grid-cols-5 mb-8">
-            <TabsTrigger value="role" className="text-sm sm:text-base">
-              <Shield className="h-4 w-4 mr-2 hidden sm:inline" /> The Role
+          <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-8 h-auto">
+            <TabsTrigger value="role" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+              <Shield className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> 
+              <span className="hidden xs:inline">The </span>Role
             </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-sm sm:text-base">
-              <Clipboard className="h-4 w-4 mr-2 hidden sm:inline" />{" "}
-              Requirements
+            <TabsTrigger value="requirements" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+              <Clipboard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Requirements</span>
+              <span className="xs:hidden">Req.</span>
             </TabsTrigger>
-            <TabsTrigger value="benefits" className="text-sm sm:text-base">
-              <DollarSign className="h-4 w-4 mr-2 hidden sm:inline" /> Benefits
+            <TabsTrigger value="benefits" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> Benefits
             </TabsTrigger>
-            <TabsTrigger value="process" className="text-sm sm:text-base">
-              <Clock className="h-4 w-4 mr-2 hidden sm:inline" /> Process
+            <TabsTrigger value="process" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+              <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> Process
             </TabsTrigger>
-            <TabsTrigger value="training" className="text-sm sm:text-base">
-              <GraduationCap className="h-4 w-4 mr-2 hidden sm:inline" />{" "}
-              Training
+            <TabsTrigger value="training" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+              <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+              <span className="hidden xs:inline">Training</span>
+              <span className="xs:hidden">Train</span>
             </TabsTrigger>
           </TabsList>
 
@@ -211,14 +214,14 @@ function RoleExplainer() {
 
           <div>
             <h3 className="text-xl font-semibold mb-4">Key Responsibilities</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {responsibilities.map((item, index) => (
-                <div key={index} className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
+                <div key={index} className="border rounded-lg p-4 bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30 hover:shadow-md transition-shadow">
                   <div className="flex items-center mb-2">
                     {item.icon}
-                    <h4 className="font-semibold ml-2 text-gray-900 dark:text-[#FFD700]">{item.title}</h4>
+                    <h4 className="font-semibold ml-2 text-gray-900 dark:text-[#FFD700] text-sm sm:text-base">{item.title}</h4>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">
+                  <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 leading-relaxed">
                     {item.description}
                   </p>
                 </div>

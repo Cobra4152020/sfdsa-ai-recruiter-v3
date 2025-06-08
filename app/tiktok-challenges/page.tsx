@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { PageWrapper } from "@/components/page-wrapper";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
 import { TikTokIcon } from "@/components/tiktok-icon";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -194,7 +195,12 @@ export default function TikTokChallengesPage() {
 
   return (
     <PageWrapper>
-      <div className="container py-8">
+      <AuthRequiredWrapper
+        requiredFeature="games"
+        title="TikTok Recruitment Challenges"
+        description="Create engaging content and help recruit the next generation of deputies"
+      >
+        <div className="container py-8">
         <header className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
@@ -364,6 +370,7 @@ export default function TikTokChallengesPage() {
           onClose={() => setViewingSubmissionId(null)}
         />
       )}
+      </AuthRequiredWrapper>
     </PageWrapper>
   );
 }

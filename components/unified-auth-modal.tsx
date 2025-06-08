@@ -60,8 +60,20 @@ export function UnifiedAuthModal() {
         closeModal();
         return;
       }
+      // Only set to signin if explicitly requested, otherwise default to signup
       setActiveTab(modalType === "signin" ? "signin" : "signup");
+      
+      // Prevent body scroll on mobile when modal is open
+      document.body.classList.add("modal-open");
+    } else {
+      // Re-enable body scroll when modal closes
+      document.body.classList.remove("modal-open");
     }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove("modal-open");
+    };
   }, [isOpen, modalType, router, closeModal]);
 
   if (!mounted) return null;
@@ -250,15 +262,15 @@ export function UnifiedAuthModal() {
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
-      <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
+      <DialogContent className="sm:max-w-[500px] w-[95vw] max-w-[95vw] sm:max-w-[500px] p-0 max-h-[95vh] overflow-hidden flex flex-col">
         {/* Header with gradient background */}
-        <div className="bg-gradient-to-r from-[#0A3C1F] to-[#1B5E20] text-white p-6">
+        <div className="bg-gradient-to-r from-[#0A3C1F] to-[#1B5E20] text-white p-4 sm:p-6 flex-shrink-0">
           <DialogHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
-              <DialogTitle className="text-2xl font-bold">
+              <DialogTitle className="text-xl sm:text-2xl font-bold">
                 {activeTab === "signin" ? "Welcome Back!" : "Join Our Team"}
               </DialogTitle>
-              <p className="text-green-100 mt-1">
+              <p className="text-green-100 mt-1 text-sm">
                 {activeTab === "signin" 
                   ? "Sign in to continue your recruitment journey" 
                   : "Start your deputy sheriff career journey"
@@ -276,7 +288,7 @@ export function UnifiedAuthModal() {
           </DialogHeader>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6 overflow-y-auto flex-1 min-h-0" style={{ WebkitOverflowScrolling: 'touch' }}>
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "signin" | "signup")}>
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="signin" className="text-sm">Sign In</TabsTrigger>

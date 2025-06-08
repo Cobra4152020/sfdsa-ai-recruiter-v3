@@ -1,4 +1,5 @@
 import { PageWrapper } from "@/components/page-wrapper";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
 import {
   Card,
   CardContent,
@@ -96,7 +97,12 @@ export default function PlayTheGamePage() {
 
   return (
     <PageWrapper>
-      <div className="container py-8">
+      <AuthRequiredWrapper
+        requiredFeature="games"
+        title="Gaming Hub Access"
+        description="Play interactive games to test your skills and earn points"
+      >
+        <div className="container py-8">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
@@ -324,6 +330,7 @@ export default function PlayTheGamePage() {
           </div>
         </div>
       </div>
+      </AuthRequiredWrapper>
     </PageWrapper>
   );
 }

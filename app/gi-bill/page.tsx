@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { PointsGate } from "@/components/points-gate";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
+import { PageWrapper } from "@/components/page-wrapper";
 import GIBillContent from "./content";
 
 export const metadata: Metadata = {
@@ -12,13 +13,16 @@ export const metadata: Metadata = {
 
 export default function GIBillPage() {
   return (
-    <PointsGate
-      requiredPoints={300}
-      pageName="G.I. Bill Benefits"
-      pageDescription="Learn how to use your G.I. Bill benefits to fund your training and education as a San Francisco Deputy Sheriff."
-      imageUrl="/veterans-law-enforcement-training.png"
-    >
-      <GIBillContent />
-    </PointsGate>
+    <PageWrapper>
+      <AuthRequiredWrapper
+        requiredFeature="locked_content"
+        minimumPoints={300}
+        title="G.I. Bill Benefits"
+        description="Learn how to use your G.I. Bill benefits to fund your training and education as a San Francisco Deputy Sheriff."
+        heroImage="/veterans-law-enforcement-training.png"
+      >
+        <GIBillContent />
+      </AuthRequiredWrapper>
+    </PageWrapper>
   );
 }

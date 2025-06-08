@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default function RoadmapPage() {
   return (
     <PageWrapper>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-16 md:py-20">
         <DeputySheriffRoadmap />
       </div>
     </PageWrapper>

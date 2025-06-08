@@ -12,11 +12,12 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { Send, MessageSquare, Gamepad2, Coffee } from "lucide-react";
+import { Send, MessageSquare, Gamepad2, Coffee, UserPlus, Zap, Shield } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import Link from "next/link";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/context/user-context";
+import { useAuthModal } from "@/context/auth-modal-context";
 import { generateResponse } from "@/lib/sgt-ken-knowledge-base";
 
 interface AskSgtKenButtonProps {
@@ -82,20 +83,8 @@ export function AskSgtKenButton({
   position = "static",
 }: AskSgtKenButtonProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [messages, setMessages] = useState<MessageType[]>([
-    {
-      role: "assistant",
-      content:
-        "Hey there! I'm Sergeant Ken. How can I help you with your journey to becoming a San Francisco Deputy Sheriff?",
-      quickReplies: [
-        "Tell me about requirements",
-        "What's the application process?",
-        "How's the salary?",
-      ],
-      id: "welcome-message",
-      timestamp: new Date(),
-    },
-  ]);
+  const [hasAskedFirstQuestion, setHasAskedFirstQuestion] = useState(false);
+  const [messages, setMessages] = useState<MessageType[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sessionId] = useState(uuidv4());
@@ -104,8 +93,23 @@ export function AskSgtKenButton({
   const [messageCount, setMessageCount] = useState(0);
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { currentUser, incrementParticipation } = useUser();
+  const { currentUser, incrementParticipation, isLoggedIn } = useUser();
+  const { openModal } = useAuthModal();
   const { toast } = useToast();
+
+  // Initialize chat with first mandatory question when dialog opens
+  useEffect(() => {
+    if (isDialogOpen && messages.length === 0) {
+      const welcomeMessage: MessageType = {
+        role: "assistant",
+        content: "👋 Hey there! I'm Sergeant Ken, your guide to becoming a San Francisco Deputy Sheriff.\n\nBefore we dive in, let me help you understand how this platform works and what you can access.",
+        quickReplies: ["How does this page work?"],
+        id: "welcome-message",
+        timestamp: new Date(),
+      };
+      setMessages([welcomeMessage]);
+    }
+  }, [isDialogOpen, messages.length]);
 
   useEffect(() => {
     if (isDialogOpen && currentUser) {
@@ -113,447 +117,312 @@ export function AskSgtKenButton({
     }
   }, [isDialogOpen, currentUser, incrementParticipation]);
 
-  // Add custom animation for the blinking effect
+  // Enhanced animations and styles
   useEffect(() => {
-    // Add the animation to the stylesheet
     const style = document.createElement("style");
     style.innerHTML = `
-    @keyframes pulseYellow {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-    .animate-pulse-yellow {
-      animation: pulseYellow 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-    }
-    @keyframes subtleGlow {
-      0%, 100% { box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); }
-      50% { box-shadow: 0 0 12px rgba(255, 215, 0, 0.6); }
-    }
-    .subtle-glow {
-      animation: subtleGlow 2s ease-in-out infinite;
-    }
-    @keyframes wiggle {
-      0%, 100% { transform: rotate(0deg); }
-      25% { transform: rotate(-5deg); }
-      75% { transform: rotate(5deg); }
-    }
-    .wiggle-icon {
-      animation: wiggle 3s ease-in-out infinite;
-      display: inline-block;
-    }
-    .sgt-ken-button-hover:hover {
-      background-color: rgba(255, 215, 0, 0.2) !important;
-      transition: all 0.3s ease;
-    }
-    @keyframes bounceSlight {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-5px); }
-    }
-    .animate-bounce-subtle {
-      animation: bounceSlight 2s ease-in-out infinite;
-    }
-    
-    /* Enhanced hover effects */
-    .floating-btn {
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-    .floating-btn:hover {
-      transform: scale(1.1) translateY(-5px);
-      box-shadow: 0 10px 25px -5px rgba(10, 60, 31, 0.3), 0 8px 10px -6px rgba(10, 60, 31, 0.2);
-    }
-    .floating-btn:active {
-      transform: scale(0.95);
-      box-shadow: 0 5px 15px -3px rgba(10, 60, 31, 0.3), 0 4px 6px -4px rgba(10, 60, 31, 0.2);
-    }
-    
-    .floating-btn .hover-ring {
-      position: absolute;
-      top: -8px;
-      left: -8px;
-      right: -8px;
-      bottom: -8px;
-      border-radius: 50%;
-      border: 2px solid #FFD700;
-      opacity: 0;
-      transform: scale(0.8);
-      transition: all 0.3s ease;
-    }
-    .floating-btn:hover .hover-ring {
-      opacity: 0.5;
-      transform: scale(1);
-    }
-    
-    .floating-btn .hover-text {
-      position: absolute;
-      top: -40px;
-      left: 50%;
-      transform: translateX(-50%) translateY(10px);
-      background-color: #0A3C1F;
-      color: white;
-      padding: 5px 10px;
-      border-radius: 4px;
-      font-size: 14px;
-      opacity: 0;
-      transition: all 0.3s ease;
-      white-space: nowrap;
-      pointer-events: none;
-    }
-    .floating-btn:hover .hover-text {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
-    }
-    .floating-btn .hover-text:after {
-      content: '';
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      margin-left: -5px;
-      border-width: 5px;
-      border-style: solid;
-      border-color: #0A3C1F transparent transparent transparent;
-    }
-    
-    @keyframes pulse-ring {
-      0% {
-        transform: scale(0.8);
-        opacity: 0.5;
+    @keyframes pulseGlow {
+      0%, 100% { 
+        box-shadow: 0 0 5px rgba(255, 215, 0, 0.4), 0 0 10px rgba(10, 60, 31, 0.2); 
+        transform: scale(1);
       }
-      70% {
-        transform: scale(1.2);
-        opacity: 0;
-      }
-      100% {
-        transform: scale(1.2);
-        opacity: 0;
+      50% { 
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.7), 0 0 20px rgba(10, 60, 31, 0.4);
+        transform: scale(1.02);
       }
     }
-    .pulse-ring {
-      position: absolute;
-      top: -8px;
-      left: -8px;
-      right: -8px;
-      bottom: -8px;
-      border-radius: 50%;
-      border: 2px solid #FFD700;
-      animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+    .enhanced-glow {
+      animation: pulseGlow 2.5s ease-in-out infinite;
     }
-    
-    /* Icon hover effect */
-    .icon-container {
-      transition: transform 0.3s ease;
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    .floating-btn:hover .icon-container {
-      transform: rotate(15deg);
+    .slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .fade-in-scale {
+      animation: fadeInScale 0.4s ease-out;
+    }
+    .gradient-bg {
+      background: linear-gradient(135deg, #0A3C1F 0%, #1a5a30 100%);
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .message-bubble {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+    }
+    .message-bubble:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-1px);
+    }
+    .quick-reply-btn {
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
+    }
+    .quick-reply-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(255, 215, 0, 0.4);
+    }
+    .registration-prompt {
+      background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+      border: 2px solid #0A3C1F;
+      animation: fadeInScale 0.5s ease-out;
     }
     `;
     document.head.appendChild(style);
-
-    return () => {
-      document.head.removeChild(style);
-    };
+    return () => document.head.removeChild(style);
   }, []);
 
-  // Scroll to bottom when messages change
-  useEffect(() => {
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
   }, [messages]);
 
-  // Typing effect function
   const startTypingEffect = (messageId: string, content: string, delay: number = 50) => {
     setTypingMessageId(messageId);
     let currentIndex = 0;
     
-    const typeInterval = setInterval(() => {
-      if (currentIndex <= content.length) {
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.id === messageId
-              ? { ...msg, displayedContent: content.substring(0, currentIndex) }
-              : msg
-          )
-        );
+    const typeNextChar = () => {
+      if (currentIndex < content.length) {
+        setMessages(prev => prev.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, displayedContent: content.substring(0, currentIndex + 1) }
+            : msg
+        ));
         currentIndex++;
+        setTimeout(typeNextChar, delay);
       } else {
-        clearInterval(typeInterval);
+        setMessages(prev => prev.map(msg => 
+          msg.id === messageId 
+            ? { ...msg, isTyping: false, displayedContent: content }
+            : msg
+        ));
         setTypingMessageId(null);
-        // Mark typing as complete
-        setMessages((prevMessages) =>
-          prevMessages.map((msg) =>
-            msg.id === messageId
-              ? { ...msg, isTyping: false, displayedContent: content }
-              : msg
-          )
-        );
       }
-    }, delay);
+    };
+    
+    setTimeout(typeNextChar, 300);
   };
 
-  // Function to generate quick replies based on the message content
-  const getContextualQuickReplies = (message: string): string[] => {
-    const lowerMessage = message.toLowerCase();
+  const handleFirstQuestion = () => {
+    if (hasAskedFirstQuestion) return;
 
-    // Always include daily briefing as an option
-    const briefingOption = "Attend Sgt. Ken's Daily Briefing";
+    const userMessage: MessageType = {
+      role: "user",
+      content: "How does this page work?",
+      id: `user-${Date.now()}`,
+      timestamp: new Date(),
+    };
 
-    // Requirements-related quick replies
-    if (
-      lowerMessage.includes("requirements") ||
-      lowerMessage.includes("qualify") ||
-      lowerMessage.includes("eligible")
-    ) {
-      return [
-        "What education is required?",
-        "Are there age requirements?",
-        "What about criminal history?",
-        briefingOption,
-      ];
-    }
+    const responseContent = `Great question! Let me explain how this platform works:
 
-    // Application-related quick replies
-    if (
-      lowerMessage.includes("apply") ||
-      lowerMessage.includes("application") ||
-      lowerMessage.includes("process")
-    ) {
-      return [
-        "How long is the process?",
-        "What tests are involved?",
-        "Tell me about the academy",
-        briefingOption,
-      ];
-    }
+🎯 **FREE ACCESS:**
+• Browse all pages and information
+• Read about requirements, salary, and benefits
+• Download basic resources
+• Take practice quizzes
+• View the application process overview
 
-    // Salary-related quick replies
-    if (
-      lowerMessage.includes("salary") ||
-      lowerMessage.includes("pay") ||
-      lowerMessage.includes("money")
-    ) {
-      return [
-        "What about overtime?",
-        "Are there pay increases?",
-        "What benefits come with the job?",
-        briefingOption,
-      ];
-    }
+🔐 **REGISTRATION REQUIRED:**
+• Personalized guidance and coaching
+• Advanced practice tests with detailed feedback
+• Badge earning system and progress tracking
+• Leaderboard participation and points
+• Background preparation assistance
+• One-on-one chat sessions with me
+• Exclusive recruitment tips and strategies
 
-    // Training-related quick replies
-    if (
-      lowerMessage.includes("training") ||
-      lowerMessage.includes("academy") ||
-      lowerMessage.includes("learn")
-    ) {
-      return [
-        "How long is the academy?",
-        "What will I learn?",
-        "Is it physically demanding?",
-        briefingOption,
-      ];
-    }
+Registration is FREE and gives you access to tools that have helped hundreds of recruits successfully get hired as San Francisco Deputy Sheriffs!
 
-    // Career-related quick replies
-    if (
-      lowerMessage.includes("career") ||
-      lowerMessage.includes("advancement") ||
-      lowerMessage.includes("promotion")
-    ) {
-      return [
-        "How fast can I get promoted?",
-        "What specialized units exist?",
-        "What's the retirement plan?",
-        briefingOption,
-      ];
-    }
+Ready to unlock your full potential? Register now to access everything this platform offers.`;
 
-    // Default quick replies for general questions
-    return [
-      "What are the requirements?",
-      "Tell me about the salary",
-      "How's the work schedule?",
-      briefingOption,
-    ];
-  };
+    const assistantMessage: MessageType = {
+      role: "assistant",
+      content: responseContent,
+      quickReplies: isLoggedIn ? [
+        "Tell me about requirements",
+        "What's the application process?", 
+        "How's the salary?"
+      ] : [
+        "🚀 Register Now - It's Free!",
+        "Tell me more about benefits",
+        "What else can I ask?"
+      ],
+      id: `assistant-${Date.now()}`,
+      timestamp: new Date(),
+      isTyping: true,
+      displayedContent: "",
+    };
 
-  // Determine if we should show a donation prompt
-  const shouldShowDonationPrompt = () => {
-    // Show donation prompt after every 4-6 messages
-    return (
-      messageCount > 0 &&
-      messageCount % (Math.floor(Math.random() * 3) + 4) === 0
-    );
+    setMessages(prev => [...prev, userMessage, assistantMessage]);
+    setHasAskedFirstQuestion(true);
+    
+    setTimeout(() => {
+      startTypingEffect(assistantMessage.id!, responseContent);
+    }, 500);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (input.trim() && !isLoading) {
-      const userMessage = input.trim();
-      setInput("");
-      setIsLoading(true);
+    if (!input.trim() || isLoading || typingMessageId !== null) return;
 
-      // Increment message count
-      setMessageCount((prev) => prev + 1);
-
-      // Add user message
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "user",
-          content: userMessage,
-          id: `user-${Date.now()}`,
-          timestamp: new Date(),
-        },
-      ]);
-
-      try {
-        // Prepare chat history for the AI service
-        const chatHistory = messages.slice(-5).map(msg => ({
-          role: msg.role,
-          content: msg.content
-        }));
-
-        // Use the enhanced chat API endpoint
-        const apiResponse = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: userMessage,
-            chatHistory: chatHistory,
-            userId: currentUser?.id,
-            sessionId,
-          }),
-        });
-
-        if (!apiResponse.ok) {
-          throw new Error(`API error: ${apiResponse.status}`);
-        }
-
-        const result = await apiResponse.json();
-        
-        if (!result.success) {
-          throw new Error(result.error || "API request failed");
-        }
-
-        let response = result.message;
-
-        // Update salary information to latest figures
-        response = response.replace(
-          /\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g,
-          "$118,768 to $184,362 (with incentives)",
-        );
-        response = response.replace(
-          /salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g,
-          "salary of $118,768 to $184,362 (with incentives)",
-        );
-        response = response.replace(
-          /salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g,
-          "salary ranges from $118,768 to $184,362 (with incentives)",
-        );
-
-        // Generate contextual quick replies based on the conversation
-        const quickReplies = getContextualQuickReplies(userMessage + " " + response);
-
-        // Check if we should show a donation prompt
-        const showDonation = shouldShowDonationPrompt();
-
-        // Add assistant response with enhanced metadata
-        const assistantMessageId = `assistant-${Date.now()}`;
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: response,
-            quickReplies: quickReplies,
-            id: assistantMessageId,
-            timestamp: new Date(),
-            showDonation,
-            isTyping: true,
-            displayedContent: "",
-          },
-        ]);
-
-        // Start typing effect for the response
-        setTimeout(() => {
-          startTypingEffect(assistantMessageId, response);
-        }, 500); // Small delay before starting to type
-
-        // Show success indicator if web search was used
-        if (result.searchUsed) {
-          toast({
-            title: "Current Information Retrieved",
-            description: "Sgt. Ken found the latest information for you!",
-            duration: 3000,
-          });
-        }
-
-        // Note: Database logging is now handled by the API endpoint
-
-      } catch (error) {
-        console.error("Error in enhanced chat flow:", error);
-
-        // Fallback to local knowledge base with enhanced personalization
-        let fallbackResponse = generateResponse(userMessage);
-        
-        // Make the fallback response more conversational and acknowledge the question
-        if (!fallbackResponse.startsWith("Hey") && !fallbackResponse.startsWith("Listen")) {
-          fallbackResponse = `Hey there! I'm having some technical issues with my main systems, but let me answer your question about "${userMessage}". ${fallbackResponse}`;
-        }
-        
-        // Update salary information in fallback response
-        const updatedResponse = fallbackResponse
-          .replace(/\$\d{2,3}(,\d{3})?(\s*-\s*|\s*to\s*)\$\d{2,3}(,\d{3})?/g, "$118,768 to $184,362 (with incentives)")
-          .replace(/salary (of|around|about|approximately) \$\d{2,3}(,\d{3})?/g, "salary of $118,768 to $184,362 (with incentives)")
-          .replace(/salary (ranges?|starting) (from )?\$\d{2,3}(,\d{3})?/g, "salary ranges from $118,768 to $184,362 (with incentives)");
-
-        // Add fallback response with enhanced metadata
-        const fallbackMessageId = `fallback-${Date.now()}`;
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: updatedResponse,
-            quickReplies: getContextualQuickReplies(userMessage + " " + updatedResponse),
-            id: fallbackMessageId,
-            timestamp: new Date(),
-            isTyping: true,
-            displayedContent: "",
-          },
-        ]);
-
-        // Start typing effect for fallback response
-        setTimeout(() => {
-          startTypingEffect(fallbackMessageId, updatedResponse);
-        }, 500);
-
-        // Show user-friendly error message that explains the situation
-        toast({
-          title: "Using my backup knowledge",
-          description: "I'm having trouble connecting to my main systems, but I'm still here to help with your questions!",
-          variant: "default",
-          duration: 4000,
-        });
-      } finally {
-        setIsLoading(false);
-      }
+    // Check if this is not the first question and user is not logged in
+    if (hasAskedFirstQuestion && !isLoggedIn) {
+      toast({
+        title: "Registration Required",
+        description: "Please register to continue chatting with Sgt. Ken and access advanced features!",
+        variant: "destructive",
+        duration: 5000,
+      });
+      openModal("signup", "recruit", "");
+      return;
     }
+
+    // If first question hasn't been asked, force it
+    if (!hasAskedFirstQuestion) {
+      handleFirstQuestion();
+      setInput("");
+      return;
+    }
+
+    setIsLoading(true);
+    const userMessage: MessageType = {
+      role: "user",
+      content: input,
+      id: `user-${Date.now()}`,
+      timestamp: new Date(),
+    };
+
+    setMessages(prev => [...prev, userMessage]);
+    setInput("");
+    setMessageCount(prev => prev + 1);
+
+    try {
+      const response = generateResponse(input);
+      const assistantMessage: MessageType = {
+        role: "assistant",
+        content: response,
+        quickReplies: getContextualQuickReplies(response),
+        id: `assistant-${Date.now()}`,
+        timestamp: new Date(),
+        isTyping: true,
+        displayedContent: "",
+        showDonation: shouldShowDonationPrompt(),
+      };
+
+      setMessages(prev => [...prev, assistantMessage]);
+      
+      setTimeout(() => {
+        startTypingEffect(assistantMessage.id!, response);
+      }, 500);
+
+    } catch (error) {
+      console.error("Error generating response:", error);
+      
+      const fallbackResponse = "I'm having a bit of trouble right now, but I'm still here to help! You can ask me about the application process, requirements, benefits, or what it's like to work as a Deputy Sheriff in San Francisco.";
+      
+      const fallbackMessage: MessageType = {
+        role: "assistant",
+        content: fallbackResponse,
+        quickReplies: ["Tell me about requirements", "Application process", "Benefits"],
+        id: `fallback-${Date.now()}`,
+        timestamp: new Date(),
+        isTyping: true,
+        displayedContent: "",
+      };
+
+      setMessages(prev => [...prev, fallbackMessage]);
+      
+      setTimeout(() => {
+        startTypingEffect(fallbackMessage.id!, fallbackResponse);
+      }, 500);
+
+      toast({
+        title: "Connection Issue",
+        description: "Using backup knowledge - I'm still here to help!",
+        variant: "default",
+        duration: 3000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const getContextualQuickReplies = (message: string): string[] => {
+    const lowerMessage = message.toLowerCase();
+    
+    if (lowerMessage.includes("salary") || lowerMessage.includes("pay")) {
+      return ["What about benefits?", "Career advancement?", "Work schedule?"];
+    }
+    if (lowerMessage.includes("requirement")) {
+      return ["Application process?", "Physical test?", "Background check?"];
+    }
+    if (lowerMessage.includes("academy") || lowerMessage.includes("training")) {
+      return ["What's the schedule?", "Benefits package?", "Career growth?"];
+    }
+    if (lowerMessage.includes("san francisco") || lowerMessage.includes("city")) {
+      return ["Cost of living?", "Neighborhoods?", "Transportation?"];
+    }
+    
+    return ["Tell me more", "Application process?", "Benefits?"];
+  };
+
+  const shouldShowDonationPrompt = (): boolean => {
+    return messageCount > 0 && messageCount % 4 === 0;
   };
 
   const handleQuickReply = (reply: string) => {
-    if (!isLoading) {
-      // Special handling for daily briefing link
-      if (
-        reply.toLowerCase().includes("briefing") ||
-        reply.toLowerCase().includes("attend briefing")
-      ) {
-        window.location.href = "/daily-briefing";
-        return;
-      }
+    if (isLoading || typingMessageId !== null) return;
 
-      setInput(reply);
-      handleSubmit(new Event("submit") as unknown as React.FormEvent);
+    // Handle registration button
+    if (reply.includes("Register Now")) {
+      openModal("signup", "recruit", "");
+      return;
     }
+
+    // Handle first question
+    if (reply === "How does this page work?") {
+      handleFirstQuestion();
+      return;
+    }
+
+    // Handle daily briefing link
+    if (reply.toLowerCase().includes("briefing") || reply.toLowerCase().includes("attend briefing")) {
+      window.location.href = "/daily-briefing";
+      return;
+    }
+
+    // Check registration requirement for subsequent questions
+    if (hasAskedFirstQuestion && !isLoggedIn) {
+      toast({
+        title: "Registration Required",
+        description: "Please register to continue chatting and access all features!",
+        variant: "destructive",
+        duration: 5000,
+      });
+      openModal("signup", "recruit", "");
+      return;
+    }
+
+    setInput(reply);
+    setTimeout(() => {
+      handleSubmit(new Event("submit") as unknown as React.FormEvent);
+    }, 100);
   };
 
-  // Determine button styling based on variant
   const getButtonStyle = () => {
     let buttonStyle = className + " ";
 
@@ -562,10 +431,7 @@ export function AskSgtKenButton({
     } else if (variant === "outline") {
       buttonStyle += "border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10 ";
     } else if (variant === "secondary") {
-      buttonStyle +=
-        "bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-medium ";
-    } else if (variant === "ghost") {
-      // Don't add additional styles for ghost variant as it's handled by className
+      buttonStyle += "bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-medium ";
     }
 
     if (fullWidth) {
@@ -573,148 +439,135 @@ export function AskSgtKenButton({
     }
 
     if (position === "fixed") {
-      buttonStyle += "fixed bottom-6 right-6 z-40 shadow-lg floating-btn ";
+      buttonStyle += "fixed bottom-6 right-6 z-40 shadow-lg enhanced-glow ";
     }
 
     return buttonStyle;
   };
 
-  // For ghost variant in the header, we want to render just text with an icon
+  // Enhanced ghost variant for header
   if (variant === "ghost" && (className?.includes("bg-[#0A3C1F]") || className?.includes("text-white"))) {
     return (
       <>
         <button
           onClick={() => setIsDialogOpen(true)}
-          className={`${className} sgt-ken-button-hover subtle-glow relative`}
+          className={`${className} enhanced-glow relative group transition-all duration-300`}
           aria-label="Chat with Sergeant Ken"
           type="button"
         >
           <span className="flex items-center relative">
-            <span className="wiggle-icon">
-              <MessageSquare className="mr-1 h-4 w-4" />
-            </span>
-            Ask Sgt. Ken
-            <span className="absolute -right-4 -top-1 h-2 w-2 rounded-full bg-[#FFD700] animate-pulse-yellow"></span>
-            <span className="absolute -right-10 top-0 text-xs bg-[#FFD700] text-[#0A3C1F] px-1.5 py-0.5 rounded-full font-bold animate-pulse-yellow">
-              Ask!
-            </span>
+            <MessageSquare className="mr-1 h-4 w-4 group-hover:scale-110 transition-transform" />
+            <span className="gradient-text font-semibold">Ask Sgt. Ken</span>
+            <Zap className="ml-1 h-3 w-3 text-[#FFD700] animate-pulse" />
           </span>
         </button>
 
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogContent className="sm:max-w-[500px] max-w-[95vw] max-h-[85vh] sm:max-h-[80vh] w-full mx-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center justify-between text-[#0A3C1F] flex-wrap gap-2">
+          <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] w-full mx-auto fade-in-scale border-2 border-[#FFD700]">
+            <DialogHeader className="gradient-bg text-white rounded-t-lg -mx-6 -mt-6 px-6 py-4">
+              <DialogTitle className="flex items-center justify-between flex-wrap gap-2">
                 <div className="flex items-center">
-                  <MessageSquare className="mr-2 h-5 w-5 text-[#0A3C1F]" />
-                  <span className="text-base sm:text-lg">Chat with Sgt. Ken</span>
-                  {offlineMode && (
-                    <Badge
-                      variant="outline"
-                      className="ml-2 bg-yellow-100 text-yellow-800 border-yellow-300 text-xs"
-                    >
-                      Offline Mode
+                  <Shield className="mr-2 h-6 w-6 text-[#FFD700]" />
+                  <span className="text-lg font-bold gradient-text">Chat with Sgt. Ken</span>
+                  {!isLoggedIn && (
+                    <Badge className="ml-2 bg-[#FFD700] text-[#0A3C1F] font-semibold">
+                      Registration Gets Full Access
                     </Badge>
                   )}
                 </div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <Link
                     href="/donate"
-                    className="flex items-center text-xs sm:text-sm text-[#0A3C1F] hover:underline"
+                    className="flex items-center text-sm text-[#FFD700] hover:text-white transition-colors"
                   >
-                    <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                    Donate
+                    <Coffee className="mr-1 h-4 w-4" />
+                    Support Us
                   </Link>
                   <Link
                     href="/daily-briefing"
-                    className="flex items-center text-xs sm:text-sm bg-[#FFD700] text-[#0A3C1F] px-2 py-1 sm:px-3 sm:py-1 rounded-full hover:bg-[#FFD700]/80 transition-colors"
+                    className="flex items-center text-sm bg-[#FFD700] text-[#0A3C1F] px-3 py-1 rounded-full hover:bg-white transition-colors font-semibold"
                   >
-                    <Gamepad2 className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                    <span className="hidden sm:inline">Attend Briefing</span>
-                    <span className="sm:hidden">Briefing</span>
+                    <Gamepad2 className="mr-1 h-4 w-4" />
+                    Daily Briefing
                   </Link>
                 </div>
               </DialogTitle>
-              <DialogDescription className="text-gray-600 dark:text-gray-400">
-                Chat with Sgt. Ken, your AI assistant for San Francisco Deputy Sheriff recruitment questions.
+              <DialogDescription className="text-[#FFD700]/90 font-medium">
+                Your AI guide to becoming a San Francisco Deputy Sheriff. Get personalized guidance!
               </DialogDescription>
             </DialogHeader>
 
-            <div className="h-[60vh] sm:h-[400px] flex flex-col border rounded-md overflow-hidden">
-              <div className="flex-1 p-3 sm:p-4 overflow-y-auto">
-                <div className="space-y-3 sm:space-y-4">
-                  {messages.map((message, _index) => (
-                    <div key={message.id || _index}>
-                      <div
-                        className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}
-                      >
-                        <div
-                          className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 ${
-                            message.role === "assistant"
-                              ? "bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white"
-                              : "bg-[#0A3C1F] text-white"
-                          }`}
-                        >
-                          <div className="whitespace-pre-wrap text-sm sm:text-base">
+            <div className="h-[75vh] sm:h-[550px] w-full flex flex-col border-2 border-[#0A3C1F]/20 rounded-lg overflow-hidden bg-gradient-to-b from-white to-gray-50">
+              <div className="flex-1 p-4 overflow-y-auto">
+                <div className="space-y-4">
+                  {messages.map((message, index) => (
+                    <div key={message.id || index} className="slide-in">
+                      <div className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}>
+                        <div className={`max-w-[85%] rounded-xl p-4 message-bubble ${
+                          message.role === "assistant"
+                            ? "bg-gradient-to-br from-[#0A3C1F] to-[#1a5a30] text-white"
+                            : "bg-gradient-to-br from-[#FFD700] to-[#FFA500] text-[#0A3C1F] font-semibold"
+                        }`}>
+                          <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                            {message.role === "assistant" && (
+                              <div className="flex items-center mb-2">
+                                <Shield className="h-4 w-4 text-[#FFD700] mr-2" />
+                                <span className="text-[#FFD700] font-semibold text-xs">SGT. KEN</span>
+                              </div>
+                            )}
                             {message.displayedContent || message.content}
                             {message.isTyping && typingMessageId === message.id && (
-                              <span className="inline-block w-2 h-4 bg-current ml-1 animate-pulse">|</span>
+                              <span className="inline-block w-2 h-4 bg-[#FFD700] ml-1 animate-pulse">|</span>
                             )}
                           </div>
 
-                          {message.quickReplies &&
-                            message.quickReplies.length > 0 && 
-                            !message.isTyping && (
-                              <div className="mt-2 sm:mt-3 flex flex-wrap gap-1 sm:gap-2">
-                                {message.quickReplies.map((reply, i) => (
-                                  <button
-                                    key={i}
-                                    onClick={() => handleQuickReply(reply)}
-                                    disabled={isLoading || typingMessageId !== null}
-                                    className="text-xs px-2 py-1 sm:px-3 sm:py-1 rounded-full bg-[#FFD700] text-[#0A3C1F] font-medium hover:bg-[#FFD700]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                  >
-                                    {reply}
-                                  </button>
-                                ))}
-                              </div>
-                            )}
+                          {message.quickReplies && message.quickReplies.length > 0 && !message.isTyping && (
+                            <div className="mt-3 flex flex-wrap gap-2">
+                              {message.quickReplies.map((reply, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => handleQuickReply(reply)}
+                                  disabled={isLoading || typingMessageId !== null}
+                                  className={`text-xs px-3 py-2 rounded-full font-semibold transition-all quick-reply-btn ${
+                                    reply.includes("Register Now") 
+                                      ? "registration-prompt text-[#0A3C1F] hover:scale-105" 
+                                      : "bg-[#FFD700] text-[#0A3C1F] hover:bg-white"
+                                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                >
+                                  {reply.includes("Register Now") && <UserPlus className="h-3 w-3 mr-1 inline" />}
+                                  {reply}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
 
-                      {/* Show donation prompt if this message is flagged to show it */}
+                      {/* Enhanced donation prompt */}
                       {message.role === "assistant" && message.showDonation && (
-                        <div className="mt-2 sm:mt-3">
-                          <div className="max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
-                            <p className="text-sm sm:text-base">
-                              If you appreciate this site and my assistance,
-                              consider buying me a coffee!
+                        <div className="mt-3 slide-in">
+                          <div className="max-w-[85%] rounded-xl p-4 bg-gradient-to-br from-[#FFD700]/20 to-[#FFA500]/20 border-2 border-[#FFD700]/30">
+                            <div className="flex items-center mb-2">
+                              <Coffee className="h-4 w-4 text-[#0A3C1F] mr-2" />
+                              <span className="text-[#0A3C1F] font-semibold">Support Our Mission</span>
+                            </div>
+                            <p className="text-sm text-[#0A3C1F] mb-3">
+                              Help keep this platform free and accessible for all future deputies!
                             </p>
-                            <div className="mt-2 flex flex-wrap gap-1 sm:gap-2">
+                            <div className="flex flex-wrap gap-2">
                               <Link href="/donate?amount=10">
-                                <Button
-                                  size="sm"
-                                  className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
-                                >
-                                  <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                                  $10
+                                <Button size="sm" className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                                  <Coffee className="mr-1 h-3 w-3" />$10
                                 </Button>
                               </Link>
                               <Link href="/donate?amount=25">
-                                <Button
-                                  size="sm"
-                                  className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
-                                >
-                                  <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                                  $25
+                                <Button size="sm" className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                                  <Coffee className="mr-1 h-3 w-3" />$25
                                 </Button>
                               </Link>
                               <Link href="/donate">
-                                <Button
-                                  size="sm"
-                                  variant="outline"
-                                  className="border-[#FFD700] text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
-                                >
-                                  Other Amount
+                                <Button size="sm" variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
+                                  Custom Amount
                                 </Button>
                               </Link>
                             </div>
@@ -725,23 +578,36 @@ export function AskSgtKenButton({
                   ))}
 
                   {isLoading && (
-                    <div className="flex justify-start">
-                      <div className="max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
+                    <div className="flex justify-start slide-in">
+                      <div className="max-w-[85%] rounded-xl p-4 bg-gradient-to-br from-[#0A3C1F] to-[#1a5a30] text-white">
+                        <div className="flex items-center mb-2">
+                          <Shield className="h-4 w-4 text-[#FFD700] mr-2" />
+                          <span className="text-[#FFD700] font-semibold text-xs">SGT. KEN</span>
+                        </div>
                         <div className="flex space-x-1">
-                          <div
-                            className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
-                            style={{ animationDelay: "0ms" }}
-                          ></div>
-                          <div
-                            className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
-                            style={{ animationDelay: "150ms" }}
-                          ></div>
-                          <div
-                            className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
-                            style={{ animationDelay: "300ms" }}
-                          ></div>
+                          <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                          <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                          <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {/* Registration prompt for non-logged in users after first question */}
+                  {hasAskedFirstQuestion && !isLoggedIn && (
+                    <div className="registration-prompt rounded-xl p-4 text-center">
+                      <UserPlus className="h-8 w-8 text-[#0A3C1F] mx-auto mb-2" />
+                      <h3 className="font-bold text-[#0A3C1F] mb-2">Ready to Unlock Everything?</h3>
+                      <p className="text-[#0A3C1F] text-sm mb-3">
+                        Register for FREE to continue chatting and access advanced features!
+                      </p>
+                      <Button 
+                        onClick={() => openModal("signup", "recruit", "")}
+                        className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white font-semibold"
+                      >
+                        <UserPlus className="h-4 w-4 mr-2" />
+                        Register Now - It's Free!
+                      </Button>
                     </div>
                   )}
 
@@ -749,26 +615,29 @@ export function AskSgtKenButton({
                 </div>
               </div>
 
-              <div className="border-t dark:border-gray-700 p-2 sm:p-3">
-                <form
-                  onSubmit={handleSubmit}
-                  className="flex items-center space-x-2"
-                >
+              <div className="border-t-2 border-[#0A3C1F]/20 p-4 bg-white">
+                <form onSubmit={handleSubmit} className="flex items-center space-x-3">
                   <input
                     type="text"
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type your message..."
-                    className="flex-1 px-2 py-2 sm:px-3 sm:py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A3C1F] dark:bg-[#2A2A2A] dark:text-white dark:border-gray-600 text-sm sm:text-base"
-                    disabled={isLoading || typingMessageId !== null}
+                    placeholder={
+                      !hasAskedFirstQuestion 
+                        ? "Ask me how this page works first!" 
+                        : hasAskedFirstQuestion && !isLoggedIn
+                        ? "Register to continue chatting..."
+                        : "Type your message..."
+                    }
+                    className="flex-1 px-4 py-3 border-2 border-[#0A3C1F]/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-[#FFD700] transition-all text-sm font-medium"
+                    disabled={isLoading || typingMessageId !== null || (!hasAskedFirstQuestion && input !== "How does this page work?") || (hasAskedFirstQuestion && !isLoggedIn)}
                   />
                   <Button
                     type="submit"
-                    disabled={isLoading || !input.trim() || typingMessageId !== null}
-                    className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white p-2 rounded-lg flex-shrink-0 disabled:opacity-50"
+                    disabled={isLoading || !input.trim() || typingMessageId !== null || (hasAskedFirstQuestion && !isLoggedIn)}
+                    className="bg-gradient-to-r from-[#0A3C1F] to-[#1a5a30] hover:from-[#0A3C1F]/90 hover:to-[#1a5a30]/90 text-white p-3 rounded-xl flex-shrink-0 disabled:opacity-50 transition-all"
                     aria-label="Send message"
                   >
-                    <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <Send className="h-5 w-5" />
                   </Button>
                 </form>
               </div>
@@ -779,145 +648,128 @@ export function AskSgtKenButton({
     );
   }
 
+  // Regular button for other variants
   return (
     <>
       <Button
         variant={variant}
         size={size}
-        className={`${getButtonStyle()} subtle-glow relative`}
+        className={`${getButtonStyle()} enhanced-glow relative group`}
         onClick={() => setIsDialogOpen(true)}
         aria-label="Chat with Sergeant Ken"
       >
-        {position === "fixed" && (
-          <>
-            <div className="pulse-ring"></div>
-            <div className="hover-ring"></div>
-            <div className="hover-text">Chat with Sgt. Ken</div>
-          </>
-        )}
-        <span
-          className={`${position === "fixed" ? "icon-container" : "wiggle-icon"}`}
-        >
-          <MessageSquare className="mr-2 h-5 w-5" />
-        </span>
-        Ask Sgt. Ken
-        <span className="absolute -right-2 -top-1 h-2 w-2 rounded-full bg-[#FFD700] animate-pulse-yellow"></span>
+        <MessageSquare className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform" />
+        <span className="font-semibold">Ask Sgt. Ken</span>
+        <Zap className="ml-1 h-3 w-3 text-[#FFD700] animate-pulse" />
       </Button>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="sm:max-w-[500px] max-w-[95vw] max-h-[85vh] sm:max-h-[80vh] w-full mx-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between text-[#0A3C1F] flex-wrap gap-2">
+        <DialogContent className="sm:max-w-[600px] max-w-[95vw] max-h-[90vh] w-full mx-auto fade-in-scale border-2 border-[#FFD700]">
+          {/* Same enhanced dialog content as above */}
+          <DialogHeader className="gradient-bg text-white rounded-t-lg -mx-6 -mt-6 px-6 py-4">
+            <DialogTitle className="flex items-center justify-between flex-wrap gap-2">
               <div className="flex items-center">
-                <MessageSquare className="mr-2 h-5 w-5 text-[#0A3C1F]" />
-                <span className="text-base sm:text-lg">Chat with Sgt. Ken</span>
-                {offlineMode && (
-                  <Badge
-                    variant="outline"
-                    className="ml-2 bg-yellow-100 text-yellow-800 border-yellow-300 text-xs"
-                  >
-                    Offline Mode
+                <Shield className="mr-2 h-6 w-6 text-[#FFD700]" />
+                <span className="text-lg font-bold gradient-text">Chat with Sgt. Ken</span>
+                {!isLoggedIn && (
+                  <Badge className="ml-2 bg-[#FFD700] text-[#0A3C1F] font-semibold">
+                    Registration Gets Full Access
                   </Badge>
                 )}
               </div>
               <div className="flex items-center gap-2 flex-wrap">
                 <Link
                   href="/donate"
-                  className="flex items-center text-xs sm:text-sm text-[#0A3C1F] hover:underline"
+                  className="flex items-center text-sm text-[#FFD700] hover:text-white transition-colors"
                 >
-                  <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                  Donate
+                  <Coffee className="mr-1 h-4 w-4" />
+                  Support Us
                 </Link>
                 <Link
                   href="/daily-briefing"
-                  className="flex items-center text-xs sm:text-sm bg-[#FFD700] text-[#0A3C1F] px-2 py-1 sm:px-3 sm:py-1 rounded-full hover:bg-[#FFD700]/80 transition-colors"
+                  className="flex items-center text-sm bg-[#FFD700] text-[#0A3C1F] px-3 py-1 rounded-full hover:bg-white transition-colors font-semibold"
                 >
-                  <Gamepad2 className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                  <span className="hidden sm:inline">Attend Briefing</span>
-                  <span className="sm:hidden">Briefing</span>
+                  <Gamepad2 className="mr-1 h-4 w-4" />
+                  Daily Briefing
                 </Link>
               </div>
             </DialogTitle>
-            <DialogDescription className="text-gray-600 dark:text-gray-400">
-              Chat with Sgt. Ken, your AI assistant for San Francisco Deputy Sheriff recruitment questions.
+            <DialogDescription className="text-[#FFD700]/90 font-medium">
+              Your AI guide to becoming a San Francisco Deputy Sheriff. Get personalized guidance!
             </DialogDescription>
           </DialogHeader>
 
-          <div className="h-[60vh] sm:h-[400px] flex flex-col border rounded-md overflow-hidden">
-            <div className="flex-1 p-3 sm:p-4 overflow-y-auto">
-              <div className="space-y-3 sm:space-y-4">
-                {messages.map((message, _index) => (
-                  <div key={message.id || _index}>
-                    <div
-                      className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}
-                    >
-                      <div
-                        className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 ${
-                          message.role === "assistant"
-                            ? "bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white"
-                            : "bg-[#0A3C1F] text-white"
-                        }`}
-                      >
-                        <div className="whitespace-pre-wrap text-sm sm:text-base">
+          <div className="h-[75vh] sm:h-[550px] w-full flex flex-col border-2 border-[#0A3C1F]/20 rounded-lg overflow-hidden bg-gradient-to-b from-white to-gray-50">
+            <div className="flex-1 p-4 overflow-y-auto">
+              <div className="space-y-4">
+                {messages.map((message, index) => (
+                  <div key={message.id || index} className="slide-in">
+                    <div className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}>
+                      <div className={`max-w-[85%] rounded-xl p-4 message-bubble ${
+                        message.role === "assistant"
+                          ? "bg-gradient-to-br from-[#0A3C1F] to-[#1a5a30] text-white"
+                          : "bg-gradient-to-br from-[#FFD700] to-[#FFA500] text-[#0A3C1F] font-semibold"
+                      }`}>
+                        <div className="whitespace-pre-wrap text-sm leading-relaxed">
+                          {message.role === "assistant" && (
+                            <div className="flex items-center mb-2">
+                              <Shield className="h-4 w-4 text-[#FFD700] mr-2" />
+                              <span className="text-[#FFD700] font-semibold text-xs">SGT. KEN</span>
+                            </div>
+                          )}
                           {message.displayedContent || message.content}
                           {message.isTyping && typingMessageId === message.id && (
-                            <span className="inline-block w-2 h-4 bg-current ml-1 animate-pulse">|</span>
+                            <span className="inline-block w-2 h-4 bg-[#FFD700] ml-1 animate-pulse">|</span>
                           )}
                         </div>
 
-                        {message.quickReplies &&
-                          message.quickReplies.length > 0 && 
-                          !message.isTyping && (
-                            <div className="mt-2 sm:mt-3 flex flex-wrap gap-1 sm:gap-2">
-                              {message.quickReplies.map((reply, i) => (
-                                <button
-                                  key={i}
-                                  onClick={() => handleQuickReply(reply)}
-                                  disabled={isLoading || typingMessageId !== null}
-                                  className="text-xs px-2 py-1 sm:px-3 sm:py-1 rounded-full bg-[#FFD700] text-[#0A3C1F] font-medium hover:bg-[#FFD700]/80 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                  {reply}
-                                </button>
-                              ))}
-                            </div>
-                          )}
+                        {message.quickReplies && message.quickReplies.length > 0 && !message.isTyping && (
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {message.quickReplies.map((reply, i) => (
+                              <button
+                                key={i}
+                                onClick={() => handleQuickReply(reply)}
+                                disabled={isLoading || typingMessageId !== null}
+                                className={`text-xs px-3 py-2 rounded-full font-semibold transition-all quick-reply-btn ${
+                                  reply.includes("Register Now") 
+                                    ? "registration-prompt text-[#0A3C1F] hover:scale-105" 
+                                    : "bg-[#FFD700] text-[#0A3C1F] hover:bg-white"
+                                } disabled:opacity-50 disabled:cursor-not-allowed`}
+                              >
+                                {reply.includes("Register Now") && <UserPlus className="h-3 w-3 mr-1 inline" />}
+                                {reply}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
 
-                    {/* Show donation prompt if this message is flagged to show it */}
+                    {/* Enhanced donation prompt */}
                     {message.role === "assistant" && message.showDonation && (
-                      <div className="mt-2 sm:mt-3">
-                        <div className="max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
-                          <p className="text-sm sm:text-base">
-                            If you appreciate this site and my assistance,
-                            consider buying me a coffee!
+                      <div className="mt-3 slide-in">
+                        <div className="max-w-[85%] rounded-xl p-4 bg-gradient-to-br from-[#FFD700]/20 to-[#FFA500]/20 border-2 border-[#FFD700]/30">
+                          <div className="flex items-center mb-2">
+                            <Coffee className="h-4 w-4 text-[#0A3C1F] mr-2" />
+                            <span className="text-[#0A3C1F] font-semibold">Support Our Mission</span>
+                          </div>
+                          <p className="text-sm text-[#0A3C1F] mb-3">
+                            Help keep this platform free and accessible for all future deputies!
                           </p>
-                          <div className="mt-2 flex flex-wrap gap-1 sm:gap-2">
+                          <div className="flex flex-wrap gap-2">
                             <Link href="/donate?amount=10">
-                              <Button
-                                size="sm"
-                                className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
-                              >
-                                <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                                $10
+                              <Button size="sm" className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                                <Coffee className="mr-1 h-3 w-3" />$10
                               </Button>
                             </Link>
                             <Link href="/donate?amount=25">
-                              <Button
-                                size="sm"
-                                className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
-                              >
-                                <Coffee className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                                $25
+                              <Button size="sm" className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                                <Coffee className="mr-1 h-3 w-3" />$25
                               </Button>
                             </Link>
                             <Link href="/donate">
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="border-[#FFD700] text-[#0A3C1F] text-xs sm:text-sm px-2 py-1 sm:px-3 sm:py-2"
-                              >
-                                Other Amount
+                              <Button size="sm" variant="outline" className="border-[#0A3C1F] text-[#0A3C1F]">
+                                Custom Amount
                               </Button>
                             </Link>
                           </div>
@@ -928,23 +780,36 @@ export function AskSgtKenButton({
                 ))}
 
                 {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="max-w-[85%] sm:max-w-[80%] rounded-lg p-2 sm:p-3 bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white">
+                  <div className="flex justify-start slide-in">
+                    <div className="max-w-[85%] rounded-xl p-4 bg-gradient-to-br from-[#0A3C1F] to-[#1a5a30] text-white">
+                      <div className="flex items-center mb-2">
+                        <Shield className="h-4 w-4 text-[#FFD700] mr-2" />
+                        <span className="text-[#FFD700] font-semibold text-xs">SGT. KEN</span>
+                      </div>
                       <div className="flex space-x-1">
-                        <div
-                          className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
-                          style={{ animationDelay: "0ms" }}
-                        ></div>
-                        <div
-                          className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
-                          style={{ animationDelay: "150ms" }}
-                        ></div>
-                        <div
-                          className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
-                          style={{ animationDelay: "300ms" }}
-                        ></div>
+                        <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                        <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                        <div className="w-2 h-2 bg-[#FFD700] rounded-full animate-bounce" style={{ animationDelay: "300ms" }}></div>
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {/* Registration prompt for non-logged in users after first question */}
+                {hasAskedFirstQuestion && !isLoggedIn && (
+                  <div className="registration-prompt rounded-xl p-4 text-center">
+                    <UserPlus className="h-8 w-8 text-[#0A3C1F] mx-auto mb-2" />
+                    <h3 className="font-bold text-[#0A3C1F] mb-2">Ready to Unlock Everything?</h3>
+                    <p className="text-[#0A3C1F] text-sm mb-3">
+                      Register for FREE to continue chatting and access advanced features!
+                    </p>
+                    <Button 
+                      onClick={() => openModal("signup", "recruit", "")}
+                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white font-semibold"
+                    >
+                      <UserPlus className="h-4 w-4 mr-2" />
+                      Register Now - It's Free!
+                    </Button>
                   </div>
                 )}
 
@@ -952,26 +817,29 @@ export function AskSgtKenButton({
               </div>
             </div>
 
-            <div className="border-t dark:border-gray-700 p-2 sm:p-3">
-              <form
-                onSubmit={handleSubmit}
-                className="flex items-center space-x-2"
-              >
+            <div className="border-t-2 border-[#0A3C1F]/20 p-4 bg-white">
+              <form onSubmit={handleSubmit} className="flex items-center space-x-3">
                 <input
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder="Type your message..."
-                  className="flex-1 px-2 py-2 sm:px-3 sm:py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A3C1F] dark:bg-[#2A2A2A] dark:text-white dark:border-gray-600 text-sm sm:text-base"
-                  disabled={isLoading || typingMessageId !== null}
+                  placeholder={
+                    !hasAskedFirstQuestion 
+                      ? "Ask me how this page works first!" 
+                      : hasAskedFirstQuestion && !isLoggedIn
+                      ? "Register to continue chatting..."
+                      : "Type your message..."
+                  }
+                  className="flex-1 px-4 py-3 border-2 border-[#0A3C1F]/20 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FFD700] focus:border-[#FFD700] transition-all text-sm font-medium"
+                  disabled={isLoading || typingMessageId !== null || (!hasAskedFirstQuestion && input !== "How does this page work?") || (hasAskedFirstQuestion && !isLoggedIn)}
                 />
                 <Button
                   type="submit"
-                  disabled={isLoading || !input.trim() || typingMessageId !== null}
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white p-2 rounded-lg flex-shrink-0 disabled:opacity-50"
+                  disabled={isLoading || !input.trim() || typingMessageId !== null || (hasAskedFirstQuestion && !isLoggedIn)}
+                  className="bg-gradient-to-r from-[#0A3C1F] to-[#1a5a30] hover:from-[#0A3C1F]/90 hover:to-[#1a5a30]/90 text-white p-3 rounded-xl flex-shrink-0 disabled:opacity-50 transition-all"
                   aria-label="Send message"
                 >
-                  <Send className="h-4 w-4 sm:h-5 sm:w-5" />
+                  <Send className="h-5 w-5" />
                 </Button>
               </form>
             </div>

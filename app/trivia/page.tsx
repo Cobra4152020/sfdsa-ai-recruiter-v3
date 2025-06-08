@@ -1,6 +1,7 @@
 "use client";
 
 import { PageWrapper } from "@/components/page-wrapper";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
 import {
   Card,
   CardDescription,
@@ -180,7 +181,12 @@ export default function TriviaHubPage() {
 
   return (
     <PageWrapper>
-      <main className="container mx-auto px-4 py-8">
+      <AuthRequiredWrapper
+        requiredFeature="practice_tests"
+        title="San Francisco Trivia Games"
+        description="Test your knowledge of San Francisco and earn points"
+      >
+        <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
             <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2 md:mb-0">
@@ -409,6 +415,7 @@ export default function TriviaHubPage() {
           })}
         </div>
       </main>
+      </AuthRequiredWrapper>
     </PageWrapper>
   );
 }

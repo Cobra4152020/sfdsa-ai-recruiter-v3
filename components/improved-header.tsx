@@ -18,6 +18,7 @@ import {
   HelpCircle,
   Menu,
   X,
+  FileText,
 } from "lucide-react";
 import { useAuthModal } from "@/context/auth-modal-context";
 import { useUser } from "@/context/user-context";
@@ -96,16 +97,16 @@ export function ImprovedHeader() {
     handleNavigation(href);
   };
 
-  const handleLogin = () => {
+  const handleSignUp = () => {
     try {
       if (typeof openModal === "function") {
-        openModal("signin", "recruit");
+        openModal("signup", "recruit");
       } else {
-        router.push("/login");
+        router.push("/apply");
       }
     } catch (error) {
-      console.error("Error opening login modal:", error);
-      router.push("/login");
+      console.error("Error opening signup modal:", error);
+      router.push("/apply");
     }
   };
 
@@ -147,6 +148,11 @@ export function ImprovedHeader() {
           label: "Application Process",
           href: "/application-process",
           icon: <Shield className="w-4 h-4" />,
+        },
+        {
+          label: "Background Prep",
+          href: "/background-preparation",
+          icon: <FileText className="w-4 h-4" />,
         },
       ],
     },
@@ -208,11 +214,16 @@ export function ImprovedHeader() {
       ],
     },
     support: {
-      label: "Support",
+      label: "Help & Support",
       icon: <HelpCircle className="w-4 h-4" />,
       items: [
         {
-          label: "Chat with Sgt. Ken",
+          label: "FAQ",
+          href: "/faq",
+          icon: <HelpCircle className="w-4 h-4" />,
+        },
+        {
+          label: "Ask Sgt. Ken (AI Chat)",
           href: "/chat-with-sgt-ken",
           icon: <MessageSquare className="w-4 h-4" />,
         },
@@ -269,11 +280,11 @@ export function ImprovedHeader() {
               <div className="block md:hidden">
                 <div className="text-xs leading-tight">
                   <div>🌟 Start Your Hero Journey</div>
-                  <div>Become a San Francisco Deputy Sheriff Today! 🌟</div>
+                  <div>Become a Deputy Sheriff Today! 🌟</div>
                 </div>
               </div>
               <span className="hidden md:block text-sm whitespace-nowrap overflow-hidden text-ellipsis">
-                🌟 Start Your Hero Journey - Become a San Francisco Deputy Sheriff Today! 🌟
+                🌟 Start Your Hero Journey - Become a Deputy Sheriff Today! 🌟
               </span>
             </div>
             {/* Social and actions - hide some on mobile */}
@@ -416,10 +427,10 @@ export function ImprovedHeader() {
                 <div className="flex items-center space-x-4">
                   <Button
                     variant="ghost"
-                    onClick={handleLogin}
+                    onClick={handleSignUp}
                     className="text-[#0A3C1F] dark:text-[#FFD700]"
                   >
-                    Login
+                    Sign Up
                   </Button>
                   <Button
                     onClick={handleApplyNow}
@@ -505,10 +516,10 @@ export function ImprovedHeader() {
                 <div className="space-y-4">
                   <Button
                     variant="ghost"
-                    onClick={handleLogin}
+                    onClick={handleSignUp}
                     className="w-full text-[#0A3C1F] dark:text-[#FFD700] justify-center py-3 text-lg"
                   >
-                    Login
+                    Sign Up
                   </Button>
                   <Button
                     onClick={handleApplyNow}

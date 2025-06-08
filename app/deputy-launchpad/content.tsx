@@ -355,30 +355,48 @@ function PointsSystemExplainer() {
 
   const gamePoints = [
     {
-      name: "Trivia Games",
+      name: "Enhanced Trivia Games",
       description:
-        "Test your knowledge about San Francisco and law enforcement",
+        "Test your knowledge about San Francisco and law enforcement with our sophisticated scoring system",
       points:
-        "10 points per correct answer, 25 bonus points for perfect scores",
+        "10 points per correct answer, 25 bonus points for perfect scores, speed bonuses available",
       icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
     },
     {
-      name: "Word Constructor",
-      description: "Build words related to law enforcement and public safety",
-      points: "5 points per word, bonus points for longer words",
+      name: "Could You Make the Cut?",
+      description: "Interactive self-assessment to evaluate your readiness for law enforcement career",
+      points: "20 points for completion, bonus points for high scores",
+      icon: <Trophy className="h-5 w-5 text-orange-500" />,
+    },
+    {
+      name: "Sgt. Ken Says",
+      description: "Weekly wisdom and insights from our AI sergeant with career guidance",
+      points: "10 points per article read, sharing bonuses available",
+      icon: <Users className="h-5 w-5 text-indigo-500" />,
+    },
+    {
+      name: "Daily Mission Briefings",
+      description: "Interactive daily content with challenges and learning opportunities",
+      points: "15 points per completed briefing, streak bonuses available",
       icon: <FileText className="h-5 w-5 text-green-500" />,
     },
     {
-      name: "Memory Match",
-      description: "Match pairs of cards featuring law enforcement concepts",
-      points: "2 points per match, time bonuses available",
-      icon: <Star className="h-5 w-5 text-yellow-500" />,
+      name: "Badge Challenges",
+      description: "Complete special challenges designed to unlock achievement badges",
+      points: "25-100 points per challenge completed, badge-specific bonuses",
+      icon: <Award className="h-5 w-5 text-yellow-500" />,
     },
     {
-      name: "Spin to Win",
-      description: "Daily opportunity to spin for random point rewards",
-      points: "10-100 random points per day",
-      icon: <Zap className="h-5 w-5 text-purple-500" />,
+      name: "Sgt. Ken Chat",
+      description: "Interactive AI-powered conversations for guidance and tips",
+      points: "5 points per meaningful interaction, bonus points for engagement",
+      icon: <MessageSquare className="h-5 w-5 text-purple-500" />,
+    },
+    {
+      name: "TikTok Challenges",
+      description: "Participate in viral social media challenges to boost recruitment",
+      points: "50 points per challenge participation, viral bonuses available",
+      icon: <Zap className="h-5 w-5 text-red-500" />,
     },
   ];
 
@@ -445,11 +463,9 @@ function PointsSystemExplainer() {
             </div>
 
             <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">Games & Points</h3>
+              <h3 className="text-xl font-semibold mb-4">Interactive Features & Points</h3>
               <p className="mb-4">
-                Engage with our interactive games to earn points while learning
-                about law enforcement and the San Francisco Sheriff&apos;s
-                Department.
+                Engage with our enhanced interactive features including trivia games, daily briefings, badge challenges, and AI-powered assistance to earn points while advancing your recruitment journey.
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {gamePoints.map((game, index) => (
@@ -468,12 +484,12 @@ function PointsSystemExplainer() {
                 ))}
               </div>
               <div className="mt-4">
-                <Link href="/games">
+                <Link href="/trivia">
                   <Button
                     variant="outline"
                     className="border-[#0A3C1F] text-[#0A3C1F]"
                   >
-                    Play Games
+                    Start Interactive Features
                   </Button>
                 </Link>
               </div>
@@ -981,12 +997,24 @@ function UnlockableContentExplainer() {
   // ...
   const unlockablePages = [
     {
+      name: "Free College Programs",
+      description:
+        "Comprehensive guide to free college and educational benefits available to deputies",
+      pointsRequired: 250,
+      imageUrl: "/ccsf_frontpg.jpg",
+      path: "/free-college",
+      featured: true,
+      badge: "🎓 Popular"
+    },
+    {
       name: "G.I. Bill Benefits",
       description:
         "Detailed information on using G.I. Bill benefits for law enforcement training",
       pointsRequired: 300,
       imageUrl: "/veterans-law-enforcement-training.png",
       path: "/gi-bill",
+      featured: true,
+      badge: "🇺🇸 Veterans"
     },
     {
       name: "Discounted Housing Programs",
@@ -995,6 +1023,8 @@ function UnlockableContentExplainer() {
       pointsRequired: 500,
       imageUrl: "/san-francisco-apartments.png",
       path: "/discounted-housing",
+      featured: true,
+      badge: "🏠 Popular"
     },
     {
       name: "Advanced Training Resources",
@@ -1086,56 +1116,117 @@ function UnlockableContentExplainer() {
 
             <div>
               <h3 className="text-xl font-semibold mb-4">Unlockable Pages</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {unlockablePages.map((page) => (
-                  <Card
-                    key={page.name}
-                    className="overflow-hidden border-[#0A3C1F]/20"
-                  >
-                    <div className="relative h-40">
-                      <Image
-                        src={page.imageUrl || "/placeholder.svg"}
-                        alt={page.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                        <div className="p-4 text-white">
-                          <h4 className="font-bold text-lg">{page.name}</h4>
-                          <div className="flex items-center">
-                            <Lock className="h-4 w-4 mr-1" />
-                            <span className="text-sm">
-                              {page.pointsRequired} points required
-                            </span>
+              {/* Featured Pages Section */}
+              <div className="mb-8">
+                <h4 className="text-lg font-semibold mb-4 text-[#0A3C1F] flex items-center">
+                  <Star className="h-5 w-5 text-[#FFD700] mr-2" />
+                  Most Popular Benefits
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                  {unlockablePages.filter(page => page.featured).map((page) => (
+                    <Card
+                      key={page.name}
+                      className="overflow-hidden border-2 border-[#FFD700] bg-gradient-to-br from-yellow-50 to-amber-50 shadow-lg hover:shadow-xl transition-all duration-300"
+                    >
+                      <div className="relative h-32">
+                        {page.badge && (
+                          <div className="absolute top-2 right-2 z-10">
+                            <Badge className="bg-[#FFD700] text-[#0A3C1F] font-semibold text-xs">
+                              {page.badge}
+                            </Badge>
+                          </div>
+                        )}
+                        <Image
+                          src={page.imageUrl || "/placeholder.svg"}
+                          alt={page.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
+                          <div className="p-3 text-white">
+                            <h4 className="font-bold text-sm">{page.name}</h4>
+                            <div className="flex items-center">
+                              <Lock className="h-3 w-3 mr-1" />
+                              <span className="text-xs">
+                                {page.pointsRequired} points
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <CardContent className="pt-4">
-                      <p className="text-sm text-muted-foreground mb-4">
-                        {page.description}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-xs text-muted-foreground">
-                            Unlock progress
-                          </span>
-                          <Progress value={0} className="h-2 w-24" />
-                        </div>
+                      <CardContent className="pt-3 pb-3">
+                        <p className="text-xs text-muted-foreground mb-3">
+                          {page.description}
+                        </p>
                         <Link href={page.path}>
                           <Button
-                            variant="outline"
                             size="sm"
-                            className="text-xs"
+                            className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white text-xs"
                           >
-                            View Page
+                            Learn More
                           </Button>
                         </Link>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+
+              {/* Other Pages Section */}
+              <div>
+                <h4 className="text-lg font-semibold mb-4 text-[#0A3C1F]">Additional Resources</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {unlockablePages.filter(page => !page.featured).map((page) => (
+                    <Card
+                      key={page.name}
+                      className="overflow-hidden border-[#0A3C1F]/20"
+                    >
+                      <div className="relative h-40">
+                        <Image
+                          src={page.imageUrl || "/placeholder.svg"}
+                          alt={page.name}
+                          fill
+                          className="object-cover"
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
+                          <div className="p-4 text-white">
+                            <h4 className="font-bold text-lg">{page.name}</h4>
+                            <div className="flex items-center">
+                              <Lock className="h-4 w-4 mr-1" />
+                              <span className="text-sm">
+                                {page.pointsRequired} points required
+                              </span>
+                            </div>
+                          </div>
+                        </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                      <CardContent className="pt-4">
+                        <p className="text-sm text-muted-foreground mb-4">
+                          {page.description}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <span className="text-xs text-muted-foreground">
+                              Unlock progress
+                            </span>
+                            <Progress value={0} className="h-2 w-24" />
+                          </div>
+                          <Link href={page.path}>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-xs"
+                            >
+                              View Page
+                            </Button>
+                          </Link>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </div>
             </div>
 

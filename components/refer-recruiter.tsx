@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/context/user-context";
-import { AuthForm } from "./auth-form";
+import { useAuthModal } from "@/context/auth-modal-context";
 
 interface ReferRecruiterProps {
   className?: string;
@@ -33,10 +33,10 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [referralLink, setReferralLink] = useState("");
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const { toast } = useToast();
   const { isLoggedIn, currentUser } = useUser();
+  const { openModal } = useAuthModal();
 
   const generateReferralLink = () => {
     // Generate a unique referral link
@@ -47,16 +47,46 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
     return refLink;
   };
 
+  const awardReferralPoints = async () => {
+    if (!currentUser?.id) return;
+    
+    try {
+      const response = await fetch("/api/points/award", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          points: 100,
+          action: "referral",
+          description: `Referred a new recruit: ${name} (${email})`
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "🎉 Referral Points Earned!",
+          description: "+100 points for referring a recruit!",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error awarding referral points:", error);
+    }
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!isLoggedIn) {
-      setShowAuthDialog(true);
+      openModal("signup", "recruit");
       return;
     }
 
     // Generate referral link
     generateReferralLink();
+
+    // Award points for referral
+    awardReferralPoints();
 
     // Simulate sending invite
     toast({
@@ -80,11 +110,6 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
       description: "Referral link copied to clipboard",
       duration: 3000,
     });
-  };
-
-  const handleAuthSuccess = () => {
-    setShowAuthDialog(false);
-    handleSubmit(new Event("submit") as unknown as React.FormEvent);
   };
 
   return (
@@ -163,17 +188,6 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
           </div>
         </CardContent>
       </Card>
-
-      {/* Auth Dialog */}
-      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogTitle>Sign in to continue</DialogTitle>
-          <DialogDescription>
-            Sign in to refer friends and earn rewards
-          </DialogDescription>
-          <AuthForm onSuccess={handleAuthSuccess} />
-        </DialogContent>
-      </Dialog>
 
       {/* Success Dialog with Referral Link */}
       <Dialog open={showSuccessDialog} onOpenChange={setShowSuccessDialog}>

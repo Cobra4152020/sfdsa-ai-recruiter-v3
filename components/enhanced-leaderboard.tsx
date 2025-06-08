@@ -286,7 +286,7 @@ export function EnhancedLeaderboard({
             confetti({
               particleCount: 30,
               spread: 70,
-              origin: { y: 0.6 },
+              origin: { x: 0.5, y: 0.6 },
               colors: ["#FFD700", "#0A3C1F"],
             });
           }
@@ -457,7 +457,7 @@ export function EnhancedLeaderboard({
                         } ${user.rank && user.rank < 4 ? "shadow-sm" : ""}`}
                       >
                         <div className="flex items-center justify-center w-8 mr-3">
-                          {getRankIcon(user.rank || user.rank + offset)}
+                          {getRankIcon((user.rank || 0) + offset)}
                         </div>
 
                         <Avatar className="h-10 w-10 mr-3">
@@ -492,49 +492,53 @@ export function EnhancedLeaderboard({
                           </div>
                         </div>
 
-                        <div className="flex items-center">
-                          {user.is_current_user && (
-                            <Badge
-                              variant="outline"
-                              className="mr-2 bg-green-50"
-                            >
-                              You
-                            </Badge>
-                          )}
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-0">
+                          <div className="flex items-center flex-wrap gap-1 sm:gap-2">
+                            {user.is_current_user && (
+                              <Badge
+                                variant="outline"
+                                className="bg-green-50 text-xs"
+                              >
+                                You
+                              </Badge>
+                            )}
 
-                          {user.trending && (
-                            <Badge
-                              variant="outline"
-                              className="mr-2 bg-[#FFD700]/10 text-[#0A3C1F]"
-                            >
-                              <TrendingUp className="h-3 w-3 mr-1" /> Trending
-                            </Badge>
-                          )}
+                            {user.trending && (
+                              <Badge
+                                variant="outline"
+                                className="bg-[#FFD700]/10 text-[#0A3C1F] text-xs"
+                              >
+                                <TrendingUp className="h-3 w-3 mr-1" /> 
+                                <span className="hidden xs:inline">Trending</span>
+                                <span className="xs:hidden">↗</span>
+                              </Badge>
+                            )}
+                          </div>
 
-                          <div className="flex gap-2 ml-auto">
+                          <div className="flex gap-2 sm:ml-auto">
                             <Button
                               size="sm"
                               variant={
                                 user.liked_by_user ? "default" : "outline"
                               }
-                              className={`${user.liked_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"} transition-all`}
+                              className={`${user.liked_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"} transition-all text-xs px-2 py-1`}
                               onClick={() => handleLike(user.id)}
                             >
                               <Heart
-                                className={`h-4 w-4 mr-1 ${user.liked_by_user ? "fill-white" : ""}`}
+                                className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 ${user.liked_by_user ? "fill-white" : ""}`}
                               />
-                              <span>{user.likes || 0}</span>
+                              <span className="text-xs">{user.likes || 0}</span>
                             </Button>
                             <Button
                               size="sm"
                               variant={
                                 user.shared_by_user ? "default" : "outline"
                               }
-                              className={`${user.shared_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"} transition-all`}
+                              className={`${user.shared_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"} transition-all text-xs px-2 py-1`}
                               onClick={() => handleShare(user.id)}
                             >
-                              <Share2 className="h-4 w-4 mr-1" />
-                              <span>{user.shares || 0}</span>
+                              <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                              <span className="text-xs">{user.shares || 0}</span>
                             </Button>
                           </div>
                         </div>

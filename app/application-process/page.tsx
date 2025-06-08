@@ -303,18 +303,18 @@ export default function ApplicationProcessPage() {
               Your complete guide to becoming a San Francisco Deputy Sheriff. Follow these 10 comprehensive steps 
               to join our team and serve your community with pride and distinction.
             </p>
-            <div className="flex items-center justify-center mt-6 space-x-6">
-              <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50">
+            <div className="flex flex-wrap items-center justify-center mt-6 gap-3 md:gap-6">
+              <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
                 <Clock className="h-3 w-3 mr-1" />
-                Total Process: 6-12 months
+                <span className="hidden sm:inline">Total Process: </span>6-12 months
               </Badge>
-              <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50">
+              <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
                 <Star className="h-3 w-3 mr-1" />
-                Competitive Selection
+                <span className="hidden sm:inline">Competitive </span>Selection
               </Badge>
-              <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50">
+              <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
                 <Zap className="h-3 w-3 mr-1" />
-                Paid Academy Training
+                <span className="hidden sm:inline">Paid </span>Academy Training
               </Badge>
             </div>
           </motion.div>
@@ -331,27 +331,29 @@ export default function ApplicationProcessPage() {
               >
                 <Card className="bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30 hover:shadow-xl transition-all duration-300">
                   <CardHeader className="bg-white dark:bg-black">
-                    <div className="flex items-start gap-6">
-                      <div className={`flex-shrink-0 w-16 h-16 ${getStepColor(step.color)} rounded-full flex items-center justify-center text-white shadow-lg`}>
+                    <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                      <div className={`flex-shrink-0 w-16 h-16 ${getStepColor(step.color)} rounded-full flex items-center justify-center text-white shadow-lg mx-auto sm:mx-0`}>
                         <div className="text-center">
                           <div className="font-bold text-lg">{step.step}</div>
                         </div>
                       </div>
-                      <div className="flex-grow">
-                        <div className="flex items-center gap-4 mb-2">
-                          <CardTitle className="text-2xl text-[#0A3C1F] dark:text-[#FFD700] flex items-center">
-                            <div className="mr-3 text-[#0A3C1F] dark:text-[#FFD700]">
+                      <div className="flex-grow w-full">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3">
+                          <CardTitle className="text-xl sm:text-2xl text-[#0A3C1F] dark:text-[#FFD700] flex items-center text-center sm:text-left justify-center sm:justify-start">
+                            <div className="mr-2 sm:mr-3 text-[#0A3C1F] dark:text-[#FFD700]">
                               {step.icon}
                             </div>
                             {step.title}
                           </CardTitle>
-                          <Badge className={getDifficultyColor(step.difficulty)}>
-                            {step.difficulty}
-                          </Badge>
-                          <Badge variant="outline" className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                            <Timer className="h-3 w-3 mr-1" />
-                            {step.timeframe}
-                          </Badge>
+                          <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+                            <Badge className={`${getDifficultyColor(step.difficulty)} text-xs`}>
+                              {step.difficulty}
+                            </Badge>
+                            <Badge variant="outline" className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs">
+                              <Timer className="h-3 w-3 mr-1" />
+                              {step.timeframe}
+                            </Badge>
+                          </div>
                         </div>
                         <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
                           {step.description}
@@ -360,9 +362,9 @@ export default function ApplicationProcessPage() {
                     </div>
                   </CardHeader>
                   <CardContent className="bg-white dark:bg-black">
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                       <div>
-                        <h4 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-3 flex items-center">
+                        <h4 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-3 flex items-center justify-center sm:justify-start">
                           <CheckCircle2 className="h-4 w-4 mr-2" />
                           Requirements
                         </h4>
@@ -370,13 +372,13 @@ export default function ApplicationProcessPage() {
                           {step.requirements.map((req, reqIndex) => (
                             <li key={reqIndex} className="flex items-start text-gray-600 dark:text-gray-300">
                               <div className="w-2 h-2 bg-[#0A3C1F] dark:bg-[#FFD700] rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                              <span className="text-sm">{req}</span>
+                              <span className="text-sm leading-relaxed">{req}</span>
                             </li>
                           ))}
                         </ul>
                       </div>
                       <div>
-                        <h4 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-3 flex items-center">
+                        <h4 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-3 flex items-center justify-center sm:justify-start">
                           <Star className="h-4 w-4 mr-2" />
                           Success Tips
                         </h4>
@@ -384,7 +386,7 @@ export default function ApplicationProcessPage() {
                           {step.tips.map((tip, tipIndex) => (
                             <li key={tipIndex} className="flex items-start text-gray-600 dark:text-gray-300">
                               <div className="w-2 h-2 bg-green-500 dark:bg-[#FFD700] rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                              <span className="text-sm">{tip}</span>
+                              <span className="text-sm leading-relaxed">{tip}</span>
                             </li>
                           ))}
                         </ul>
@@ -418,16 +420,16 @@ export default function ApplicationProcessPage() {
                     <h3 className="font-semibold text-amber-800 dark:text-amber-300 mb-3">Important Process Information</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <ul className="space-y-2 text-amber-700 dark:text-amber-200 text-sm">
-                        <li>• Each step must be completed successfully to advance</li>
-                        <li>• Background investigation continues throughout the process</li>
-                        <li>• Honesty and integrity are essential at every stage</li>
-                        <li>• Medical and psychological evaluations are confidential</li>
+                        <li className="leading-relaxed">• Each step must be completed successfully to advance</li>
+                        <li className="leading-relaxed">• Background investigation continues throughout the process</li>
+                        <li className="leading-relaxed">• Honesty and integrity are essential at every stage</li>
+                        <li className="leading-relaxed">• Medical and psychological evaluations are confidential</li>
                       </ul>
                       <ul className="space-y-2 text-amber-700 dark:text-amber-200 text-sm">
-                        <li>• Process timelines may vary based on application volume</li>
-                        <li>• Candidates may be disqualified at any stage</li>
-                        <li>• Academy training is mandatory and unpaid leave is not permitted</li>
-                        <li>• Questions? Contact recruitment team immediately</li>
+                        <li className="leading-relaxed">• Process timelines may vary based on application volume</li>
+                        <li className="leading-relaxed">• Candidates may be disqualified at any stage</li>
+                        <li className="leading-relaxed">• Academy training is mandatory and unpaid leave is not permitted</li>
+                        <li className="leading-relaxed">• Questions? Contact recruitment team immediately</li>
                       </ul>
                     </div>
                   </div>
@@ -482,18 +484,18 @@ export default function ApplicationProcessPage() {
                       </Button>
                     </Link>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                     <div className="flex items-center justify-center text-white/80 dark:text-gray-400">
-                      <Phone className="h-4 w-4 mr-2" />
-                      Recruitment: (415) 554-7225
+                      <Phone className="h-4 w-4 mr-2 flex-shrink-0" />
+                      <span className="text-center sm:text-left">Recruitment: (415) 554-7225</span>
                     </div>
                     <div className="flex items-center justify-center text-white/80 dark:text-gray-400">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      1 Dr. Carlton B. Goodlett Place
+                      <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+                      <span className="text-center sm:text-left">1 Dr. Carlton B. Goodlett Place</span>
                     </div>
-                    <div className="flex items-center justify-center text-white/80 dark:text-gray-400">
-                      <Clock className="h-4 w-4 mr-2" />
-                      Mon-Fri: 8:00 AM - 5:00 PM
+                    <div className="flex items-center justify-center text-white/80 dark:text-gray-400 sm:col-span-2 lg:col-span-1">
+                      <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
+                      <span className="text-center sm:text-left">Mon-Fri: 8:00 AM - 5:00 PM</span>
                     </div>
                   </div>
                 </div>

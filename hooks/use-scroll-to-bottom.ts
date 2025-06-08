@@ -6,7 +6,13 @@ export function useScrollToBottom<
 >(ref: RefObject<T>, dependencies: D) {
   useEffect(() => {
     if (ref.current) {
-      ref.current.scrollTop = ref.current.scrollHeight;
+      // Use smooth scrolling with a slight delay to give users time to read
+      setTimeout(() => {
+        ref.current?.scrollTo({
+          top: ref.current.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 500); // 500ms delay before scrolling
     }
   }, [ref, ...dependencies]);
 }

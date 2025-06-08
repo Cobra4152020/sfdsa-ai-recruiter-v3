@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { PageWrapper } from "@/components/page-wrapper";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
 import { BriefingCard } from "@/components/daily-briefing/briefing-card";
 import { BriefingStats as BriefingStatsComponent } from "@/components/daily-briefing/briefing-stats";
 import { BriefingLeaderboard } from "@/components/daily-briefing/briefing-leaderboard";
@@ -108,7 +109,12 @@ export default function DailyBriefingPage() {
 
   return (
     <PageWrapper>
-      <div className="container mx-auto px-4 py-8">
+      <AuthRequiredWrapper
+        requiredFeature="sgt_ken_chat"
+        title="Daily Briefing Access"
+        description="Stay informed with daily updates from Sgt. Ken and the department"
+      >
+        <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Hero Section with Image */}
           <motion.div 
@@ -459,6 +465,7 @@ export default function DailyBriefingPage() {
           </div>
         </div>
       </div>
+      </AuthRequiredWrapper>
     </PageWrapper>
   );
 }

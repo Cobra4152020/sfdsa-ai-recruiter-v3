@@ -9,6 +9,7 @@ import { ImprovedHeader } from "@/components/improved-header";
 import { MobileOptimizedFooter } from "@/components/mobile-optimized-footer";
 import { UnifiedAuthModal } from "@/components/unified-auth-modal";
 import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
+import { FloatingShareWidget } from "@/components/floating-share-widget";
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler";
 import { ErrorMonitor } from "@/components/error-monitor";
 import PerformanceMonitor from "@/components/performance-monitor";
@@ -96,6 +97,7 @@ export default function RootLayout({
                             className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
                           />
                         </div>
+                        <FloatingShareWidget />
                         <UnifiedAuthModal />
                       </div>
                     </PerformanceMonitor>

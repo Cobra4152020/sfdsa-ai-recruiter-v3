@@ -26,6 +26,7 @@ interface AuthRequiredWrapperProps {
   title?: string;
   description?: string;
   className?: string;
+  heroImage?: string;
 }
 
 export function AuthRequiredWrapper({
@@ -34,7 +35,8 @@ export function AuthRequiredWrapper({
   minimumPoints = 0,
   title,
   description,
-  className
+  className,
+  heroImage
 }: AuthRequiredWrapperProps) {
   const { currentUser, isLoading } = useUser();
   const { openModal } = useAuthModal();
@@ -120,17 +122,39 @@ export function AuthRequiredWrapper({
   if (!currentUser) {
     return (
       <div className={`${className}`}>
-        <Card className={`${config.color} max-w-2xl mx-auto`}>
-          <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 p-4 bg-white rounded-full shadow-sm">
-              {config.icon}
+        <Card className={`${config.color} max-w-2xl mx-auto overflow-hidden`}>
+          {heroImage && (
+            <div className="relative h-48 w-full overflow-hidden">
+              <img 
+                src={heroImage} 
+                alt={title || config.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6">
+                <CardTitle className="text-3xl font-bold text-white mb-2">
+                  {title || config.title}
+                </CardTitle>
+                <p className="text-gray-100 text-lg">
+                  {description || config.description}
+                </p>
+              </div>
             </div>
-            <CardTitle className="text-2xl">
-              {title || config.title}
-            </CardTitle>
-            <p className="text-gray-600 mt-2">
-              {description || config.description}
-            </p>
+          )}
+          <CardHeader className={`text-center ${heroImage ? 'pt-6 pb-4' : 'pb-4'}`}>
+            {!heroImage && (
+              <>
+                <div className="mx-auto mb-4 p-4 bg-white rounded-full shadow-sm">
+                  {config.icon}
+                </div>
+                <CardTitle className="text-2xl">
+                  {title || config.title}
+                </CardTitle>
+                <p className="text-gray-600 mt-2">
+                  {description || config.description}
+                </p>
+              </>
+            )}
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
@@ -199,17 +223,39 @@ export function AuthRequiredWrapper({
 
     return (
       <div className={`${className}`}>
-        <Card className={`${config.color} max-w-2xl mx-auto`}>
-          <CardHeader className="text-center pb-4">
-            <div className="mx-auto mb-4 p-4 bg-white rounded-full shadow-sm">
-              <Lock className="h-6 w-6 text-gray-600" />
+        <Card className={`${config.color} max-w-2xl mx-auto overflow-hidden`}>
+          {heroImage && (
+            <div className="relative h-48 w-full overflow-hidden">
+              <img 
+                src={heroImage} 
+                alt={title || config.title}
+                className="w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center text-white px-6">
+                <CardTitle className="text-3xl font-bold text-white mb-2">
+                  {title || `${config.title} Locked`}
+                </CardTitle>
+                <p className="text-gray-100 text-lg">
+                  You need more points to access this feature
+                </p>
+              </div>
             </div>
-            <CardTitle className="text-2xl">
-              {title || `${config.title} Locked`}
-            </CardTitle>
-            <p className="text-gray-600 mt-2">
-              You need more points to access this feature
-            </p>
+          )}
+          <CardHeader className={`text-center ${heroImage ? 'pt-6 pb-4' : 'pb-4'}`}>
+            {!heroImage && (
+              <>
+                <div className="mx-auto mb-4 p-4 bg-white rounded-full shadow-sm">
+                  <Lock className="h-6 w-6 text-gray-600" />
+                </div>
+                <CardTitle className="text-2xl">
+                  {title || `${config.title} Locked`}
+                </CardTitle>
+                <p className="text-gray-600 mt-2">
+                  You need more points to access this feature
+                </p>
+              </>
+            )}
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-3">

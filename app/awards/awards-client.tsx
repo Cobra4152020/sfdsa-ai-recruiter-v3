@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { AdvancedLeaderboard } from "@/components/advanced-leaderboard";
 import { ShareToUnlock } from "@/components/share-to-unlock";
 import { ReferRecruiter } from "@/components/refer-recruiter";
+import { ViralShareIncentives } from "@/components/viral-share-incentives";
 import TopRecruitsScroll from "@/components/top-recruits-scroll";
 
 // Error boundary component
@@ -84,8 +85,7 @@ export default function AwardsClient() {
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-[#0A3C1F] via-[#FFD700] to-[#0A3C1F] rounded-full"></div>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mt-8">
-            Recognize outstanding achievement in our recruitment program. Like,
-            share, and refer to earn points and unlock exclusive badges.
+            Maximize your impact! Share, refer, and compete to earn points, unlock exclusive badges, and help us find the best candidates.
           </p>
         </div>
 
@@ -94,8 +94,20 @@ export default function AwardsClient() {
         </div>
 
         <div className="mb-16">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-[#0A3C1F] mb-4">
+              🚀 Go Viral & Earn Big
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Our most successful recruits use social sharing to amplify their impact. Join viral challenges, compete on leaderboards, and earn massive point bonuses!
+            </p>
+          </div>
+          <ViralShareIncentives />
+        </div>
+
+        <div className="mb-16">
           <h2 className="text-3xl font-bold text-[#0A3C1F] text-center mb-8">
-            Unlock Your Achievements
+            Traditional Sharing & Referrals
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <ShareToUnlock

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { PageWrapper } from "@/components/page-wrapper";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -271,11 +272,16 @@ export default function CouldYouMakeTheCutPage() {
 
   return (
     <PageWrapper>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+      <AuthRequiredWrapper
+        requiredFeature="games"
+        title="Deputy Skills Challenge"
+        description="Test your law enforcement decision-making skills with real scenarios"
       >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
         {!hasStarted ? (
           // Game Introduction
           <Card className="text-center">
@@ -436,6 +442,7 @@ export default function CouldYouMakeTheCutPage() {
           </div>
         )}
       </motion.div>
+      </AuthRequiredWrapper>
     </PageWrapper>
   );
 } 

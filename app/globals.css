@@ -139,9 +139,24 @@
 /* Mobile-optimized dialog styles */
 @media (max-width: 640px) {
   [role="dialog"] {
-    margin: 1rem;
-    max-width: calc(100vw - 2rem);
-    max-height: calc(100vh - 2rem);
+    margin: 0.5rem;
+    max-width: calc(100vw - 1rem);
+    max-height: calc(100vh - 1rem);
+    min-height: auto;
+  }
+  
+  /* Ensure modal content is scrollable on mobile */
+  [role="dialog"] > div > div {
+    max-height: calc(100vh - 8rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent body scroll when modal is open on mobile */
+  body.modal-open {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
   }
 }
 
@@ -243,6 +258,24 @@ select:focus {
   select {
     padding: 0.75rem;
     border-radius: 0.5rem;
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  /* Modal input specific optimizations */
+  [role="dialog"] input,
+  [role="dialog"] textarea,
+  [role="dialog"] select {
+    font-size: 16px;
+    min-height: 44px; /* iOS minimum touch target */
+  }
+  
+  /* Additional mobile form optimizations */
+  [role="dialog"] .space-y-4 > * + * {
+    margin-top: 0.75rem; /* Tighter spacing on mobile */
+  }
+  
+  [role="dialog"] .grid-cols-2 {
+    gap: 0.5rem; /* Reduce gap on mobile */
   }
 }
 

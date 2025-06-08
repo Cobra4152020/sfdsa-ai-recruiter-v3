@@ -1,18 +1,21 @@
 "use client";
 
-import { PointsGate } from "@/components/points-gate";
+import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
+import { PageWrapper } from "@/components/page-wrapper";
 import DiscountedHousingContent from "./content";
 
 export default function DiscountedHousingClient() {
   return (
-    <PointsGate
-      requiredPoints={500}
-      pageName="Discounted Housing Programs"
-      pageDescription="Learn about special housing programs and discounts available to San Francisco Deputy Sheriffs. Find affordable housing options in and around San Francisco."
-      imageUrl="/san-francisco-apartments.png"
-      fallbackMessage="Sign up to access information about discounted housing programs for San Francisco Deputy Sheriffs."
-    >
-      <DiscountedHousingContent />
-    </PointsGate>
+    <PageWrapper>
+      <AuthRequiredWrapper
+        requiredFeature="locked_content"
+        minimumPoints={500}
+        title="Discounted Housing Programs"
+        description="Learn about special housing programs and discounts available to San Francisco Deputy Sheriffs. Find affordable housing options in and around San Francisco."
+        heroImage="/san-francisco-apartments.png"
+      >
+        <DiscountedHousingContent />
+      </AuthRequiredWrapper>
+    </PageWrapper>
   );
 }

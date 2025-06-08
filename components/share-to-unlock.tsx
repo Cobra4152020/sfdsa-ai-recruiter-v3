@@ -31,7 +31,7 @@ import {
 import { AchievementBadge } from "./achievement-badge";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/context/user-context";
-import { AuthForm } from "./auth-form";
+import { useAuthModal } from "@/context/auth-modal-context";
 import confetti from "canvas-confetti";
 import type { BadgeType } from "@/types/badge";
 
@@ -53,9 +53,9 @@ export function ShareToUnlock({
   const [isLocked, setIsLocked] = useState(true);
   const [sharesCompleted, setSharesCompleted] = useState(0);
   const [showShareDialog, setShowShareDialog] = useState(false);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { toast } = useToast();
-  const { isLoggedIn } = useUser();
+  const { isLoggedIn, currentUser } = useUser();
+  const { openModal } = useAuthModal();
 
   const handleShare = (platform: string) => {
     // Create share content
@@ -111,6 +111,9 @@ export function ShareToUnlock({
       }
     }
     
+    // Award points for sharing
+    awardSharingPoints(platform);
+    
     // Update share progress
     setSharesCompleted((prev) => {
       const newCount = prev + 1;
@@ -150,16 +153,38 @@ export function ShareToUnlock({
 
   const handleShareClick = () => {
     if (!isLoggedIn) {
-      setShowAuthDialog(true);
+      openModal("signup", "recruit");
       return;
     }
 
     setShowShareDialog(true);
   };
 
-  const handleAuthSuccess = () => {
-    setShowAuthDialog(false);
-    setShowShareDialog(true);
+  const awardSharingPoints = async (platform: string) => {
+    if (!currentUser?.id) return;
+    
+    try {
+      const response = await fetch("/api/points/award", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          points: 25,
+          action: "social_sharing",
+          description: `Shared recruitment content on ${platform}`
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "🎉 Points Earned!",
+          description: `+25 points for sharing on ${platform}!`,
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error awarding sharing points:", error);
+    }
   };
 
   return (
@@ -290,16 +315,6 @@ export function ShareToUnlock({
         </DialogContent>
       </Dialog>
 
-      {/* Auth Dialog */}
-      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogTitle>Sign in to continue</DialogTitle>
-          <DialogDescription>
-            Sign in to unlock badges through sharing
-          </DialogDescription>
-          <AuthForm onSuccess={handleAuthSuccess} />
-        </DialogContent>
-      </Dialog>
     </>
   );
 }

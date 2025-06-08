@@ -34,7 +34,7 @@ import {
   Heart as HeartFilled,
   Share2 as Share2Filled,
 } from "lucide-react";
-import { AuthForm } from "@/components/auth-form";
+import { useAuthModal } from "@/context/auth-modal-context";
 import {
   Dialog,
   DialogContent,
@@ -102,7 +102,6 @@ export function AdvancedLeaderboard({
   const [totalUsers, setTotalUsers] = useState(0);
   const [timeframe, setTimeframe] = useState<string>("all-time");
   const [offset, setOffset] = useState(0);
-  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const [pendingAction, setPendingAction] = useState<{
     type: "like" | "share";
     userId: string;
@@ -116,6 +115,7 @@ export function AdvancedLeaderboard({
 
   const { isLoggedIn, currentUser } = useUser();
   const { toast } = useToast();
+  const { openModal } = useAuthModal();
   const spotlightRef = useRef<HTMLDivElement>(null);
 
   // Use the current user ID from context if not provided as prop
@@ -385,11 +385,46 @@ export function AdvancedLeaderboard({
     }
   };
 
+  const awardLikePoints = async () => {
+    if (!currentUser?.id) return;
+    
+    try {
+      const response = await fetch("/api/points/award", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          points: 5,
+          action: "like_support",
+          description: "Liked a fellow recruit's achievement"
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "🎉 Support Points Earned!",
+          description: "+5 points for supporting a fellow recruit!",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error awarding like points:", error);
+    }
+  };
+
   const handleLike = (userId: string) => {
     if (!isLoggedIn) {
-      setPendingAction({ type: "like", userId });
-      setShowAuthDialog(true);
+      openModal("signup", "recruit");
       return;
+    }
+
+    // Check if user is already liked
+    const user = leaderboardData.find(u => u.id === userId);
+    const isLiking = !user?.liked_by_user;
+
+    // Award points for liking (not for unliking)
+    if (isLiking) {
+      awardLikePoints();
     }
 
     // Update the liked status
@@ -420,19 +455,16 @@ export function AdvancedLeaderboard({
       }),
     );
 
-    const isLiking = !leaderboardData.find(u => u.id === userId)?.liked_by_user;
-
     toast({
       title: isLiking ? "Thanks for your support!" : "Like removed",
-      description: isLiking ? "Your like has been recorded. You earned 5 points!" : "Your like has been removed.",
+      description: isLiking ? "Your like has been recorded!" : "Your like has been removed.",
       duration: 3000,
     });
   };
 
   const handleShare = (userId: string) => {
     if (!isLoggedIn) {
-      setPendingAction({ type: "share", userId });
-      setShowAuthDialog(true);
+      openModal("signup", "recruit");
       return;
     }
 
@@ -441,6 +473,33 @@ export function AdvancedLeaderboard({
     
     // Store the userId for sharing
     setPendingAction({ type: "share", userId });
+  };
+
+  const awardSharingPoints = async (platform: string) => {
+    if (!currentUser?.id) return;
+    
+    try {
+      const response = await fetch("/api/points/award", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          points: 10,
+          action: "social_sharing",
+          description: `Shared recruit profile on ${platform}`
+        })
+      });
+
+      if (response.ok) {
+        toast({
+          title: "🎉 Sharing Points Earned!",
+          description: `+10 points for sharing on ${platform}!`,
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error("Error awarding sharing points:", error);
+    }
   };
 
   const shareToSocialMedia = (platform: string) => {
@@ -496,6 +555,9 @@ export function AdvancedLeaderboard({
       }
     }
 
+    // Award points for sharing
+    awardSharingPoints(platform);
+
     // Update the shared status and award points
     setLeaderboardData((prev) =>
       prev.map((user) => {
@@ -532,7 +594,7 @@ export function AdvancedLeaderboard({
 
     toast({
       title: `Shared on ${platform}!`,
-      description: "Thanks for spreading the word about our recruitment program. You earned 10 points!",
+      description: "Thanks for spreading the word about our recruitment program!",
       duration: 3000,
     });
 
@@ -553,23 +615,9 @@ export function AdvancedLeaderboard({
     }
   };
 
-  const handleAuthSuccess = () => {
-    setShowAuthDialog(false);
-
-    // Process the pending action
-    if (pendingAction) {
-      if (pendingAction.type === "like") {
-        handleLike(pendingAction.userId);
-      } else if (pendingAction.type === "share") {
-        handleShare(pendingAction.userId);
-      }
-      setPendingAction(null);
-    }
-  };
-
   const handleReferRecruit = () => {
     if (!isLoggedIn) {
-      setShowAuthDialog(true);
+      openModal("signup", "recruit");
       return;
     }
 
@@ -1122,21 +1170,6 @@ export function AdvancedLeaderboard({
           </div>
         </CardContent>
       </Card>
-
-      {/* Login Modal */}
-      <Dialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
-        <DialogContent className="sm:max-w-md">
-          <DialogTitle>Sign in to continue</DialogTitle>
-          <DialogDescription>
-            {pendingAction?.type === "like"
-              ? "Sign in to like this recruiter's profile."
-              : pendingAction?.type === "share"
-                ? "Sign in to share this recruiter's profile."
-                : "Sign in to access this feature."}
-          </DialogDescription>
-          <AuthForm onSuccess={handleAuthSuccess} />
-        </DialogContent>
-      </Dialog>
 
       {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>

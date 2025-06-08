@@ -2,6 +2,7 @@
 
 import { HeroSection } from "@/components/hero-section";
 import { BenefitsSection } from "@/components/benefits-section";
+import { PopularLockedBenefits } from "@/components/popular-locked-benefits";
 import { TestimonialsSection } from "@/components/testimonials-section";
 import { FAQSection } from "@/components/faq-section";
 import { CTASection } from "@/components/cta-section";
@@ -62,6 +63,10 @@ function HomeContent() {
 
         <section id="benefits" className="w-full scroll-mt-20">
           <BenefitsSection />
+        </section>
+
+        <section className="w-full scroll-mt-20">
+          <PopularLockedBenefits />
         </section>
 
         <section id="testimonials" className="w-full scroll-mt-20">
