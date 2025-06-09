@@ -21,7 +21,7 @@ export function MobileOptimizedFooter() {
 
   if (!mounted) {
     return (
-      <footer className="bg-[#0A3C1F] text-white">
+      <footer className="bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 py-2">
           <div className="animate-pulse">
             <div className="h-8 bg-gray-700 rounded"></div>
@@ -34,7 +34,7 @@ export function MobileOptimizedFooter() {
   return (
     <>
       {/* Mobile Footer - Ultra Compact */}
-      <footer className="md:hidden bg-[#0A3C1F] text-white">
+      <footer className="md:hidden bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 py-2">
           {/* Header row */}
           <div className="flex items-center justify-between mb-2">
@@ -43,13 +43,13 @@ export function MobileOptimizedFooter() {
               className="flex items-center"
               aria-label="Go to homepage"
             >
-              <ShieldLogo className="w-4 h-4 text-[#FFD700] mr-1" />
-              <span className="font-bold text-xs">SF Deputy Sheriff</span>
+              <ShieldLogo className="w-4 h-4 text-secondary mr-1" />
+              <span className="font-bold text-xs text-white dark:text-yellow-400">SF Deputy Sheriff</span>
             </button>
             <Button
               onClick={() => handleNavigation("/donate")}
               size="sm"
-              className="py-1 px-2 text-xs bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90"
+              className="py-1 px-2 text-xs bg-secondary text-secondary-foreground hover:bg-secondary/90"
             >
               Donate
             </Button>
@@ -68,7 +68,7 @@ export function MobileOptimizedFooter() {
               <button
                 key={href}
                 onClick={() => handleNavigation(href)}
-                className="text-left text-white/80 hover:text-[#FFD700] transition-colors"
+                className="text-left text-white/90 dark:text-yellow-200/80 hover:text-secondary transition-colors"
               >
                 {label}
               </button>
@@ -76,29 +76,29 @@ export function MobileOptimizedFooter() {
           </div>
 
           {/* Bottom row - Contact & Social */}
-          <div className="border-t border-white/20 pt-2">
+          <div className="border-t border-white/20 dark:border-yellow-400/20 pt-2">
             <div className="flex justify-between items-center text-xs">
-              <div className="text-white/70">
-                <a href="tel:+14156962428" className="hover:text-[#FFD700]">
+              <div className="text-white/90 dark:text-yellow-200/80">
+                <a href="tel:+14156962428" className="hover:text-secondary">
                   (415) 696-2428
                 </a>
                 <span className="mx-1">•</span>
-                <a href="mailto:info@sfdeputysheriff.com" className="hover:text-[#FFD700]">
+                <a href="mailto:info@sfdeputysheriff.com" className="hover:text-secondary">
                   Email
                 </a>
               </div>
               <div className="flex space-x-2">
                 {[
-                  { href: "https://www.facebook.com/SFDeputySheriff", icon: Facebook },
-                  { href: "https://twitter.com/SFDeputySheriff", icon: Twitter },
-                  { href: "https://www.instagram.com/sfdeputysheriff", icon: Instagram }
+                  { href: "https://www.facebook.com/SanFranciscoDeputySheriffsAssociation", icon: Facebook },
+                  { href: "https://twitter.com/sanfranciscodsa", icon: Twitter },
+                  { href: "https://www.instagram.com/sfdeputysheriffsassociation/", icon: Instagram }
                 ].map(({ href, icon: Icon }) => (
                   <a
                     key={href}
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-white/70 hover:text-[#FFD700]"
+                    className="text-white/90 dark:text-yellow-200/80 hover:text-secondary"
                   >
                     <Icon size={12} />
                   </a>

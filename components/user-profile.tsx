@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { LogOut, User, Settings, Award, ChevronDown } from "lucide-react";
+import { LogOut, User, Settings, Award, ChevronDown, Shield } from "lucide-react";
 import { useUser } from "@/context/user-context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 
 export function UserProfile() {
-  const { currentUser, logout } = useUser();
+  const { currentUser, signOut } = useUser();
   const [isOpen, setIsOpen] = useState(false);
 
   if (!currentUser) {
@@ -24,7 +24,7 @@ export function UserProfile() {
   }
 
   const handleLogout = async () => {
-    await logout();
+    await signOut();
     setIsOpen(false);
   };
 
@@ -64,6 +64,12 @@ export function UserProfile() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem asChild>
+          <Link href="/dashboard" className="flex items-center cursor-pointer">
+            <Shield className="mr-2 h-4 w-4" />
+            <span>Dashboard</span>
+          </Link>
+        </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/profile" className="flex items-center cursor-pointer">
             <User className="mr-2 h-4 w-4" />

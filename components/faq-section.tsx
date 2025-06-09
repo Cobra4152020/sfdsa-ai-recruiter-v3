@@ -56,20 +56,20 @@ export function FAQSection() {
   };
 
   return (
-    <section className="w-full py-8 sm:py-12 md:py-20 bg-[#0A3C1F] text-white">
+    <section className="w-full py-8 sm:py-12 md:py-20 bg-card text-card-foreground">
       <div className="container mx-auto px-4 sm:px-6">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-[#F8F5EE] text-center sm:text-left">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 sm:mb-8 text-card-foreground text-center sm:text-left">
             Frequently Asked Questions
           </h2>
           <div className="text-center sm:text-left mb-8 sm:mb-12">
-            <p className="text-sm sm:text-base text-[#F8F5EE]/80 max-w-3xl mx-auto">
+            <p className="text-sm sm:text-base text-card-foreground/80 max-w-3xl mx-auto">
               Find answers to common questions about becoming a San Francisco
               Deputy Sheriff.
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto divide-y divide-white/10">
+          <div className="max-w-4xl mx-auto divide-y divide-border">
             {faqs.map((faq, index) => (
               <div key={index} className="py-4 sm:py-5">
                 <button
@@ -78,14 +78,14 @@ export function FAQSection() {
                   aria-expanded={openIndex === index}
                   aria-controls={`faq-answer-${index}`}
                 >
-                  <h3 className="text-base sm:text-lg font-medium text-[#FFD700] pr-4 group-hover:text-[#FFD700]/80 transition-colors">
+                  <h3 className="text-base sm:text-lg font-medium text-primary pr-4 group-hover:text-primary/80 transition-colors">
                     {faq.question}
                   </h3>
                   <span className="ml-4 flex-shrink-0 transition-transform duration-200">
                     {openIndex === index ? (
-                      <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-[#FFD700]" />
+                      <ChevronUp className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     ) : (
-                      <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-[#FFD700]" />
+                      <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     )}
                   </span>
                 </button>
@@ -93,7 +93,7 @@ export function FAQSection() {
                   id={`faq-answer-${index}`}
                   className={`mt-2 transition-all duration-300 overflow-hidden ${openIndex === index ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}
                 >
-                  <p className="text-sm sm:text-base text-white/80 pr-8">
+                  <p className="text-sm sm:text-base text-card-foreground/80 pr-8">
                     {faq.answer}
                   </p>
                 </div>

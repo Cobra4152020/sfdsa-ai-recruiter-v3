@@ -38,46 +38,26 @@ export function MonthlyImpactCalculator() {
   }, [monthlyAmount, yearlyTotal]);
 
   return (
-    <Card className="border-[#0A3C1F]/20 mt-8">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-lg text-[#0A3C1F]">
-          See Your Annual Impact
+    <Card className="border-primary/20 mt-8">
+      <CardHeader>
+        <CardTitle className="text-lg text-foreground">
+          Your Monthly Impact Preview
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-6">
-          <div className="space-y-2">
-            <div className="flex justify-between">
-              <Label htmlFor="monthly-impact">
-                Monthly Donation: ${monthlyAmount}
-              </Label>
-              <span className="font-semibold text-[#0A3C1F]">
-                Yearly Total: ${yearlyTotal}
-              </span>
-            </div>
-            <Slider
-              id="monthly-impact"
-              min={5}
-              max={100}
-              step={5}
-              value={[monthlyAmount]}
-              onValueChange={(value) => setMonthlyAmount(value[0])}
-              className="py-4"
-            />
+        <div className="space-y-4">
+          <div className="flex justify-between items-center">
+            <span>Monthly Impact Score:</span>
+            <span className="font-semibold text-primary">
+              {Math.round(yearlyTotal / 1000)} points
+            </span>
           </div>
-
-          <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
-            <h3 className="font-semibold text-[#0A3C1F] mb-2">
-              Your Annual Impact:
-            </h3>
-            <p className="text-sm text-gray-700">{impact}</p>
-          </div>
-
-          <div className="text-center text-sm text-gray-600 italic">
-            <p>
-              Monthly donations provide sustainable support that allows
-              Protecting San Francisco to plan long-term initiatives.
-            </p>
+          
+          <div className="flex justify-between items-center">
+            <span>Yearly Total Impact:</span>
+            <span className="font-semibold text-2xl text-primary">
+              {Math.round(yearlyTotal / 1000 * 12).toLocaleString()} points
+            </span>
           </div>
         </div>
       </CardContent>

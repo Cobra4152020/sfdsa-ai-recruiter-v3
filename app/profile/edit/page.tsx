@@ -27,19 +27,6 @@ import { useToast } from "@/components/ui/use-toast";
 import { ArrowLeft, Save } from "lucide-react";
 import { getClientSideSupabase } from "@/lib/supabase";
 import { useUser } from "@/context/user-context";
-import type { SupabaseClient, User } from "@supabase/supabase-js";
-
-// Define a more specific type for user metadata if known, or use a generic object
-interface UserMetadata {
-  first_name?: string;
-  last_name?: string;
-  // Add other metadata fields as needed
-}
-
-// Extend the Supabase User type to include our specific user_metadata structure
-interface CurrentUserType extends User {
-  user_metadata: UserMetadata;
-}
 
 export default function EditProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -61,91 +48,80 @@ export default function EditProfilePage() {
 
   const router = useRouter();
   const { toast } = useToast();
-  const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
-  // Cast currentUser from useUser to our more specific type
-  const { currentUser, setCurrentUser: userContextSetCurrentUser } =
-    useUser() as {
-      currentUser: CurrentUserType | null;
-      setCurrentUser: (user: CurrentUserType | null) => void;
-    };
+  const { currentUser } = useUser();
 
+  // Simple initialization effect
   useEffect(() => {
-    const loadClientModules = async () => {
-      const supabaseInstance = getClientSideSupabase();
-      setSupabase(supabaseInstance);
-    };
-    loadClientModules();
-  }, []);
+    const initializeForm = async () => {
+      if (!currentUser) {
+        setIsLoading(false);
+        return;
+      }
 
-  useEffect(() => {
-    const checkAuth = async () => {
-      if (!supabase) return;
       try {
-        const {
-          data: { session },
-          error,
-        } = await supabase.auth.getSession();
+        const supabase = getClientSideSupabase();
+        
+        // Ensure user exists in database first
+        await fetch('/api/user/ensure', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            email: currentUser.email,
+            name: currentUser.user_metadata?.first_name || currentUser.user_metadata?.last_name 
+              ? `${currentUser.user_metadata?.first_name || ''} ${currentUser.user_metadata?.last_name || ''}`.trim()
+              : currentUser.email?.split('@')[0] || 'New User'
+          })
+        }).catch(err => console.log('User ensure failed:', err));
 
-        if (error) throw error;
-
-        if (!session) {
-          // Not authenticated, redirect to login
-          router.push("/login");
-          return;
-        }
-
-        // Fetch user profile
-        const { data: profile, error: profileError } = await supabase
-          .from("user_profiles")
-          .select("*")
-          .eq("user_id", session.user.id)
+        // Try to fetch existing profile
+        const { data: profile } = await supabase
+          .from("users")
+          .select("name, email, bio")
+          .eq("id", currentUser.id)
           .single();
 
-        if (profileError && profileError.code !== "PGRST116") {
-          throw profileError;
-        }
-
         if (profile) {
+          const nameParts = (profile.name || "").split(" ");
           setFormData({
-            first_name: profile.first_name || "",
-            last_name: profile.last_name || "",
-            email: session.user.email || "",
-            phone: profile.phone || "",
-            address: profile.address || "",
-            city: profile.city || "",
-            state: profile.state || "",
-            zip: profile.zip || "",
+            first_name: nameParts[0] || "",
+            last_name: nameParts.slice(1).join(" ") || "",
+            email: profile.email || currentUser.email || "",
+            phone: "",
+            address: "",
+            city: "",
+            state: "",
+            zip: "",
             bio: profile.bio || "",
-            military_experience: profile.military_experience || "none",
-            law_enforcement_experience:
-              profile.law_enforcement_experience || "none",
-            education_level: profile.education_level || "high_school",
+            military_experience: "none",
+            law_enforcement_experience: "none",
+            education_level: "high_school",
           });
-        } else if (session?.user?.email) {
-          setFormData({
-            ...formData,
-            first_name: session.user.user_metadata?.first_name || "",
-            last_name: session.user.user_metadata?.last_name || "",
-            email: session.user.email,
-          });
+        } else {
+          // Use auth data as fallback
+          setFormData(prev => ({
+            ...prev,
+            first_name: currentUser.user_metadata?.first_name || "",
+            last_name: currentUser.user_metadata?.last_name || "",
+            email: currentUser.email || "",
+          }));
         }
       } catch (error) {
-        console.error("Auth check error:", error);
-        toast({
-          title: "Authentication error",
-          description:
-            error instanceof Error
-              ? error.message
-              : "Failed to authenticate user",
-          variant: "destructive",
-        });
+        console.error("Error initializing form:", error);
+        // Use basic user data
+        setFormData(prev => ({
+          ...prev,
+          first_name: currentUser.user_metadata?.first_name || "",
+          last_name: currentUser.user_metadata?.last_name || "",
+          email: currentUser.email || "",
+        }));
       } finally {
         setIsLoading(false);
       }
     };
 
-    checkAuth();
-  }, [router, toast, supabase, formData]);
+    initializeForm();
+  }, [currentUser?.id]); // Only depend on user ID
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -160,76 +136,73 @@ export default function EditProfilePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSaving(true);
-
-    if (!supabase) {
+    
+    if (!currentUser) {
       toast({
         title: "Error",
-        description: "Supabase client is not initialized.",
+        description: "Please log in to update your profile.",
         variant: "destructive",
       });
-      setIsSaving(false);
       return;
     }
 
-    try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+    setIsSaving(true);
 
-      if (!session) {
-        router.push("/login");
-        return;
-      }
+    try {
+      const supabase = getClientSideSupabase();
 
       // Update user metadata in Supabase Auth
-      const { error: metadataError } = await supabase.auth.updateUser({
+      await supabase.auth.updateUser({
         data: {
           first_name: formData.first_name,
           last_name: formData.last_name,
         },
       });
 
-      if (metadataError) throw metadataError;
-
-      // Update profile in the public.user_profiles table
+      // Create/update profile in users table
       const { error: profileError } = await supabase
-        .from("user_profiles")
+        .from("users")
         .upsert({
-          user_id: session.user.id,
-          first_name: formData.first_name,
-          last_name: formData.last_name,
-          phone: formData.phone,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          zip: formData.zip,
+          id: currentUser.id,
+          email: currentUser.email,
+          name: `${formData.first_name} ${formData.last_name}`.trim(),
           bio: formData.bio,
-          military_experience: formData.military_experience,
-          law_enforcement_experience: formData.law_enforcement_experience,
-          education_level: formData.education_level,
+          participation_count: 0,
+          has_applied: false,
+          created_at: new Date().toISOString(),
           updated_at: new Date().toISOString(),
+          last_active_at: new Date().toISOString()
         });
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error("Profile update error:", profileError);
+      }
 
-      // Update user context
-      if (userContextSetCurrentUser && currentUser) {
-        const updatedUserContext: CurrentUserType = {
-          ...currentUser,
-          user_metadata: {
-            ...currentUser.user_metadata, // Spread existing metadata
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-          },
-          // If your useUser hook or context expects a 'name' field directly, construct it
-          // This depends on how CurrentUserType and the context expect the name.
-          // For now, we assume 'name' isn't a direct field in CurrentUserType but constructed as needed elsewhere
-          // or handled by the context consumer.
-        };
-        // If 'name' is indeed a part of your context's user shape, ensure it's updated:
-        // (updatedUserContext as any).name = `${formData.first_name} ${formData.last_name}`.trim();
-        userContextSetCurrentUser(updatedUserContext);
+      // Award points for completing profile
+      try {
+        const response = await fetch('/api/points/award', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            action: 'profile_completion',
+            points: 50,
+            description: 'Completed profile information'
+          }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          if (result.success && result.awarded) {
+            toast({
+              title: "🎉 Points Earned!",
+              description: "You earned 50 points for completing your profile!",
+              duration: 5000,
+            });
+          }
+        }
+      } catch (pointsError) {
+        console.log('Points award failed (non-critical):', pointsError);
       }
 
       toast({
@@ -237,14 +210,13 @@ export default function EditProfilePage() {
         description: "Your profile information has been saved successfully.",
       });
 
-      // Redirect back to profile view
       router.push("/dashboard");
+
     } catch (error) {
       console.error("Profile update error:", error);
       toast({
         title: "Update failed",
-        description:
-          error instanceof Error ? error.message : "Failed to update profile",
+        description: "Please try again. If the issue persists, contact support.",
         variant: "destructive",
       });
     } finally {
@@ -261,28 +233,47 @@ export default function EditProfilePage() {
     );
   }
 
+  if (!currentUser) {
+    return (
+      <main className="container mx-auto px-4 py-8">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Authentication Required</h1>
+          <p className="mb-4">Please log in to edit your profile.</p>
+          <Button onClick={() => router.push("/?auth=login")}>
+            Log In
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="flex items-center mb-6">
         <Button
           variant="ghost"
-          onClick={() => router.push("/dashboard")}
-          className="mr-2"
+          size="sm"
+          onClick={() => router.back()}
+          className="mr-4"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Dashboard
+          Back
         </Button>
+        <h1 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+          Edit Profile
+        </h1>
       </div>
-      <Card>
+
+      <Card className="max-w-4xl mx-auto">
         <CardHeader>
-          <CardTitle>Edit Profile</CardTitle>
+          <CardTitle>Personal Information</CardTitle>
           <CardDescription>
-            Update your personal information and preferences.
+            Complete your profile to help us better serve you. Earn 50 points for completion!
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <form onSubmit={handleSubmit}>
+          <CardContent className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="first_name">First Name</Label>
                 <Input
@@ -290,6 +281,7 @@ export default function EditProfilePage() {
                   name="first_name"
                   value={formData.first_name}
                   onChange={handleChange}
+                  placeholder="Enter your first name"
                   required
                 />
               </div>
@@ -300,40 +292,51 @@ export default function EditProfilePage() {
                   name="last_name"
                   value={formData.last_name}
                   onChange={handleChange}
+                  placeholder="Enter your last name"
                   required
                 />
               </div>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
                 name="email"
+                type="email"
                 value={formData.email}
                 onChange={handleChange}
+                placeholder="Enter your email"
                 required
                 disabled
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
-              <Input
-                id="phone"
-                name="phone"
-                value={formData.phone}
-                onChange={handleChange}
-              />
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="(555) 123-4567"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="address">Address</Label>
+                <Input
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="123 Main St"
+                />
+              </div>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="address">Address</Label>
-              <Input
-                id="address"
-                name="address"
-                value={formData.address}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="city">City</Label>
                 <Input
@@ -341,16 +344,71 @@ export default function EditProfilePage() {
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
+                  placeholder="City"
                 />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="state">State</Label>
-                <Input
-                  id="state"
-                  name="state"
+                <Select
                   value={formData.state}
-                  onChange={handleChange}
-                />
+                  onValueChange={(value) => handleSelectChange("state", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select state" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="AL">Alabama</SelectItem>
+                    <SelectItem value="AK">Alaska</SelectItem>
+                    <SelectItem value="AZ">Arizona</SelectItem>
+                    <SelectItem value="AR">Arkansas</SelectItem>
+                    <SelectItem value="CA">California</SelectItem>
+                    <SelectItem value="CO">Colorado</SelectItem>
+                    <SelectItem value="CT">Connecticut</SelectItem>
+                    <SelectItem value="DE">Delaware</SelectItem>
+                    <SelectItem value="FL">Florida</SelectItem>
+                    <SelectItem value="GA">Georgia</SelectItem>
+                    <SelectItem value="HI">Hawaii</SelectItem>
+                    <SelectItem value="ID">Idaho</SelectItem>
+                    <SelectItem value="IL">Illinois</SelectItem>
+                    <SelectItem value="IN">Indiana</SelectItem>
+                    <SelectItem value="IA">Iowa</SelectItem>
+                    <SelectItem value="KS">Kansas</SelectItem>
+                    <SelectItem value="KY">Kentucky</SelectItem>
+                    <SelectItem value="LA">Louisiana</SelectItem>
+                    <SelectItem value="ME">Maine</SelectItem>
+                    <SelectItem value="MD">Maryland</SelectItem>
+                    <SelectItem value="MA">Massachusetts</SelectItem>
+                    <SelectItem value="MI">Michigan</SelectItem>
+                    <SelectItem value="MN">Minnesota</SelectItem>
+                    <SelectItem value="MS">Mississippi</SelectItem>
+                    <SelectItem value="MO">Missouri</SelectItem>
+                    <SelectItem value="MT">Montana</SelectItem>
+                    <SelectItem value="NE">Nebraska</SelectItem>
+                    <SelectItem value="NV">Nevada</SelectItem>
+                    <SelectItem value="NH">New Hampshire</SelectItem>
+                    <SelectItem value="NJ">New Jersey</SelectItem>
+                    <SelectItem value="NM">New Mexico</SelectItem>
+                    <SelectItem value="NY">New York</SelectItem>
+                    <SelectItem value="NC">North Carolina</SelectItem>
+                    <SelectItem value="ND">North Dakota</SelectItem>
+                    <SelectItem value="OH">Ohio</SelectItem>
+                    <SelectItem value="OK">Oklahoma</SelectItem>
+                    <SelectItem value="OR">Oregon</SelectItem>
+                    <SelectItem value="PA">Pennsylvania</SelectItem>
+                    <SelectItem value="RI">Rhode Island</SelectItem>
+                    <SelectItem value="SC">South Carolina</SelectItem>
+                    <SelectItem value="SD">South Dakota</SelectItem>
+                    <SelectItem value="TN">Tennessee</SelectItem>
+                    <SelectItem value="TX">Texas</SelectItem>
+                    <SelectItem value="UT">Utah</SelectItem>
+                    <SelectItem value="VT">Vermont</SelectItem>
+                    <SelectItem value="VA">Virginia</SelectItem>
+                    <SelectItem value="WA">Washington</SelectItem>
+                    <SelectItem value="WV">West Virginia</SelectItem>
+                    <SelectItem value="WI">Wisconsin</SelectItem>
+                    <SelectItem value="WY">Wyoming</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="zip">ZIP Code</Label>
@@ -359,9 +417,11 @@ export default function EditProfilePage() {
                   name="zip"
                   value={formData.zip}
                   onChange={handleChange}
+                  placeholder="12345"
                 />
               </div>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="bio">Bio</Label>
               <Textarea
@@ -369,13 +429,16 @@ export default function EditProfilePage() {
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
-                rows={4}
                 placeholder="Tell us about yourself..."
+                rows={4}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="military_experience">Military Experience</Label>
+                <Label htmlFor="military_experience">
+                  Military Experience
+                </Label>
                 <Select
                   value={formData.military_experience}
                   onValueChange={(value) =>
@@ -383,15 +446,13 @@ export default function EditProfilePage() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select experience" />
+                    <SelectValue placeholder="Select experience level" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
+                    <SelectItem value="none">No Experience</SelectItem>
                     <SelectItem value="active">Active Duty</SelectItem>
                     <SelectItem value="veteran">Veteran</SelectItem>
-                    <SelectItem value="reserve">
-                      Reserve/National Guard
-                    </SelectItem>
+                    <SelectItem value="reserve">Reserve/National Guard</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -406,57 +467,57 @@ export default function EditProfilePage() {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select experience" />
+                    <SelectValue placeholder="Select experience level" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="none">None</SelectItem>
-                    <SelectItem value="sworn">Sworn Officer</SelectItem>
-                    <SelectItem value="civilian">Civilian</SelectItem>
-                    <SelectItem value="intern">Intern/Volunteer</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="education_level">Education Level</Label>
-                <Select
-                  value={formData.education_level}
-                  onValueChange={(value) =>
-                    handleSelectChange("education_level", value)
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select education" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="high_school">High School</SelectItem>
-                    <SelectItem value="associates">
-                      Associate&apos;s Degree
-                    </SelectItem>
-                    <SelectItem value="bachelors">
-                      Bachelor&apos;s Degree
-                    </SelectItem>
-                    <SelectItem value="masters">
-                      Master&apos;s Degree
-                    </SelectItem>
-                    <SelectItem value="doctorate">Doctorate</SelectItem>
+                    <SelectItem value="none">No Experience</SelectItem>
+                    <SelectItem value="1-2">1-2 Years</SelectItem>
+                    <SelectItem value="3-5">3-5 Years</SelectItem>
+                    <SelectItem value="6-10">6-10 Years</SelectItem>
+                    <SelectItem value="10+">10+ Years</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
-            <CardFooter className="flex justify-end space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => router.push("/dashboard")}
+
+            <div className="space-y-2">
+              <Label htmlFor="education_level">Education Level</Label>
+              <Select
+                value={formData.education_level}
+                onValueChange={(value) =>
+                  handleSelectChange("education_level", value)
+                }
               >
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isSaving}>
-                {isSaving ? "Saving..." : "Save Changes"}
-                <Save className="h-4 w-4 ml-2" />
-              </Button>
-            </CardFooter>
-          </form>
-        </CardContent>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select education level" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="high_school">High School Diploma/GED</SelectItem>
+                  <SelectItem value="some_college">Some College</SelectItem>
+                  <SelectItem value="associates">Associate's Degree</SelectItem>
+                  <SelectItem value="bachelors">Bachelor's Degree</SelectItem>
+                  <SelectItem value="masters">Master's Degree</SelectItem>
+                  <SelectItem value="doctorate">Doctorate</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" disabled={isSaving} className="w-full">
+              {isSaving ? (
+                <>
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-b-transparent" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Profile
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </form>
       </Card>
     </main>
   );

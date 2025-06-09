@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useMessageHistory } from "@/hooks/use-message-history";
 import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom";
-import { PageWrapper } from "@/components/page-wrapper";
 import { AuthRequiredWrapper } from "@/components/auth-required-wrapper";
 import { 
   MessageSquare, 
@@ -26,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
+import { PageWrapper } from "@/components/page-wrapper";
 
 interface Message {
   content: string;
@@ -213,58 +213,37 @@ export default function ChatWithSgtKenPage() {
         title="Chat with Sgt. Ken"
         description="Get instant answers about recruitment and earn points for every interaction"
       >
-        <div className="container mx-auto px-4 py-6 sm:py-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="container mx-auto px-4 py-6 sm:py-8 flex flex-col h-full">
+          {/* Page Header */}
           <div className="text-center mb-8 sm:mb-10">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
-              💬 Chat with Sgt. Ken
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground">
+              <span className="bg-gradient-to-r from-primary to-yellow-400 bg-clip-text text-transparent">💬 Chat with Sgt. Ken</span>
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto mt-4">
               Get instant answers to your questions about the recruitment process, department policies, 
               and career opportunities. Earn points for every interaction!
             </p>
-
-            {/* Quick Stats */}
-            <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">{messageCount}</div>
-                  <div className="text-sm text-gray-600 font-medium">Messages Sent</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">{totalPointsEarned}</div>
-                  <div className="text-sm text-gray-600 font-medium">Points Earned</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">5-7</div>
-                  <div className="text-sm text-gray-600 font-medium">Points Per Message</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">24/7</div>
-                  <div className="text-sm text-gray-600 font-medium">Always Available</div>
-                </div>
-              </div>
-            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8">
-            <div className="lg:col-span-3">
-              <Card className="h-[75vh] sm:h-[650px] flex flex-col shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white p-4 sm:p-6">
-                  <CardTitle className="flex items-center justify-between text-lg sm:text-xl">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 min-h-0 h-full">
+            {/* Main Chat Panel */}
+            <div className="lg:col-span-3 flex flex-col">
+              <Card className="flex-1 flex flex-col shadow-lg overflow-hidden bg-card">
+                <CardHeader className="bg-card-foreground/5 dark:bg-card flex-shrink-0 border-b border-border">
+                  <CardTitle className="flex items-center justify-between text-lg sm:text-xl text-foreground">
                     <div className="flex items-center">
-                      <div className="bg-white/20 p-2 rounded-full mr-3">
-                        <Bot className="h-5 w-5 text-white" />
+                      <div className="bg-primary/10 dark:bg-primary/20 p-2 rounded-full mr-3">
+                        <Bot className="h-5 w-5 text-primary" />
                       </div>
                       Sgt. Ken - AI Assistant
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="bg-white/20 text-white border-white/30">
+                      <Badge variant="outline" className="border-primary/30 text-primary">
                         <Sparkles className="h-3 w-3 mr-1" />
                         AI-Powered
                       </Badge>
                       {currentUser && (
-                        <Badge variant="secondary" className="bg-green-500/20 text-white border-green-300">
+                        <Badge variant="secondary" className="bg-green-500/80 text-white border-green-300">
                           <Star className="h-3 w-3 mr-1" />
                           {totalPointsEarned} pts
                         </Badge>
@@ -272,35 +251,35 @@ export default function ChatWithSgtKenPage() {
                     </div>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex-1 p-4 sm:p-6 flex flex-col">
+                <CardContent className="flex-1 flex flex-col p-4 sm:p-6 min-h-0">
                   <div
                     ref={scrollAreaRef}
-                    className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 mb-4 px-2"
+                    className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 mb-4 pr-2 -mr-4"
                   >
                     {/* Welcome message */}
                     {messages.length === 0 && !isLoading && !error && (
                       <div className="space-y-4">
                         <div className="flex items-start space-x-3 sm:space-x-4">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/80 flex items-center justify-center flex-shrink-0 shadow-md">
-                            <Bot className="h-5 w-5 text-white" />
+                          <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0 shadow-md">
+                            <Bot className="h-5 w-5 text-primary" />
                           </div>
-                          <div className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg p-4 shadow-sm">
-                            <p className="text-sm sm:text-base font-medium text-[#0A3C1F] mb-2">
+                          <div className="flex-1 bg-muted/50 dark:bg-muted/40 rounded-lg p-4 shadow-sm">
+                            <p className="text-sm sm:text-base font-medium text-foreground mb-2">
                               👋 Hello! I'm Sgt. Ken, your AI recruitment assistant.
                             </p>
-                            <p className="text-sm sm:text-base text-gray-700 mb-3">
+                            <p className="text-sm sm:text-base text-muted-foreground mb-3">
                               I'm here to help you learn about becoming a San Francisco Deputy Sheriff. 
                               {currentUser ? " You'll earn 5-7 points for each question you ask!" : " Sign in to earn points for every interaction!"}
                             </p>
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs text-muted-foreground/80">
                               💡 Try asking about requirements, salary, training, or career opportunities
                             </div>
                           </div>
                         </div>
 
                         {/* Suggested questions */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                          <h3 className="text-sm font-semibold text-blue-900 mb-3 flex items-center">
+                        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
+                          <h3 className="text-sm font-semibold text-primary mb-3 flex items-center">
                             <HelpCircle className="h-4 w-4 mr-2" />
                             Quick Start Questions
                           </h3>
@@ -309,7 +288,7 @@ export default function ChatWithSgtKenPage() {
                               <button
                                 key={index}
                                 onClick={() => handleSuggestedQuestion(question)}
-                                className="text-left text-xs sm:text-sm text-blue-700 hover:text-blue-900 hover:bg-blue-100 p-2 rounded transition-colors"
+                                className="text-left text-xs sm:text-sm text-primary/80 dark:text-primary/90 hover:text-primary dark:hover:text-primary hover:bg-primary/10 p-2 rounded transition-colors"
                               >
                                 {question}
                               </button>
@@ -323,39 +302,39 @@ export default function ChatWithSgtKenPage() {
                     {messages.map((msg, index) => (
                       <div
                         key={index}
-                        className={`flex items-start space-x-3 sm:space-x-4 ${msg.role === "user" ? "justify-end" : ""}`}
+                        className={`flex items-start space-x-3 sm:space-x-4 w-full ${msg.role === "user" ? "justify-end" : "justify-start"}`}
                       >
                         {msg.role === "assistant" && (
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/80 flex items-center justify-center flex-shrink-0 shadow-md">
-                            <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
+                          <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 shadow-md">
+                            <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                           </div>
                         )}
                         <div
-                          className={`flex-1 rounded-lg p-3 sm:p-4 max-w-[85%] sm:max-w-[70%] shadow-sm ${
+                          className={`rounded-lg p-3 sm:p-4 shadow-sm break-words ${
                             msg.role === "user" 
-                              ? "bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white text-right" 
-                              : "bg-gradient-to-r from-gray-50 to-gray-100"
+                              ? "bg-primary text-primary-foreground text-right max-w-[85%] sm:max-w-[75%]" 
+                              : "bg-muted/60 dark:bg-muted/80 text-foreground max-w-[90%] sm:max-w-[80%]"
                           }`}
                         >
-                          <p className="text-sm sm:text-base">
-                            {msg.displayedContent || msg.content}
-                            {msg.isTyping && typingMessageId === msg.id && (
-                              <span className="inline-block w-0.5 h-5 bg-current ml-1 animate-pulse">|</span>
-                            )}
+                          <p className="text-sm sm:text-base leading-relaxed m-0 whitespace-pre-wrap">
+                              {msg.displayedContent || msg.content}
+                              {msg.isTyping && typingMessageId === msg.id && (
+                                <span className="inline-block w-0.5 h-5 bg-current ml-1 animate-pulse">|</span>
+                              )}
                           </p>
-                          <div className="flex items-center justify-between mt-2">
-                            <p className="text-xs text-gray-500">
+                          <div className="flex items-center justify-between mt-2 w-full">
+                            <p className="text-xs text-muted-foreground/70 flex-shrink-0">
                               {new Date(msg.timestamp).toLocaleTimeString()}
                             </p>
                             {msg.pointsAwarded && (
-                              <Badge variant="secondary" className="text-xs bg-green-100 text-green-800">
+                              <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-800/50 text-green-800 dark:text-green-200 flex-shrink-0">
                                 +{msg.pointsAwarded} pts {msg.searchUsed && "🔍"}
                               </Badge>
                             )}
                           </div>
                         </div>
                         {msg.role === "user" && (
-                          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center text-white flex-shrink-0 text-sm sm:text-base font-semibold shadow-md">
+                          <div className="w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center flex-shrink-0 text-sm sm:text-base font-semibold shadow-md">
                             {currentUser?.email?.charAt(0).toUpperCase() || "U"}
                           </div>
                         )}
@@ -363,10 +342,10 @@ export default function ChatWithSgtKenPage() {
                     ))}
                     {isLoading && (
                       <div className="flex items-center justify-center py-4">
-                        <div className="flex items-center space-x-2 text-gray-500">
-                          <div className="w-2 h-2 bg-[#0A3C1F] rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-[#0A3C1F] rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                          <div className="w-2 h-2 bg-[#0A3C1F] rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+                        <div className="flex items-center space-x-2 text-muted-foreground">
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                           <span className="text-sm sm:text-base ml-2">Sgt. Ken is thinking...</span>
                         </div>
                       </div>
@@ -377,7 +356,7 @@ export default function ChatWithSgtKenPage() {
                       </div>
                     )}
                   </div>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 pt-4 border-t border-border flex-shrink-0">
                     <Input
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
@@ -391,7 +370,7 @@ export default function ChatWithSgtKenPage() {
                     <Button
                       onClick={handleSendMessage}
                       disabled={isLoading || !input.trim()}
-                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white flex-shrink-0 px-4 sm:px-6 shadow-md hover:shadow-lg transition-all"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground flex-shrink-0 px-4 sm:px-6 shadow-md hover:shadow-lg transition-all"
                     >
                       <Send className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
@@ -404,23 +383,23 @@ export default function ChatWithSgtKenPage() {
             <div className="lg:col-span-1">
               <div className="space-y-6">
                 {/* Quick Stats Card */}
-                <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                <Card className="bg-card border-border">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-blue-900 flex items-center">
-                      <Trophy className="h-5 w-5 mr-2" />
+                    <CardTitle className="text-lg text-foreground flex items-center">
+                      <Trophy className="h-5 w-5 mr-2 text-primary" />
                       Your Progress
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-blue-800">Messages</span>
-                      <Badge variant="secondary" className="bg-blue-200 text-blue-800">
+                      <span className="text-sm text-muted-foreground">Messages</span>
+                      <Badge variant="outline" className="text-muted-foreground">
                         {messageCount}
                       </Badge>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-blue-800">Points Earned</span>
-                      <Badge variant="secondary" className="bg-green-200 text-green-800">
+                      <span className="text-sm text-muted-foreground">Points Earned</span>
+                      <Badge variant="secondary" className="bg-green-500/80 text-white">
                         {totalPointsEarned}
                       </Badge>
                     </div>
@@ -429,7 +408,7 @@ export default function ChatWithSgtKenPage() {
                         <Button 
                           size="sm" 
                           onClick={() => openModal("signup", "recruit")}
-                          className="bg-blue-600 hover:bg-blue-700"
+                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
                         >
                           Sign Up to Earn Points
                         </Button>
@@ -439,37 +418,37 @@ export default function ChatWithSgtKenPage() {
                 </Card>
 
                 {/* Quick Tips Card */}
-                <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                <Card className="bg-card border-border">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-green-900 flex items-center">
-                      <HelpCircle className="h-5 w-5 mr-2" />
+                    <CardTitle className="text-lg text-foreground flex items-center">
+                      <HelpCircle className="h-5 w-5 mr-2 text-primary" />
                       Ask About
                     </CardTitle>
                   </CardHeader>
-                  <CardContent className="space-y-2">
-                    <ul className="text-sm space-y-2 text-green-800">
+                  <CardContent>
+                    <ul className="text-sm space-y-2 text-muted-foreground">
                       <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-green-600" />
+                        <Star className="h-3 w-3 mr-2 text-primary/70" />
                         Application requirements
                       </li>
                       <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-green-600" />
+                        <Star className="h-3 w-3 mr-2 text-primary/70" />
                         Salary and benefits
                       </li>
                       <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-green-600" />
+                        <Star className="h-3 w-3 mr-2 text-primary/70" />
                         Training academy
                       </li>
                       <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-green-600" />
+                        <Star className="h-3 w-3 mr-2 text-primary/70" />
                         Career opportunities
                       </li>
                       <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-green-600" />
+                        <Star className="h-3 w-3 mr-2 text-primary/70" />
                         Daily responsibilities
                       </li>
                       <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-green-600" />
+                        <Star className="h-3 w-3 mr-2 text-primary/70" />
                         Department culture
                       </li>
                     </ul>
@@ -477,26 +456,26 @@ export default function ChatWithSgtKenPage() {
                 </Card>
 
                 {/* Games Promotion Card */}
-                <Card className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-yellow-200">
+                <Card className="bg-gradient-to-br from-yellow-300/20 via-card to-card border-yellow-400/30">
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-yellow-900 flex items-center">
-                      <Gamepad2 className="h-5 w-5 mr-2" />
+                    <CardTitle className="text-lg text-foreground flex items-center">
+                      <Gamepad2 className="h-5 w-5 mr-2 text-yellow-400" />
                       Earn More Points
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    <p className="text-sm text-yellow-800">
+                    <p className="text-sm text-muted-foreground">
                       Want to earn even more points? Try our interactive games!
                     </p>
                     <div className="space-y-2">
                       <Link href="/trivia">
-                        <Button size="sm" variant="outline" className="w-full text-xs border-yellow-300 text-yellow-800 hover:bg-yellow-200">
+                        <Button size="sm" variant="outline" className="w-full text-xs">
                           <Trophy className="h-3 w-3 mr-1" />
                           SF Trivia (60-120 pts)
                         </Button>
                       </Link>
                       <Link href="/sgt-ken-says">
-                        <Button size="sm" variant="outline" className="w-full text-xs border-yellow-300 text-yellow-800 hover:bg-yellow-200">
+                        <Button size="sm" variant="outline" className="w-full text-xs">
                           <Clock className="h-3 w-3 mr-1" />
                           Daily Puzzle (100-220 pts)
                         </Button>
@@ -508,7 +487,6 @@ export default function ChatWithSgtKenPage() {
             </div>
           </div>
         </div>
-      </div>
       </AuthRequiredWrapper>
     </PageWrapper>
   );

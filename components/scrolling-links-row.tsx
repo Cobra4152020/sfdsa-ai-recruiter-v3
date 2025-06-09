@@ -72,7 +72,7 @@ export function ScrollingLinksRow() {
             <Link
               key={`${link.href}-${index}`}
               href={link.href}
-              className="inline-flex items-center text-[#0A3C1F] hover:text-[#0A3C1F]/80 font-medium transition-colors"
+              className="inline-flex items-center text-primary hover:text-primary/80 font-medium transition-colors"
             >
               <span>{link.text}</span>
               <ArrowRight className="ml-1 h-4 w-4" />

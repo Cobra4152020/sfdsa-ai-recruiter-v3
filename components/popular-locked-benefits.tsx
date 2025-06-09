@@ -27,7 +27,7 @@ export function PopularLockedBenefits() {
       icon: <GraduationCap className="h-6 w-6" />,
       badge: "🎓 Education",
       color: "from-blue-500 to-blue-600",
-      bgColor: "bg-blue-50 border-blue-200",
+      bgColor: "bg-card border-border",
       highlights: [
         "100% Paid Academy Training",
         "$5,250+ Annual Reimbursement", 
@@ -44,7 +44,7 @@ export function PopularLockedBenefits() {
       icon: <Flag className="h-6 w-6" />,
       badge: "🇺🇸 Veterans",
       color: "from-red-500 to-red-600",
-      bgColor: "bg-red-50 border-red-200",
+      bgColor: "bg-card border-border",
       highlights: [
         "Veterans Preference Points",
         "Academy Training Coverage",
@@ -61,7 +61,7 @@ export function PopularLockedBenefits() {
       icon: <Home className="h-6 w-6" />,
       badge: "🏠 Housing",
       color: "from-green-500 to-green-600",
-      bgColor: "bg-green-50 border-green-200",
+      bgColor: "bg-card border-border",
       highlights: [
         "First-Time Homebuyer Assistance",
         "Law Enforcement Discounts",
@@ -72,29 +72,29 @@ export function PopularLockedBenefits() {
   ];
 
   return (
-    <section className="w-full py-16 bg-gradient-to-br from-gray-50 to-white">
+    <section className="w-full py-16 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           
           {/* Section Header */}
           <div className="text-center mb-12">
             <div className="flex items-center justify-center mb-4">
-              <div className="p-3 bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/80 rounded-full shadow-lg">
-                <Star className="h-8 w-8 text-[#FFD700]" />
+              <div className="p-3 bg-gradient-to-br from-primary to-primary/80 rounded-full shadow-lg">
+                <Star className="h-8 w-8 text-primary-foreground" />
               </div>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-[#0A3C1F] mb-4">
+            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
               Exclusive Deputy Benefits
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Unlock access to detailed information about the premium benefits and programs available to San Francisco Deputy Sheriffs. 
               These resources are available after you demonstrate your commitment to the recruitment process.
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-6">
-              <Badge className="bg-[#FFD700] text-[#0A3C1F] px-4 py-2 text-sm font-semibold">
+              <Badge className="bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold">
                 Most Popular Benefits
               </Badge>
-              <Badge variant="outline" className="border-[#0A3C1F] text-[#0A3C1F] px-4 py-2">
+              <Badge variant="outline" className="border-primary text-primary px-4 py-2">
                 Points Required to Unlock
               </Badge>
             </div>
@@ -120,7 +120,7 @@ export function PopularLockedBenefits() {
                   
                   {/* Badge Overlay */}
                   <div className="absolute top-4 right-4">
-                    <Badge className="bg-[#FFD700] text-[#0A3C1F] font-semibold">
+                    <Badge className="bg-primary text-primary-foreground font-semibold">
                       {benefit.badge}
                     </Badge>
                   </div>
@@ -140,22 +140,22 @@ export function PopularLockedBenefits() {
                     <div className={`p-2 rounded-lg bg-gradient-to-br ${benefit.color} text-white`}>
                       {benefit.icon}
                     </div>
-                    <h3 className="text-xl font-bold text-[#0A3C1F]">
+                    <h3 className="text-xl font-bold text-card-foreground">
                       {benefit.name}
                     </h3>
                   </div>
                   
-                  <p className="text-gray-600 mb-4 text-sm leading-relaxed">
+                  <p className="text-muted-foreground mb-4 text-sm leading-relaxed">
                     {benefit.description}
                   </p>
 
                   {/* Highlights */}
                   <div className="mb-6">
-                    <h4 className="font-semibold text-[#0A3C1F] mb-2 text-sm">Key Benefits:</h4>
+                    <h4 className="font-semibold text-card-foreground mb-2 text-sm">Key Benefits:</h4>
                     <ul className="space-y-1">
                       {benefit.highlights.map((highlight, idx) => (
-                        <li key={idx} className="flex items-center gap-2 text-xs text-gray-600">
-                          <div className="w-1.5 h-1.5 bg-[#FFD700] rounded-full" />
+                        <li key={idx} className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                           {highlight}
                         </li>
                       ))}
@@ -165,8 +165,8 @@ export function PopularLockedBenefits() {
                   {/* Points Progress */}
                   <div className="mb-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-xs font-medium text-gray-500">Unlock Progress</span>
-                      <span className="text-xs text-[#0A3C1F] font-semibold">
+                      <span className="text-xs font-medium text-muted-foreground">Unlock Progress</span>
+                      <span className="text-xs text-card-foreground font-semibold">
                         0 / {benefit.pointsRequired}
                       </span>
                     </div>
@@ -188,24 +188,24 @@ export function PopularLockedBenefits() {
           </div>
 
           {/* Call to Action */}
-          <Card className="bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/90 text-white">
+          <Card className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground">
             <CardContent className="p-8 text-center">
-              <Zap className="h-12 w-12 text-[#FFD700] mx-auto mb-4" />
+              <Zap className="h-12 w-12 text-primary-foreground mx-auto mb-4" />
               <h3 className="text-3xl font-bold mb-4">
                 Unlock These Benefits Today
               </h3>
-              <p className="text-xl text-white/90 mb-6 max-w-2xl mx-auto">
+              <p className="text-xl text-primary-foreground/90 mb-6 max-w-2xl mx-auto">
                 Start earning points by engaging with our platform, completing your profile, and taking practice tests. 
                 Each interaction brings you closer to unlocking these exclusive benefits.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/apply">
-                  <Button size="lg" className="bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 font-semibold">
+                  <Button size="lg" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold">
                     Start Your Application
                   </Button>
                 </Link>
                 <Link href="/deputy-launchpad">
-                  <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+                  <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10">
                     Learn About Points System
                   </Button>
                 </Link>

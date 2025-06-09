@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Award, Gift, Share2, Users, Trophy, Star } from "lucide-react";
+import { Award, Gift, Share2, Users, Trophy, Star, FileText } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import {
   Dialog,
@@ -43,35 +43,35 @@ export function ReferralRewards() {
       count: 1,
       reward: "+100 Points",
       description: "Refer your first recruit",
-      icon: <Trophy className="h-5 w-5 text-[#FFD700]" />,
+      icon: <Trophy className="h-5 w-5 text-primary" />,
       achieved: referralCount >= 1,
     },
     {
       count: 3,
       reward: "Connector Badge",
       description: "Refer 3 potential recruits",
-      icon: <Award className="h-5 w-5 text-[#0A3C1F]" />,
+      icon: <Award className="h-5 w-5 text-primary" />,
       achieved: referralCount >= 3,
     },
     {
       count: 5,
       reward: "+500 Points",
       description: "Refer 5 potential recruits",
-      icon: <Trophy className="h-5 w-5 text-[#FFD700]" />,
+      icon: <Trophy className="h-5 w-5 text-primary" />,
       achieved: referralCount >= 5,
     },
     {
       count: 10,
       reward: "Recruitment Champion NFT",
       description: "Refer 10 potential recruits",
-      icon: <Star className="h-5 w-5 text-[#FFD700]" />,
+      icon: <Star className="h-5 w-5 text-primary" />,
       achieved: referralCount >= 10,
     },
     {
       count: 25,
       reward: "VIP Recruitment Event Access",
       description: "Refer 25 potential recruits",
-      icon: <Gift className="h-5 w-5 text-[#0A3C1F]" />,
+      icon: <Gift className="h-5 w-5 text-primary" />,
       achieved: referralCount >= 25,
     },
   ];

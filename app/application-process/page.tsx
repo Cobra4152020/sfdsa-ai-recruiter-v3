@@ -444,12 +444,12 @@ export default function ApplicationProcessPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.9 }}
           >
-            <Card className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 dark:from-black dark:to-gray-900 text-white dark:text-[#FFD700] border-[#0A3C1F] dark:border-[#FFD700]/30">
+            <Card className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground border-primary">
               <CardContent className="p-8">
                 <div className="text-center">
-                  <Shield className="h-16 w-16 mx-auto mb-6 text-white dark:text-[#FFD700]" />
+                  <Shield className="h-16 w-16 mx-auto mb-6 text-primary-foreground" />
                   <h2 className="text-3xl font-bold mb-4">Ready to Start Your Journey?</h2>
-                  <p className="text-white/90 dark:text-gray-300 mb-8 max-w-3xl mx-auto text-lg">
+                  <p className="text-primary-foreground/90 mb-8 max-w-3xl mx-auto text-lg">
                     Make sure you meet all requirements before beginning your application. 
                     Our recruitment team is here to guide you through every step of the process.
                   </p>
@@ -457,7 +457,7 @@ export default function ApplicationProcessPage() {
                     <Link href={"/requirements" as Route}>
                       <Button 
                         size="lg" 
-                        className="bg-white dark:bg-[#FFD700] text-[#0A3C1F] dark:text-black hover:bg-gray-100 dark:hover:bg-[#FFD700]/90 font-semibold px-8"
+                        className="bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold px-8"
                       >
                         <CheckCircle2 className="h-5 w-5 mr-2" />
                         Review Requirements
@@ -467,7 +467,7 @@ export default function ApplicationProcessPage() {
                       <Button 
                         variant="outline" 
                         size="lg" 
-                        className="border-white dark:border-[#FFD700] text-white dark:text-[#FFD700] hover:bg-white/10 dark:hover:bg-[#FFD700]/10 px-8"
+                        className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-8"
                       >
                         <Zap className="h-5 w-5 mr-2" />
                         Start Application
@@ -477,7 +477,7 @@ export default function ApplicationProcessPage() {
                       <Button 
                         variant="outline" 
                         size="lg" 
-                        className="border-white dark:border-[#FFD700] text-white dark:text-[#FFD700] hover:bg-white/10 dark:hover:bg-[#FFD700]/10 px-8"
+                        className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-8"
                       >
                         <Info className="h-5 w-5 mr-2" />
                         Learn More
@@ -485,15 +485,15 @@ export default function ApplicationProcessPage() {
                     </Link>
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
-                    <div className="flex items-center justify-center text-white/80 dark:text-gray-400">
+                    <div className="flex items-center justify-center text-primary-foreground/80">
                       <Phone className="h-4 w-4 mr-2 flex-shrink-0" />
                       <span className="text-center sm:text-left">Recruitment: (415) 554-7225</span>
                     </div>
-                    <div className="flex items-center justify-center text-white/80 dark:text-gray-400">
+                    <div className="flex items-center justify-center text-primary-foreground/80">
                       <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
                       <span className="text-center sm:text-left">1 Dr. Carlton B. Goodlett Place</span>
                     </div>
-                    <div className="flex items-center justify-center text-white/80 dark:text-gray-400 sm:col-span-2 lg:col-span-1">
+                    <div className="flex items-center justify-center text-primary-foreground/80 sm:col-span-2 lg:col-span-1">
                       <Clock className="h-4 w-4 mr-2 flex-shrink-0" />
                       <span className="text-center sm:text-left">Mon-Fri: 8:00 AM - 5:00 PM</span>
                     </div>

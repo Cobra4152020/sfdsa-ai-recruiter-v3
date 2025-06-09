@@ -201,10 +201,10 @@ export default function LeaderboardPage() {
                 </div>
               </div>
               <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-600 font-medium flex items-center">
+                <div className="text-sm text-blue-600 font-medium flex items-center">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-2"></div>
-                  <strong>Live System:</strong> Rankings update in real-time as you earn badges and complete activities. Mock users have lower scores (25-85 points) so real users can easily climb the leaderboard!
-                </p>
+                  <span><strong>Live System:</strong> Rankings update in real-time as you earn badges and complete activities. Mock users have lower scores (25-85 points) so real users can easily climb the leaderboard!</span>
+                </div>
               </div>
             </CardContent>
           </Card>

@@ -677,58 +677,43 @@ export function TriviaGame({
     return (
       <Card className="shadow-md">
         <CardContent className="p-6 text-center">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] mb-4">Game Over!</h2>
-
-          <div className="bg-[#0A3C1F]/10 rounded-lg p-6 mb-6">
-            <div className="text-4xl font-bold text-[#0A3C1F] mb-2">
-              {score} / {questions.length}
+          <h2 className="text-2xl font-bold text-foreground mb-4">Game Over!</h2>
+          <div className="mb-6">
+            <div className="text-4xl font-bold text-primary mb-2">
+              {score}
             </div>
-            <p className="text-gray-600">
-              {score === questions.length
-                ? "Perfect score! Amazing job!"
-                : score >= questions.length / 2
-                  ? "Great job! You know San Francisco well!"
-                  : "Good effort! Keep learning about San Francisco!"}
-            </p>
-
-            {isLoggedIn && (
-              <div className="mt-4 p-3 bg-[#FFD700]/20 rounded-lg">
-                <p className="font-semibold text-[#0A3C1F]">
-                  <Trophy className="h-5 w-5 inline-block mr-2" />
-                  You earned {pointsAwarded} points!
-                </p>
+            <p className="text-muted-foreground">Final Score</p>
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4 mb-6">
+            <div className="text-center">
+              <div className="text-lg font-semibold text-foreground">
+                {gameStats.correctAnswers}
               </div>
-            )}
+              <p className="text-sm text-muted-foreground">Correct</p>
+            </div>
+            <div className="text-center">
+              <p className="font-semibold text-primary">
+                {Math.round((gameStats.correctAnswers / gameStats.totalAttempts) * 100)}%
+              </p>
+              <p className="text-sm text-muted-foreground">Accuracy</p>
+            </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
+          <div className="space-y-2 mb-6">
             <Button
               onClick={handleRestartGame}
-              className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+              className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              <RefreshCw className="h-4 w-4 mr-2" />
               Play Again
             </Button>
-
-            {isLoggedIn ? (
-              <Button
-                onClick={() => setShowShareDialog(true)}
-                variant="outline"
-                className="border-[#0A3C1F] text-[#0A3C1F]"
-              >
-                <Share2 className="h-4 w-4 mr-2" />
-                Share Results
-              </Button>
-            ) : (
-              <Button
-                onClick={() => (window.location.href = "/badges")}
-                variant="outline"
-                className="border-[#0A3C1F] text-[#0A3C1F]"
-              >
-                <Award className="h-4 w-4 mr-2" />
-                View Badges
-              </Button>
-            )}
+            <Button
+              onClick={() => setIsGameOver(false)}
+              variant="outline"
+              className="w-full border-primary text-primary"
+            >
+              View Results
+            </Button>
           </div>
         </CardContent>
       </Card>

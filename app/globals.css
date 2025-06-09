@@ -1,85 +1,72 @@
+/* Test comment to unstick the toolchain */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
 @layer base {
   :root {
-    /* Sheriff's Department Colors */
-    --sheriff-green: #0a3c1f;
-    --sheriff-gold: #ffd700;
-    --sheriff-black: #000000; /* True black instead of dark gray */
-    --sheriff-tan: #f8f5ee;
-
-    /* Light mode */
-    --background: 39 44% 97%; /* sheriff's tan */
-    --foreground: 148 63% 13%; /* sheriff's green */
-
-    --card: 39 44% 97%; /* sheriff's tan */
-    --card-foreground: 148 63% 13%; /* sheriff's green */
-
+    /* Light mode - Sheriff's Department Green & Tan Uniforms */
+    --background: 39 44% 97%; /* Warm tan/cream */
+    --foreground: 148 63% 13%; /* Deep sheriff green */
+    --card: 0 0% 100%; /* Pure white */
+    --card-foreground: 148 63% 13%; /* Deep sheriff green */
     --popover: 0 0% 100%;
     --popover-foreground: 148 63% 13%;
-
-    --primary: 148 63% 13%; /* sheriff's green */
-    --primary-foreground: 39 44% 97%; /* sheriff's tan */
-
-    --secondary: 48 100% 50%; /* sheriff's gold/yellow */
-    --secondary-foreground: 148 63% 13%;
-
-    --muted: 39 44% 97%;
-    --muted-foreground: 148 63% 13%;
-
-    --accent: 48 100% 50%;
+    --primary: 148 63% 13%; /* Sheriff green */
+    --primary-foreground: 0 0% 100%; /* White text on green */
+    --secondary: 48 100% 50%; /* Sheriff gold */
+    --secondary-foreground: 148 63% 13%; /* Green text on gold */
+    --muted: 39 20% 90%; /* Light tan */
+    --muted-foreground: 148 30% 30%; /* Muted green */
+    --accent: 48 100% 50%; /* Sheriff gold accent */
     --accent-foreground: 148 63% 13%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 148 63% 13%;
-
-    --border: 39 44% 90%;
-    --input: 39 44% 90%;
-    --ring: 48 100% 50%;
-
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 39 20% 85%; /* Light tan border */
+    --input: 39 20% 85%;
+    --ring: 148 63% 13%; /* Sheriff green focus ring */
     --radius: 0.5rem;
+    --chart-1: 148 63% 13%;
+    --chart-2: 48 100% 50%;
+    --chart-3: 39 44% 80%;
+    --chart-4: 148 40% 40%;
+    --chart-5: 48 80% 60%;
   }
 
   .dark {
-    --background: 0 0% 0%; /* True black */
-    --foreground: 48 100% 50%; /* sheriff's gold/yellow */
-
-    --card: 0 0% 0%; /* True black */
-    --card-foreground: 48 100% 50%; /* sheriff's gold/yellow */
-
-    --popover: 0 0% 0%; /* True black */
-    --popover-foreground: 48 100% 50%;
-
-    --primary: 48 100% 50%; /* sheriff's gold/yellow */
-    --primary-foreground: 0 0% 0%; /* True black */
-
-    --secondary: 0 0% 0%; /* True black */
-    --secondary-foreground: 48 100% 50%;
-
-    --muted: 0 0% 5%; /* Very dark for subtle backgrounds */
-    --muted-foreground: 48 100% 50%;
-
-    --accent: 48 100% 50%;
-    --accent-foreground: 0 0% 0%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 48 100% 50%;
-
-    --border: 0 0% 10%; /* Dark border but visible */
-    --input: 0 0% 8%; /* Slightly lighter for input fields */
-    --ring: 48 100% 50%;
+    /* Dark mode - Deep True Blacks with Yellow Accents */
+    --background: 0 0% 2%; /* Very deep black base */
+    --foreground: 48 100% 75%; /* Bright yellow text */
+    --card: 0 0% 5%; /* Deep black for cards */
+    --card-foreground: 48 100% 75%; /* Yellow text on cards */
+    --popover: 0 0% 7%; /* Slightly lighter black for popovers */
+    --popover-foreground: 48 100% 75%;
+    --primary: 48 100% 65%; /* Vibrant yellow for buttons */
+    --primary-foreground: 0 0% 2%; /* Deep black text on yellow */
+    --secondary: 0 0% 8%; /* Very dark black for secondary elements */
+    --secondary-foreground: 48 100% 75%; /* Yellow text on dark */
+    --muted: 0 0% 6%; /* Deep black for muted areas */
+    --muted-foreground: 48 30% 60%; /* Muted yellow text */
+    --accent: 48 100% 70%; /* Bright yellow accent */
+    --accent-foreground: 0 0% 2%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 12%; /* Dark black borders for contrast */
+    --input: 0 0% 4%; /* Very dark input backgrounds */
+    --ring: 48 100% 65%; /* Yellow focus ring */
+    --chart-1: 48 100% 65%;
+    --chart-2: 0 0% 15%;
+    --chart-3: 48 80% 50%;
+    --chart-4: 0 0% 20%;
+    --chart-5: 48 60% 45%;
   }
 }
 
 /* Custom header styles */
 .header-nav {
-  @apply bg-[#0A3C1F] text-white dark:bg-black dark:text-[#FFD700];
+  @apply bg-card text-card-foreground border-b border-border;
 }
-
 .header-nav-item {
-  @apply text-white hover:text-[#FFD700] dark:text-[#FFD700] dark:hover:text-white transition-colors duration-200;
+  @apply text-muted-foreground hover:text-primary transition-colors duration-200;
 }
 
 @layer base {
@@ -93,7 +80,6 @@
     /* Smooth scrolling */
     scroll-behavior: smooth;
   }
-  
   /* Mobile optimization */
   html {
     /* Prevent zoom on iOS */
@@ -102,40 +88,33 @@
     -webkit-overflow-scrolling: touch;
   }
 }
-
 @layer utilities {
   .hide-scrollbar {
     -ms-overflow-style: none; /* IE and Edge */
     scrollbar-width: none; /* Firefox */
   }
-
   .hide-scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari and Opera */
   }
-  
   /* Mobile-specific utilities */
   .mobile-safe-area {
     /* Account for notches and rounded corners on mobile */
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
-  
   .mobile-tap-highlight {
     /* Disable default tap highlighting */
     -webkit-tap-highlight-color: transparent;
   }
-  
   .mobile-touch-manipulation {
     /* Improve touch responsiveness */
     touch-action: manipulation;
   }
 }
-
 /* Dialog/Modal styles */
 .dialog-gold-border {
-  @apply border-2 border-[#FFD700] dark:border-[#FFD700];
+  @apply border-2 border-primary;
 }
-
 /* Mobile-optimized dialog styles */
 @media (max-width: 640px) {
   [role="dialog"] {
@@ -144,14 +123,12 @@
     max-height: calc(100vh - 1rem);
     min-height: auto;
   }
-  
   /* Ensure modal content is scrollable on mobile */
   [role="dialog"] > div > div {
     max-height: calc(100vh - 8rem);
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
-  
   /* Prevent body scroll when modal is open on mobile */
   body.modal-open {
     overflow: hidden;
@@ -159,25 +136,20 @@
     width: 100%;
   }
 }
-
 /* Scrollbar styles */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-black;
+  @apply bg-transparent;
 }
-
 ::-webkit-scrollbar-thumb {
-  @apply bg-[#0A3C1F] dark:bg-[#FFD700] rounded-full;
+  @apply bg-muted rounded-full border-2 border-transparent;
 }
-
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-[#0A3C1F]/80 dark:bg-[#FFD700]/80;
+  @apply bg-primary/40;
 }
-
 /* Mobile-friendly scrollbars */
 @media (max-width: 768px) {
   ::-webkit-scrollbar {
@@ -185,72 +157,59 @@
     height: 4px;
   }
 }
-
 /* Selection styles */
 ::selection {
-  @apply bg-[#0A3C1F] text-white dark:bg-[#FFD700] dark:text-black;
+  @apply bg-primary/20 text-foreground;
 }
-
 /* Focus outline styles */
-:focus {
-  @apply outline-none ring-2 ring-[#0A3C1F] dark:ring-[#FFD700];
+:focus-visible {
+  @apply outline-none ring-2 ring-offset-2 ring-offset-background dark:ring-primary;
 }
-
 /* Link hover styles */
 a:not(.no-underline):hover {
-  @apply underline decoration-[#0A3C1F] dark:decoration-[#FFD700];
+  @apply underline decoration-primary;
 }
-
 /* Code block styles */
 pre {
-  @apply bg-gray-100 dark:bg-black border dark:border-[#FFD700]/20 p-4 rounded-lg overflow-x-auto;
+  @apply bg-muted border border-border p-4 rounded-lg overflow-x-auto;
 }
-
 code {
-  @apply font-mono text-sm bg-gray-100 dark:bg-black dark:text-[#FFD700] px-1 py-0.5 rounded;
+  @apply font-mono text-sm bg-muted text-foreground px-1 py-0.5 rounded;
 }
-
 /* Table styles */
 table {
   @apply w-full border-collapse;
 }
-
 th,
 td {
-  @apply border border-gray-200 dark:border-[#FFD700]/30 p-2;
+  @apply border border-border p-2;
 }
-
 th {
-  @apply bg-gray-100 dark:bg-black dark:text-[#FFD700];
+  @apply bg-muted/50 text-foreground;
 }
-
 /* Mobile-responsive table */
 @media (max-width: 640px) {
   table {
     font-size: 0.875rem;
   }
-  
   th,
   td {
     padding: 0.5rem;
   }
 }
-
 /* Form element styles */
 input,
 textarea,
 select {
-  @apply bg-white dark:bg-black border border-gray-300 dark:border-[#FFD700]/50 dark:text-[#FFD700] rounded-md px-3 py-2;
+  @apply bg-background border border-border text-foreground rounded-md px-3 py-2;
   /* Improve mobile input experience */
   font-size: 16px; /* Prevent zoom on iOS */
 }
-
 input:focus,
 textarea:focus,
 select:focus {
-  @apply border-[#0A3C1F] dark:border-[#FFD700] ring-2 ring-[#0A3C1F]/20 dark:ring-[#FFD700]/20;
+  @apply border-primary ring-2 ring-primary/20;
 }
-
 /* Mobile form optimization */
 @media (max-width: 640px) {
   input,
@@ -260,7 +219,6 @@ select:focus {
     border-radius: 0.5rem;
     font-size: 16px; /* Prevent zoom on iOS */
   }
-  
   /* Modal input specific optimizations */
   [role="dialog"] input,
   [role="dialog"] textarea,
@@ -268,22 +226,18 @@ select:focus {
     font-size: 16px;
     min-height: 44px; /* iOS minimum touch target */
   }
-  
   /* Additional mobile form optimizations */
   [role="dialog"] .space-y-4 > * + * {
     margin-top: 0.75rem; /* Tighter spacing on mobile */
   }
-  
   [role="dialog"] .grid-cols-2 {
     gap: 0.5rem; /* Reduce gap on mobile */
   }
 }
-
 /* Button hover effects */
 button:not(.no-hover):hover {
   @apply transform transition-transform duration-200 scale-[1.02];
 }
-
 /* Mobile button optimization */
 @media (max-width: 640px) {
   button {
@@ -291,7 +245,6 @@ button:not(.no-hover):hover {
     padding: 0.75rem 1rem;
   }
 }
-
 /* Custom animations */
 @keyframes pulse-yellow {
   0%,
@@ -302,36 +255,30 @@ button:not(.no-hover):hover {
     opacity: 0.5;
   }
 }
-
 .animate-pulse-yellow {
   animation: pulse-yellow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
-
 /* Custom utilities */
 .text-balance {
   text-wrap: balance;
 }
-
 /* Mobile-specific improvements */
 @media (max-width: 768px) {
   /* Improve text readability on mobile */
   body {
     line-height: 1.6;
   }
-  
   /* Better spacing for mobile */
   .container {
     padding-left: 1rem;
     padding-right: 1rem;
   }
-  
   /* Prevent text overflow */
   h1, h2, h3, h4, h5, h6 {
     word-wrap: break-word;
     overflow-wrap: break-word;
   }
 }
-
 /* iOS specific optimizations */
 @supports (-webkit-touch-callout: none) {
   /* iOS safe area support */
@@ -339,7 +286,6 @@ button:not(.no-hover):hover {
     padding-bottom: env(safe-area-inset-bottom);
     padding-top: env(safe-area-inset-top);
   }
-  
   /* Fix iOS input zoom */
   input[type="email"],
   input[type="number"],
@@ -352,14 +298,92 @@ button:not(.no-hover):hover {
     font-size: 16px;
   }
 }
-
 /* Loading states for mobile */
 .mobile-loading {
   @apply animate-pulse bg-gray-200 dark:bg-black rounded;
 }
-
 /* Ensure fixed elements don't interfere with mobile navigation */
 .fixed-mobile-safe {
   bottom: calc(1rem + env(safe-area-inset-bottom));
   right: calc(1rem + env(safe-area-inset-right));
+}
+
+/* Chat-specific fixes for text overflow */
+.chat-message {
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+.chat-message p {
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  white-space: pre-wrap !important;
+  margin: 0 !important;
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.chat-container {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Additional mobile chat fixes */
+@media (max-width: 768px) {
+  .chat-message {
+    max-width: 85% !important;
+    font-size: 0.875rem !important;
+  }
+  
+  .chat-message p {
+    line-height: 1.4 !important;
+  }
+}
+
+/* 3D Shadow and Depth Effects for Dark Mode */
+.dark {
+  /* Card shadows for depth */
+  .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3); }
+  .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4); }
+  .shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.5); }
+  .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.6); }
+  .shadow-xl { box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7); }
+  
+  /* 3D inset effects for inputs and recessed areas */
+  .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.6); }
+  
+  /* Yellow glow effects for interactive elements */
+  .ring-primary { box-shadow: 0 0 0 3px hsl(48 100% 65% / 0.3); }
+  .focus\\:ring-primary:focus { box-shadow: 0 0 0 3px hsl(48 100% 65% / 0.5); }
+  
+  /* Raised button effect */
+  .btn-3d {
+    box-shadow: 0 4px 8px -2px rgba(0, 0, 0, 0.8), 
+                0 2px 4px -1px rgba(0, 0, 0, 0.6),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .btn-3d:hover {
+    box-shadow: 0 6px 12px -2px rgba(0, 0, 0, 0.9), 
+                0 4px 8px -1px rgba(0, 0, 0, 0.7),
+                inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+    transform: translateY(-1px);
+  }
+  
+  .btn-3d:active {
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.6), 
+                inset 0 2px 4px 0 rgba(0, 0, 0, 0.3);
+    transform: translateY(1px);
+  }
+}
+
+/* Pure black footer in dark mode */
+.dark footer {
+  background-color: #000000 !important;
 }

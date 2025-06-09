@@ -51,7 +51,7 @@ export function URLConfigClient() {
       {loading ? (
         <div className="text-center py-4">
           <div
-            className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-[#0A3C1F] rounded-full"
+            className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-primary rounded-full"
             aria-hidden="true"
           ></div>
           <p className="mt-2">Checking URL configuration...</p>

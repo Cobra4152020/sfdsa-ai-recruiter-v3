@@ -238,13 +238,11 @@ export function TriviaLeaderboard({
           {leaderboardData.map((entry) => (
             <div
               key={entry.name}
-              className={cn(
-                "flex items-center justify-between p-3 rounded-lg",
-                entry.isCurrentUser
-                  ? "bg-[#F0F7F2] border border-[#0A3C1F]"
-                  : "bg-white border border-gray-100",
-                "hover:shadow-sm transition-shadow",
-              )}
+              className={`p-4 rounded-lg border transition-colors ${
+                entry.isCurrentUser 
+                  ? "bg-primary/10 border-primary/20 text-primary"
+                  : "bg-card border-border hover:bg-muted/50"
+              }`}
             >
               <div className="flex items-center gap-3">
                 <div className="flex items-center justify-center w-8 h-8">

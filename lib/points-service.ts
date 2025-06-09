@@ -30,21 +30,104 @@ export async function addParticipationPoints(
     }
 
     // Manual method as fallback
-    // 1. Update user participation count
-    const { error: updateError } = await supabase
-      .from("users")
-      .update({
-        participation_count: supabase.rpc("increment", {
-          row_id: userId,
-          table: "users",
-          column: "participation_count",
-          amount: points,
-        }),
-      })
-      .eq("id", userId);
+    // First, check user type to determine which table to update
+    const { data: userTypeData } = await supabase
+      .from('user_types')
+      .select('user_type')
+      .eq('user_id', userId)
+      .single();
 
-    if (updateError) {
-      console.error("Error updating participation count:", updateError);
+    let updateSuccess = false;
+
+    if (userTypeData?.user_type === 'recruit') {
+      // Update recruits table
+      const { error: recruitError } = await supabase
+        .from("recruits")
+        .update({
+          points: supabase.rpc("increment_recruit_points", {
+            user_id_param: userId,
+            points_param: points,
+          }),
+        })
+        .eq("user_id", userId);
+
+      if (recruitError) {
+        console.error("Error updating recruit points:", recruitError);
+        // Fallback: use raw SQL increment
+        const { error: fallbackError } = await supabase
+          .from("recruits")
+          .update({
+            points: supabase.rpc("coalesce", [
+              supabase.rpc("add", [
+                supabase.rpc("select_recruit_points", { user_id_param: userId }),
+                points
+              ]),
+              points
+            ])
+          })
+          .eq("user_id", userId);
+        
+        if (!fallbackError) updateSuccess = true;
+      } else {
+        updateSuccess = true;
+      }
+    } else if (userTypeData?.user_type === 'volunteer') {
+      // Update volunteer_recruiters table
+      const { error: volunteerError } = await supabase
+        .from("volunteer_recruiters")
+        .update({
+          points: supabase.rpc("increment_volunteer_points", {
+            user_id_param: userId,
+            points_param: points,
+          }),
+        })
+        .eq("user_id", userId);
+
+      if (volunteerError) {
+        console.error("Error updating volunteer points:", volunteerError);
+        // Fallback: simple increment
+        const { data: currentData } = await supabase
+          .from("volunteer_recruiters")
+          .select("points")
+          .eq("user_id", userId)
+          .single();
+        
+        const newPoints = (currentData?.points || 0) + points;
+        const { error: fallbackError } = await supabase
+          .from("volunteer_recruiters")
+          .update({ points: newPoints })
+          .eq("user_id", userId);
+        
+        if (!fallbackError) updateSuccess = true;
+      } else {
+        updateSuccess = true;
+      }
+    } else {
+      // Default to users table (participation_count)
+      const { data: currentData } = await supabase
+        .from("users")
+        .select("participation_count")
+        .eq("id", userId)
+        .single();
+
+      const newParticipationCount = (currentData?.participation_count || 0) + points;
+      
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({
+          participation_count: newParticipationCount,
+        })
+        .eq("id", userId);
+
+      if (!updateError) {
+        updateSuccess = true;
+      } else {
+        console.error("Error updating participation count:", updateError);
+      }
+    }
+
+    if (!updateSuccess) {
+      console.error("Failed to update points in any table");
       return false;
     }
 
@@ -68,6 +151,7 @@ export async function addParticipationPoints(
       console.warn("Could not log to participation_points table:", insertErr);
     }
 
+    console.log(`Successfully added ${points} points to user ${userId} (${userTypeData?.user_type || 'default'}) for ${activityType}`);
     return true;
   } catch (error) {
     console.error("Exception in addParticipationPoints:", error);

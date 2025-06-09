@@ -1,141 +1,90 @@
+"use client";
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Info, Clock, Award, Trophy, Brain, Zap, Star } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { Brain, Clock, Star, Trophy, Award } from "lucide-react";
 
 export function TriviaRules() {
   return (
-    <Card>
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg font-semibold flex items-center">
-          <Info className="h-5 w-5 mr-2 text-blue-500" />
-          How to Play
-        </CardTitle>
+    <Card className="w-full max-w-2xl mx-auto">
+      <CardHeader>
+        <CardTitle className="text-center text-foreground">How to Play Trivia</CardTitle>
       </CardHeader>
-      <CardContent className="p-4">
-        <div className="space-y-4 text-sm">
-          {/* Game Modes */}
-          <div className="flex items-start">
-            <Brain className="h-4 w-4 mr-2 mt-0.5 text-[#0A3C1F]" />
+      <CardContent className="space-y-6">
+        <div className="space-y-4">
+          <div className="flex items-start gap-3">
+            <Brain className="h-4 w-4 mr-2 mt-0.5 text-primary" />
             <div>
-              <p className="font-medium">Game Modes</p>
-              <div className="space-y-2 mt-2">
-                <div>
-                  <Badge variant="outline" className="mb-1">
-                    Normal Mode
-                  </Badge>
-                  <p className="text-gray-600">
-                    Standard gameplay with 30 seconds per question.
-                  </p>
-                </div>
-                <div>
-                  <Badge variant="destructive" className="mb-1">
-                    Challenge Mode
-                  </Badge>
-                  <p className="text-gray-600">
-                    15 seconds per question with 2x points multiplier!
-                  </p>
-                </div>
-                <div>
-                  <Badge variant="default" className="mb-1">
-                    Study Mode
-                  </Badge>
-                  <p className="text-gray-600">
-                    No time pressure, detailed explanations, and review cards
-                    for incorrect answers.
-                  </p>
-                </div>
+              <h3 className="font-semibold text-foreground">Question Types</h3>
+              <p className="text-sm text-muted-foreground">
+                Answer questions about law enforcement, San Francisco history, 
+                and deputy sheriff responsibilities. Each question has multiple 
+                choice answers.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <Clock className="h-4 w-4 mr-2 mt-0.5 text-primary" />
+            <div>
+              <h3 className="font-semibold text-foreground">Time Limits</h3>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>• <strong>Easy questions:</strong> 15 seconds</p>
+                <p>• <strong>Medium questions:</strong> 20 seconds</p>
+                <p>• <strong>Hard questions:</strong> 30 seconds</p>
+                <p className="mt-2">Answer quickly for bonus points!</p>
               </div>
             </div>
           </div>
 
-          {/* Time Limit */}
-          <div className="flex items-start">
-            <Clock className="h-4 w-4 mr-2 mt-0.5 text-[#0A3C1F]" />
+          <div className="flex items-start gap-3">
+            <Star className="h-4 w-4 mr-2 mt-0.5 text-primary" />
             <div>
-              <p className="font-medium">Time Limit</p>
-              <p className="text-gray-600">
-                Normal Mode: 30 seconds per question
-                <br />
-                Challenge Mode: 15 seconds per question
-                <br />
-                Study Mode: No time limit
-              </p>
+              <h3 className="font-semibold text-foreground">Scoring System</h3>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>• <strong>Easy questions:</strong> 10 points</p>
+                <p>• <strong>Medium questions:</strong> 20 points</p>
+                <p>• <strong>Hard questions:</strong> 30 points</p>
+                <p>• <strong>Speed bonus:</strong> Up to 10 extra points</p>
+                <p>• <strong>Streak bonus:</strong> 5 points per consecutive correct answer</p>
+              </div>
             </div>
           </div>
 
-          {/* Scoring System */}
-          <div className="flex items-start">
-            <Star className="h-4 w-4 mr-2 mt-0.5 text-[#0A3C1F]" />
+          <div className="flex items-start gap-3">
+            <Trophy className="h-4 w-4 mr-2 mt-0.5 text-primary" />
             <div>
-              <p className="font-medium">Scoring System</p>
-              <p className="text-gray-600">
-                Base points are multiplied by various bonuses:
-              </p>
-              <ul className="list-disc list-inside ml-4 mt-1 text-gray-600">
-                <li>Difficulty: Easy (1x), Medium (1.5x), Hard (2x)</li>
-                <li>Streak: 3+ correct (1.5x), 5+ correct (2x)</li>
-                <li>Time Bonus: Up to 1x extra based on speed</li>
-                <li>Challenge Mode: 2x all points</li>
-              </ul>
+              <h3 className="font-semibold text-foreground">Competition</h3>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>• Compete with other recruits on the leaderboard</p>
+                <p>• Top performers earn special recognition</p>
+                <p>• Leaderboard resets weekly for fair competition</p>
+              </div>
             </div>
           </div>
 
-          {/* Badges */}
-          <div className="flex items-start">
-            <Trophy className="h-4 w-4 mr-2 mt-0.5 text-[#0A3C1F]" />
+          <div className="flex items-start gap-3">
+            <Award className="h-4 w-4 mr-2 mt-0.5 text-primary" />
             <div>
-              <p className="font-medium">Earning Badges</p>
-              <p className="text-gray-600">
-                Complete achievements to earn special badges:
-              </p>
-              <ul className="list-disc list-inside ml-4 mt-1 text-gray-600">
-                <li>Trivia Participant: Complete your first trivia round</li>
-                <li>Trivia Enthusiast: Complete 5 trivia rounds</li>
-                <li>Trivia Master: Achieve 3 perfect scores</li>
-                <li>
-                  Speed Demon: Answer 10 questions in under 5 seconds each
-                </li>
-                <li>
-                  Challenge Champion: Complete a perfect round in Challenge Mode
-                </li>
-              </ul>
+              <h3 className="font-semibold text-foreground">Rewards</h3>
+              <div className="text-sm text-muted-foreground space-y-1">
+                <p>• Earn points that count toward your total score</p>
+                <p>• Unlock achievement badges for milestones</p>
+                <p>• Points help you access exclusive content</p>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Social Sharing */}
-          <div className="flex items-start">
-            <Award className="h-4 w-4 mr-2 mt-0.5 text-[#0A3C1F]" />
-            <div>
-              <p className="font-medium">Bonus Points</p>
-              <p className="text-gray-600">
-                Share your achievements to earn extra points:
-              </p>
-              <ul className="list-disc list-inside ml-4 mt-1 text-gray-600">
-                <li>+15 points for sharing mid-game</li>
-                <li>+25 points for sharing a perfect score</li>
-                <li>+20 points for sharing a new badge</li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="bg-[#0A3C1F]/10 p-3 rounded-lg mt-4">
-            <p className="font-medium text-[#0A3C1F] flex items-center">
-              <Zap className="h-4 w-4 mr-2" />
-              Pro Tips
-            </p>
-            <ul className="text-sm text-gray-600 mt-2 space-y-1">
-              <li>• Use Study Mode to learn and practice without pressure</li>
-              <li>• Build streaks in Normal Mode to maximize points</li>
-              <li>
-                • Try Challenge Mode once you&apos;re confident for double
-                points!
-              </li>
-              <li>
-                • Share your achievements to help spread the word about SFSO
-                recruitment
-              </li>
-            </ul>
-          </div>
+        <div className="bg-secondary/20 p-4 rounded-lg border border-secondary/40">
+          <p className="font-medium text-foreground flex items-center">
+            <Star className="h-4 w-4 mr-2 text-primary" />
+            Pro Tip
+          </p>
+          <p className="text-sm text-muted-foreground mt-1">
+            Study the Deputy Sheriff handbook and practice regularly to improve 
+            your scores. The questions are based on real scenarios you&apos;ll 
+            encounter as a deputy!
+          </p>
         </div>
       </CardContent>
     </Card>

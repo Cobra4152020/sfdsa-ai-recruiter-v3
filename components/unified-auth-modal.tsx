@@ -152,10 +152,35 @@ export function UnifiedAuthModal() {
       
     } catch (error) {
       console.error("Sign in error:", error);
-      const errorMessage = error instanceof Error ? error.message : "Failed to sign in. Please try again.";
+      
+      let errorMessage = "Failed to sign in. Please try again.";
+      let errorTitle = "Sign In Failed";
+      
+      if (error instanceof Error) {
+        // Handle specific sign-in errors with helpful messages
+        if (error.message.includes('Invalid login credentials')) {
+          errorTitle = "Incorrect Credentials";
+          errorMessage = "Email or password is incorrect. Please check your details and try again.";
+        } else if (error.message.includes('Email not confirmed')) {
+          errorTitle = "Email Not Verified";
+          errorMessage = "Please check your email and click the verification link before signing in.";
+        } else if (error.message.includes('Email address') && error.message.includes('invalid')) {
+          errorTitle = "Invalid Email Address";
+          errorMessage = "Please enter a valid email address.";
+        } else if (error.message.includes('rate limit') || error.message.includes('too many')) {
+          errorTitle = "Too Many Attempts";
+          errorMessage = "Please wait a moment before trying to sign in again.";
+        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+          errorTitle = "Connection Error";
+          errorMessage = "Network error. Please check your internet connection and try again.";
+        } else {
+          // Show the actual error message for other errors
+          errorMessage = error.message;
+        }
+      }
       
       toast({
-        title: "Sign In Failed",
+        title: errorTitle,
         description: errorMessage,
         variant: "destructive",
       });
@@ -166,12 +191,35 @@ export function UnifiedAuthModal() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("🚀 Starting registration process...");
+    
+    // Mobile debugging - show alert to confirm function is called
+    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
+      console.log("📱 Mobile device detected - registration starting");
+    }
+    
     setIsLoading(true);
 
     try {
+      // Initialize Supabase client
+      console.log("📡 Initializing Supabase client...");
       const supabase = getClientSideSupabase();
       
-      // Validation
+      if (!supabase) {
+        throw new Error("Authentication service is not available. Please try again later.");
+      }
+
+      console.log("✅ Supabase client initialized");
+      
+      // Enhanced validation with detailed logging
+      console.log("🔍 Validating form data...", {
+        email: !!formData.email,
+        password: !!formData.password,
+        firstName: !!formData.firstName,
+        lastName: !!formData.lastName,
+        passwordsMatch: formData.password === formData.confirmPassword
+      });
+
       if (!formData.email || !formData.password || !formData.firstName || !formData.lastName) {
         throw new Error("Please fill in all required fields");
       }
@@ -184,34 +232,79 @@ export function UnifiedAuthModal() {
         throw new Error("Password must be at least 6 characters long");
       }
 
-      const { data, error } = await supabase.auth.signUp({
+      // Email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        throw new Error("Please enter a valid email address");
+      }
+
+      console.log("✅ Form validation passed");
+      console.log("📤 Sending registration request to Supabase...");
+
+      const signUpData = {
         email: formData.email.trim(),
         password: formData.password,
         options: {
           data: {
-            first_name: formData.firstName,
-            last_name: formData.lastName,
-            full_name: `${formData.firstName} ${formData.lastName}`.trim(),
+            first_name: formData.firstName.trim(),
+            last_name: formData.lastName.trim(),
+            full_name: `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim(),
             user_type: 'recruit',
             referral_code: referralCode || null,
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback?userType=recruit&redirect=dashboard&welcome=true`,
         },
+      };
+
+      console.log("📋 Registration data prepared:", {
+        email: signUpData.email,
+        hasPassword: !!signUpData.password,
+        userData: signUpData.options.data
       });
 
-      if (error) throw error;
+      const { data, error } = await supabase.auth.signUp(signUpData);
 
-      // Award registration points if user is confirmed
-      if (data.user?.email_confirmed_at) {
-        await awardRegistrationPoints(data.user.id);
+      console.log("📨 Supabase response received:", {
+        hasData: !!data,
+        hasUser: !!data?.user,
+        hasError: !!error,
+        userId: data?.user?.id,
+        emailConfirmed: !!data?.user?.email_confirmed_at
+      });
+
+      if (error) {
+        console.error("❌ Supabase auth error:", error);
+        throw error;
       }
 
+      if (!data || !data.user) {
+        console.error("❌ No user data returned from Supabase");
+        throw new Error("Registration failed - no user data received. Please try again.");
+      }
+
+      console.log("✅ User created successfully:", data.user.id);
+
+      // Award registration points if user is confirmed
+      if (data.user.email_confirmed_at) {
+        console.log("🎁 Awarding registration points...");
+        await awardRegistrationPoints(data.user.id);
+      } else {
+        console.log("📧 Email confirmation required, points will be awarded after verification");
+      }
+
+      const successMessage = data.user.email_confirmed_at ? 
+        "Welcome to the team! You've earned 50 points to get started." :
+        "Account created successfully! Please check your email and click the verification link to claim your 50 welcome points.";
+
+      console.log("🎉 Registration completed successfully");
+      
       toast({
-        title: "🎉 Account Created!",
-        description: data.user?.email_confirmed_at ? 
-          "Welcome to the team! You've earned 50 points to get started." :
-          "Please check your email to verify your account and claim your 50 welcome points!",
+        title: "🎉 Account Created Successfully!",
+        description: successMessage,
+        duration: 6000, // Show longer for better UX
       });
 
+      // Clear form
       setFormData({
         email: "",
         password: "",
@@ -220,20 +313,72 @@ export function UnifiedAuthModal() {
         lastName: "",
       });
 
-      if (data.user?.email_confirmed_at) {
+      if (data.user.email_confirmed_at) {
+        console.log("🔄 Closing modal - user is verified");
         closeModal();
       } else {
+        console.log("📧 Switching to sign-in tab - email verification needed");
         setActiveTab("signin");
+        
+        // Show additional guidance toast after switching tabs
+        setTimeout(() => {
+          toast({
+            title: "📧 Check Your Email",
+            description: "We sent you a verification link. After clicking it, sign in here to access your dashboard and claim your points!",
+            duration: 8000,
+          });
+        }, 1000);
       }
+
     } catch (error) {
-      console.error("Sign up error:", error);
+      console.error("💥 Registration error:", error);
+      
+      let errorMessage = "Failed to create account. Please try again.";
+      let errorTitle = "Registration Failed";
+      
+      if (error instanceof Error) {
+        console.log("🔍 Error details:", {
+          message: error.message,
+          name: error.name,
+          stack: error.stack?.substring(0, 200)
+        });
+        
+        // Handle specific Supabase errors with helpful messages
+        if (error.message.includes('User already registered')) {
+          errorTitle = "Account Already Exists";
+          errorMessage = "An account with this email already exists. Please sign in instead.";
+        } else if (error.message.includes('Email address') && error.message.includes('invalid')) {
+          errorTitle = "Invalid Email Address";
+          errorMessage = "Please use a valid email address with a real domain (like @gmail.com, @outlook.com, etc.). Fake email domains are not allowed.";
+        } else if (error.message.includes('Invalid email')) {
+          errorTitle = "Invalid Email Format";
+          errorMessage = "Please enter a valid email address format (example@domain.com).";
+        } else if (error.message.includes('Password should be at least')) {
+          errorTitle = "Password Too Short";
+          errorMessage = "Password must be at least 6 characters long.";
+        } else if (error.message.includes('Database error saving new user')) {
+          errorTitle = "Registration System Error";
+          errorMessage = "There was a system error creating your account. Please try again in a moment.";
+        } else if (error.message.includes('Network') || error.message.includes('fetch')) {
+          errorTitle = "Connection Error";
+          errorMessage = "Network error. Please check your internet connection and try again.";
+        } else if (error.message.includes('rate limit') || error.message.includes('too many')) {
+          errorTitle = "Too Many Attempts";
+          errorMessage = "Please wait a moment before trying to register again.";
+        } else {
+          // Show the actual error message for any other errors
+          errorMessage = error.message;
+        }
+      }
+      
       toast({
-        title: "Registration Failed",
-        description: error instanceof Error ? error.message : "Failed to create account",
+        title: errorTitle,
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
       setIsLoading(false);
+      console.log("🔄 Registration process completed");
     }
   };
 
@@ -264,13 +409,13 @@ export function UnifiedAuthModal() {
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
       <DialogContent className="sm:max-w-[500px] w-[95vw] max-w-[95vw] sm:max-w-[500px] p-0 max-h-[95vh] overflow-hidden flex flex-col">
         {/* Header with gradient background */}
-        <div className="bg-gradient-to-r from-[#0A3C1F] to-[#1B5E20] text-white p-4 sm:p-6 flex-shrink-0">
+        <div className="bg-gradient-to-r from-primary to-primary/80 text-primary-foreground p-4 sm:p-6 flex-shrink-0">
           <DialogHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
               <DialogTitle className="text-xl sm:text-2xl font-bold">
                 {activeTab === "signin" ? "Welcome Back!" : "Join Our Team"}
               </DialogTitle>
-              <p className="text-green-100 mt-1 text-sm">
+              <p className="text-primary-foreground/80 mt-1 text-sm">
                 {activeTab === "signin" 
                   ? "Sign in to continue your recruitment journey" 
                   : "Start your deputy sheriff career journey"
@@ -280,7 +425,7 @@ export function UnifiedAuthModal() {
             <Button
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full text-white hover:bg-white/20"
+              className="h-8 w-8 rounded-full text-primary-foreground hover:bg-primary-foreground/20"
               onClick={closeModal}
             >
               <X className="h-4 w-4" />
@@ -344,7 +489,7 @@ export function UnifiedAuthModal() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 h-11"
+                  className="w-full bg-primary hover:bg-primary/90 h-11"
                   disabled={isLoading}
                 >
                   {isLoading ? "Signing In..." : "Sign In"}
@@ -353,7 +498,7 @@ export function UnifiedAuthModal() {
                 <div className="text-center">
                   <button
                     type="button"
-                    className="text-sm text-[#0A3C1F] hover:underline"
+                    className="text-sm text-primary hover:underline"
                     onClick={() => setActiveTab("signup")}
                   >
                     Don't have an account? <span className="font-medium">Sign up free</span>
@@ -377,7 +522,14 @@ export function UnifiedAuthModal() {
                 </CardContent>
               </Card>
 
-              <form onSubmit={handleSignUp} className="space-y-4">
+              <form onSubmit={(e) => {
+                console.log("📝 Form submission triggered!");
+                toast({
+                  title: "Form Submitted",
+                  description: "Registration form submitted successfully",
+                });
+                handleSignUp(e);
+              }} className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-2">
                     <Label htmlFor="first-name" className="text-sm font-medium">

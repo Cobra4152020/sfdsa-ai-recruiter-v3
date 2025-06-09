@@ -1,11 +1,11 @@
 import { useEffect, RefObject } from "react";
 
-export function useScrollToBottom<
-  T extends HTMLElement,
-  D extends ReadonlyArray<unknown>,
->(ref: RefObject<T>, dependencies: D) {
+export function useScrollToBottom<T extends HTMLElement>(
+  ref: RefObject<T>, 
+  messages: any[]
+) {
   useEffect(() => {
-    if (ref.current) {
+    if (ref.current && messages.length > 0) {
       // Use smooth scrolling with a slight delay to give users time to read
       setTimeout(() => {
         ref.current?.scrollTo({
@@ -14,5 +14,5 @@ export function useScrollToBottom<
         });
       }, 500); // 500ms delay before scrolling
     }
-  }, [ref, ...dependencies]);
+  }, [ref, messages.length]); // Only depend on messages.length, not the entire array
 }

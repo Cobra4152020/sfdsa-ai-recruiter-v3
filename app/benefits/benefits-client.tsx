@@ -110,10 +110,10 @@ export default function BenefitsClient() {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+            <h1 className="text-4xl font-bold text-foreground mb-4">
               Comprehensive Benefits Package
             </h1>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
               As a San Francisco Deputy Sheriff, you&apos;ll enjoy a rewarding
               career with excellent benefits designed to support your
               professional growth, health, and financial security.
@@ -130,20 +130,20 @@ export default function BenefitsClient() {
                 >
                   <CardContent className="pt-6">
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-12 h-12 bg-[#0A3C1F]/10 rounded-full flex items-center justify-center">
-                        <Icon className="h-6 w-6 text-[#0A3C1F]" />
+                      <div className="flex-shrink-0 w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                        <Icon className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <h2 className="text-xl font-semibold text-[#0A3C1F] mb-3">
+                        <h2 className="text-xl font-semibold text-foreground mb-3">
                           {category.title}
                         </h2>
                         <ul className="space-y-2">
                           {category.benefits.map((benefit) => (
                             <li
                               key={benefit}
-                              className="flex items-start gap-2 text-gray-700"
+                              className="flex items-start gap-2 text-muted-foreground"
                             >
-                              <span className="text-[#0A3C1F] font-bold">
+                              <span className="text-primary font-bold">
                                 •
                               </span>
                               <span>{benefit}</span>
@@ -158,12 +158,12 @@ export default function BenefitsClient() {
             })}
           </div>
 
-          <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-8">
+          <div className="mt-12 bg-secondary/20 border border-secondary/40 rounded-lg p-8">
             <div className="max-w-3xl mx-auto text-center">
-              <h2 className="text-2xl font-semibold text-blue-800 mb-4">
+              <h2 className="text-2xl font-semibold text-foreground mb-4">
                 Start Your Career Today
               </h2>
-              <p className="text-blue-700 mb-6">
+              <p className="text-muted-foreground mb-6">
                 Join the San Francisco Sheriff&apos;s Department and enjoy these
                 comprehensive benefits while making a difference in your
                 community.
@@ -171,13 +171,13 @@ export default function BenefitsClient() {
               <div className="flex flex-wrap gap-4 justify-center">
                 <a
                   href="/requirements"
-                  className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-primary text-primary-foreground font-semibold rounded-lg hover:bg-primary/90 transition-colors"
                 >
                   Check Requirements
                 </a>
                 <a
                   href="/application-process"
-                  className="inline-flex items-center px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors"
+                  className="inline-flex items-center px-6 py-3 bg-card text-foreground font-semibold rounded-lg border border-border hover:bg-muted transition-colors"
                 >
                   Apply Now
                 </a>

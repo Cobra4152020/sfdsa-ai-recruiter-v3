@@ -9,6 +9,8 @@ export async function GET(request: NextRequest) {
   const code = requestParams.get("code");
   const userType = requestParams.get("userType") || "recruit";
   const callbackUrl = requestParams.get("callbackUrl");
+  const redirect = requestParams.get("redirect");
+  const welcome = requestParams.get("welcome");
   const error = requestParams.get("error");
   const errorDescription = requestParams.get("error_description");
 
@@ -31,6 +33,12 @@ export async function GET(request: NextRequest) {
     redirectTo = "/admin/dashboard";
   } else {
     redirectTo = "/dashboard";
+  }
+
+  // Handle welcome parameter for new user registrations
+  if (welcome === "true") {
+    // Redirect to dedicated welcome page for new users
+    redirectTo = "/dashboard/welcome";
   }
 
   // Use callback URL if provided

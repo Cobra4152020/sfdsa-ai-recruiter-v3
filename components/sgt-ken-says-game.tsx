@@ -18,6 +18,7 @@ import {
   Twitter,
   Linkedin,
   Copy,
+  Zap,
 } from "lucide-react";
 import {
   Dialog,
@@ -475,33 +476,33 @@ export function SgtKenSaysGame() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4 text-center">
-            <Trophy className="h-6 w-6 text-[#FFD700] mx-auto mb-2" />
-            <div className="text-2xl font-bold text-[#0A3C1F]">{gameState.totalWins}</div>
-            <div className="text-sm text-gray-600">Wins</div>
+            <Trophy className="h-6 w-6 text-primary mx-auto mb-2" />
+            <div className="text-2xl font-bold text-foreground">{gameState.totalWins}</div>
+            <div className="text-sm text-muted-foreground">Total Wins</div>
           </CardContent>
         </Card>
         
         <Card>
           <CardContent className="p-4 text-center">
-            <Target className="h-6 w-6 text-[#0A3C1F] mx-auto mb-2" />
-            <div className="text-2xl font-bold text-[#0A3C1F]">{gameState.totalGamesPlayed}</div>
-            <div className="text-sm text-gray-600">Played</div>
+            <Target className="h-6 w-6 text-primary mx-auto mb-2" />
+            <div className="text-2xl font-bold text-foreground">{gameState.totalGamesPlayed}</div>
+            <div className="text-sm text-muted-foreground">Games Played</div>
           </CardContent>
         </Card>
         
         <Card>
           <CardContent className="p-4 text-center">
-            <Star className="h-6 w-6 text-[#FF6B6B] mx-auto mb-2" />
-            <div className="text-2xl font-bold text-[#0A3C1F]">{gameState.streak}</div>
-            <div className="text-sm text-gray-600">Streak</div>
+            <Zap className="h-6 w-6 text-primary mx-auto mb-2" />
+            <div className="text-2xl font-bold text-foreground">{gameState.streak}</div>
+            <div className="text-sm text-muted-foreground">Current Streak</div>
           </CardContent>
         </Card>
         
         <Card>
           <CardContent className="p-4 text-center">
-            <Clock className="h-6 w-6 text-[#0A3C1F] mx-auto mb-2" />
-            <div className="text-2xl font-bold text-[#0A3C1F]">{timeUntilNext}</div>
-            <div className="text-sm text-gray-600">Next Puzzle</div>
+            <Clock className="h-6 w-6 text-primary mx-auto mb-2" />
+            <div className="text-2xl font-bold text-foreground">{timeUntilNext}</div>
+            <div className="text-sm text-muted-foreground">Next Game</div>
           </CardContent>
         </Card>
       </div>

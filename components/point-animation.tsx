@@ -23,8 +23,8 @@ export function PointAnimation({
       confetti({
         particleCount: Math.min(points, 100),
         spread: 70,
-        origin: { y: 0.6 },
-        colors: ["#FFD700", "#0A3C1F", "#FFFFFF"],
+        origin: { x: 0.5, y: 0.6 },
+        colors: ["hsl(var(--secondary))", "hsl(var(--primary))", "hsl(var(--background))"],
       });
     }
 
@@ -39,17 +39,26 @@ export function PointAnimation({
     return () => clearTimeout(timer);
   }, [points, onComplete]);
 
+  const triggerConfetti = () => {
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { x: 0.5, y: 0.6 },
+      colors: ["hsl(var(--secondary))", "hsl(var(--primary))", "hsl(var(--background))"],
+    });
+  };
+
   return (
     <AnimatePresence>
       {isVisible && (
         <motion.div
           className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
         >
           <motion.div
-            className="bg-[#0A3C1F]/90 text-white rounded-lg px-6 py-4 shadow-xl"
+            className="bg-card/90 text-foreground rounded-lg px-6 py-4 shadow-xl"
             initial={{ scale: 0.8, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.8, y: 20 }}

@@ -291,37 +291,37 @@ export default function CouldYouMakeTheCutPage() {
                 animate={{ scale: 1 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
               >
-                <Trophy className="w-16 h-16 mx-auto text-[#FFD700] mb-4" />
+                <Trophy className="w-16 h-16 mx-auto text-secondary mb-4" />
               </motion.div>
-              <CardTitle className="text-3xl font-bold text-[#0A3C1F] mb-2">
+              <CardTitle className="text-3xl font-bold text-foreground mb-2">
                 Could You Make the Cut?
               </CardTitle>
-              <p className="text-lg text-gray-600 dark:text-gray-300">
+              <p className="text-lg text-muted-foreground">
                 Test your law enforcement instincts with real deputy scenarios
               </p>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-                  <Clock className="w-8 h-8 mx-auto text-blue-600 mb-2" />
-                  <div className="font-semibold">10 Minutes</div>
-                  <div className="text-gray-600 dark:text-gray-400">Time Limit</div>
+                <div className="bg-primary/10 p-4 rounded-lg">
+                  <Clock className="w-8 h-8 mx-auto text-primary mb-2" />
+                  <div className="font-semibold text-foreground">10 Minutes</div>
+                  <div className="text-muted-foreground">Time Limit</div>
                 </div>
-                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-                  <Star className="w-8 h-8 mx-auto text-green-600 mb-2" />
-                  <div className="font-semibold">10 Scenarios</div>
-                  <div className="text-gray-600 dark:text-gray-400">Real Situations</div>
+                <div className="bg-primary/10 p-4 rounded-lg">
+                  <Star className="w-8 h-8 mx-auto text-primary mb-2" />
+                  <div className="font-semibold text-foreground">10 Scenarios</div>
+                  <div className="text-muted-foreground">Real Situations</div>
                 </div>
-                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
-                  <Share2 className="w-8 h-8 mx-auto text-yellow-600 mb-2" />
-                  <div className="font-semibold">Share Results</div>
-                  <div className="text-gray-600 dark:text-gray-400">Challenge Friends</div>
+                <div className="bg-primary/10 p-4 rounded-lg">
+                  <Share2 className="w-8 h-8 mx-auto text-primary mb-2" />
+                  <div className="font-semibold text-foreground">Share Results</div>
+                  <div className="text-muted-foreground">Challenge Friends</div>
                 </div>
               </div>
               
-              <div className="bg-[#0A3C1F]/5 border border-[#0A3C1F]/20 rounded-lg p-4">
-                <h3 className="font-semibold text-[#0A3C1F] mb-2">💪 Sgt. Ken Says:</h3>
-                <p className="text-gray-700 dark:text-gray-300 italic">
+              <div className="bg-secondary/20 border border-secondary/40 rounded-lg p-4">
+                <h3 className="font-semibold text-foreground mb-2">💪 Sgt. Ken Says:</h3>
+                <p className="text-muted-foreground italic">
                   "Think you've got what it takes to protect and serve San Francisco? 
                   Let's see how you handle the real situations our deputies face every day. 
                   Good luck, recruit!"
@@ -331,7 +331,7 @@ export default function CouldYouMakeTheCutPage() {
               <Button
                 onClick={startGame}
                 size="lg"
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white px-8 py-4 text-lg"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg"
               >
                 Start the Challenge
               </Button>
@@ -431,7 +431,7 @@ export default function CouldYouMakeTheCutPage() {
                     <Button
                       onClick={nextQuestion}
                       disabled={selectedAnswer === null}
-                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                      className="bg-primary hover:bg-primary/90 text-primary-foreground"
                     >
                       {gameState.currentQuestion === gameScenarios.length - 1 ? 'Finish' : 'Next Question'}
                     </Button>

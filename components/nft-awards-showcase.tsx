@@ -77,7 +77,7 @@ export function NFTAwardsShowcase({
       <CardContent>
         {isLoading ? (
           <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A3C1F]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : error ? (
           <div className="text-center py-8 text-red-500">{error}</div>

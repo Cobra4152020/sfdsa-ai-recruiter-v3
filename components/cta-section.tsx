@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 export function CTASection() {
   const router = useRouter();
   return (
-    <section className="w-full py-12 md:py-20 bg-[#0A3C1F] text-white">
+    <section className="w-full py-12 md:py-20 bg-card text-card-foreground">
       <div className="container mx-auto px-4 text-center">
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
           Ready to Start Your Journey?
@@ -20,7 +20,7 @@ export function CTASection() {
           <Button
             onClick={() => router.push("/apply")}
             size="lg"
-            className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-bold text-lg px-8"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-lg px-8"
           >
             Apply Now
           </Button>
@@ -28,7 +28,7 @@ export function CTASection() {
             onClick={() => router.push("/mission-briefing")}
             size="lg"
             variant="outline"
-            className="border-2 border-[#FFD700] text-[#FFD700] hover:bg-[#FFD700]/10 font-medium text-lg px-8"
+            className="border-2 border-primary text-primary hover:bg-primary/10 font-medium text-lg px-8"
           >
             Get More Information{" "}
             <ArrowRight className="ml-2 h-5 w-5" aria-hidden="true" />

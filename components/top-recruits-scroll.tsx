@@ -150,9 +150,9 @@ export default function TopRecruitsScroll() {
   const handleMouseLeave = () => setIsPaused(false);
 
   return (
-    <section className="w-full py-8 bg-[#0A3C1F] text-white">
+    <section className="w-full py-8 bg-card text-card-foreground">
       <div className="container mx-auto px-4">
-        <h2 className="text-2xl font-bold mb-4 text-[#F8F5EE]">Top Recruits</h2>
+        <h2 className="text-2xl font-bold mb-4 text-card-foreground">Top Recruits</h2>
         <div
           ref={scrollRef}
           className="flex overflow-x-auto pb-4 hide-scrollbar"
@@ -165,12 +165,12 @@ export default function TopRecruitsScroll() {
             {recruits.map((user, index) => (
               <Card
                 key={user.id}
-                className="min-w-[280px] md:min-w-[320px] bg-white border border-[#0A3C1F]/10"
+                className="min-w-[280px] md:min-w-[320px] bg-card border border-border"
               >
                 <CardContent className="p-4">
                   <div className="flex items-center space-x-4">
                     <div className="relative">
-                      <div className="h-16 w-16 rounded-full overflow-hidden bg-[#0A3C1F]/10 relative">
+                      <div className="h-16 w-16 rounded-full overflow-hidden bg-muted relative">
                         <Image
                           src={getProfileImage(user.id) || "/placeholder.svg"}
                           alt={user.name || `Recruit #${user.id}`}
@@ -182,30 +182,30 @@ export default function TopRecruitsScroll() {
                         />
                       </div>
                       {index < 3 && (
-                        <div className="absolute -top-2 -right-2 bg-[#FFD700] rounded-full p-1">
+                        <div className="absolute -top-2 -right-2 bg-secondary rounded-full p-1">
                           {index === 0 ? (
-                            <Trophy className="h-4 w-4 text-[#0A3C1F]" />
+                            <Trophy className="h-4 w-4 text-secondary-foreground" />
                           ) : index === 1 ? (
-                            <Star className="h-4 w-4 text-[#0A3C1F]" />
+                            <Star className="h-4 w-4 text-secondary-foreground" />
                           ) : (
-                            <Award className="h-4 w-4 text-[#0A3C1F]" />
+                            <Award className="h-4 w-4 text-secondary-foreground" />
                           )}
                         </div>
                       )}
                     </div>
                     <div>
-                      <h3 className="font-semibold text-[#0A3C1F]">
+                      <h3 className="font-semibold text-card-foreground">
                         {user.name || `Recruit #${user.id}`}
                       </h3>
-                      <p className="text-sm text-[#0A3C1F]/70">
+                      <p className="text-sm text-muted-foreground">
                         {user.title || "Recruit Applicant"}
                       </p>
                       <div className="flex items-center mt-2">
-                        <Badge className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90">
+                        <Badge className="bg-primary text-primary-foreground hover:bg-primary/90">
                           {user.points || 0} points
                         </Badge>
                         {user.badges && user.badges > 0 && (
-                          <Badge className="ml-2 bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90">
+                          <Badge className="ml-2 bg-secondary text-secondary-foreground hover:bg-secondary/90">
                             {user.badges} badges
                           </Badge>
                         )}

@@ -333,10 +333,10 @@ export function DeputySheriffRoadmap() {
           className="text-center space-y-6"
         >
           <div className="relative">
-            <h1 className="text-5xl md:text-6xl font-bold text-[#0A3C1F] mb-6 relative z-10">
-              Deputy Sheriff Roadmap
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 relative z-10">
+              Deputy Sheriff
             </h1>
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-[#0A3C1F] via-[#FFD700] to-[#0A3C1F] rounded-full"></div>
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-primary via-secondary to-primary rounded-full"></div>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Your personalized journey to becoming a San Francisco Deputy Sheriff. Track your progress and unlock new opportunities.
@@ -432,10 +432,10 @@ export function DeputySheriffRoadmap() {
           transition={{ duration: 0.6 }}
         >
           <div className="relative mb-8">
-            <h1 className="text-5xl md:text-6xl font-bold text-[#0A3C1F] mb-6 relative z-10">
-              Deputy Sheriff Roadmap
+            <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6 relative z-10">
+              Deputy Sheriff
             </h1>
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-[#0A3C1F] via-[#FFD700] to-[#0A3C1F] rounded-full"></div>
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-primary via-secondary to-primary rounded-full"></div>
           </div>
           <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
             Your personalized journey to becoming a San Francisco Deputy Sheriff. Complete activities, earn points, and unlock new content and opportunities.
@@ -449,44 +449,44 @@ export function DeputySheriffRoadmap() {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="relative"
         >
-          <div className="bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/90 rounded-2xl p-8 shadow-2xl border border-[#0A3C1F]/20 text-white">
+          <div className="bg-gradient-to-br from-primary to-primary/90 rounded-2xl p-8 shadow-2xl border border-primary/20 text-white">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center group">
                 <div className="mb-4">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FFD700] rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <TrendingUp className="h-8 w-8 text-[#0A3C1F]" />
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <TrendingUp className="h-8 w-8 text-secondary-foreground" />
                   </div>
                 </div>
-                <div className="text-4xl font-bold text-[#FFD700] mb-2">{points}</div>
+                <div className="text-4xl font-bold text-secondary mb-2">{points}</div>
                 <div className="text-white/80 font-medium">Total Points Earned</div>
               </div>
               <div className="text-center group">
                 <div className="mb-4">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FFD700] rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <Map className="h-8 w-8 text-[#0A3C1F]" />
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <Map className="h-8 w-8 text-secondary-foreground" />
                   </div>
                 </div>
-                <div className="text-4xl font-bold text-[#FFD700] mb-2">{getProgressPercentage()}%</div>
+                <div className="text-4xl font-bold text-secondary mb-2">{getProgressPercentage()}%</div>
                 <div className="text-white/80 font-medium">Roadmap Progress</div>
               </div>
               <div className="text-center group">
                 <div className="mb-4">
-                  <div className="inline-flex items-center justify-center w-16 h-16 bg-[#FFD700] rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
-                    <Target className="h-8 w-8 text-[#0A3C1F]" />
+                  <div className="inline-flex items-center justify-center w-16 h-16 bg-secondary rounded-full mb-3 group-hover:scale-110 transition-transform duration-300">
+                    <Target className="h-8 w-8 text-secondary-foreground" />
                   </div>
                 </div>
-                <div className="text-4xl font-bold text-[#FFD700] mb-2">{getTotalPossiblePoints()}</div>
+                <div className="text-4xl font-bold text-secondary mb-2">{getTotalPossiblePoints()}</div>
                 <div className="text-white/80 font-medium">Maximum Points</div>
               </div>
             </div>
             <div className="mt-8">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-white/80 font-medium">Overall Progress</span>
-                <span className="text-[#FFD700] font-bold">{getProgressPercentage()}%</span>
+                <span className="text-secondary font-bold">{getProgressPercentage()}%</span>
               </div>
               <div className="w-full bg-white/20 rounded-full h-3 overflow-hidden">
                 <motion.div 
-                  className="h-full bg-gradient-to-r from-[#FFD700] to-[#FFD700]/80 rounded-full"
+                  className="h-full bg-gradient-to-r from-secondary to-secondary/80 rounded-full"
                   initial={{ width: 0 }}
                   animate={{ width: `${getProgressPercentage()}%` }}
                   transition={{ duration: 1, delay: 0.5 }}
@@ -587,13 +587,13 @@ export function DeputySheriffRoadmap() {
                           </div>
                           <div className="flex-1">
                             <CardTitle className="text-xl mb-3 flex items-center gap-3">
-                              <span className="text-[#0A3C1F]">{step.title}</span>
+                              <span className="text-primary">{step.title}</span>
                               <div className="flex gap-2">
                                 <Badge 
                                   variant={step.unlocked ? "default" : "secondary"} 
                                   className={`px-3 py-1 font-semibold ${
                                     step.unlocked 
-                                      ? 'bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90' 
+                                      ? 'bg-secondary text-secondary-foreground hover:bg-secondary/90' 
                                       : ''
                                   }`}
                                 >
@@ -630,7 +630,7 @@ export function DeputySheriffRoadmap() {
                             <Link href={step.route}>
                               <Button 
                                 size="lg" 
-                                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground px-6 py-3 font-semibold shadow-lg hover:shadow-xl transition-all duration-300 group-hover:scale-105"
                               >
                                 Start Journey
                                 <ArrowRight className="h-5 w-5 ml-2" />
@@ -700,7 +700,7 @@ export function DeputySheriffRoadmap() {
         transition={{ duration: 0.6, delay: 0.4 }}
         className="relative overflow-hidden"
       >
-        <div className="bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/90 text-white rounded-2xl p-12 text-center shadow-2xl">
+        <div className="bg-gradient-to-br from-primary to-primary/90 text-white rounded-2xl p-12 text-center shadow-2xl">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0" style={{
@@ -711,8 +711,8 @@ export function DeputySheriffRoadmap() {
           
           <div className="relative z-10">
             <div className="mb-6">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-[#FFD700] rounded-full mb-4">
-                <Trophy className="h-10 w-10 text-[#0A3C1F]" />
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-secondary rounded-full mb-4">
+                <Trophy className="h-10 w-10 text-secondary-foreground" />
               </div>
             </div>
             <h3 className="text-4xl font-bold mb-4">Ready to Serve San Francisco?</h3>
@@ -725,7 +725,7 @@ export function DeputySheriffRoadmap() {
                 <Button 
                   size="lg" 
                   variant="secondary" 
-                  className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] px-8 py-4 text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  className="bg-secondary hover:bg-secondary/90 text-secondary-foreground px-8 py-4 text-lg font-bold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   <Calendar className="mr-3 h-6 w-6" />
                   Start with Daily Briefing
@@ -735,7 +735,7 @@ export function DeputySheriffRoadmap() {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-2 border-white text-white hover:bg-white hover:text-[#0A3C1F] px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   <Compass className="mr-3 h-6 w-6" />
                   View Your Profile

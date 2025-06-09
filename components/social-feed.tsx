@@ -150,19 +150,21 @@ export function SocialFeed({ className, limit = 4 }: SocialFeedProps) {
                 </div>
               )}
 
-              <div className="flex gap-4 mt-3">
-                <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#0A3C1F]">
-                  <Heart className="h-4 w-4" />
-                  <span>{item.likes}</span>
-                </button>
-                <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#0A3C1F]">
-                  <MessageCircle className="h-4 w-4" />
-                  <span>{item.comments}</span>
-                </button>
-                <button className="flex items-center gap-1 text-sm text-gray-500 hover:text-[#0A3C1F]">
-                  <Share2 className="h-4 w-4" />
-                  <span>{item.shares}</span>
-                </button>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
+                    <Heart className="h-4 w-4" />
+                    <span>{item.likes}</span>
+                  </button>
+                  <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
+                    <MessageCircle className="h-4 w-4" />
+                    <span>{item.comments}</span>
+                  </button>
+                  <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary">
+                    <Share2 className="h-4 w-4" />
+                    <span>{item.shares}</span>
+                  </button>
+                </div>
               </div>
             </div>
           ))}

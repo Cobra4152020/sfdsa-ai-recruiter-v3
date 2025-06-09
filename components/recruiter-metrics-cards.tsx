@@ -21,31 +21,54 @@ interface RecruiterMetricsCardsProps {
     pendingApplications: number;
     totalClicks: number;
     clickToReferralRate: number;
+    totalApplications: number;
+    newApplicationsThisWeek: number;
+    qualifiedCandidates: number;
   };
 }
 
 export function RecruiterMetricsCards({ metrics }: RecruiterMetricsCardsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">
-                Total Referrals
-              </p>
-              <h3 className="text-2xl font-bold text-[#0A3C1F]">
-                {metrics.totalReferrals}
-              </h3>
-            </div>
-            <div className="h-12 w-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-              <Users className="h-6 w-6 text-[#0A3C1F]" />
-            </div>
+      <Card className="p-6 bg-card border border-border">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              Total Applications
+            </p>
+            <h3 className="text-2xl font-bold text-foreground">
+              {metrics.totalApplications.toLocaleString()}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              +{metrics.newApplicationsThisWeek} this week
+            </p>
           </div>
-          <p className="text-xs text-gray-500 mt-2">
-            People you&apos;ve referred to the department
-          </p>
-        </CardContent>
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <Users className="h-6 w-6 text-primary" />
+          </div>
+        </div>
+      </Card>
+
+      <Card className="p-6 bg-card border border-border">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-muted-foreground">
+              Qualified Candidates
+            </p>
+            <h3 className="text-2xl font-bold text-foreground">
+              {metrics.qualifiedCandidates.toLocaleString()}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {Math.round(
+                (metrics.qualifiedCandidates / metrics.totalApplications) * 100
+              )}% 
+              qualification rate
+            </p>
+          </div>
+          <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+            <UserCheck className="h-6 w-6 text-primary" />
+          </div>
+        </div>
       </Card>
 
       <Card>

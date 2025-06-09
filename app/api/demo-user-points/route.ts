@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/app/lib/supabase/server";
+import { addParticipationPoints } from "@/lib/points-service";
 
 export const dynamic = "force-dynamic";
 
@@ -47,41 +48,28 @@ export async function POST(request: Request) {
       pointsToAward = points; // Points calculated based on challenge type
     }
 
-    // First get the current user to calculate new participation count
-    const { data: currentUser, error: fetchError } = await supabase
-      .from('users')
-      .select('participation_count')
-      .eq('id', userId)
-      .single();
+    // Use the user-type-aware points service instead of manually updating users table
+    const success = await addParticipationPoints(
+      userId,
+      pointsToAward,
+      action,
+      `Awarded ${pointsToAward} points for ${action}`
+    );
 
-    if (fetchError) {
-      console.error('Error fetching user:', fetchError);
+    if (!success) {
+      console.error('Error awarding points via participation service');
       return NextResponse.json({
         success: false,
-        message: "Could not fetch user data",
+        message: "Could not award points",
       }, { status: 500 });
     }
 
-    const newParticipationCount = (currentUser?.participation_count || 0) + pointsToAward;
-
-    // Update user's participation count
-    const { data: updatedUser, error } = await supabase
+    // Get the updated user data for response
+    const { data: updatedUser } = await supabase
       .from('users')
-      .update({ 
-        participation_count: newParticipationCount,
-        updated_at: new Date().toISOString()
-      })
-      .eq('id', userId)
       .select('id, name, participation_count')
+      .eq('id', userId)
       .single();
-
-    if (error) {
-      console.error('Error updating user points:', error);
-      return NextResponse.json({
-        success: false,
-        message: "Could not update user points",
-      }, { status: 500 });
-    }
 
     return NextResponse.json({
       success: true,

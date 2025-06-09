@@ -44,7 +44,7 @@ function HomeContent() {
         <TopRecruitsScroll />
 
         {currentUser && (
-          <section className="w-full py-12 bg-[#0A3C1F] dark:bg-[#121212]">
+          <section className="w-full py-12">
             <div className="container mx-auto px-4">
               <div className="max-w-7xl mx-auto">
                 <ApplicationProgressGamification />
@@ -53,7 +53,7 @@ function HomeContent() {
           </section>
         )}
 
-        <section className="w-full py-12 bg-[#0A3C1F] dark:bg-[#1A1A1A]">
+        <section className="w-full py-12">
           <div className="container mx-auto px-4">
             <div className="max-w-7xl mx-auto">
               <PointsIntroduction />
