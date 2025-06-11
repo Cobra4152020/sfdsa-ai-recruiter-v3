@@ -147,16 +147,38 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
       setError(null);
 
       try {
-        // In a real implementation, this would be an API call
-        // For now, we'll use mock data
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Fetch real user data instead of mock data
+        let actualUserPoints = 0;
+        let actualBadges = 0;
+        
+        try {
+          // Get actual points
+          const pointsResponse = await fetch(`/api/user/points?userId=${currentUser.id}`);
+          if (pointsResponse.ok) {
+            const pointsData = await pointsResponse.json();
+            actualUserPoints = pointsData.totalPoints || 0;
+          }
 
+          // Get actual badges
+          const badgesResponse = await fetch(`/api/users/${currentUser.id}/badges`);
+          if (badgesResponse.ok) {
+            const badgesData = await badgesResponse.json();
+            actualBadges = badgesData.badges?.length || 0;
+          }
+        } catch (error) {
+          console.log("Could not fetch real data, using fallback");
+        }
+
+        // Create realistic points history based on actual total
         const mockPointsHistory = Array.from({ length: 30 }, (_, i) => {
           const date = new Date();
           date.setDate(date.getDate() - 29 + i);
+          // Distribute points more realistically
+          const basePoints = actualUserPoints > 0 ? Math.floor(actualUserPoints / 30) : 10;
+          const variation = Math.floor(Math.random() * 20) - 10;
           return {
             date: date.toISOString().split("T")[0],
-            points: Math.floor(Math.random() * 100) + 50,
+            points: Math.max(0, basePoints + variation),
           };
         });
 
@@ -364,10 +386,10 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
         };
 
         setDashboardData({
-          applicationProgress: 35,
-          pointsTotal: 1250,
-          badgeCount: 8,
-          nftCount: 2,
+          applicationProgress: actualUserPoints >= 500 ? 100 : Math.floor((actualUserPoints / 500) * 100),
+          pointsTotal: actualUserPoints,
+          badgeCount: actualBadges,
+          nftCount: 0,
           pointsHistory: mockPointsHistory,
           tasks: mockTasks,
           appointments: mockAppointments,

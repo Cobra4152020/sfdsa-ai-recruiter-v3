@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Unified Points API</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        #result { margin-top: 20px; padding: 15px; border: 1px solid #ddd; border-radius: 4px; background: #f9f9f9; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Unified Points API</h1>
+    <p><strong>User ID:</strong> 10278ec9-3a35-45bd-b051-eb6f805d0002</p>
+    
+    <button onclick="checkPoints()">1. Check Current Points</button>
+    <button onclick="addTestPoints()">2. Add 5 Test Points</button>
+    <button onclick="testChatPoints()">3. Test Chat Points (7 points)</button>
+    
+    <div id="result"></div>
+
+    <script>
+        const userId = '10278ec9-3a35-45bd-b051-eb6f805d0002';
+
+        async function checkPoints() {
+            logResult('Checking current points...', 'info');
+            try {
+                const response = await fetch(`/api/user/points-unified?userId=${userId}`);
+                const result = await response.json();
+                if (response.ok) {
+                    logResult(`✅ Current Points: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    logResult(`❌ Error checking points: ${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                logResult(`❌ Network error checking points: ${error.message}`, 'error');
+            }
+        }
+
+        async function addTestPoints() {
+            logResult('Adding 5 test points...', 'info');
+            try {
+                const response = await fetch('/api/user/points-unified', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        pointsToAdd: 5,
+                        action: 'test_points',
+                        description: 'Manual test of unified points API'
+                    })
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    logResult(`✅ Successfully added 5 points: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    logResult(`❌ Error adding points (${response.status}): ${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                logResult(`❌ Network error adding points: ${error.message}`, 'error');
+            }
+        }
+
+        async function testChatPoints() {
+            logResult('Testing chat points (7 points)...', 'info');
+            try {
+                const response = await fetch('/api/user/points-unified', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        pointsToAdd: 7,
+                        action: 'chat_participation',
+                        description: 'Chatted with Sgt. Ken (with current info bonus)'
+                    })
+                });
+                
+                const result = await response.json();
+                if (response.ok) {
+                    logResult(`✅ Successfully added 7 chat points: ${JSON.stringify(result, null, 2)}`, 'success');
+                } else {
+                    logResult(`❌ Error adding chat points (${response.status}): ${JSON.stringify(result, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                logResult(`❌ Network error adding chat points: ${error.message}`, 'error');
+            }
+        }
+
+        function logResult(message, type) {
+            const result = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            result.innerHTML += `<div class="${type}"><strong>[${timestamp}]</strong> ${message}</div>`;
+            result.scrollTop = result.scrollHeight;
+        }
+
+        // Test connection on load
+        window.onload = function() {
+            logResult('🔧 Testing page loaded. Click buttons to test the unified points API.', 'info');
+        };
+    </script>
+</body>
+</html> 
+</html> 

@@ -323,6 +323,81 @@ export async function POST(request: Request) {
       // Don't fail the application for email issues
     }
 
+    // Award points for application submission
+    try {
+      // Get user ID from session or request (we'll need to pass this from the frontend)
+      const userId = formData.get('userId') as string;
+      
+      if (userId) {
+        const pointsResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/points`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId,
+            action: 'application_submission',
+            points: 500,
+            description: 'Submitted deputy sheriff application'
+          }),
+        });
+
+        if (!pointsResponse.ok) {
+          console.error('Failed to award application submission points');
+        } else {
+          const pointsResult = await pointsResponse.json();
+          console.log('Successfully awarded 500 points for application submission:', pointsResult);
+        }
+
+        // Award application completion badge directly to user_badges table
+        try {
+          const supabase = getServiceSupabase();
+          
+          // Check if user already has this badge
+          const { data: existingBadge } = await supabase
+            .from('user_badges')
+            .select('*')
+            .eq('user_id', userId)
+            .eq('badge_name', 'Application Completed')
+            .single();
+
+          if (!existingBadge) {
+            // Award the badge
+            const { data: newBadge, error: badgeError } = await supabase
+              .from('user_badges')
+              .insert([
+                {
+                  user_id: userId,
+                  badge_name: 'Application Completed',
+                  metadata: {
+                    badge_type: 'application-completed',
+                    description: 'Completed the full deputy sheriff application process',
+                    points_earned: 500,
+                    awarded_for: 'Deputy Sheriff Application Completion',
+                    application_id: applicationId
+                  }
+                }
+              ])
+              .select()
+              .single();
+
+            if (badgeError) {
+              console.error('Error awarding application completion badge:', badgeError);
+            } else {
+              console.log('Successfully awarded application completion badge:', newBadge);
+            }
+          } else {
+            console.log('User already has application completion badge');
+          }
+        } catch (badgeError) {
+          console.error('Error in badge awarding process:', badgeError);
+        }
+      }
+    } catch (pointsError) {
+      console.error('Error awarding application points:', pointsError);
+      // Don't fail the application for points issues
+    }
+
     return NextResponse.json({
       success: true,
       message: "Application submitted successfully",

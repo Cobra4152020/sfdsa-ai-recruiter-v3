@@ -36,6 +36,7 @@ import {
 import { toast } from "@/components/ui/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { SocialShareForPoints } from "@/components/social-share-for-points";
+import { useUser } from "@/context/user-context";
 
 interface ApplicationFormData {
   firstName: string;
@@ -86,6 +87,8 @@ const timeSlots: TimeSlot[] = [
 ];
 
 export function DeputySheriffApplicationForm() {
+  const { currentUser } = useUser();
+  
   const [formData, setFormData] = useState<ApplicationFormData>({
     firstName: "",
     lastName: "",
@@ -295,6 +298,16 @@ export function DeputySheriffApplicationForm() {
       submitFormData.append('applicationDate', new Date().toISOString());
       submitFormData.append('status', 'pending');
       
+      // Add user ID for points system
+      if (currentUser?.id) {
+        submitFormData.append('userId', currentUser.id);
+      }
+      
+      // Add user ID for points system
+      if (currentUser?.id) {
+        submitFormData.append('userId', currentUser.id);
+      }
+
       // Submit to API
       const response = await fetch("/api/deputy-applications/submit", {
         method: "POST",
@@ -703,8 +716,6 @@ export function DeputySheriffApplicationForm() {
                     Associate's Degree or Higher
                   </Label>
                 </div>
-
-
 
                 <div className="flex items-start space-x-3">
                   <Checkbox

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -34,6 +34,7 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
   const [isAttended, setIsAttended] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const { currentUser } = useUser();
   const { toast } = useToast();
 
@@ -55,6 +56,60 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
         month: "long",
         day: "numeric",
       });
+
+  // Check attendance status on component mount
+  useEffect(() => {
+    const checkAttendanceStatus = async () => {
+      if (!currentUser || !validBriefing?.id || isInitialized) return;
+
+      try {
+        const supabase = getClientSideSupabase();
+        const { data: attendance } = await supabase
+          .from("briefing_attendance")
+          .select("id")
+          .eq("user_id", currentUser.id)
+          .eq("briefing_id", validBriefing.id)
+          .maybeSingle();
+
+        if (attendance) {
+          setIsAttended(true);
+        }
+        setIsInitialized(true);
+      } catch (error) {
+        console.error("Error checking attendance status:", error);
+        setIsInitialized(true);
+      }
+    };
+
+    checkAttendanceStatus();
+  }, [currentUser, validBriefing?.id, isInitialized]);
+
+  // Check attendance status on component mount
+  useEffect(() => {
+    const checkAttendanceStatus = async () => {
+      if (!currentUser || !validBriefing?.id || isInitialized) return;
+
+      try {
+        const supabase = getClientSideSupabase();
+        const { data: attendance } = await supabase
+          .from("briefing_attendance")
+          .select("id")
+          .eq("user_id", currentUser.id)
+          .eq("briefing_id", validBriefing.id)
+          .maybeSingle();
+
+        if (attendance) {
+          setIsAttended(true);
+        }
+        setIsInitialized(true);
+      } catch (error) {
+        console.error("Error checking attendance status:", error);
+        setIsInitialized(true);
+      }
+    };
+
+    checkAttendanceStatus();
+  }, [currentUser, validBriefing?.id, isInitialized]);
 
   const handleAttend = async () => {
     if (isAttended || isLoading) return;
@@ -94,9 +149,8 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
         if (response.ok) {
           setIsAttended(true);
           toast({
-            title: "Attendance Recorded",
-            description:
-              "You&apos;ve been marked as present for today&apos;s briefing.",
+            title: "Attendance Recorded! 🎉",
+            description: "You've earned 5 points for attending today's briefing.",
             variant: "default",
           });
         } else {
@@ -107,9 +161,8 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
         // If we don't have a valid briefing ID, still mark as attended on the UI
         setIsAttended(true);
         toast({
-          title: "Attendance Recorded",
-          description:
-            "You&apos;ve been marked as present for today&apos;s briefing.",
+          title: "Attendance Recorded! 🎉",
+          description: "You've earned 5 points for attending today's briefing.",
           variant: "default",
         });
       }

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Points API</title>
+</head>
+<body>
+    <h1>Debug Points API</h1>
+    <button onclick="checkPoints()">1. Check Current Points</button>
+    <button onclick="addTestPoints()">2. Add 5 Test Points</button>
+    <button onclick="checkLogs()">3. Check Points Log</button>
+    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;"></div>
+
+    <script>
+        const userId = '10278ec9-3a35-45bd-b051-eb6f805d0002';
+
+        async function checkPoints() {
+            try {
+                const response = await fetch(`/api/user/points-unified?userId=${userId}`);
+                const result = await response.json();
+                document.getElementById('result').innerHTML = '<h3>Current Points Check:</h3><pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<h3>Error checking points:</h3>' + error.message;
+            }
+        }
+
+        async function addTestPoints() {
+            try {
+                const response = await fetch('/api/user/points-unified', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        userId: userId,
+                        pointsToAdd: 5,
+                        action: 'debug_test',
+                        description: 'Debug test of unified points API'
+                    }),
+                });
+
+                const result = await response.json();
+                document.getElementById('result').innerHTML = '<h3>Add Points Result:</h3><pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<h3>Error adding points:</h3>' + error.message;
+            }
+        }
+
+        async function checkLogs() {
+            try {
+                const response = await fetch(`/api/user/points-log?userId=${userId}`);
+                const result = await response.json();
+                document.getElementById('result').innerHTML = '<h3>Points Log:</h3><pre>' + JSON.stringify(result, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '<h3>Error checking logs:</h3>' + error.message;
+            }
+        }
+    </script>
+</body>
+</html> 

@@ -71,24 +71,40 @@ export async function POST(req: NextRequest) {
         // Award participation points if user is logged in (enhanced system)
         if (userId) {
           try {
-            // Use the new demo points system for consistency
-            const pointsResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3004'}/api/demo-user-points`, {
+            // Use the correct URL for development vs production
+            const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_APP_URL;
+            const pointsUrl = `${baseUrl}/api/user/points-unified`;
+            console.log('🔧 Attempting to call unified API at:', pointsUrl);
+            console.log('🔧 Environment:', process.env.NODE_ENV);
+            
+            const pointsPayload = {
+              userId,
+              pointsToAdd: actualSearchUsed ? 7 : 5, // Bonus for current info
+              action: 'chat_participation',
+              description: `Chatted with Sgt. Ken${actualSearchUsed ? ' (with current info bonus)' : ''}`
+            };
+            console.log('🔧 Points payload:', pointsPayload);
+
+            const pointsResponse = await fetch(pointsUrl, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
               },
-              body: JSON.stringify({
-                userId,
-                action: 'chat_participation',
-                points: actualSearchUsed ? 7 : 5, // Bonus for current info
-              }),
+              body: JSON.stringify(pointsPayload),
             });
 
+            console.log('🔧 Points response status:', pointsResponse.status);
+            console.log('🔧 Points response ok:', pointsResponse.ok);
+
             if (!pointsResponse.ok) {
-              console.error('Failed to award chat participation points');
+              const errorText = await pointsResponse.text();
+              console.error('❌ Failed to award chat participation points:', errorText);
+            } else {
+              const responseData = await pointsResponse.json();
+              console.log('✅ Successfully awarded chat points via unified API:', responseData);
             }
           } catch (pointsError) {
-            console.error("Error awarding participation points:", pointsError);
+            console.error("❌ Error awarding participation points:", pointsError);
             // Continue even if points award fails
           }
         }

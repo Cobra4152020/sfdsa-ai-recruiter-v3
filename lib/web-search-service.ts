@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio';
+import { webSearch } from './assistant-tools';
 
 // Web search service for getting real-time SFSO and SF government information
 export class WebSearchService {
@@ -28,83 +29,46 @@ export class WebSearchService {
     success: boolean;
   }> {
     try {
-      // Check if we're on the server-side (preferred for web search)
-      if (typeof window !== 'undefined') {
-        console.warn('Web search should preferably run server-side');
-        // Return fallback content for client-side calls
+      console.log(`[WebSearch] Performing live web search for: "${query}"`);
+
+      // Use the built-in web search tool
+      const searchResults = await webSearch(query);
+      
+      if (!searchResults || searchResults.length === 0) {
+        console.log('[WebSearch] No results found from live search.');
         return {
           content: this.getFallbackContent(),
-          sources: ['SFSO Knowledge Base'],
-          lastUpdated: new Date().toLocaleDateString(),
-          success: false
+          sources: ['Internal Knowledge Base'],
+          lastUpdated: new Date().toISOString(),
+          success: false,
         };
       }
+      
+      // Format the results for the AI
+      const formattedContent = searchResults
+        .map(
+          (result) => `Source: ${result.url}\nTitle: ${result.title}\nSnippet: ${result.snippet}`
+        )
+        .join('\n\n---\n\n');
+        
+      const sources = searchResults.map(result => new URL(result.url).hostname);
 
-      console.log(`🔍 Searching for: ${query}`);
-      
-      // Determine search type based on query
-      const searchType = this.categorizeQuery(query);
-      
-      let results: string[] = [];
-      let sources: string[] = [];
-      
-      // Search specific sources based on query type
-      switch (searchType) {
-        case 'recruitment':
-          const recruitmentInfo = await this.searchRecruitmentInfo();
-          if (recruitmentInfo.content) {
-            results.push(recruitmentInfo.content);
-            sources.push(...recruitmentInfo.sources);
-          }
-          break;
-          
-        case 'government':
-          const govInfo = await this.searchGovernmentInfo();
-          if (govInfo.content) {
-            results.push(govInfo.content);
-            sources.push(...govInfo.sources);
-          }
-          break;
-          
-        case 'general':
-        default:
-          // Search multiple sources for general information
-          const [recruitment, government] = await Promise.allSettled([
-            this.searchRecruitmentInfo(),
-            this.searchGovernmentInfo()
-          ]);
-          
-          if (recruitment.status === 'fulfilled' && recruitment.value.content) {
-            results.push(recruitment.value.content);
-            sources.push(...recruitment.value.sources);
-          }
-          
-          if (government.status === 'fulfilled' && government.value.content) {
-            results.push(government.value.content);
-            sources.push(...government.value.sources);
-          }
-          break;
-      }
-      
-      // Combine results
-      const combinedContent = results.length > 0 
-        ? results.join('\n\n') 
-        : this.getFallbackContent();
-      
+      console.log(`[WebSearch] Found ${searchResults.length} results.`);
+
       return {
-        content: combinedContent,
-        sources: sources.length > 0 ? sources : ['SFSO Knowledge Base'],
-        lastUpdated: new Date().toLocaleDateString(),
-        success: results.length > 0
+        content: formattedContent,
+        sources: [...new Set(sources)], // Return unique hostnames
+        lastUpdated: new Date().toISOString(),
+        success: true,
       };
       
     } catch (error) {
-      console.error('Web search error:', error);
+      console.error('[WebSearch] An error occurred during the live web search:', error);
       return {
         content: this.getFallbackContent(),
-        sources: ['SFSO Knowledge Base'],
-        lastUpdated: new Date().toLocaleDateString(),
-        success: false
+        sources: ['Internal Knowledge Base'],
+        lastUpdated: new Date().toISOString(),
+        success: false,
       };
     }
   }

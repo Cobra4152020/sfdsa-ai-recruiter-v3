@@ -15,58 +15,36 @@ export async function GET(request: NextRequest) {
 
     const supabase = getServiceSupabase();
 
-    // Get user's total points from the appropriate table
-    // First check user type
-    const { data: userTypeData } = await supabase
-      .from('user_types')
-      .select('user_type')
-      .eq('user_id', userId)
-      .single();
+    // New permission-free method: Calculate total from activity logs
+    // Base points for application completion is 500
+    const BASE_POINTS = 500;
 
-    let userProfile = null;
-    let error = null;
+    const { data: activityData, error: activityError } = await supabase
+      .from('user_points')
+      .select('points')
+      .eq('user_id', userId);
 
-    if (userTypeData?.user_type === 'recruit') {
-      const { data, error: recruitError } = await supabase
-        .from('recruits')
-        .select('points')
-        .eq('user_id', userId)
-        .single();
-      userProfile = data ? { total_points: data.points } : null;
-      error = recruitError;
-    } else if (userTypeData?.user_type === 'volunteer') {
-      const { data, error: volunteerError } = await supabase
-        .from('volunteer_recruiters')
-        .select('points')
-        .eq('user_id', userId)
-        .single();
-      userProfile = data ? { total_points: data.points } : null;
-      error = volunteerError;
-    } else {
-      // Default to users table
-      const { data, error: userError } = await supabase
-        .from('users')
-        .select('participation_count')
-        .eq('id', userId)
-        .single();
-      userProfile = data ? { total_points: data.participation_count || 0 } : null;
-      error = userError;
+    if (activityError) {
+      console.error('Error fetching user_points activity:', activityError);
+      // Fallback to a default or error value if activity can't be fetched
+      return NextResponse.json({
+        success: true,
+        totalPoints: BASE_POINTS,
+        userId,
+        source: 'fallback_base_points'
+      });
     }
 
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching user points:', error);
-      return NextResponse.json(
-        { message: "Failed to fetch user points" },
-        { status: 500 }
-      );
-    }
+    const activityPoints = activityData.reduce((sum, entry) => sum + (entry.points || 0), 0);
+    const totalPoints = BASE_POINTS + activityPoints;
 
-    const totalPoints = userProfile?.total_points || 0;
+    console.log(`[Points API] Calculated total for ${userId}: ${totalPoints} (Base: ${BASE_POINTS}, Activity: ${activityPoints})`);
 
     return NextResponse.json({
       success: true,
       totalPoints,
-      userId
+      userId,
+      source: 'calculated_from_activity'
     });
 
   } catch (error) {

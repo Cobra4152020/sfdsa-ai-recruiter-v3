@@ -96,12 +96,19 @@ export default function ChatWithSgtKenPage() {
   ];
 
   const handleSendMessage = async () => {
-    if (!input.trim()) return;
+    console.log('[CHAT] handleSendMessage triggered.');
+    if (!input.trim()) {
+        console.log('[CHAT] Input is empty, aborting.');
+        return;
+    }
+    console.log('[CHAT] Input is valid.');
 
     if (!currentUser) {
-      openModal("signup", "recruit");
-      return;
+        console.log('[CHAT] User not signed in. Opening auth modal.');
+        openModal("signup", "recruit");
+        return;
     }
+    console.log(`[CHAT] User signed in: ${currentUser.id}`);
 
     const messageText = input.trim();
 
@@ -112,6 +119,7 @@ export default function ChatWithSgtKenPage() {
       id: `user-${Date.now()}`,
     };
     setMessages((prevMessages) => [...prevMessages, userMessage]);
+    console.log('[CHAT] User message added to state.');
 
     setInput("");
     setIsLoading(true);
@@ -123,6 +131,15 @@ export default function ChatWithSgtKenPage() {
         role: msg.role,
         content: msg.content
       }));
+      console.log('[CHAT] Prepared chat history:', chatHistory);
+
+      const payload = {
+          message: messageText,
+          userId: currentUser?.id,
+          chatHistory,
+          sessionId: "chat-page-session",
+      };
+      console.log('[CHAT] Preparing to call /api/chat with payload:', payload);
 
       // Call the enhanced chat API
       const response = await fetch("/api/chat", {
@@ -130,19 +147,18 @@ export default function ChatWithSgtKenPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          message: messageText,
-          userId: currentUser?.id,
-          chatHistory,
-          sessionId: "chat-page-session",
-        }),
+        body: JSON.stringify(payload),
       });
+      console.log(`[CHAT] Received response from /api/chat. Status: ${response.status}`);
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`[CHAT] API error response: ${errorText}`);
         throw new Error(`API error: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('[CHAT] API response data:', data);
       
       if (!data.success) {
         throw new Error(data.error || "Unknown error");
@@ -251,54 +267,26 @@ export default function ChatWithSgtKenPage() {
                     </div>
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="flex-1 flex flex-col p-4 sm:p-6 min-h-0">
-                  <div
-                    ref={scrollAreaRef}
-                    className="flex-1 overflow-y-auto space-y-4 sm:space-y-6 mb-4 pr-2 -mr-4"
-                  >
-                    {/* Welcome message */}
-                    {messages.length === 0 && !isLoading && !error && (
-                      <div className="space-y-4">
-                        <div className="flex items-start space-x-3 sm:space-x-4">
-                          <div className="w-10 h-10 rounded-full bg-primary/10 dark:bg-primary/20 flex items-center justify-center flex-shrink-0 shadow-md">
-                            <Bot className="h-5 w-5 text-primary" />
-                          </div>
-                          <div className="flex-1 bg-muted/50 dark:bg-muted/40 rounded-lg p-4 shadow-sm">
-                            <p className="text-sm sm:text-base font-medium text-foreground mb-2">
-                              👋 Hello! I'm Sgt. Ken, your AI recruitment assistant.
-                            </p>
-                            <p className="text-sm sm:text-base text-muted-foreground mb-3">
-                              I'm here to help you learn about becoming a San Francisco Deputy Sheriff. 
-                              {currentUser ? " You'll earn 5-7 points for each question you ask!" : " Sign in to earn points for every interaction!"}
-                            </p>
-                            <div className="text-xs text-muted-foreground/80">
-                              💡 Try asking about requirements, salary, training, or career opportunities
-                            </div>
-                          </div>
-                        </div>
 
-                        {/* Suggested questions */}
-                        <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-                          <h3 className="text-sm font-semibold text-primary mb-3 flex items-center">
-                            <HelpCircle className="h-4 w-4 mr-2" />
-                            Quick Start Questions
-                          </h3>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                            {suggestedQuestions.map((question, index) => (
-                              <button
-                                key={index}
-                                onClick={() => handleSuggestedQuestion(question)}
-                                className="text-left text-xs sm:text-sm text-primary/80 dark:text-primary/90 hover:text-primary dark:hover:text-primary hover:bg-primary/10 p-2 rounded transition-colors"
-                              >
-                                {question}
-                              </button>
-                            ))}
-                          </div>
+                <CardContent className="flex-1 flex flex-col p-0">
+                  <div ref={scrollAreaRef} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+                    {/* Initial welcome message */}
+                    {messages.length === 0 && (
+                      <div className="flex items-start space-x-3 sm:space-x-4 w-full justify-start">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 shadow-md">
+                          <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        </div>
+                        <div className="rounded-lg p-3 sm:p-4 shadow-sm bg-muted/60 dark:bg-muted/80 text-foreground max-w-[90%] sm:max-w-[80%]">
+                          <p className="font-bold mb-2">Welcome! I'm Sgt. Ken.</p>
+                          <p className="text-sm sm:text-base leading-relaxed m-0 whitespace-pre-wrap">
+                            I'm your AI guide to becoming a San Francisco Deputy Sheriff. 
+                            Ask me anything about the job, or try one of the suggestions below.
+                          </p>
                         </div>
                       </div>
                     )}
 
-                    {/* Messages */}
+                    {/* Chat Messages */}
                     {messages.map((msg, index) => (
                       <div
                         key={index}
@@ -322,41 +310,60 @@ export default function ChatWithSgtKenPage() {
                                 <span className="inline-block w-0.5 h-5 bg-current ml-1 animate-pulse">|</span>
                               )}
                           </p>
-                          <div className="flex items-center justify-between mt-2 w-full">
-                            <p className="text-xs text-muted-foreground/70 flex-shrink-0">
-                              {new Date(msg.timestamp).toLocaleTimeString()}
-                            </p>
-                            {msg.pointsAwarded && (
-                              <Badge variant="secondary" className="text-xs bg-green-100 dark:bg-green-800/50 text-green-800 dark:text-green-200 flex-shrink-0">
-                                +{msg.pointsAwarded} pts {msg.searchUsed && "🔍"}
-                              </Badge>
-                            )}
-                          </div>
                         </div>
                         {msg.role === "user" && (
-                          <div className="w-8 h-8 rounded-full bg-secondary text-secondary-foreground flex items-center justify-center flex-shrink-0 text-sm sm:text-base font-semibold shadow-md">
-                            {currentUser?.email?.charAt(0).toUpperCase() || "U"}
+                          <div className="w-8 h-8 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0 shadow-md text-foreground">
+                            {currentUser?.email?.[0].toUpperCase() || 'U'}
                           </div>
                         )}
                       </div>
                     ))}
-                    {isLoading && (
-                      <div className="flex items-center justify-center py-4">
-                        <div className="flex items-center space-x-2 text-muted-foreground">
-                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
-                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
-                          <span className="text-sm sm:text-base ml-2">Sgt. Ken is thinking...</span>
+                    
+                    {/* Loading indicator */}
+                    {isLoading && messages[messages.length - 1]?.role === 'user' && (
+                       <div className="flex items-start space-x-3 sm:space-x-4 w-full justify-start">
+                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0 shadow-md">
+                          <Bot className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                        </div>
+                        <div className="rounded-lg p-3 sm:p-4 shadow-sm bg-muted/60 dark:bg-muted/80 text-foreground">
+                            <div className="flex space-x-1">
+                              <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "0ms" }} ></div>
+                              <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "150ms" }} ></div>
+                              <div className="w-2 h-2 bg-primary/60 rounded-full animate-bounce" style={{ animationDelay: "300ms" }} ></div>
+                            </div>
                         </div>
                       </div>
                     )}
+
+                    {/* Suggested Questions */}
+                    {messages.length === 0 && !isLoading && (
+                      <div className="pt-4 border-t border-border/50">
+                        <h3 className="text-sm font-semibold text-muted-foreground mb-3 text-center">Or try a suggested question:</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {suggestedQuestions.map((q, i) => (
+                            <Button
+                              key={i}
+                              variant="outline"
+                              size="sm"
+                              className="text-left justify-start h-auto whitespace-normal"
+                              onClick={() => handleSuggestedQuestion(q)}
+                            >
+                              <HelpCircle className="h-4 w-4 mr-2 flex-shrink-0" />
+                              {q}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Error message display */}
                     {error && (
                       <div className="text-center text-red-500 text-sm sm:text-base bg-red-50 border border-red-200 rounded-lg p-3">
                         Error: {error}
                       </div>
                     )}
                   </div>
-                  <div className="flex space-x-2 pt-4 border-t border-border flex-shrink-0">
+                  <div className="flex space-x-2 pt-4 border-t border-border flex-shrink-0 p-4">
                     <Input
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
@@ -380,110 +387,52 @@ export default function ChatWithSgtKenPage() {
             </div>
 
             {/* Enhanced Sidebar */}
-            <div className="lg:col-span-1">
-              <div className="space-y-6">
-                {/* Quick Stats Card */}
-                <Card className="bg-card border-border">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-foreground flex items-center">
-                      <Trophy className="h-5 w-5 mr-2 text-primary" />
-                      Your Progress
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Messages</span>
-                      <Badge variant="outline" className="text-muted-foreground">
-                        {messageCount}
-                      </Badge>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted-foreground">Points Earned</span>
-                      <Badge variant="secondary" className="bg-green-500/80 text-white">
-                        {totalPointsEarned}
-                      </Badge>
-                    </div>
-                    {!currentUser && (
-                      <div className="text-center pt-2">
-                        <Button 
-                          size="sm" 
-                          onClick={() => openModal("signup", "recruit")}
-                          className="bg-primary hover:bg-primary/90 text-primary-foreground"
-                        >
-                          Sign Up to Earn Points
-                        </Button>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
+            <div className="lg:col-span-1 space-y-6">
+               <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center"><Trophy className="h-5 w-5 mr-2 text-yellow-500"/> Your Stats</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-muted-foreground">Questions Asked</span>
+                    <span className="font-bold text-lg">{messageCount}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-muted-foreground">Points from Chat</span>
+                    <span className="font-bold text-lg text-green-500">+{totalPointsEarned}</span>
+                  </div>
+                   <Button asChild variant="outline" className="w-full">
+                     <Link href="/dashboard">
+                        <Award className="h-4 w-4 mr-2" />
+                        View Full Dashboard
+                     </Link>
+                  </Button>
+                </CardContent>
+              </Card>
 
-                {/* Quick Tips Card */}
-                <Card className="bg-card border-border">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-foreground flex items-center">
-                      <HelpCircle className="h-5 w-5 mr-2 text-primary" />
-                      Ask About
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="text-sm space-y-2 text-muted-foreground">
-                      <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-primary/70" />
-                        Application requirements
-                      </li>
-                      <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-primary/70" />
-                        Salary and benefits
-                      </li>
-                      <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-primary/70" />
-                        Training academy
-                      </li>
-                      <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-primary/70" />
-                        Career opportunities
-                      </li>
-                      <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-primary/70" />
-                        Daily responsibilities
-                      </li>
-                      <li className="flex items-center">
-                        <Star className="h-3 w-3 mr-2 text-primary/70" />
-                        Department culture
-                      </li>
-                    </ul>
-                  </CardContent>
-                </Card>
-
-                {/* Games Promotion Card */}
-                <Card className="bg-gradient-to-br from-yellow-300/20 via-card to-card border-yellow-400/30">
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg text-foreground flex items-center">
-                      <Gamepad2 className="h-5 w-5 mr-2 text-yellow-400" />
-                      Earn More Points
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <p className="text-sm text-muted-foreground">
-                      Want to earn even more points? Try our interactive games!
-                    </p>
-                    <div className="space-y-2">
-                      <Link href="/trivia">
-                        <Button size="sm" variant="outline" className="w-full text-xs">
-                          <Trophy className="h-3 w-3 mr-1" />
-                          SF Trivia (60-120 pts)
-                        </Button>
-                      </Link>
-                      <Link href="/sgt-ken-says">
-                        <Button size="sm" variant="outline" className="w-full text-xs">
-                          <Clock className="h-3 w-3 mr-1" />
-                          Daily Puzzle (100-220 pts)
-                        </Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
+               <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center"><Gamepad2 className="h-5 w-5 mr-2 text-blue-500"/> SF Trivia Challenge</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">Test your knowledge about the SFSO and earn bonus points!</p>
+                  <Button asChild className="w-full">
+                    <Link href="/trivia">Play Now</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+              
+               <Card className="shadow-lg">
+                <CardHeader>
+                  <CardTitle className="flex items-center"><Users className="h-5 w-5 mr-2 text-purple-500"/> Connect with a Recruiter</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-muted-foreground mb-4">Have specific questions? Get in touch with a human recruiter.</p>
+                  <Button asChild variant="secondary" className="w-full">
+                     <Link href="/contact">Contact Us</Link>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </div>

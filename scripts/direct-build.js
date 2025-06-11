@@ -17,13 +17,13 @@ async function buildProject() {
     log("Starting simplified build process...");
 
     // Clean any previous build artifacts
-    if (fs.existsSync(path.join(process.cwd(), ".next"))) {
+    /* if (fs.existsSync(path.join(process.cwd(), ".next"))) {
       log("Cleaning previous build...");
       fs.rmSync(path.join(process.cwd(), ".next"), {
         recursive: true,
         force: true,
       });
-    }
+    } */
 
     // Set environment variables to skip problematic checks
     process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS = "true";

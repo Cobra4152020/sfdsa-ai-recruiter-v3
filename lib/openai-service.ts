@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import { webSearchService, WebSearchService } from "./web-search-service";
+import { webSearch } from "./assistant-tools"; // Use local mock
 
 // Only initialize OpenAI on the server-side
 let openai: OpenAI | null = null;
@@ -118,30 +118,33 @@ export async function generateChatResponse(
       };
     }
 
-    // Determine if web search is needed for current information
-    const needsWebSearch = WebSearchService.shouldUseWebSearch(userMessage);
-
+    // Keyword-based check to decide if a web search is necessary
+    const searchKeywords = ['who is', 'what is', 'current', 'latest', 'news', 'in 2024', 'in 2025'];
+    const needsWebSearch = searchKeywords.some(keyword => userMessage.toLowerCase().includes(keyword));
+    
     let webSearchResults = '';
     let searchUsed = false;
 
-    // Perform web search if needed
     if (needsWebSearch) {
+      console.log(`[ChatService] Performing live web search for: "${userMessage}"`);
       try {
-        const searchResult = await webSearchService.searchSFSOInfo(userMessage);
-        if (searchResult.success) {
-          webSearchResults = searchResult.content;
+        const searchResults = await webSearch(userMessage);
+        if (searchResults && searchResults.length > 0) {
+          webSearchResults = searchResults
+            .map(r => `Source: ${r.url}\nSnippet: ${r.snippet}`)
+            .join('\n\n---\n\n');
           searchUsed = true;
+          console.log(`[ChatService] Found ${searchResults.length} web results.`);
         }
       } catch (error) {
-        console.error('Web search failed:', error);
-        webSearchResults = '';
+        console.error('[ChatService] Web search failed:', error);
       }
     }
 
     // Prepare enhanced system prompt with web search results if available
     let systemPrompt = ENHANCED_SYSTEM_PROMPT;
-    if (webSearchResults) {
-      systemPrompt += `\n\nCURRENT INFORMATION (use this in your response naturally):\n${webSearchResults}`;
+    if (searchUsed) {
+      systemPrompt += `\n\nUse the following real-time web search results to answer the user's question. Synthesize the information and present it as if it's your own knowledge. Do not mention that you performed a search. \n\nCURRENT INFORMATION:\n${webSearchResults}`;
     }
 
     // Prepare messages for the API

@@ -4,7 +4,7 @@ import { addParticipationPoints } from "@/lib/points-service";
 
 export const dynamic = "force-dynamic";
 
-// Endpoint to demonstrate how easy it is for real users to surpass mock data
+// Production points system for awarding points to users
 export async function POST(request: Request) {
   try {
     const { userId, action = 'chat_participation', points } = await request.json();
@@ -49,7 +49,7 @@ export async function POST(request: Request) {
       pointsToAward = points; // Points calculated based on challenge type
     }
 
-    // Use the user-type-aware points service instead of manually updating users table
+    // Use the production points service
     const success = await addParticipationPoints(
       userId,
       pointsToAward,
@@ -78,16 +78,11 @@ export async function POST(request: Request) {
       user: updatedUser,
       points_awarded: pointsToAward,
       action: action,
-      demonstration: {
-        message: "With just a few activities, real users will surpass the mock data!",
-        mock_top_score: 85,
-        user_new_score: updatedUser?.participation_count || 0,
-        can_surpass_mock: (updatedUser?.participation_count || 0) > 85
-      }
+      new_total: updatedUser?.participation_count || 0
     });
 
   } catch (error) {
-    console.error('Error in demo points API:', error);
+    console.error('Error in points API:', error);
     return NextResponse.json({
       success: false,
       message: "Internal server error",
@@ -98,7 +93,7 @@ export async function POST(request: Request) {
 export async function GET() {
   return NextResponse.json({
     success: true,
-    message: "Demo user points endpoint ready",
+    message: "Production points system ready",
     available_actions: [
       { action: 'chat_participation', points: 5 },
       { action: 'contact_form_submission', points: 10 },
@@ -112,9 +107,9 @@ export async function GET() {
       { action: 'trivia_game_completion', points: 'variable (60-120)' },
       { action: 'tiktok_challenge_submission', points: 'variable (125-200)' }
     ],
-    mock_data_info: {
-      top_mock_score: 85,
-      message: "Mock users have very low scores (25-85 points) so real users can easily climb the leaderboard!"
+    system_info: {
+      type: "production",
+      description: "Live points system for SFDSA recruitment platform"
     }
   });
 } 
