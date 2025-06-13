@@ -105,6 +105,61 @@ CREATE TABLE IF NOT EXISTS public.trivia_game_results (
 
 ---
 
+## Database Schema and Architecture
+
+The platform is powered by a robust PostgreSQL database managed via Supabase. The schema is designed to support a gamified, multi-faceted user journey, from initial engagement to final application.
+
+### Core Tables
+
+*   **`users`**: Stores core user profile information, linked to `auth.users`.
+*   **`badges`**: Defines all available badges that users can earn.
+*   **`user_badges`**: A join table that tracks which badges have been awarded to which users.
+*   **`points_transactions`**: A log of every point transaction, providing a complete audit trail.
+*   **`chat_messages`**: Logs all interactions with the AI assistant, "Sgt. Ken".
+
+### Gamification & Application Journey Tables
+
+*   **`application_steps`**: Defines the official, ordered steps of the recruitment application process. This table serves as the single source of truth for the "Your Application Journey" component.
+*   **`user_application_progress`**: Tracks each user's completion status for each step defined in `application_steps`. This enables a personalized and persistent application experience.
+*   **`user_engagement_metrics`**: Tracks key user interactions like page views and resource downloads.
+*   **`trivia_games`**, **`trivia_questions`**, **`trivia_attempts`**: Manages the trivia system, a key engagement and knowledge-testing feature.
+
+### SQL Schema Definitions
+
+Below are the `CREATE TABLE` statements for the key new tables that power the application journey.
+
+**`application_steps` Table:**
+```sql
+CREATE TABLE IF NOT EXISTS public.application_steps (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    step_order INT NOT NULL,
+    title TEXT NOT NULL,
+    description TEXT NOT NULL,
+    points_awarded INT NOT NULL,
+    badge_id_on_completion UUID REFERENCES public.badges(id),
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(step_order),
+    UNIQUE(title)
+);
+```
+
+**`user_application_progress` Table:**
+```sql
+CREATE TABLE IF NOT EXISTS public.user_application_progress (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+    step_id UUID REFERENCES public.application_steps(id) ON DELETE CASCADE NOT NULL,
+    is_completed BOOLEAN DEFAULT FALSE,
+    completed_at TIMESTAMPTZ,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW(),
+    UNIQUE(user_id, step_id)
+);
+```
+
+---
+
 ## Recent Platform Enhancements (v2.0)
 
 ### Major System Consolidations & Improvements
@@ -1126,7 +1181,7 @@ The platform's unique combination of **AI-powered guidance**, **comprehensive pr
 - Dark mode: Pure black with bright yellow (`45 93% 47%`) accents (black uniforms with yellow patches)
 - Enhanced 3D design system with multiple black hierarchy levels (2%, 5%, 7%, 8%)
 - Theme-aware component updates across entire platform
-- Ripple pattern integration with sheriff's green cross/plus patterns
+- Ripple pattern integration with sheriff's green cross/plus designs
 
 ✅ **Footer Optimization & Social Media Integration**
 - Fixed text readability issues in dark mode with proper contrast ratios

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useUser } from "@/context/user-context";
+import { useSupabase } from "@/context/supabase-context";
 
 export interface TriviaGameHistory {
   gameId: string;
@@ -13,6 +14,7 @@ export interface TriviaGameHistory {
 
 export function useTriviaHistory() {
   const { currentUser, isLoggedIn } = useUser();
+  const supabase = useSupabase();
   const [gameHistory, setGameHistory] = useState<
     Record<string, TriviaGameHistory>
   >({});
@@ -21,7 +23,7 @@ export function useTriviaHistory() {
 
   useEffect(() => {
     async function fetchGameHistory() {
-      if (!isLoggedIn || !currentUser) {
+      if (!isLoggedIn || !currentUser || !supabase) {
         setIsLoading(false);
         return;
       }
@@ -30,8 +32,6 @@ export function useTriviaHistory() {
         setIsLoading(true);
         setError(null);
 
-        const { getClientSideSupabase } = require("@/lib/supabase");
-        const supabase = getClientSideSupabase();
         const { data, error } = await supabase
           .from("trivia_game_results")
           .select("*")
@@ -92,7 +92,7 @@ export function useTriviaHistory() {
     }
 
     fetchGameHistory();
-  }, [currentUser, isLoggedIn]);
+  }, [currentUser, isLoggedIn, supabase]);
 
   return { gameHistory, isLoading, error };
 }

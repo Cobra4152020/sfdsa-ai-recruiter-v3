@@ -13,6 +13,8 @@ import { FloatingShareWidget } from "@/components/floating-share-widget";
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler";
 import { ErrorMonitor } from "@/components/error-monitor";
 import PerformanceMonitor from "@/components/performance-monitor";
+import { ClerkProvider } from "@clerk/nextjs";
+import { SupabaseProvider } from "@/context/supabase-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -64,50 +66,54 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <head>
-        <title>SFDSA AI Recruiter</title>
-        <meta
-          name="description"
-          content="San Francisco Deputy Sheriffs' Association AI Recruiter"
-        />
-        <meta name="generator" content="v0.dev" />
-      </head>
-      <body className={inter.className} suppressHydrationWarning>
-        <ThemeProvider defaultTheme="light" storageKey="app-theme">
-          <UserProvider>
-            <RegistrationProvider>
-              <AuthModalProvider>
-                <WebSocketErrorHandler>
-                  <ErrorMonitor>
-                    <PerformanceMonitor>
-                      <div className="min-h-screen flex flex-col w-full overflow-x-hidden">
-                        <ImprovedHeader />
-                        <main
-                          id="main-content"
-                          className="flex-1 pt-12 sm:pt-16 md:pt-20 bg-background dark:bg-black w-full"
-                        >
-                          {children}
-                        </main>
-                        <MobileOptimizedFooter />
-                        <div className="hidden md:block fixed right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col space-y-4">
-                          <AskSgtKenButton 
-                            position="fixed" 
-                            variant="secondary"
-                            className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
-                          />
-                        </div>
-                        <FloatingShareWidget />
-                        <UnifiedAuthModal />
-                      </div>
-                    </PerformanceMonitor>
-                  </ErrorMonitor>
-                </WebSocketErrorHandler>
-              </AuthModalProvider>
-            </RegistrationProvider>
-          </UserProvider>
-        </ThemeProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <head>
+          <title>SFDSA AI Recruiter</title>
+          <meta
+            name="description"
+            content="San Francisco Deputy Sheriffs' Association AI Recruiter"
+          />
+          <meta name="generator" content="v0.dev" />
+        </head>
+        <body className={inter.className} suppressHydrationWarning>
+          <ThemeProvider defaultTheme="light" storageKey="app-theme">
+            <SupabaseProvider>
+              <UserProvider>
+                <RegistrationProvider>
+                  <AuthModalProvider>
+                    <WebSocketErrorHandler>
+                      <ErrorMonitor>
+                        <PerformanceMonitor>
+                          <div className="min-h-screen flex flex-col w-full overflow-x-hidden">
+                            <ImprovedHeader />
+                            <main
+                              id="main-content"
+                              className="flex-1 pt-12 sm:pt-16 md:pt-20 bg-background dark:bg-black w-full"
+                            >
+                              {children}
+                            </main>
+                            <MobileOptimizedFooter />
+                            <div className="hidden md:block fixed right-2 md:right-4 top-1/2 transform -translate-y-1/2 z-50 flex flex-col space-y-4">
+                              <AskSgtKenButton 
+                                position="fixed" 
+                                variant="secondary"
+                                className="shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110"
+                              />
+                            </div>
+                            <FloatingShareWidget />
+                            <UnifiedAuthModal />
+                          </div>
+                        </PerformanceMonitor>
+                      </ErrorMonitor>
+                    </WebSocketErrorHandler>
+                  </AuthModalProvider>
+                </RegistrationProvider>
+              </UserProvider>
+            </SupabaseProvider>
+          </ThemeProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

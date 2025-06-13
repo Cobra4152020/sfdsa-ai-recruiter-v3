@@ -585,14 +585,19 @@ export function EnhancedTriviaGame({
     const currentQuestion = questions[currentQuestionIndex];
     if (!currentQuestion) return; // Safety check
 
-    const isCorrect = answerIndex === currentQuestion.correctAnswer;
+    console.log("Checking answer:", {
+      selected: answerIndex,
+      correct: currentQuestion.correctAnswer,
+      selectedType: typeof answerIndex,
+      correctType: typeof currentQuestion.correctAnswer,
+    });
 
-    // Show visual feedback
+    const isCorrect = answerIndex === currentQuestion.correctAnswer;
     setIsCorrectAnswer(isCorrect);
     setShowFeedback(true);
 
-    // Play sound effects
     if (isCorrect) {
+      // Play correct sound effect
       try {
         if (correctAudioRef.current) {
           correctAudioRef.current.volume = isMuted ? 0 : volume;
@@ -605,7 +610,7 @@ export function EnhancedTriviaGame({
         console.error("Error playing correct sound:", error);
       }
 
-      // Rest of the isCorrect code remains the same
+      // Update scores
       setScore((prev) => prev + 1);
       setCorrectAnswers((prev) => prev + 1);
 
@@ -621,6 +626,7 @@ export function EnhancedTriviaGame({
         console.error("Error showing confetti:", error);
       }
     } else {
+      // Play wrong sound effect
       try {
         if (wrongAudioRef.current) {
           wrongAudioRef.current.volume = isMuted ? 0 : volume;
@@ -635,6 +641,7 @@ export function EnhancedTriviaGame({
     }
 
     // Track this answer in analytics
+    /*
     try {
       trackEngagement("trivia_answer", {
         gameId,
@@ -647,6 +654,7 @@ export function EnhancedTriviaGame({
     } catch (error) {
       console.error("Error tracking answer:", error);
     }
+    */
 
     // If this is the last question, end the game
     if (currentQuestionIndex === questions.length - 1) {
@@ -1152,32 +1160,24 @@ export function EnhancedTriviaGame({
           </div>
 
           {/* Question Image with Feedback Overlay */}
-          <div className="mb-4 rounded-lg overflow-hidden relative w-full h-48 md:h-64 bg-gray-100">
-            {!imageLoadError[currentQuestionIndex] ? (
+          <div className="mb-4 rounded-lg overflow-hidden relative w-full h-48 md:h-64 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+            {imageLoadError[currentQuestionIndex] ||
+            !currentQuestion.imageUrl ? (
+              <div className="text-center text-gray-500 dark:text-gray-400 p-4">
+                <ImageIcon className="h-12 w-12 mx-auto text-gray-400" />
+                <p className="mt-2 text-sm">Image not available</p>
+              </div>
+            ) : (
               <Image
-                src={currentQuestion.imageUrl || "/placeholder.svg"}
+                src={currentQuestion.imageUrl}
                 alt={
-                  currentQuestion.imageAlt ||
-                  `Image for question about ${currentQuestion.category}`
+                  currentQuestion.imageAlt || "Trivia question image"
                 }
                 fill
-                className="object-cover"
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
                 onError={() => handleImageError(currentQuestionIndex)}
-                priority
-                sizes="(max-width: 768px) 100vw, 768px"
-                crossOrigin="anonymous"
+                priority={currentQuestionIndex === 0}
               />
-            ) : (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                <div className="text-center">
-                  <ImageIcon className="h-12 w-12 mx-auto text-gray-400" />
-                  <p className="text-sm text-gray-500 mt-2">
-                    {currentQuestion.category
-                      ? `Image related to ${currentQuestion.category}`
-                      : "Image unavailable"}
-                  </p>
-                </div>
-              </div>
             )}
 
             {/* Feedback overlay */}

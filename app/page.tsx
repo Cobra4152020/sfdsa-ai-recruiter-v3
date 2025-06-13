@@ -8,7 +8,7 @@ import { FAQSection } from "@/components/faq-section";
 import { CTASection } from "@/components/cta-section";
 import { DebugUser } from "@/components/debug-user";
 import TopRecruitsScroll from "@/components/top-recruits-scroll";
-import { ApplicationProgressGamification } from "@/components/application-progress-gamification";
+import ApplicationProgressGamification from "@/components/application-progress-gamification";
 import { PointsIntroduction } from "@/components/points-introduction";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { useUser } from "@/context/user-context";

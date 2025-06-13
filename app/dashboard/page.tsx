@@ -9,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Trophy, Star, Clock, Settings, PartyPopper, Gift, TrendingUp, Award, Calendar, MessageCircle, Gamepad2 } from "lucide-react";
 import { RecruitDashboard } from "@/components/recruit-dashboard";
-import { ApplicationProgressGamification } from "@/components/application-progress-gamification";
+import ApplicationProgressGamification from "@/components/application-progress-gamification";
 import { EarnedBadges } from "@/components/earned-badges";
 import { PointsLog } from "@/components/points-log";
 import { useUser } from "@/context/user-context";
@@ -51,28 +51,19 @@ export default function DashboardPage() {
         }
 
         // Check for profile/user data to get actual points
-        const profileResponse = await fetch(`/api/users/${currentUser.id}`);
+        const profileResponse = await fetch(`/api/users/${currentUser.id}/profile`);
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
-          const actualPoints = profileData.user?.participation_count || profileData.user?.total_points || 0;
+          const userProfile = profileData.profile;
+          const actualPoints = userProfile?.participation_count || 0;
           setUserStats(prev => ({
             ...prev,
             totalPoints: actualPoints,
-            achievements: actualPoints >= 500 ? 1 : Math.floor(actualPoints / 100), // Recognition for application completion
-            nextSteps: actualPoints >= 500 ? 1 : 3, // Fewer next steps if you've completed application
-            pointsThisMonth: actualPoints, // Show your earned points
-            badgesEarned: actualPoints >= 500 ? 1 : 0, // Should have Application Completed badge
-            daysActive: Math.ceil((new Date().getTime() - new Date(profileData.user?.created_at || Date.now()).getTime()) / (1000 * 60 * 60 * 24))
-          }));
-        }
-
-        // Try to fetch badges
-        const badgesResponse = await fetch(`/api/users/${currentUser.id}/badges`);
-        if (badgesResponse.ok) {
-          const badgesData = await badgesResponse.json();
-          setUserStats(prev => ({
-            ...prev,
-            badgesEarned: badgesData.badges?.length || 0
+            achievements: userProfile?.badge_count || 0,
+            nextSteps: userProfile?.has_applied ? 1 : 3, // Fewer next steps if you've completed application
+            pointsThisMonth: actualPoints, // This should be calculated based on a date range
+            badgesEarned: userProfile?.badge_count || 0,
+            daysActive: userProfile?.created_at ? Math.ceil((new Date().getTime() - new Date(userProfile.created_at).getTime()) / (1000 * 60 * 60 * 24)) : 0
           }));
         }
 

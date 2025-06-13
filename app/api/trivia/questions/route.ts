@@ -1,7 +1,13 @@
-export const dynamic = "force-static";
-export const revalidate = 3600; // Revalidate every hour;
+export const dynamic = "force-dynamic";
 
 import { NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface TriviaQuestion {
   id: string;
@@ -15,13 +21,7 @@ interface TriviaQuestion {
   imageAlt: string;
 }
 
-// Generate static paths for common parameter combinations
-export function generateStaticParams() {
-  const counts = [5, 10, 15, 20];
-  return counts.map((count) => ({ count: count.toString() }));
-}
-
-// Static fallback questions
+// Static fallback questions with proper Unsplash URLs
 const fallbackQuestions: TriviaQuestion[] = [
   {
     id: "1",
@@ -37,7 +37,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "San Francisco Deputy Sheriffs primarily maintain security in courts and jails, ensuring public safety in these critical facilities.",
     difficulty: "easy",
     category: "general",
-    imageUrl: "/images/courthouse.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?courthouse,justice",
     imageAlt: "San Francisco courthouse",
   },
   {
@@ -45,7 +45,7 @@ const fallbackQuestions: TriviaQuestion[] = [
     question:
       "Which of these is a requirement to become a San Francisco Deputy Sheriff?",
     options: [
-              "Must be at least 20 years old",
+      "Must be at least 20 years old",
       "Must be at least 21 years old",
       "Must be at least 25 years old",
       "Must be at least 30 years old",
@@ -55,7 +55,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "Candidates must be at least 21 years old to become a San Francisco Deputy Sheriff.",
     difficulty: "easy",
     category: "requirements",
-    imageUrl: "/images/badge.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?badge,sheriff",
     imageAlt: "San Francisco Deputy Sheriff badge",
   },
   {
@@ -73,7 +73,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "A high school diploma or equivalent is the minimum education requirement for becoming a San Francisco Deputy Sheriff.",
     difficulty: "easy",
     category: "requirements",
-    imageUrl: "/images/diploma.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?diploma,education",
     imageAlt: "High school diploma",
   },
   {
@@ -91,7 +91,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "Traffic enforcement is primarily handled by SFPD, not the Sheriff's Department.",
     difficulty: "medium",
     category: "duties",
-    imageUrl: "/images/courthouse-security.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?courthouse,security",
     imageAlt: "Deputy providing courthouse security",
   },
   {
@@ -109,7 +109,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "The San Francisco Sheriff's Department's primary jurisdiction is the City and County of San Francisco.",
     difficulty: "easy",
     category: "general",
-    imageUrl: "/images/sf-map.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?san-francisco,map",
     imageAlt: "Map of San Francisco",
   },
   {
@@ -127,7 +127,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "Candidates must pass the POST (Peace Officer Standards and Training) physical fitness test.",
     difficulty: "medium",
     category: "requirements",
-    imageUrl: "/images/fitness-test.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?fitness,training",
     imageAlt: "Physical fitness test",
   },
   {
@@ -139,7 +139,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "The Deputy Sheriff training academy is approximately 6 months long.",
     difficulty: "medium",
     category: "training",
-    imageUrl: "/images/academy.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?academy,training",
     imageAlt: "Sheriff's academy training",
   },
   {
@@ -157,7 +157,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "Serving eviction notices and other civil papers is a key civil law enforcement responsibility of Deputy Sheriffs.",
     difficulty: "medium",
     category: "duties",
-    imageUrl: "/images/civil-service.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?legal,documents",
     imageAlt: "Deputy serving civil papers",
   },
   {
@@ -175,7 +175,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "A valid standard Class C driver's license is required to become a Deputy Sheriff.",
     difficulty: "easy",
     category: "requirements",
-    imageUrl: "/images/drivers-license.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?drivers-license,california",
     imageAlt: "California driver's license",
   },
   {
@@ -193,7 +193,7 @@ const fallbackQuestions: TriviaQuestion[] = [
       "Juvenile Hall is operated by the Juvenile Probation Department, not the Sheriff's Department.",
     difficulty: "hard",
     category: "facilities",
-    imageUrl: "/images/jail.jpg",
+    imageUrl: "https://source.unsplash.com/800x600/?jail,facility",
     imageAlt: "San Francisco County Jail",
   },
 ];
@@ -201,11 +201,12 @@ const fallbackQuestions: TriviaQuestion[] = [
 // Add fallback images for any missing image paths
 const ensureImageUrls = (questions: TriviaQuestion[]): TriviaQuestion[] => {
   return questions.map((question) => {
-    if (!question.imageUrl || question.imageUrl.includes("placeholder.svg")) {
+    if (!question.imageUrl || question.imageUrl.includes("placeholder.svg") || question.imageUrl.startsWith("/")) {
       // Generate a placeholder image based on question content
+      const keywords = question.category || "sheriff";
       return {
         ...question,
-        imageUrl: `/placeholder.svg?height=300&width=500&query=${encodeURIComponent(question.question)}`,
+        imageUrl: `https://source.unsplash.com/800x600/?${keywords}`,
         imageAlt:
           question.imageAlt ||
           `Image related to question: ${question.question}`,
@@ -219,21 +220,52 @@ export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
     const count = Number.parseInt(url.searchParams.get("count") || "5", 10);
+    const gameId = url.searchParams.get("gameId") || "sf-district";
 
-    // Ensure all questions have valid image URLs
+    // Try to fetch questions from database first
+    try {
+      const { data: dbQuestions, error } = await supabase
+        .from('trivia_questions')
+        .select('*')
+        .eq('category', gameId === 'sf-district' ? 'general' : gameId)
+        .limit(count);
+
+      if (!error && dbQuestions && dbQuestions.length > 0) {
+        // Transform database questions to match our interface
+        const transformedQuestions: TriviaQuestion[] = dbQuestions.map((q: any) => ({
+          id: q.id.toString(),
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          explanation: q.explanation,
+          difficulty: q.difficulty,
+          category: q.category,
+          imageUrl: q.imageUrl || `https://source.unsplash.com/800x600/?${q.category || 'sheriff'}`,
+          imageAlt: q.imageAlt || `Image related to ${q.category || 'sheriff'} question`,
+        }));
+
+        // Ensure all questions have valid image URLs
+        const questionsWithImages = ensureImageUrls(transformedQuestions);
+
+        return NextResponse.json({
+          questions: questionsWithImages,
+          source: "database",
+        });
+      }
+    } catch (dbError) {
+      console.error("Database error, falling back to static questions:", dbError);
+    }
+
+    // Fallback to static questions if database fails
     const questionsWithImages = ensureImageUrls(fallbackQuestions);
-
-    // For static generation, we'll return a deterministic set based on count
-    // This ensures the same questions are returned for the same count parameter
     const selected = questionsWithImages.slice(
       0,
       Math.min(count, questionsWithImages.length),
     );
 
-    // Return the selected questions as JSON
     return NextResponse.json({
       questions: selected,
-      source: "static",
+      source: "static-fallback",
     });
   } catch (error) {
     console.error("Error in trivia questions API:", error);
@@ -248,4 +280,4 @@ export async function GET(req: Request) {
       { status: 200 }, // Return 200 to allow the client to display the fallback questions
     );
   }
-}
+} 

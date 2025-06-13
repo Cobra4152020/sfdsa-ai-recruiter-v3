@@ -21,6 +21,7 @@ export function trackEngagement(
   action: string,
   details?: Record<string, unknown>,
 ) {
+  return; // Temporarily disabled
   try {
     // Send to Supabase analytics table
     fetch("/api/analytics/engagement", {

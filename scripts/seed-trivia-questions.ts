@@ -1,10 +1,25 @@
 import { createClient } from '@supabase/supabase-js';
+import dotenv from "dotenv";
+import path from "path";
+import { v5 as uuidv5 } from "uuid";
+
+// Load environment variables from .env.local
+dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
 // This would use your actual Supabase credentials
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
+if (!supabaseUrl || !supabaseServiceKey) {
+  throw new Error(
+    "Supabase URL or service key is missing. Make sure NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY are set in your .env.local file.",
+  );
+}
+
 const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+// A constant namespace UUID for generating trivia question UUIDs
+const TRIVIA_NAMESPACE_UUID = "d5c4b3a0-9c1d-4a1e-a2c1-8a8b1a2b3c4d";
 
 interface TriviaQuestion {
   id: string;
@@ -648,113 +663,51 @@ const COMPREHENSIVE_QUESTIONS: TriviaQuestion[] = [
 ];
 
 async function seedTriviaQuestions() {
-  try {
-    console.log('Starting trivia questions seed...');
+  console.log('Starting to seed trivia questions...');
+
+  const { data: existingIds, error:_ } = await supabase
+    .from('trivia_questions')
+    .select('id');
+
+  const existingIdSet = new Set((existingIds || []).map(q => q.id));
+  
+  const upsertPromises = COMPREHENSIVE_QUESTIONS.map(async (question) => {
+    // Ensure options are a valid JSONB string
+    const optionsAsJson = JSON.stringify(question.options);
     
-    // First, ensure the games exist
-    const games = [
-      {
-        id: 'sf-football',
-        name: 'SF Football Trivia',
-        description: 'Test your knowledge about San Francisco football history and the 49ers.',
-        image_url: '/levis-stadium-49ers.png'
-      },
-      {
-        id: 'sf-baseball',
-        name: 'SF Baseball Trivia',
-        description: 'How much do you know about the San Francisco Giants and baseball in the Bay Area?',
-        image_url: '/oracle-park-giants.png'
-      },
-      {
-        id: 'sf-basketball',
-        name: 'SF Basketball Trivia',
-        description: 'Challenge yourself with questions about the Golden State Warriors and basketball in San Francisco.',
-        image_url: '/chase-center-gsw.png'
-      },
-      {
-        id: 'sf-districts',
-        name: 'SF District Trivia',
-        description: 'Test your knowledge of San Francisco\'s unique and diverse neighborhoods and districts.',
-        image_url: '/mission-district-sf.png'
-      },
-      {
-        id: 'sf-tourist-spots',
-        name: 'SF Most Popular Tourist Spots',
-        description: 'How well do you know San Francisco\'s famous landmarks and tourist attractions?',
-        image_url: '/golden-gate-bridge.png'
-      },
-      {
-        id: 'sf-day-trips',
-        name: 'SF Best Places to Visit',
-        description: 'Test your knowledge about the best day trips and places to visit around San Francisco.',
-        image_url: '/muir-woods-day-trip.png'
-      }
-    ];
-
-    // Insert games
-    const { error: gamesError } = await supabase
-      .from('trivia_games')
-      .upsert(games, { onConflict: 'id' });
-
-    if (gamesError) {
-      console.error('Error inserting games:', gamesError);
-      return;
-    }
-
-    console.log('Games inserted successfully');
-
-    // Clear existing questions
-    const { error: deleteError } = await supabase
+    // Generate a deterministic UUID from the string ID
+    const generatedUuid = uuidv5(question.id, TRIVIA_NAMESPACE_UUID);
+    
+    const questionData = {
+      ...question,
+      id: generatedUuid,
+      options: optionsAsJson,
+    };
+    
+    // Use the id field for the upsert operation
+    const { data, error } = await supabase
       .from('trivia_questions')
-      .delete()
-      .neq('id', 'impossible-id'); // Delete all
+      .upsert(questionData, { onConflict: 'id', ignoreDuplicates: false });
 
-    if (deleteError) {
-      console.error('Error clearing existing questions:', deleteError);
+    if (error) {
+      console.error(`Error upserting question ${question.id}:`, error.message);
+    } else {
+      const action = existingIdSet.has(generatedUuid) ? 'Updated' : 'Inserted';
+      console.log(`${action} question: ${question.id} - ${question.question.substring(0, 30)}...`);
     }
+  });
 
-    // Insert questions in batches
-    const batchSize = 50;
-    for (let i = 0; i < COMPREHENSIVE_QUESTIONS.length; i += batchSize) {
-      const batch = COMPREHENSIVE_QUESTIONS.slice(i, i + batchSize);
-      
-      const { error } = await supabase
-        .from('trivia_questions')
-        .upsert(batch, { onConflict: 'id' });
-
-      if (error) {
-        console.error(`Error inserting batch ${i / batchSize + 1}:`, error);
-        continue;
-      }
-
-      console.log(`Inserted batch ${i / batchSize + 1} (${batch.length} questions)`);
-    }
-
-    console.log(`Seed completed! Inserted ${COMPREHENSIVE_QUESTIONS.length} questions across ${games.length} games.`);
-    
-    // Log summary
-    const summary = games.map(game => {
-      const count = COMPREHENSIVE_QUESTIONS.filter(q => q.game_id === game.id).length;
-      return `${game.name}: ${count} questions`;
-    });
-    
-    console.log('\nSummary:');
-    console.log(summary.join('\n'));
-    console.log('\nNote: In production, expand to 100+ questions per game for maximum variety!');
-
-  } catch (error) {
-    console.error('Seed failed:', error);
+  try {
+    await Promise.all(upsertPromises);
+    console.log('Successfully seeded/updated all trivia questions.');
+  } catch (e) {
+    console.error('An error occurred during the seeding process:', e);
   }
 }
 
-// Run the seed function
-if (require.main === module) {
-  seedTriviaQuestions()
-    .then(() => process.exit(0))
-    .catch((error) => {
-      console.error('Seed script failed:', error);
-      process.exit(1);
-    });
-}
+seedTriviaQuestions().catch((e) => {
+  console.error('Fatal error running seed script:', e);
+  process.exit(1);
+});
 
 export { seedTriviaQuestions }; 

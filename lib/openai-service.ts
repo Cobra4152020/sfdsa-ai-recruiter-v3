@@ -138,6 +138,13 @@ export async function generateChatResponse(
         }
       } catch (error) {
         console.error('[ChatService] Web search failed:', error);
+        // Return a specific error message to the client
+        return {
+          response: "I'm having trouble searching for real-time information right now. Please try again later.",
+          success: false,
+          error: "Web search functionality is currently unavailable.",
+          searchUsed: false,
+        };
       }
     }
 

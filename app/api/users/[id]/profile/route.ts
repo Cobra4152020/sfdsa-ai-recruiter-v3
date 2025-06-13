@@ -13,15 +13,16 @@ export async function generateStaticParams() {
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } },
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const params = await context.params;
     const userId = params.id;
 
     if (!userId) {
       return NextResponse.json(
-        { success: false, message: "User ID is required" },
-        { status: 400 },
+        { error: "User ID is required" },
+        { status: 400 }
       );
     }
 
@@ -53,9 +54,9 @@ export async function GET(
         );
       }
 
-      // Get user's badges
+      // Get user's badges from the correct 'user_badges' table
       const { data: badges, error: badgesError } = await serviceClient
-        .from("badges")
+        .from("user_badges")
         .select("id, badge_type, earned_at")
         .eq("user_id", userId)
         .order("earned_at", { ascending: false });

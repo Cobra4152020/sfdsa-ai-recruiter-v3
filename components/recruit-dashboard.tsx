@@ -96,6 +96,7 @@ interface DashboardData {
   applicationProgress: number;
   pointsTotal: number;
   badgeCount: number;
+  badgesThisMonth: number;
   nftCount: number;
   pointsHistory: PointsHistoryEntry[];
   tasks: Task[];
@@ -150,6 +151,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
         // Fetch real user data instead of mock data
         let actualUserPoints = 0;
         let actualBadges = 0;
+        let badgesThisMonth = 0;
         
         try {
           // Get actual points
@@ -159,11 +161,22 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             actualUserPoints = pointsData.totalPoints || 0;
           }
 
-          // Get actual badges
+          // Get actual badges with detailed information for filtering
           const badgesResponse = await fetch(`/api/users/${currentUser.id}/badges`);
           if (badgesResponse.ok) {
             const badgesData = await badgesResponse.json();
             actualBadges = badgesData.badges?.length || 0;
+            
+            // Count badges earned this month
+            if (badgesData.badges) {
+              const currentDate = new Date();
+              const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+              
+              badgesThisMonth = badgesData.badges.filter((badge: any) => {
+                const earnedDate = new Date(badge.earned_at);
+                return earnedDate >= startOfMonth;
+              }).length;
+            }
           }
         } catch (error) {
           console.log("Could not fetch real data, using fallback");
@@ -389,6 +402,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           applicationProgress: actualUserPoints >= 500 ? 100 : Math.floor((actualUserPoints / 500) * 100),
           pointsTotal: actualUserPoints,
           badgeCount: actualBadges,
+          badgesThisMonth: badgesThisMonth,
           nftCount: 0,
           pointsHistory: mockPointsHistory,
           tasks: mockTasks,
@@ -568,7 +582,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                   {dashboardData?.badgeCount}
                 </div>
                 <div className="text-xs text-muted-foreground mt-1">
-                  2 new this month
+                  {dashboardData?.badgesThisMonth} new this month
                 </div>
               </CardContent>
             </Card>
