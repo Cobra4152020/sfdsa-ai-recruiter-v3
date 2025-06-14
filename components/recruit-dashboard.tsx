@@ -168,7 +168,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             actualBadges = badgesData.badges?.length || 0;
             
             // Count badges earned this month
-            if (badgesData.badges) {
+            if (badgesData.badges && Array.isArray(badgesData.badges)) {
               const currentDate = new Date();
               const startOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
               
