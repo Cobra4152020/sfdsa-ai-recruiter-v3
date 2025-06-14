@@ -57,30 +57,34 @@ export async function POST(request: Request) {
       );
     }
 
-    // Award 5 points for attendance using the new unified system
+    // Award 5 points for attendance using the simple award system
     try {
-      const baseUrl = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : process.env.NEXT_PUBLIC_SITE_URL;
-      const pointsResponse = await fetch(`${baseUrl}/api/user/points-unified`, {
+      // Fix: Use dynamic port detection instead of hardcoded localhost:3000
+      const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+      const host = request.headers.get('host') || 'localhost:3000';
+      const baseUrl = process.env.NODE_ENV === 'development' ? `${protocol}://${host}` : process.env.NEXT_PUBLIC_SITE_URL;
+      
+      const pointsResponse = await fetch(`${baseUrl}/api/points/simple-award`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId: user.id,
-          pointsToAdd: 5,
+          points: 5,
           action: 'daily_briefing_attendance',
-          description: 'Attended Sgt. Ken\'s Daily Briefing'
+          description: 'Attended Daily Briefing'
         })
       });
 
       if (pointsResponse.ok) {
         const pointsResult = await pointsResponse.json();
-        console.log('Successfully awarded 5 points via unified API:', pointsResult);
+        console.log('Successfully awarded 5 points via simple API:', pointsResult);
       } else {
-        throw new Error('Unified points API failed');
+        throw new Error('Simple points API failed');
       }
     } catch (pointsError) {
-      console.error('Error with unified points API, using fallback:', pointsError);
+      console.error('Error with simple points API, using fallback:', pointsError);
       
       // Fallback: Try direct database update to user_profiles
       try {

@@ -94,7 +94,7 @@ export async function GET() {
             
             <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
               <h4 class="text-lg font-semibold text-yellow-800 mb-3">⚡ Call to Action</h4>
-              <p class="text-yellow-700 font-medium">${data.call_to_action || 'Justice needs boots on the ground. Yours. Become a Deputy → https://sfdeputysheriff.com/'}</p>
+              <p class="text-yellow-700 font-medium">${data.call_to_action || 'Justice needs boots on the ground. Yours. Become a Deputy → https://www.sfdeputysheriff.com/apply'}</p>
             </div>
 
             <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
@@ -185,7 +185,7 @@ export async function GET() {
           
           <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
             <h4 class="text-lg font-semibold text-yellow-800 mb-3">⚡ Call to Action</h4>
-            <p class="text-yellow-700 font-medium">${selectedBriefing.call_to_action || 'Justice needs boots on the ground. Yours. Become a Deputy → https://sfdeputysheriff.com/'}</p>
+            <p class="text-yellow-700 font-medium">${selectedBriefing.call_to_action || 'Justice needs boots on the ground. Yours. Become a Deputy → https://www.sfdeputysheriff.com/apply'}</p>
           </div>
 
           <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">

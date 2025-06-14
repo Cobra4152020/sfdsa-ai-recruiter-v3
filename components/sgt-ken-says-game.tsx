@@ -318,7 +318,8 @@ export function SgtKenSaysGame() {
   // Award points to live user system
   const awardLivePoints = async (userId: string, points: number, attempts: number) => {
     try {
-      const response = await fetch('/api/demo-user-points', {
+      const description = `Sgt Ken Says completed in ${attempts} attempts (+${points} points)`;
+      const response = await fetch('/api/points/simple-award', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -327,11 +328,7 @@ export function SgtKenSaysGame() {
           userId,
           action: 'sgt_ken_game_win',
           points,
-          gameDetails: {
-            attempts,
-            maxAttempts: gameState.maxAttempts,
-            date: todayDate,
-          }
+          description
         }),
       });
 
@@ -352,22 +349,24 @@ export function SgtKenSaysGame() {
   // Award streak badge
   const awardStreakBadge = async (userId: string, streak: number) => {
     try {
-      const response = await fetch('/api/demo-user-points', {
+      const response = await fetch('/api/award-badge', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           userId,
-          action: 'badge_earned',
-          points: 50,
-          badge: `${streak}_day_sgt_ken_streak`
+          badgeType: `sgt-ken-streak-${streak}`,
+          badgeName: `Sgt Ken Streak Master`,
+          badgeDescription: `Achieved ${streak} consecutive wins in Sgt Ken Says!`,
+          participationPoints: 50,
+          shareMessage: `I just achieved a ${streak}-day winning streak in Sgt Ken Says! 🏆`
         }),
       });
 
       if (response.ok) {
         toast({
-          title: "Streak Badge Earned!",
+          title: "🏆 Streak Badge Earned!",
           description: `${streak} day winning streak! +50 bonus points`,
         });
       }
@@ -648,6 +647,85 @@ export function SgtKenSaysGame() {
               <div className="mt-2 whitespace-pre-line text-xs">
                 {generateShareText().substring(0, 200)}...
               </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Stats Dialog */}
+      <Dialog open={showStats} onOpenChange={setShowStats}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Your Sgt. Ken Says Stats</DialogTitle>
+            <DialogDescription>
+              Track your progress and see how you're improving!
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Overall Stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="text-center p-4 bg-gray-50 rounded">
+                <div className="text-2xl font-bold text-[#0A3C1F]">{gameState.totalGamesPlayed}</div>
+                <div className="text-sm text-gray-600">Games Played</div>
+              </div>
+              <div className="text-center p-4 bg-gray-50 rounded">
+                <div className="text-2xl font-bold text-[#0A3C1F]">
+                  {gameState.totalGamesPlayed > 0 ? Math.round((gameState.totalWins / gameState.totalGamesPlayed) * 100) : 0}%
+                </div>
+                <div className="text-sm text-gray-600">Win Rate</div>
+              </div>
+            </div>
+
+            {/* Streak & Rank */}
+            <div className="space-y-3">
+              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-[#0A3C1F]/10 to-transparent rounded">
+                <span className="font-medium">Current Streak</span>
+                <div className="flex items-center">
+                  <Zap className="h-4 w-4 text-[#0A3C1F] mr-1" />
+                  <span className="font-bold text-[#0A3C1F]">{gameState.streak} days</span>
+                </div>
+              </div>
+              
+              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-[#0A3C1F]/10 to-transparent rounded">
+                <span className="font-medium">Current Rank</span>
+                <span className="font-bold text-[#0A3C1F]">{getRank()}</span>
+              </div>
+            </div>
+
+            {/* Today's Performance */}
+            {gameState.gameStatus !== 'playing' && (
+              <div className="border-t pt-4">
+                <h4 className="font-medium mb-3">Today's Performance</h4>
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <span>Status:</span>
+                    <span className={`font-medium ${gameState.gameStatus === 'won' ? 'text-green-600' : 'text-red-600'}`}>
+                      {gameState.gameStatus === 'won' ? 'Solved' : 'Failed'}
+                    </span>
+                  </div>
+                  {gameState.gameStatus === 'won' && (
+                    <>
+                      <div className="flex justify-between">
+                        <span>Attempts:</span>
+                        <span className="font-medium">{gameState.attempts}/6</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Points Earned:</span>
+                        <span className="font-medium text-[#0A3C1F]">+{gameState.points}</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Motivational Message */}
+            <div className="text-center p-4 bg-[#0A3C1F]/5 rounded">
+              <div className="text-sm text-gray-600 italic">
+                "Keep training, cadet. Every puzzle solved makes you a better deputy!"
+              </div>
+              <div className="text-xs text-gray-500 mt-1">- Sgt. Ken</div>
             </div>
           </div>
         </DialogContent>

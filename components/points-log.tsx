@@ -20,7 +20,7 @@ interface PointsLogEntry {
   id: string;
   action: string;
   points: number;
-  description: string;
+  description?: string;
   created_at: string;
 }
 
@@ -69,6 +69,12 @@ export function PointsLog({ userId }: PointsLogProps) {
         return <FileText className="h-4 w-4" />;
       case 'achievement':
         return <Trophy className="h-4 w-4" />;
+      case 'daily_briefing_attendance':
+        return <Calendar className="h-4 w-4" />;
+      case 'sgt_ken_game_win':
+        return <Trophy className="h-4 w-4" />;
+      case 'chat_participation':
+        return <TrendingUp className="h-4 w-4" />;
       default:
         return <TrendingUp className="h-4 w-4" />;
     }
@@ -84,6 +90,12 @@ export function PointsLog({ userId }: PointsLogProps) {
         return 'bg-purple-500';
       case 'achievement':
         return 'bg-yellow-500';
+      case 'daily_briefing_attendance':
+        return 'bg-indigo-500';
+      case 'sgt_ken_game_win':
+        return 'bg-orange-500';
+      case 'chat_participation':
+        return 'bg-teal-500';
       default:
         return 'bg-gray-500';
     }
@@ -98,10 +110,36 @@ export function PointsLog({ userId }: PointsLogProps) {
   };
 
   const formatAction = (action: string) => {
-    return action
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    switch (action) {
+      case 'daily_briefing_attendance':
+        return 'Daily Briefing';
+      case 'sgt_ken_game_win':
+        return 'Sgt Ken Says';
+      case 'chat_participation':
+        return 'Chat Participation';
+      default:
+        return action
+          .split('_')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ');
+    }
+  };
+
+  const getActionDescription = (entry: PointsLogEntry) => {
+    if (entry.description) {
+      return entry.description;
+    }
+    
+    switch (entry.action) {
+      case 'daily_briefing_attendance':
+        return 'Attended daily briefing session';
+      case 'sgt_ken_game_win':
+        return `Won Sgt Ken Says game (+${entry.points} points)`;
+      case 'chat_participation':
+        return 'Participated in community chat';
+      default:
+        return `Earned ${entry.points} points for ${entry.action.replace(/_/g, ' ')}`;
+    }
   };
 
   if (isLoading) {
@@ -197,7 +235,7 @@ export function PointsLog({ userId }: PointsLogProps) {
                       </Badge>
                     </div>
                     <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-                      {entry.description}
+                      {getActionDescription(entry)}
                     </p>
                     <p className="text-xs text-gray-400">
                       {formatDate(entry.created_at)}

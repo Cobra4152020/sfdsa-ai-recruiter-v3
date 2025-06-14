@@ -525,9 +525,9 @@ export default function BackgroundPreparationPage() {
     const fetchUserPoints = async () => {
       if (currentUser) {
         try {
-          const response = await fetch('/api/user/points');
+          const response = await fetch(`/api/user/points?userId=${currentUser.id}`);
           const data = await response.json();
-          setUserPoints(data.points || 0);
+          setUserPoints(data.totalPoints || 0);
         } catch (error) {
           console.error('Error fetching points:', error);
         }
@@ -557,11 +557,12 @@ export default function BackgroundPreparationPage() {
     } else {
       newCheckedItems.add(id);
       // Award points for checking off items
-      if (typeof window !== 'undefined') {
+      if (typeof window !== 'undefined' && currentUser) {
         fetch('/api/points/award', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            userId: currentUser.id,
             action: 'background_prep',
             points: 2,
             description: `Checked off background document: ${documents.find(d => d.id === id)?.title}`
@@ -575,8 +576,59 @@ export default function BackgroundPreparationPage() {
         });
       }
     }
+    
     setCheckedItems(newCheckedItems);
     saveProgress(newCheckedItems);
+    
+    // Check for completion achievements
+    if (currentUser && typeof window !== 'undefined') {
+      const newCompletedRequired = requiredDocs.filter(doc => newCheckedItems.has(doc.id)).length;
+      const newCompletedTotal = documents.filter(doc => newCheckedItems.has(doc.id)).length;
+      
+      // Award "Background Prepared" badge for completing all required documents
+      if (newCompletedRequired === requiredDocs.length && completedRequired < requiredDocs.length) {
+        fetch('/api/award-badge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            badgeType: "background-prepared",
+            badgeName: "Background Prepared",
+            badgeDescription: "Completed all required background investigation documents - ahead of 95% of candidates!",
+            participationPoints: 25,
+            shareMessage: "I'm fully prepared for my background investigation with all required documents ready!"
+          })
+        }).then(() => {
+          toast({
+            title: "🏆 Badge Earned: Background Prepared! +25 Bonus Points",
+            description: "You're ahead of 95% of candidates! All required documents ready.",
+          });
+          setUserPoints(prev => prev + 25);
+        });
+      }
+      
+      // Award "Document Master" badge for completing ALL documents (required + optional)
+      if (newCompletedTotal === documents.length && checkedItems.size < documents.length) {
+        fetch('/api/award-badge', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: currentUser.id,
+            badgeType: "document-master",
+            badgeName: "Document Master",
+            badgeDescription: "Completed ALL background investigation documents (required + optional) - ultimate preparation achieved!",
+            participationPoints: 50,
+            shareMessage: "I've achieved Document Master status with every single background document completed!"
+          })
+        }).then(() => {
+          toast({
+            title: "🏆 Badge Earned: Document Master! +50 Bonus Points",
+            description: "Ultimate preparation! You've completed every single document.",
+          });
+          setUserPoints(prev => prev + 50);
+        });
+      }
+    }
   };
 
   const hasAccess = currentUser && userPoints >= REQUIRED_POINTS;

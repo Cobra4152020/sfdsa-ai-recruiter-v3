@@ -3,8 +3,13 @@ import { getServiceSupabase } from "@/app/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId, points, action, description } = await request.json();
-    console.log('Points award request:', { userId, points, action });
+    // Get raw body first for debugging
+    const rawBody = await request.text();
+    console.log('Raw request body:', rawBody);
+    
+    // Parse the JSON
+    const { userId, points, action, description } = JSON.parse(rawBody);
+    console.log('Points award request:', { userId, points, action, description });
 
     if (!userId || !points || !action) {
       return NextResponse.json(
@@ -58,6 +63,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Insert into points log for history tracking
+    const { error: logError } = await supabase
+      .from('user_point_logs')
+      .insert({
+        user_id: userId,
+        action: action,
+        points: points,
+        description: description || `${action} - ${points} points`,
+        created_at: new Date().toISOString()
+      });
+
+    if (logError) {
+      console.error('Points log insertion failed:', logError);
+      // Don't fail the entire request if log insertion fails
+    } else {
+      console.log('Points log entry created successfully');
+    }
+
     console.log('Points awarded successfully!');
     return NextResponse.json({
       success: true,
@@ -75,61 +98,3 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
-async function checkBadgeAchievements(userId: string, totalPoints: number) {
-  const supabase = getServiceSupabase();
-
-  const badges = [
-    { name: "Bronze Recruit", pointsRequired: 100, level: "bronze" },
-    { name: "Silver Recruit", pointsRequired: 250, level: "silver" },
-    { name: "Gold Recruit", pointsRequired: 500, level: "gold" },
-    { name: "Platinum Recruit", pointsRequired: 1000, level: "platinum" }
-  ];
-
-  for (const badge of badges) {
-    if (totalPoints >= badge.pointsRequired) {
-      try {
-        // Check if user already has this badge
-        const { data: existingBadge } = await supabase
-          .from('user_badges')
-          .select('id')
-          .eq('user_id', userId)
-          .eq('badge_name', badge.name)
-          .single();
-
-        if (!existingBadge) {
-          // Award the badge
-          await supabase
-            .from('user_badges')
-            .insert({
-              user_id: userId,
-              badge_name: badge.name,
-              badge_level: badge.level,
-              earned_at: new Date().toISOString(),
-              metadata: {
-                pointsAtEarning: totalPoints,
-                pointsRequired: badge.pointsRequired
-              }
-            });
-
-          // Send notification (optional, only if table exists)
-          try {
-            await supabase
-              .from('user_notifications')
-              .insert({
-                user_id: userId,
-                type: 'badge_earned',
-                title: `New Badge Earned: ${badge.name}!`,
-                message: `Congratulations! You've earned the ${badge.name} badge with ${totalPoints} points.`,
-                metadata: { badgeName: badge.name, badgeLevel: badge.level }
-              });
-          } catch (notificationError) {
-            console.log('Badge notification table not available');
-          }
-        }
-      } catch (badgeError) {
-        console.log('Badge system not available:', badgeError);
-      }
-    }
-  }
-} 

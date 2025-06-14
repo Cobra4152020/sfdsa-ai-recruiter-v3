@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     console.log('✅ Successfully inserted into user_points');
 
-    // Step 2: Also log in user_point_logs for backup tracking
+    // Step 2: Also log in user_point_logs for backup tracking (dashboard reads from this table)
     console.log('🔧 Inserting into user_point_logs table...');
     const { error: logError } = await supabase
       .from('user_point_logs')
