@@ -65,7 +65,7 @@ export default function AwardsClient() {
       <div className="max-w-7xl mx-auto px-4 pt-8 pb-8">
         <div className="mb-12 text-center mt-8">
           <div className="h-12 bg-gray-200 rounded animate-pulse mb-4"></div>
-          <div className="h-6 bg-gray-200 rounded animate-pulse max-w-3xl mx-auto"></div>
+          <div className="h-6 bg-gray-200 rounded animate-pulse mx-auto"></div>
         </div>
         <div className="mb-12">
           <div className="h-32 bg-gray-200 rounded animate-pulse"></div>
@@ -76,7 +76,7 @@ export default function AwardsClient() {
 
   return (
     <ErrorBoundary>
-      <main className="max-w-7xl mx-auto px-4 pt-8 pb-8">
+      <main className="container mx-auto px-4 pt-8 pb-8">
         <div className="mb-16 text-center mt-12">
           <div className="relative">
             <h1 className="text-5xl md:text-6xl font-bold text-[#0A3C1F] mb-6 relative z-10">
@@ -84,7 +84,7 @@ export default function AwardsClient() {
             </h1>
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-[#0A3C1F] via-[#FFD700] to-[#0A3C1F] rounded-full"></div>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mt-8">
+          <p className="text-xl text-gray-600 mx-auto leading-relaxed mt-8">
             Maximize your impact! Share, refer, and compete to earn points, unlock exclusive badges, and help us find the best candidates.
           </p>
         </div>

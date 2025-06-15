@@ -27,108 +27,106 @@ import type { Route } from "next";
 export default function MissionBriefingContent() {
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary mb-2">
-            Mission Briefing
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Your comprehensive guide to becoming a San Francisco Deputy Sheriff.
-            Learn about the role, requirements, and application process.
-          </p>
-        </div>
-
-        <Tabs defaultValue="role" className="w-full">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-8 h-auto">
-            <TabsTrigger value="role" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
-              <Shield className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> 
-              <span className="hidden xs:inline">The </span>Role
-            </TabsTrigger>
-            <TabsTrigger value="requirements" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
-              <Clipboard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline">Requirements</span>
-              <span className="xs:hidden">Req.</span>
-            </TabsTrigger>
-            <TabsTrigger value="benefits" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
-              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> Benefits
-            </TabsTrigger>
-            <TabsTrigger value="process" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
-              <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> Process
-            </TabsTrigger>
-            <TabsTrigger value="training" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
-              <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-              <span className="hidden xs:inline">Training</span>
-              <span className="xs:hidden">Train</span>
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="role" className="space-y-6">
-            <RoleExplainer />
-          </TabsContent>
-
-          <TabsContent value="requirements" className="space-y-6">
-            <RequirementsExplainer />
-          </TabsContent>
-
-          <TabsContent value="benefits" className="space-y-6">
-            <BenefitsExplainer />
-          </TabsContent>
-
-          <TabsContent value="process" className="space-y-6">
-            <ProcessExplainer />
-          </TabsContent>
-
-          <TabsContent value="training" className="space-y-6">
-            <TrainingExplainer />
-          </TabsContent>
-        </Tabs>
-
-        <Card className="mt-12 border-primary/20">
-          <CardHeader className="bg-primary text-primary-foreground">
-            <CardTitle className="flex items-center">
-              <Shield className="h-5 w-5 mr-2" /> Ready to Begin Your Journey?
-            </CardTitle>
-            <CardDescription className="text-gray-200">
-              Take the first step toward becoming a San Francisco Deputy Sheriff
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">Apply Now</h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Start your application process today and begin your career in
-                  law enforcement with the San Francisco Sheriff&apos;s
-                  Department.
-                </p>
-                <Link href={"/apply" as Route}>
-                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                    Apply Now
-                  </Button>
-                </Link>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  Explore the Deputy Launchpad
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Learn about our points system, badges, and rewards as you
-                  progress through the recruitment process.
-                </p>
-                <Link href={"/deputy-launchpad" as Route}>
-                  <Button
-                    variant="outline"
-                    className="border-primary text-primary"
-                  >
-                    <Rocket className="h-4 w-4 mr-2" />
-                    Visit Deputy Launchpad
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-primary mb-2">
+          Mission Briefing
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          Your comprehensive guide to becoming a San Francisco Deputy Sheriff.
+          Learn about the role, requirements, and application process.
+        </p>
       </div>
+
+      <Tabs defaultValue="role" className="w-full">
+        <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 mb-8 h-auto">
+          <TabsTrigger value="role" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+            <Shield className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> 
+            <span className="hidden xs:inline">The </span>Role
+          </TabsTrigger>
+          <TabsTrigger value="requirements" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+            <Clipboard className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">Requirements</span>
+            <span className="xs:hidden">Req.</span>
+          </TabsTrigger>
+          <TabsTrigger value="benefits" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+            <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> Benefits
+          </TabsTrigger>
+          <TabsTrigger value="process" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+            <Clock className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" /> Process
+          </TabsTrigger>
+          <TabsTrigger value="training" className="text-xs sm:text-sm lg:text-base p-2 sm:p-3">
+            <GraduationCap className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+            <span className="hidden xs:inline">Training</span>
+            <span className="xs:hidden">Train</span>
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="role" className="space-y-6">
+          <RoleExplainer />
+        </TabsContent>
+
+        <TabsContent value="requirements" className="space-y-6">
+          <RequirementsExplainer />
+        </TabsContent>
+
+        <TabsContent value="benefits" className="space-y-6">
+          <BenefitsExplainer />
+        </TabsContent>
+
+        <TabsContent value="process" className="space-y-6">
+          <ProcessExplainer />
+        </TabsContent>
+
+        <TabsContent value="training" className="space-y-6">
+          <TrainingExplainer />
+        </TabsContent>
+      </Tabs>
+
+      <Card className="mt-12 border-primary/20">
+        <CardHeader className="bg-primary text-primary-foreground">
+          <CardTitle className="flex items-center">
+            <Shield className="h-5 w-5 mr-2" /> Ready to Begin Your Journey?
+          </CardTitle>
+          <CardDescription className="text-gray-200">
+            Take the first step toward becoming a San Francisco Deputy Sheriff
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Apply Now</h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Start your application process today and begin your career in
+                law enforcement with the San Francisco Sheriff&apos;s
+                Department.
+              </p>
+              <Link href={"/apply" as Route}>
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                  Apply Now
+                </Button>
+              </Link>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">
+                Explore the Deputy Launchpad
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Learn about our points system, badges, and rewards as you
+                progress through the recruitment process.
+              </p>
+              <Link href={"/deputy-launchpad" as Route}>
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary"
+                >
+                  <Rocket className="h-4 w-4 mr-2" />
+                  Visit Deputy Launchpad
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

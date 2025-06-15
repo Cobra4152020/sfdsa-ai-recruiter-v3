@@ -103,7 +103,6 @@ export default function PlayTheGamePage() {
         description="Play interactive games to test your skills and earn points"
       >
         <div className="container py-8">
-        <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
               🎮 Play & Earn Points
@@ -329,7 +328,6 @@ export default function PlayTheGamePage() {
             </div>
           </div>
         </div>
-      </div>
       </AuthRequiredWrapper>
     </PageWrapper>
   );

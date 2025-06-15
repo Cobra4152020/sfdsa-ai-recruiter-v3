@@ -213,6 +213,7 @@ export default function FAQPage() {
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 py-8">
+        {/* Place all main content here, no inner max-w-6xl wrapper */}
         <div className="max-w-6xl mx-auto">
           {/* Header Section */}
           <div className="text-center mb-12">

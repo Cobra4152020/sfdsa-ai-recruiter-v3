@@ -50,18 +50,18 @@ export function useUserPoints(userId?: string) {
         return;
       }
 
-      // In a real app, this would be an API call
-      // const response = await fetch(`/api/users/${userId}/points`)
-      // const data = await response.json()
-
-      // For demo purposes, generate a random number of points
-      const mockPoints = Math.floor(Math.random() * 7500);
-
-      setPoints(mockPoints);
+      // Fetch real user points from the API
+      const response = await fetch(`/api/user/points?userId=${userId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch user points');
+      }
+      const data = await response.json();
+      const realPoints = data.totalPoints || 0;
+      setPoints(realPoints);
 
       // Determine next tier
       const currentTierIndex = pointTiers.findIndex(
-        (tier) => tier.points > mockPoints,
+        (tier) => tier.points > realPoints,
       );
       if (currentTierIndex !== -1) {
         setNextTier(pointTiers[currentTierIndex]);

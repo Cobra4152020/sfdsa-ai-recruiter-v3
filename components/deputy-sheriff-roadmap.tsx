@@ -325,7 +325,7 @@ export function DeputySheriffRoadmap() {
 
   if (!currentUser) {
     return (
-      <div className="max-w-3xl mx-auto space-y-8">
+      <div className="container mx-auto px-4 py-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -423,8 +423,7 @@ export function DeputySheriffRoadmap() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-12">
-      {/* Enhanced Header */}
+    <div className="container mx-auto px-4 py-8">
       <div className="text-center space-y-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -442,7 +441,6 @@ export function DeputySheriffRoadmap() {
           </p>
         </motion.div>
 
-        {/* Enhanced Progress Overview */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -497,7 +495,6 @@ export function DeputySheriffRoadmap() {
         </motion.div>
       </div>
 
-      {/* Enhanced Category Navigation */}
       <Tabs value={selectedCategory} onValueChange={setSelectedCategory} className="w-full">
         <div className="mb-12">
           <TabsList className="grid w-full grid-cols-4 h-16 bg-gray-100 rounded-xl p-2">
@@ -518,7 +515,6 @@ export function DeputySheriffRoadmap() {
 
         {categories.map((category) => (
           <TabsContent key={category.id} value={category.id} className="space-y-8">
-            {/* Enhanced Category Header */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -556,7 +552,6 @@ export function DeputySheriffRoadmap() {
               </div>
             </motion.div>
 
-            {/* Enhanced Category Steps */}
             <div className="grid gap-8">
               {getCurrentCategorySteps().map((step, index) => (
                 <motion.div
@@ -570,7 +565,6 @@ export function DeputySheriffRoadmap() {
                       ? 'border-green-200 bg-gradient-to-br from-green-50/50 to-white hover:from-green-50 hover:to-green-50/30 shadow-lg' 
                       : 'border-gray-200 bg-gradient-to-br from-gray-50/50 to-white hover:from-gray-50 hover:to-gray-50/30'
                   }`}>
-                    {/* Accent Bar */}
                     <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${
                       step.unlocked ? 'from-green-400 to-green-600' : 'from-gray-300 to-gray-400'
                     }`} />
@@ -693,15 +687,13 @@ export function DeputySheriffRoadmap() {
         ))}
       </Tabs>
 
-      {/* Enhanced Call to Action */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="relative overflow-hidden"
+        className="relative overflow-hidden mt-16"
       >
         <div className="bg-gradient-to-br from-primary to-primary/90 text-white rounded-2xl p-12 text-center shadow-2xl">
-          {/* Background Pattern */}
           <div className="absolute inset-0 opacity-10">
             <div className="absolute inset-0" style={{
               backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%23ffffff' fillOpacity='0.3'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
@@ -735,7 +727,7 @@ export function DeputySheriffRoadmap() {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-2 border-white text-white hover:bg-white hover:text-primary px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  className="bg-white text-primary hover:bg-primary hover:text-white border-2 border-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   <Compass className="mr-3 h-6 w-6" />
                   View Your Profile

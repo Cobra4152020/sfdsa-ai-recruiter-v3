@@ -48,7 +48,7 @@ export default function GamificationExplainer() {
 
   return (
     <div className="container mx-auto px-4 py-4">
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">
             Recruitment Gamification System

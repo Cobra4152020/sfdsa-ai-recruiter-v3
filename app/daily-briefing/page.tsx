@@ -115,7 +115,6 @@ export default function DailyBriefingPage() {
         description="Stay informed with daily updates from Sgt. Ken and the department"
       >
         <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
           {/* Hero Section with Image */}
           <motion.div 
             initial={{ opacity: 0, y: -20 }}
@@ -464,7 +463,6 @@ export default function DailyBriefingPage() {
             </div>
           </div>
         </div>
-      </div>
       </AuthRequiredWrapper>
     </PageWrapper>
   );

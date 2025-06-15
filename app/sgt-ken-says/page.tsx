@@ -18,7 +18,7 @@ export default function SgtKenSaysPage() {
               <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
                 🎯 Sgt. Ken Says...
               </h1>
-              <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
                 Daily law enforcement word challenge! Crack the code, earn points, and share your victory with the squad.
               </p>
             </div>
