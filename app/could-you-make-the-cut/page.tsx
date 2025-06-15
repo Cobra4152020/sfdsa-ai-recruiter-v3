@@ -284,62 +284,74 @@ export default function CouldYouMakeTheCutPage() {
         >
         {!hasStarted ? (
           // Game Introduction
-          <Card className="text-center">
-            <CardHeader>
-              <motion.div
-                initial={{ scale: 0.8 }}
-                animate={{ scale: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-              >
-                <Trophy className="w-16 h-16 mx-auto text-secondary mb-4" />
-              </motion.div>
-              <CardTitle className="text-3xl font-bold text-foreground mb-2">
-                Could You Make the Cut?
-              </CardTitle>
-              <p className="text-lg text-muted-foreground">
-                Test your law enforcement instincts with real deputy scenarios
-              </p>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-primary/10 p-4 rounded-lg">
-                  <Clock className="w-8 h-8 mx-auto text-primary mb-2" />
-                  <div className="font-semibold text-foreground">10 Minutes</div>
-                  <div className="text-muted-foreground">Time Limit</div>
-                </div>
-                <div className="bg-primary/10 p-4 rounded-lg">
-                  <Star className="w-8 h-8 mx-auto text-primary mb-2" />
-                  <div className="font-semibold text-foreground">10 Scenarios</div>
-                  <div className="text-muted-foreground">Real Situations</div>
-                </div>
-                <div className="bg-primary/10 p-4 rounded-lg">
-                  <Share2 className="w-8 h-8 mx-auto text-primary mb-2" />
-                  <div className="font-semibold text-foreground">Share Results</div>
-                  <div className="text-muted-foreground">Challenge Friends</div>
-                </div>
-              </div>
-              
-              <div className="bg-secondary/20 border border-secondary/40 rounded-lg p-4">
-                <h3 className="font-semibold text-foreground mb-2">💪 Sgt. Ken Says:</h3>
-                <p className="text-muted-foreground italic">
-                  "Think you've got what it takes to protect and serve San Francisco? 
-                  Let's see how you handle the real situations our deputies face every day. 
-                  Good luck, recruit!"
+          <div className="container mx-auto px-4 py-8">
+            <Card className="text-center">
+              <CardHeader>
+                <motion.div
+                  initial={{ scale: 0.8 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5, delay: 0.2 }}
+                >
+                  <Trophy className="w-16 h-16 mx-auto text-secondary mb-4" />
+                </motion.div>
+                <CardTitle className="text-3xl font-bold text-foreground mb-2">
+                  Could You Make the Cut?
+                </CardTitle>
+                <p className="text-lg text-muted-foreground">
+                  Test your law enforcement instincts with real deputy scenarios
                 </p>
-              </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid md:grid-cols-3 gap-4 text-sm">
+                  <div className="bg-primary/10 p-4 rounded-lg">
+                    <Clock className="w-8 h-8 mx-auto text-primary mb-2" />
+                    <div className="font-semibold text-foreground">10 Minutes</div>
+                    <div className="text-muted-foreground">Time Limit</div>
+                  </div>
+                  <div className="bg-primary/10 p-4 rounded-lg">
+                    <Star className="w-8 h-8 mx-auto text-primary mb-2" />
+                    <div className="font-semibold text-foreground">10 Scenarios</div>
+                    <div className="text-muted-foreground">Real Situations</div>
+                  </div>
+                  <div className="bg-primary/10 p-4 rounded-lg">
+                    <Share2 className="w-8 h-8 mx-auto text-primary mb-2" />
+                    <div className="font-semibold text-foreground">Share Results</div>
+                    <div className="text-muted-foreground">Challenge Friends</div>
+                  </div>
+                </div>
+                
+                <div className="bg-secondary/20 border border-secondary/40 rounded-lg p-4">
+                  <h3 className="font-semibold text-foreground mb-2">💪 Sgt. Ken Says:</h3>
+                  <p className="text-muted-foreground italic">
+                    "Think you've got what it takes to protect and serve San Francisco? 
+                    Let's see how you handle the real situations our deputies face every day. 
+                    Good luck, recruit!"
+                  </p>
+                </div>
 
-              <Button
-                onClick={startGame}
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg"
-              >
-                Start the Challenge
-              </Button>
-            </CardContent>
-          </Card>
+                {/* Points System Explanation */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
+                  <h4 className="font-semibold text-blue-900 mb-1">How Points Work:</h4>
+                  <ul className="list-disc pl-5 text-blue-900 text-sm">
+                    <li><span className="font-semibold">+10 points</span> for each correct answer</li>
+                    <li><span className="font-semibold">+5 points</span> for every full minute left when you finish</li>
+                    <li>Try to answer quickly and accurately for the highest score!</li>
+                  </ul>
+                </div>
+
+                <Button
+                  onClick={startGame}
+                  size="lg"
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg"
+                >
+                  Start the Challenge
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
         ) : (
           // Game Interface
-          <div className="space-y-6">
+          <div className="container mx-auto px-4 py-8 space-y-6">
             {/* Header with progress and timer */}
             <Card>
               <CardContent className="pt-6">

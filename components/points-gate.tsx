@@ -33,7 +33,7 @@ export function PointsGate({
     // Loading state
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="animate-pulse bg-gray-200 dark:bg-gray-700 h-96 rounded-lg"></div>
         </div>
       </div>
@@ -43,7 +43,7 @@ export function PointsGate({
   if (!currentUser) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <Card className="shadow-lg border-[#0A3C1F]/20">
             <CardHeader className="text-center bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 text-white">
               <div className="flex justify-center mb-4">
@@ -113,7 +113,7 @@ export function PointsGate({
     
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <Card className="shadow-lg border-amber-200">
             <CardHeader className="text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white">
               <div className="flex justify-center mb-4">

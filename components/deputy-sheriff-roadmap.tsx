@@ -325,7 +325,7 @@ export function DeputySheriffRoadmap() {
 
   if (!currentUser) {
     return (
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-3xl mx-auto space-y-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -437,7 +437,7 @@ export function DeputySheriffRoadmap() {
             </h1>
             <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-primary via-secondary to-primary rounded-full"></div>
           </div>
-          <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Your personalized journey to becoming a San Francisco Deputy Sheriff. Complete activities, earn points, and unlock new content and opportunities.
           </p>
         </motion.div>

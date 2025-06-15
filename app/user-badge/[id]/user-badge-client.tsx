@@ -149,7 +149,7 @@ export default function UserBadgeClient({ badgeId }: UserBadgeClientProps) {
   if (isLoading || !badge) {
     return (
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="animate-pulse">
             <div className="h-8 w-64 bg-gray-200 rounded mb-4" />
             <div className="h-96 bg-gray-200 rounded" />
@@ -161,7 +161,7 @@ export default function UserBadgeClient({ badgeId }: UserBadgeClientProps) {
 
   return (
     <main className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         <div className="flex items-center mb-6">
           <Button
             variant="ghost"

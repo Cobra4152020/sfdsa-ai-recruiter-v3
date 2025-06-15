@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export default function WelcomePage() {
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-3xl py-8">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold mb-4">
           Welcome to SFDSA Recruiter! 🎉

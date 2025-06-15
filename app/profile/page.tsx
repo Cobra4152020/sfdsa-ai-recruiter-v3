@@ -88,7 +88,7 @@ export default function ProfilePage() {
     return (
       <PageWrapper>
         <div className="container mx-auto px-4 py-8">
-          <div className="max-w-4xl mx-auto">
+          <div className="max-w-3xl mx-auto">
             <Skeleton className="h-8 w-48 mb-6" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="md:col-span-2">
@@ -124,7 +124,7 @@ export default function ProfilePage() {
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
               Profile

@@ -162,7 +162,7 @@ export default function SettingsPage() {
         <h1 className="text-3xl font-bold text-[#0A3C1F]">Account Settings</h1>
       </div>
 
-      <Tabs defaultValue="profile" className="max-w-4xl mx-auto">
+      <Tabs defaultValue="profile" className="max-w-3xl mx-auto">
         <TabsList className="mb-6">
           <TabsTrigger value="profile">
             <User className="h-4 w-4 mr-2" />

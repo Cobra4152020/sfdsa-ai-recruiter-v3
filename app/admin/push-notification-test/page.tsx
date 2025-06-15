@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 
 export default function PushNotificationTestPage() {
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="container max-w-3xl py-8">
       <h1 className="text-3xl font-bold mb-6">Push Notification Test</h1>
 
       <Card>

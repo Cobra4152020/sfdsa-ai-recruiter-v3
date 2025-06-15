@@ -13,12 +13,16 @@ import { formatDistanceToNow } from "date-fns";
 // import { NotificationItem } from "./notification-item"; // Commented out unused import
 // import type { Notification as NotificationType } from "@/lib/notification-service"; // Commented out unused import
 
+// A more robust Notification interface based on likely database columns
 interface Notification {
   id: number;
+  user_id: string;
+  created_at: string;
   title: string;
   message: string;
-  timestamp: string;
-  read: boolean;
+  is_read?: boolean; // Optional to handle both cases
+  read?: boolean; // Optional for backwards compatibility
+  action_url?: string;
   type: "info" | "success" | "warning" | "error";
 }
 

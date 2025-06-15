@@ -124,7 +124,7 @@ export default function JoinClient() {
   if (isLoggedIn) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
-        <div className="max-w-4xl mx-auto px-4">
+        <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
               You're Already Part of the Team!
@@ -193,7 +193,7 @@ export default function JoinClient() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
-      <div className="max-w-4xl mx-auto px-4">
+      <div className="max-w-3xl mx-auto px-4">
         {/* Hero Section */}
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-[#0A3C1F] mb-6">

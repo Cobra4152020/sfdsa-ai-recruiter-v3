@@ -64,7 +64,7 @@ export default function BadgeDemoPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12 px-4">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
@@ -75,7 +75,7 @@ export default function BadgeDemoPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Live Badge System Demo
           </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Experience the real-time badge awarding system! Click the buttons below to award badges and see the live system in action.
           </p>
         </div>

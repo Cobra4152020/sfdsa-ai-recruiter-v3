@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function TermsOfService() {
   return (
-    <div className="container mx-auto px-4 py-12 max-w-4xl">
+    <div className="container mx-auto px-4 py-12 max-w-3xl">
       <Card className="shadow-md">
         <CardHeader className="border-b bg-muted/50">
           <CardTitle className="text-2xl font-bold text-[#0A3C1F]">

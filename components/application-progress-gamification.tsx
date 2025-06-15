@@ -53,7 +53,7 @@ export default function ApplicationProgressGamification() {
           throw new Error('Failed to fetch application progress');
         }
         const data = await response.json();
-        setApplicationSteps(data);
+        setApplicationSteps(Array.isArray(data) ? data : []);
       } catch (err: any) {
         setError(err.message);
       } finally {

@@ -156,12 +156,12 @@ export default function DonatePage() {
   return (
     <PageWrapper>
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
             <h1 className="text-3xl font-bold text-[#0A3C1F] mb-4">
               Support Protecting San Francisco
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Your donations help maintain this recruitment platform and support
               our mission to build a stronger, safer San Francisco.
               {currentUser && (
@@ -407,7 +407,7 @@ export default function DonatePage() {
             </Card>
           </div>
 
-          <Tabs defaultValue="one-time" className="max-w-2xl mx-auto">
+          <Tabs defaultValue="one-time" className="max-w-3xl mx-auto">
             <TabsList className="grid w-full grid-cols-2 mb-8">
               <TabsTrigger value="one-time" onClick={() => setIsRecurring(false)}>
                 One-Time Donation
@@ -930,7 +930,7 @@ export default function DonatePage() {
             </TabsContent>
           </Tabs>
 
-          <div className="mt-12 bg-white rounded-lg border border-[#0A3C1F]/20 p-6 max-w-2xl mx-auto">
+          <div className="mt-12 bg-white rounded-lg border border-[#0A3C1F]/20 p-6 max-w-3xl mx-auto">
             <h2 className="text-xl font-bold text-[#0A3C1F] mb-6 text-center">
               Your Donation&apos;s Impact
             </h2>
@@ -1048,7 +1048,7 @@ export default function DonatePage() {
             </div>
           </div>
 
-          <div className="mt-12 bg-[#0A3C1F]/5 rounded-lg p-6 max-w-2xl mx-auto">
+          <div className="mt-12 bg-[#0A3C1F]/5 rounded-lg p-6 max-w-3xl mx-auto">
             <h2 className="text-xl font-bold text-[#0A3C1F] mb-4">Our Mission</h2>
             <div className="space-y-6">
               <div className="flex items-start">

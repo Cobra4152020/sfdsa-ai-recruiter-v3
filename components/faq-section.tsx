@@ -69,7 +69,7 @@ export function FAQSection() {
             </p>
           </div>
 
-          <div className="max-w-4xl mx-auto divide-y divide-border">
+          <div className="max-w-3xl mx-auto divide-y divide-border">
             {faqs.map((faq, index) => (
               <div key={index} className="py-4 sm:py-5">
                 <button

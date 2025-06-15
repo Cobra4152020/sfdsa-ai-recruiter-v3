@@ -264,7 +264,7 @@ export default function EditProfilePage() {
         </h1>
       </div>
 
-      <Card className="max-w-4xl mx-auto">
+      <Card className="max-w-3xl mx-auto">
         <CardHeader>
           <CardTitle>Personal Information</CardTitle>
           <CardDescription>

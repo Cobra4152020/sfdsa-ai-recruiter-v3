@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/dialog";
 import { Share2, Facebook, Twitter, Linkedin } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { addParticipationPoints } from "@/lib/points-service";
 import { useUser } from "@/context/user-context";
 import { useAuthModal } from "@/context/auth-modal-context";
 import { useClientOnly } from "@/hooks/use-client-only";
@@ -50,15 +49,19 @@ export function GameShare({
     setIsSharing(true);
 
     try {
-      // Add participation points - 10 points for sharing
-      const success = await addParticipationPoints(
-        currentUser.id,
-        10,
-        "game_share",
-        `Shared ${gameName} score on ${platform}`,
-      );
-
-      if (success) {
+      // Add participation points via API route
+      const response = await fetch("/api/points/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          points: 10,
+          activityType: "game_share",
+          description: `Shared ${gameName} score on ${platform}`,
+        }),
+      });
+      const result = await response.json();
+      if (result.success) {
         onPointsAdded?.(10);
         toast({
           title: "Points added!",

@@ -7,7 +7,7 @@ export default function VolunteerRegisterPage() {
       <section className="relative overflow-hidden bg-gradient-to-r from-green-600 via-green-700 to-green-800 text-white">
         <div className="absolute inset-0 bg-black opacity-10"></div>
         <div className="relative container mx-auto px-4 py-12 md:py-24">
-          <div className="text-center max-w-4xl mx-auto">
+          <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-yellow-300 to-yellow-100 bg-clip-text text-transparent">
               Join Our Community of Hero Builders
             </h1>
@@ -31,7 +31,7 @@ export default function VolunteerRegisterPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               How Our Gamified System Works
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Join our gamified recruitment program and earn rewards while building safer communities
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function VolunteerRegisterPage() {
                 <span className="text-white text-xl">📱</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Share Links</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 max-w-3xl mx-auto">
                 Post job openings on social media, in community groups, and with your personal network
               </p>
             </div>
@@ -117,7 +117,7 @@ export default function VolunteerRegisterPage() {
                 <span className="text-white text-xl">🎯</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Reach Candidates</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 max-w-3xl mx-auto">
                 Help qualified individuals discover career opportunities with the Sheriff's Department
               </p>
             </div>
@@ -127,7 +127,7 @@ export default function VolunteerRegisterPage() {
                 <span className="text-white text-xl">❤️</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Build Community</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 max-w-3xl mx-auto">
                 Strengthen community-police relationships by connecting people with meaningful careers
               </p>
             </div>
@@ -137,7 +137,7 @@ export default function VolunteerRegisterPage() {
                 <span className="text-white text-xl">🌟</span>
               </div>
               <h3 className="text-xl font-semibold text-gray-800 mb-2">Earn Recognition</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 max-w-3xl mx-auto">
                 Get rewarded for your community service with points, badges, and upcoming NFTs
               </p>
             </div>
@@ -151,7 +151,7 @@ export default function VolunteerRegisterPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-6">
             Your Valiant Community Service Matters
           </h2>
-          <p className="text-lg text-gray-700 max-w-4xl mx-auto leading-relaxed mb-8">
+          <p className="text-lg text-gray-700 max-w-3xl mx-auto leading-relaxed mb-8">
             Every recruitment link you share helps build a stronger, safer community. By connecting 
             talented individuals with meaningful careers in law enforcement, you're directly contributing 
             to public safety and community well-being. Your volunteer service creates a bridge between 
@@ -167,7 +167,7 @@ export default function VolunteerRegisterPage() {
             <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">
               Ready to Start Your Journey?
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
               Submit your volunteer recruiter application below. All applications require admin approval 
               to ensure program quality and prevent unauthorized access.
             </p>

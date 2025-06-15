@@ -17,6 +17,7 @@ import {
   RefreshCw
 } from "lucide-react";
 import { gameScenarios } from "@/lib/game-scenarios";
+import { GameShare } from "@/components/game-share";
 
 interface GameResultsProps {
   score: number;
@@ -85,88 +86,13 @@ const formatTime = (seconds: number) => {
 };
 
 export function GameResults({ score, totalQuestions, timeUsed, answers, onRestart }: GameResultsProps) {
-  const [isSharing, setIsSharing] = useState(false);
+  const [showGameShare, setShowGameShare] = useState(false);
+  const [pointsAwarded, setPointsAwarded] = useState(0);
   const percentage = Math.round((score / (totalQuestions * 10)) * 100);
   const rank = getRankInfo(percentage);
 
-  const shareResults = async () => {
-    setIsSharing(true);
-    
-    const shareText = `🚔 Just completed the "Could You Make the Cut?" law enforcement challenge!
-    
-📊 My Results:
-• Score: ${percentage}% (${score}/${totalQuestions * 10} points)
-• Rank: ${rank.name} ${rank.icon}
-• Time: ${formatTime(timeUsed)}
-
-${rank.name === "Sheriff Material" ? "I've got what it takes to serve and protect! 🏆" : 
-  rank.name === "Deputy Ready" ? "Ready for the academy! 🎖️" : 
-  "Still training to serve San Francisco! 💪"}
-
-Think you can beat my score? Test your deputy skills!
-🔗 https://sfdeputysheriff.com/could-you-make-the-cut
-
-#SFDSA #LawEnforcement #CouldYouMakeTheCut`;
-    
-    try {
-      if (navigator.share) {
-        await navigator.share({
-          title: "Could You Make the Cut? - Challenge Results",
-          text: shareText,
-          url: 'https://sfdeputysheriff.com/could-you-make-the-cut'
-        });
-      } else {
-        await navigator.clipboard.writeText(shareText);
-        // You could add a toast notification here
-        alert("Results copied to clipboard! Share it anywhere to challenge your friends.");
-      }
-    } catch (error) {
-      console.log("Sharing failed:", error);
-      // Fallback: just copy to clipboard
-      try {
-        await navigator.clipboard.writeText(shareText);
-        alert("Results copied to clipboard!");
-      } catch (clipboardError) {
-        console.error("Clipboard failed too:", clipboardError);
-      }
-    } finally {
-      setIsSharing(false);
-    }
-  };
-
-  const shareToTwitter = () => {
-    const text = encodeURIComponent(`🚔 I scored ${percentage}% on the "Could You Make the Cut?" law enforcement challenge! My rank: ${rank.name} ${rank.icon}
-
-Think you can beat my score? Test your deputy skills: https://sfdeputysheriff.com/could-you-make-the-cut
-
-#SFDSA #LawEnforcement #CouldYouMakeTheCut`);
-    
-    window.open(`https://twitter.com/intent/tweet?text=${text}`, '_blank');
-  };
-
-  const shareToLinkedIn = () => {
-    const title = encodeURIComponent("Could You Make the Cut? - Law Enforcement Challenge");
-    const summary = encodeURIComponent(`I just completed the deputy skills challenge and scored ${percentage}%! Rank achieved: ${rank.name}. Test your own law enforcement instincts.`);
-    const url = encodeURIComponent('https://sfdeputysheriff.com/could-you-make-the-cut');
-    
-    window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}&summary=${summary}`, '_blank');
-  };
-
-  const shareToFacebook = () => {
-    const url = encodeURIComponent('https://sfdeputysheriff.com/could-you-make-the-cut');
-    const quote = encodeURIComponent(`I scored ${percentage}% on the "Could You Make the Cut?" law enforcement challenge! Think you can do better?`);
-    
-    window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${quote}`, '_blank');
-  };
-
-  const generateBadgeImage = () => {
-    // This would generate a badge image for social sharing
-    // For now, we'll just show a message
-    alert("Badge generation feature coming soon!");
-  };
-
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
+    <div className="container mx-auto px-4 py-8 max-w-3xl">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -242,15 +168,13 @@ Think you can beat my score? Test your deputy skills: https://sfdeputysheriff.co
               {/* Primary Actions */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button
-                  onClick={shareResults}
-                  disabled={isSharing}
+                  onClick={() => setShowGameShare(true)}
                   variant="outline"
                   className="flex items-center gap-2"
                 >
                   <Share2 className="w-4 h-4" />
-                  {isSharing ? "Sharing..." : "Share Results"}
+                  Share Results
                 </Button>
-                
                 <Button
                   onClick={onRestart}
                   className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 flex items-center gap-2"
@@ -259,33 +183,15 @@ Think you can beat my score? Test your deputy skills: https://sfdeputysheriff.co
                   Try Again
                 </Button>
               </div>
-              
-              {/* Social Media Buttons */}
-              <div className="grid grid-cols-3 gap-3 max-w-md mx-auto">
-                <Button
-                  onClick={shareToTwitter}
-                  size="sm"
-                  className="bg-[#1DA1F2] hover:bg-[#1DA1F2]/90 text-white"
-                >
-                  Twitter
-                </Button>
-                
-                <Button
-                  onClick={shareToLinkedIn}
-                  size="sm"
-                  className="bg-[#0A66C2] hover:bg-[#0A66C2]/90 text-white"
-                >
-                  LinkedIn
-                </Button>
-                
-                <Button
-                  onClick={shareToFacebook}
-                  size="sm"
-                  className="bg-[#1877F2] hover:bg-[#1877F2]/90 text-white"
-                >
-                  Facebook
-                </Button>
-              </div>
+              {/* New GameShare Dialog */}
+              {showGameShare && (
+                <GameShare
+                  score={score}
+                  gameName={"Could You Make the Cut"}
+                  gameDescription={rank.message}
+                  onPointsAdded={(points) => setPointsAwarded(points)}
+                />
+              )}
             </div>
 
             {/* Encourage Action */}
