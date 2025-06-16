@@ -185,7 +185,7 @@ export function AskSgtKenButton({
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+    };
 
   useEffect(() => {
     scrollToBottom();
@@ -198,17 +198,17 @@ export function AskSgtKenButton({
     const typeNextChar = () => {
       if (currentIndex < content.length) {
         setMessages(prev => prev.map(msg => 
-          msg.id === messageId 
+            msg.id === messageId
             ? { ...msg, displayedContent: content.substring(0, currentIndex + 1) }
-            : msg
+              : msg
         ));
         currentIndex++;
         setTimeout(typeNextChar, delay);
       } else {
         setMessages(prev => prev.map(msg => 
-          msg.id === messageId 
-            ? { ...msg, isTyping: false, displayedContent: content }
-            : msg
+            msg.id === messageId
+              ? { ...msg, isTyping: false, displayedContent: content }
+              : msg
         ));
         setTypingMessageId(null);
       }
@@ -313,52 +313,52 @@ Ready to unlock your full potential? Register now to access everything this plat
     try {
       const response = generateResponse(input);
       const assistantMessage: MessageType = {
-        role: "assistant",
-        content: response,
+            role: "assistant",
+            content: response,
         quickReplies: getContextualQuickReplies(response),
         id: `assistant-${Date.now()}`,
-        timestamp: new Date(),
-        isTyping: true,
-        displayedContent: "",
+            timestamp: new Date(),
+            isTyping: true,
+            displayedContent: "",
         showDonation: shouldShowDonationPrompt(),
       };
 
       setMessages(prev => [...prev, assistantMessage]);
       
-      setTimeout(() => {
+        setTimeout(() => {
         startTypingEffect(assistantMessage.id!, response);
       }, 500);
 
-    } catch (error) {
+      } catch (error) {
       console.error("Error generating response:", error);
       
       const fallbackResponse = "I'm having a bit of trouble right now, but I'm still here to help! You can ask me about the application process, requirements, benefits, or what it's like to work as a Deputy Sheriff in San Francisco.";
       
       const fallbackMessage: MessageType = {
-        role: "assistant",
+            role: "assistant",
         content: fallbackResponse,
         quickReplies: ["Tell me about requirements", "Application process", "Benefits"],
         id: `fallback-${Date.now()}`,
-        timestamp: new Date(),
-        isTyping: true,
-        displayedContent: "",
+            timestamp: new Date(),
+            isTyping: true,
+            displayedContent: "",
       };
 
       setMessages(prev => [...prev, fallbackMessage]);
       
-      setTimeout(() => {
+        setTimeout(() => {
         startTypingEffect(fallbackMessage.id!, fallbackResponse);
-      }, 500);
+        }, 500);
 
-      toast({
+        toast({
         title: "Connection Issue",
         description: "Using backup knowledge - I'm still here to help!",
-        variant: "default",
+          variant: "default",
         duration: 3000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+        });
+      } finally {
+        setIsLoading(false);
+      }
   };
 
   const getContextualQuickReplies = (message: string): string[] => {
@@ -401,9 +401,9 @@ Ready to unlock your full potential? Register now to access everything this plat
 
     // Handle daily briefing link
     if (reply.toLowerCase().includes("briefing") || reply.toLowerCase().includes("attend briefing")) {
-      window.location.href = "/daily-briefing";
-      return;
-    }
+        window.location.href = "/daily-briefing";
+        return;
+      }
 
     // Check registration requirement for subsequent questions
     if (hasAskedFirstQuestion && !isLoggedIn) {
@@ -417,7 +417,7 @@ Ready to unlock your full potential? Register now to access everything this plat
       return;
     }
 
-    setInput(reply);
+      setInput(reply);
     setTimeout(() => {
       handleSubmit(new Event("submit") as unknown as React.FormEvent);
     }, 100);
@@ -504,7 +504,7 @@ Ready to unlock your full potential? Register now to access everything this plat
                     <div key={message.id || index} className="slide-in">
                       <div className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}>
                         <div className={`max-w-[85%] rounded-xl p-4 message-bubble ${
-                          message.role === "assistant"
+                            message.role === "assistant"
                             ? "bg-gradient-to-br from-[#0A3C1F] to-[#1a5a30] text-white"
                             : "bg-gradient-to-br from-[#FFD700] to-[#FFA500] text-[#0A3C1F] font-semibold"
                         }`}>
@@ -523,11 +523,11 @@ Ready to unlock your full potential? Register now to access everything this plat
 
                           {message.quickReplies && message.quickReplies.length > 0 && !message.isTyping && (
                             <div className="mt-3 flex flex-wrap gap-2">
-                              {message.quickReplies.map((reply, i) => (
-                                <button
-                                  key={i}
-                                  onClick={() => handleQuickReply(reply)}
-                                  disabled={isLoading || typingMessageId !== null}
+                                {message.quickReplies.map((reply, i) => (
+                                  <button
+                                    key={i}
+                                    onClick={() => handleQuickReply(reply)}
+                                    disabled={isLoading || typingMessageId !== null}
                                   className={`text-xs px-3 py-2 rounded-full font-semibold transition-all quick-reply-btn ${
                                     reply.includes("Register Now") 
                                       ? "registration-prompt text-[#0A3C1F] hover:scale-105" 
@@ -535,11 +535,11 @@ Ready to unlock your full potential? Register now to access everything this plat
                                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >
                                   {reply.includes("Register Now") && <UserPlus className="h-3 w-3 mr-1 inline" />}
-                                  {reply}
-                                </button>
-                              ))}
-                            </div>
-                          )}
+                                    {reply}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
                         </div>
                       </div>
 
@@ -706,7 +706,7 @@ Ready to unlock your full potential? Register now to access everything this plat
                   <div key={message.id || index} className="slide-in">
                     <div className={`flex ${message.role === "assistant" ? "justify-start" : "justify-end"}`}>
                       <div className={`max-w-[85%] rounded-xl p-4 message-bubble ${
-                        message.role === "assistant"
+                          message.role === "assistant"
                           ? "bg-gradient-to-br from-[#0A3C1F] to-[#1a5a30] text-white"
                           : "bg-gradient-to-br from-[#FFD700] to-[#FFA500] text-[#0A3C1F] font-semibold"
                       }`}>
@@ -725,11 +725,11 @@ Ready to unlock your full potential? Register now to access everything this plat
 
                         {message.quickReplies && message.quickReplies.length > 0 && !message.isTyping && (
                           <div className="mt-3 flex flex-wrap gap-2">
-                            {message.quickReplies.map((reply, i) => (
-                              <button
-                                key={i}
-                                onClick={() => handleQuickReply(reply)}
-                                disabled={isLoading || typingMessageId !== null}
+                              {message.quickReplies.map((reply, i) => (
+                                <button
+                                  key={i}
+                                  onClick={() => handleQuickReply(reply)}
+                                  disabled={isLoading || typingMessageId !== null}
                                 className={`text-xs px-3 py-2 rounded-full font-semibold transition-all quick-reply-btn ${
                                   reply.includes("Register Now") 
                                     ? "registration-prompt text-[#0A3C1F] hover:scale-105" 
@@ -737,11 +737,11 @@ Ready to unlock your full potential? Register now to access everything this plat
                                 } disabled:opacity-50 disabled:cursor-not-allowed`}
                               >
                                 {reply.includes("Register Now") && <UserPlus className="h-3 w-3 mr-1 inline" />}
-                                {reply}
-                              </button>
-                            ))}
-                          </div>
-                        )}
+                                  {reply}
+                                </button>
+                              ))}
+                            </div>
+                          )}
                       </div>
                     </div>
 

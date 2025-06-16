@@ -49,120 +49,118 @@ export default function LaunchpadContent() {
   const { toast } = useToast();
 
   return (
-    <div className="container mx-auto px-4 py-4">
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">
-            Deputy Launchpad
-          </h1>
-          <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-            Your mission control center for becoming a San Francisco Deputy
-            Sheriff. Earn points, unlock badges, and track your progress through
-            our engaging recruitment platform.
-          </p>
-        </div>
-
-        <Tabs
-          defaultValue="points"
-          value={activeTab}
-          onValueChange={setActiveTab}
-          className="w-full"
-        >
-          <TabsList className="grid grid-cols-6 mb-8">
-            <TabsTrigger value="points" className="text-sm sm:text-base">
-              <Trophy className="h-4 w-4 mr-2 hidden sm:inline" /> Points System
-            </TabsTrigger>
-            <TabsTrigger value="badges" className="text-sm sm:text-base">
-              <Award className="h-4 w-4 mr-2 hidden sm:inline" /> Badges
-            </TabsTrigger>
-            <TabsTrigger value="referrals" className="text-sm sm:text-base">
-              <Users className="h-4 w-4 mr-2 hidden sm:inline" /> Referrals
-            </TabsTrigger>
-            <TabsTrigger value="unlockables" className="text-sm sm:text-base">
-              <Lock className="h-4 w-4 mr-2 hidden sm:inline" /> Unlockable
-              Content
-            </TabsTrigger>
-            <TabsTrigger value="nfts" className="text-sm sm:text-base">
-              <Star className="h-4 w-4 mr-2 hidden sm:inline" /> NFT Rewards
-            </TabsTrigger>
-            <TabsTrigger value="trivia" className="text-sm sm:text-base">
-              <MessageSquare className="h-4 w-4 mr-2 hidden sm:inline" /> SF
-              Trivia
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="points" className="space-y-6">
-            <PointsSystemExplainer />
-          </TabsContent>
-
-          <TabsContent value="badges" className="space-y-6">
-            <BadgesExplainer />
-          </TabsContent>
-
-          <TabsContent value="referrals" className="space-y-6">
-            <ReferralRewardsExplainer setShowShareDialog={setShowShareDialog} />
-          </TabsContent>
-
-          <TabsContent value="unlockables" className="space-y-6">
-            <UnlockableContentExplainer />
-          </TabsContent>
-
-          <TabsContent value="nfts" className="space-y-6">
-            <NFTRewardsExplainer />
-          </TabsContent>
-
-          <TabsContent value="trivia" className="space-y-6">
-            <TriviaGameExplainer />
-          </TabsContent>
-        </Tabs>
-
-        <Card className="mt-12 border-[#0A3C1F]/20">
-          <CardHeader className="bg-[#0A3C1F] text-white">
-            <CardTitle className="flex items-center">
-              <Rocket className="h-5 w-5 mr-2" /> Launch Your Career
-            </CardTitle>
-            <CardDescription className="text-gray-200">
-              Begin your journey to becoming a San Francisco Deputy Sheriff
-              today!
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  Start Earning Points
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Create an account, complete your profile, and start engaging
-                  with our platform to earn your first points and badges.
-                </p>
-                <Link href="/awards">
-                  <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-                    View Leaderboard
-                  </Button>
-                </Link>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold mb-2">
-                  Track Your Progress
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Monitor your points, badges, and unlocked content in your
-                  profile dashboard.
-                </p>
-                <Link href="/profile">
-                  <Button
-                    variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
-                  >
-                    Go to Profile
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+    <div className="mx-auto px-4 py-8 max-w-3xl">
+      <div className="text-center mb-8">
+        <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">
+          Deputy Launchpad
+        </h1>
+        <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+          Your mission control center for becoming a San Francisco Deputy
+          Sheriff. Earn points, unlock badges, and track your progress through
+          our engaging recruitment platform.
+        </p>
       </div>
+
+      <Tabs
+        defaultValue="points"
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="w-full"
+      >
+        <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 mb-8">
+          <TabsTrigger value="points" className="text-sm sm:text-base">
+            <Trophy className="h-4 w-4 mr-2 hidden sm:inline" /> Points System
+          </TabsTrigger>
+          <TabsTrigger value="badges" className="text-sm sm:text-base">
+            <Award className="h-4 w-4 mr-2 hidden sm:inline" /> Badges
+          </TabsTrigger>
+          <TabsTrigger value="referrals" className="text-sm sm:text-base">
+            <Users className="h-4 w-4 mr-2 hidden sm:inline" /> Referrals
+          </TabsTrigger>
+          <TabsTrigger value="unlockables" className="text-sm sm:text-base">
+            <Lock className="h-4 w-4 mr-2 hidden sm:inline" /> Unlockable
+            Content
+          </TabsTrigger>
+          <TabsTrigger value="nfts" className="text-sm sm:text-base">
+            <Star className="h-4 w-4 mr-2 hidden sm:inline" /> NFT Rewards
+          </TabsTrigger>
+          <TabsTrigger value="trivia" className="text-sm sm:text-base">
+            <MessageSquare className="h-4 w-4 mr-2 hidden sm:inline" /> SF
+            Trivia
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="points" className="space-y-6">
+          <PointsSystemExplainer />
+        </TabsContent>
+
+        <TabsContent value="badges" className="space-y-6">
+          <BadgesExplainer />
+        </TabsContent>
+
+        <TabsContent value="referrals" className="space-y-6">
+          <ReferralRewardsExplainer setShowShareDialog={setShowShareDialog} />
+        </TabsContent>
+
+        <TabsContent value="unlockables" className="space-y-6">
+          <UnlockableContentExplainer />
+        </TabsContent>
+
+        <TabsContent value="nfts" className="space-y-6">
+          <NFTRewardsExplainer />
+        </TabsContent>
+
+        <TabsContent value="trivia" className="space-y-6">
+          <TriviaGameExplainer />
+        </TabsContent>
+      </Tabs>
+
+      <Card className="mt-12 border-[#0A3C1F]/20">
+        <CardHeader className="bg-[#0A3C1F] text-white">
+          <CardTitle className="flex items-center">
+            <Rocket className="h-5 w-5 mr-2" /> Launch Your Career
+          </CardTitle>
+          <CardDescription className="text-gray-200">
+            Begin your journey to becoming a San Francisco Deputy Sheriff
+            today!
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">
+                Start Earning Points
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Create an account, complete your profile, and start engaging
+                with our platform to earn your first points and badges.
+              </p>
+              <Link href="/awards">
+                <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                  View Leaderboard
+                </Button>
+              </Link>
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold mb-2">
+                Track Your Progress
+              </h3>
+              <p className="text-gray-600 dark:text-gray-300 mb-4">
+                Monitor your points, badges, and unlocked content in your
+                profile dashboard.
+              </p>
+              <Link href="/profile">
+                <Button
+                  variant="outline"
+                  className="border-[#0A3C1F] text-[#0A3C1F]"
+                >
+                  Go to Profile
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Share Dialog */}
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
@@ -231,8 +229,6 @@ export default function LaunchpadContent() {
 }
 
 function PointsSystemExplainer() {
-  // Content remains the same as before
-  // ...
   const pointTiers = [
     {
       name: "Bronze Recruit",
@@ -251,305 +247,110 @@ function PointsSystemExplainer() {
     {
       name: "Gold Recruit",
       points: 5000,
-      rewards: ["Gold Badge", "Exclusive Resources"],
-      icon: <Award className="h-8 w-8 text-yellow-400" />,
+      rewards: [
+        "Gold Badge",
+        "Exclusive Q&A with a Deputy",
+        "SFDSA Store Discount",
+      ],
+      icon: <Award className="h-8 w-8 text-yellow-500" />,
       color: "from-yellow-200/20 to-yellow-200/5",
     },
     {
       name: "Platinum Recruit",
       points: 10000,
-      rewards: ["Platinum Badge", "Direct Contact with Recruiters"],
-      icon: <Award className="h-8 w-8 text-gray-300" />,
-      color: "from-gray-100/20 to-gray-100/5",
-    },
-  ];
-
-  const pointActivities = [
-    {
-      name: "Chat with Sgt. Ken",
-      points: 5,
-      description:
-        "Earn points for each meaningful interaction with our AI assistant",
-      icon: <MessageSquare className="h-8 w-8 text-blue-500" />,
-    },
-    {
-      name: "Complete Practice Tests",
-      points: 20,
-      description: "Earn points for each practice test you complete",
-      icon: <FileText className="h-8 w-8 text-green-500" />,
-    },
-    {
-      name: "Review Application Materials",
-      points: 10,
-      description:
-        "Earn points for reviewing application documents and resources",
-      icon: <FileText className="h-8 w-8 text-purple-500" />,
-    },
-    {
-      name: "Submit Application",
-      points: 100,
-      description:
-        "Earn a significant point bonus when you submit your application",
-      icon: <CheckCircle className="h-8 w-8 text-green-600" />,
-    },
-  ];
-
-  const pointCategories = [
-    {
-      icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
-      title: "Chat Interactions",
-      description:
-        "Earn points by chatting with our AI assistant and asking questions about the recruitment process.",
-      points: "5-20 points per meaningful interaction",
-    },
-    {
-      icon: <Download className="h-5 w-5 text-green-500" />,
-      title: "Resource Downloads",
-      description:
-        "Download study materials, application guides, and other resources to prepare for the process.",
-      points: "10 points per resource",
-    },
-    {
-      icon: <Clock className="h-5 w-5 text-purple-500" />,
-      title: "Time Spent",
-      description:
-        "Points awarded based on time spent engaging with our recruitment platform.",
-      points: "1 point per minute (up to 30 points per day)",
-    },
-    {
-      icon: <Award className="h-5 w-5 text-yellow-500" />,
-      title: "Badge Achievements",
-      description:
-        "Earn badges by completing specific actions and milestones in the recruitment process.",
-      points: "25-100 points per badge",
-    },
-    {
-      icon: <CheckCircle className="h-5 w-5 text-red-500" />,
-      title: "Application Progress",
-      description:
-        "Advance through the application process to earn substantial points.",
-      points: "50-200 points per stage completed",
-    },
-    {
-      icon: <Users className="h-5 w-5 text-indigo-500" />,
-      title: "Referrals",
-      description:
-        "Refer potential recruits to earn points when they sign up using your referral link.",
-      points: "100 points per successful referral",
-    },
-    {
-      icon: <Gift className="h-5 w-5 text-pink-500" />,
-      title: "Donations",
-      description:
-        "Support the SFDSA through donations to earn points and special recognition.",
-      points: "10 points per dollar donated",
-    },
-    {
-      icon: <Share2 className="h-5 w-5 text-orange-500" />,
-      title: "Social Sharing",
-      description:
-        "Share content, badges, or your achievements on social media to earn points.",
-      points: "25 points per share",
-    },
-  ];
-
-  const gamePoints = [
-    {
-      name: "Enhanced Trivia Games",
-      description:
-        "Test your knowledge about San Francisco and law enforcement with our sophisticated scoring system",
-      points:
-        "10 points per correct answer, 25 bonus points for perfect scores, speed bonuses available",
-      icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
-    },
-    {
-      name: "Could You Make the Cut?",
-      description: "Interactive self-assessment to evaluate your readiness for law enforcement career",
-      points: "20 points for completion, bonus points for high scores",
-      icon: <Trophy className="h-5 w-5 text-orange-500" />,
-    },
-    {
-      name: "Sgt. Ken Says",
-      description: "Weekly wisdom and insights from our AI sergeant with career guidance",
-      points: "10 points per article read, sharing bonuses available",
-      icon: <Users className="h-5 w-5 text-indigo-500" />,
-    },
-    {
-      name: "Daily Mission Briefings",
-      description: "Interactive daily content with challenges and learning opportunities",
-      points: "15 points per completed briefing, streak bonuses available",
-      icon: <FileText className="h-5 w-5 text-green-500" />,
-    },
-    {
-      name: "Badge Challenges",
-      description: "Complete special challenges designed to unlock achievement badges",
-      points: "25-100 points per challenge completed, badge-specific bonuses",
-      icon: <Award className="h-5 w-5 text-yellow-500" />,
-    },
-    {
-      name: "Sgt. Ken Chat",
-      description: "Interactive AI-powered conversations for guidance and tips",
-      points: "5 points per meaningful interaction, bonus points for engagement",
-      icon: <MessageSquare className="h-5 w-5 text-purple-500" />,
-    },
-    {
-      name: "TikTok Challenges",
-      description: "Participate in viral social media challenges to boost recruitment",
-      points: "50 points per challenge participation, viral bonuses available",
-      icon: <Zap className="h-5 w-5 text-red-500" />,
+      rewards: ["Platinum Badge", "Personalized recruitment guide"],
+      icon: <Trophy className="h-8 w-8 text-blue-400" />,
+      color: "from-blue-200/20 to-blue-200/5",
     },
   ];
 
   return (
-    <>
-      <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
-          <CardTitle className="flex items-center">
-            <Trophy className="h-5 w-5 text-[#FFD700] mr-2" />
-            Points System Overview
-          </CardTitle>
-          <CardDescription className="text-gray-200">
-            Our points system rewards your engagement and progress through the
-            recruitment process
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-6">
+    <Card className="border-[#0A3C1F]/20">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Trophy className="mr-2 text-[#0A3C1F]" /> How the Points System Works
+        </CardTitle>
+        <CardDescription>
+          Earn points for engaging with our platform. The more you explore, the
+          more you earn!
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-4">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-[#0A3C1F]/10 rounded-full">
+              <CheckCircle className="h-6 w-6 text-[#0A3C1F]" />
+            </div>
             <div>
-              <h3 className="text-xl font-semibold mb-4">How to Earn Points</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {pointActivities.map((activity) => (
-                  <div
-                    key={activity.name}
-                    className="flex items-start p-4 rounded-lg border bg-gray-50 dark:bg-gray-800/50"
-                  >
-                    <div className="rounded-full p-2 mr-3 bg-white dark:bg-gray-800 shadow-sm">
-                      {activity.icon}
-                    </div>
-                    <div>
-                      <div className="flex items-center">
-                        <h4 className="font-medium">{activity.name}</h4>
-                        <span className="ml-2 px-2 py-0.5 rounded-full bg-[#0A3C1F] text-white text-xs">
-                          +{activity.points} pts
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {activity.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">Point Categories</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {pointCategories.map((category, index) => (
-                  <div key={index} className="flex p-4 border rounded-lg">
-                    <div className="mr-3">{category.icon}</div>
-                    <div>
-                      <h4 className="font-medium">{category.title}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {category.description}
-                      </p>
-                      <div className="mt-2 text-sm font-medium text-[#0A3C1F]">
-                        {category.points}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">Interactive Features & Points</h3>
-              <p className="mb-4">
-                Engage with our enhanced interactive features including trivia games, daily briefings, badge challenges, and AI-powered assistance to earn points while advancing your recruitment journey.
+              <h4 className="font-semibold">Complete Your Profile</h4>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Earn an instant <strong>250 points</strong> for filling out
+                your profile information.
               </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {gamePoints.map((game, index) => (
-                  <div key={index} className="flex p-4 border rounded-lg">
-                    <div className="mr-3">{game.icon}</div>
-                    <div>
-                      <h4 className="font-medium">{game.name}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {game.description}
-                      </p>
-                      <div className="mt-2 text-sm font-medium text-[#0A3C1F]">
-                        {game.points}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4">
-                <Link href="/trivia">
-                  <Button
-                    variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
-                  >
-                    Start Interactive Features
-                  </Button>
-                </Link>
-              </div>
-            </div>
-
-            <div className="mt-8">
-              <h3 className="text-xl font-semibold mb-4">
-                Point Tiers and Rewards
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {pointTiers.map((tier) => (
-                  <div key={tier.name} className="border rounded-lg p-4">
-                    <div
-                      className={`rounded-full p-2 mb-3 inline-block bg-gradient-to-b ${tier.color}`}
-                    >
-                      {tier.icon}
-                    </div>
-                    <h4 className="font-bold">{tier.name}</h4>
-                    <p className="text-sm text-muted-foreground">
-                      {tier.points.toLocaleString()} points
-                    </p>
-                    <div className="mt-2 space-y-1">
-                      {tier.rewards.map((reward, i) => (
-                        <div key={i} className="flex items-center text-sm">
-                          <CheckCircle className="h-3 w-3 mr-1 text-green-500" />
-                          <span>{reward}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20 mt-8">
-              <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">
-                Points and Leaderboard
-              </h3>
-              <p>
-                Your points determine your position on our leaderboard. The
-                leaderboard is updated in real-time, allowing you to see how you
-                stack up against other recruits. Top performers are recognized
-                and may receive special opportunities in the recruitment
-                process.
-              </p>
-              <div className="mt-4">
-                <Link href="/awards">
-                  <Button
-                    variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
-                  >
-                    View Leaderboard
-                  </Button>
-                </Link>
-              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-[#0A3C1F]/10 rounded-full">
+              <FileText className="h-6 w-6 text-[#0A3C1F]" />
+            </div>
+            <div>
+              <h4 className="font-semibold">Read Informational Pages</h4>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Gain <strong>50 points</strong> for each informational page you
+                read.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-[#0A3C1F]/10 rounded-full">
+              <Zap className="h-6 w-6 text-[#0A3C1F]" />
+            </div>
+            <div>
+              <h4 className="font-semibold">Play SF Trivia</h4>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Test your knowledge and earn up to <strong>100 points</strong>{" "}
+                per trivia game.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center space-x-4">
+            <div className="p-3 bg-[#0A3C1F]/10 rounded-full">
+              <Users className="h-6 w-6 text-[#0A3C1F]" />
+            </div>
+            <div>
+              <h4 className="font-semibold">Refer a Friend</h4>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Receive <strong>500 points</strong> for every successful
+                referral.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <h4 className="text-lg font-semibold mt-8 mb-4">Point Tiers</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {pointTiers.map((tier) => (
+            <div
+              key={tier.name}
+              className={`rounded-lg p-4 bg-gradient-to-br ${tier.color} border border-black/10 dark:border-white/10`}
+            >
+              <div className="flex items-start space-x-4">
+                {tier.icon}
+                <div>
+                  <h5 className="font-semibold">{tier.name}</h5>
+                  <p className="text-sm font-bold">{tier.points} Points</p>
+                  <ul className="mt-2 space-y-1 text-xs list-disc list-inside">
+                    {tier.rewards.map((reward) => (
+                      <li key={reward}>{reward}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -558,1213 +359,422 @@ function ReferralRewardsExplainer({
 }: {
   setShowShareDialog: (show: boolean) => void;
 }) {
-  // Content remains the same as before
-  // ...
-  const referralCount = 2; // Demo value
-
-  const referralTiers = [
-    {
-      count: 1,
-      reward: "+100 Points",
-      description: "Refer your first recruit",
-      icon: <Trophy className="h-5 w-5 text-[#FFD700]" />,
-      achieved: referralCount >= 1,
-    },
-    {
-      count: 3,
-      reward: "Connector Badge",
-      description: "Refer 3 potential recruits",
-      icon: <Award className="h-5 w-5 text-[#0A3C1F]" />,
-      achieved: referralCount >= 3,
-    },
-    {
-      count: 5,
-      reward: "+500 Points",
-      description: "Refer 5 potential recruits",
-      icon: <Trophy className="h-5 w-5 text-[#FFD700]" />,
-      achieved: referralCount >= 5,
-    },
-    {
-      count: 10,
-      reward: "Recruitment Champion NFT",
-      description: "Refer 10 potential recruits",
-      icon: <Star className="h-5 w-5 text-[#FFD700]" />,
-      achieved: referralCount >= 10,
-    },
-    {
-      count: 25,
-      reward: "VIP Recruitment Event Access",
-      description: "Refer 25 potential recruits",
-      icon: <Gift className="h-5 w-5 text-[#0A3C1F]" />,
-      achieved: referralCount >= 25,
-    },
-  ];
-
-  // Find the next tier
-  const nextTier = referralTiers.find((tier) => !tier.achieved);
-
-  // Calculate progress to next tier
-  const progressToNextTier = nextTier
-    ? Math.min(100, Math.round((referralCount / nextTier.count) * 100))
-    : 100;
-
   return (
-    <>
-      <Card className="w-full shadow-md">
-        <CardHeader className="bg-[#0A3C1F] text-white">
-          <CardTitle className="flex items-center">
-            <Users className="mr-2 h-5 w-5" />
-            Referral Rewards Program
-          </CardTitle>
-          <CardDescription className="text-gray-200">
-            Refer potential recruits and earn exclusive rewards
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="p-6">
-          <div className="mb-6">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h3 className="text-lg font-medium">Your Referrals</h3>
-                <p className="text-sm text-gray-500">
-                  You&apos;ve referred {referralCount} potential recruits
-                </p>
-              </div>
-              <Button
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
-                onClick={() => setShowShareDialog(true)}
-              >
-                <Share2 className="mr-2 h-4 w-4" />
-                Share Your Link
-              </Button>
-            </div>
+    <Card className="border-[#0A3C1F]/20">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Users className="mr-2 text-[#0A3C1F]" /> Refer a Recruit, Earn
+          Rewards
+        </CardTitle>
+        <CardDescription>
+          Help us find the next generation of Deputy Sheriffs and get rewarded
+          for it.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="text-center bg-gray-50 dark:bg-gray-800/50 p-6 rounded-lg">
+          <h3 className="text-2xl font-bold text-[#0A3C1F]">
+            Earn 500 Points
+          </h3>
+          <p className="text-gray-600 dark:text-gray-300 mt-1">
+            For every friend who signs up using your unique referral link.
+          </p>
+          <Button
+            className="mt-4 bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            onClick={() => setShowShareDialog(true)}
+          >
+            <Share2 className="mr-2 h-4 w-4" />
+            Get Your Referral Link
+          </Button>
+        </div>
 
-            {nextTier && (
-              <div className="mt-4">
-                <div className="flex justify-between mb-1 text-sm">
-                  <span>Progress to next reward: {nextTier.reward}</span>
-                  <span>
-                    {referralCount}/{nextTier.count} referrals
-                  </span>
-                </div>
-                <Progress value={progressToNextTier} className="h-2" />
-                <p className="text-xs text-gray-500 mt-1">
-                  Refer {nextTier.count - referralCount} more recruits to unlock{" "}
-                  {nextTier.reward}
-                </p>
-              </div>
-            )}
-          </div>
+        <div className="mt-6 space-y-4">
+          <h4 className="font-semibold">How It Works:</h4>
+          <ol className="list-decimal list-inside space-y-2 text-gray-600 dark:text-gray-400">
+            <li>
+              <strong>Share Your Link:</strong> Get your unique link from your
+              profile and share it via social media, email, or text.
+            </li>
+            <li>
+              <strong>Friend Signs Up:</strong> Your friend clicks the link and
+              creates an account on our platform.
+            </li>
+            <li>
+              <strong>You Get Points:</strong> Once their account is verified,
+              500 points are automatically added to your total.
+            </li>
+          </ol>
+        </div>
 
-          <div className="space-y-4">
-            <h3 className="font-medium">Referral Reward Tiers</h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {referralTiers.map((tier) => (
-                <div
-                  key={tier.count}
-                  className={`p-4 border rounded-lg transition-all ${
-                    tier.achieved
-                      ? "bg-[#0A3C1F]/5 border-[#0A3C1F]/20"
-                      : "border-gray-200"
-                  }`}
-                >
-                  <div className="flex items-center mb-2">
-                    <div
-                      className={`p-2 rounded-full ${tier.achieved ? "bg-[#0A3C1F]/10" : "bg-gray-100"}`}
-                    >
-                      {tier.icon}
-                    </div>
-                    <div className="ml-3">
-                      <h4 className="font-medium">{tier.reward}</h4>
-                      <p className="text-xs text-gray-500">
-                        {tier.description}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex justify-between items-center mt-2">
-                    <span className="text-sm font-medium">
-                      {tier.count} Referrals
-                    </span>
-                    {tier.achieved ? (
-                      <Badge className="bg-[#0A3C1F] text-white">
-                        Unlocked
-                      </Badge>
-                    ) : (
-                      <Badge variant="outline" className="text-gray-500">
-                        Locked
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-6 pt-4 border-t">
-              <h3 className="font-medium mb-2">How It Works</h3>
-              <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
-                <li>Share your unique referral link with potential recruits</li>
-                <li>
-                  When they sign up using your link, you get credit for the
-                  referral
-                </li>
-                <li>
-                  As your referral count grows, you unlock exclusive rewards
-                </li>
-                <li>Track your progress and rewards on this page</li>
-              </ol>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </>
+        <div className="mt-6 bg-[#0A3C1F]/10 p-4 rounded-lg">
+          <h4 className="font-semibold text-[#0A3C1F] flex items-center">
+            <Gift className="mr-2 h-4 w-4" /> Unlimited Referrals
+          </h4>
+          <p className="text-sm text-[#0A3C1F]/80 mt-1">
+            There's no limit to how many people you can refer or how many
+            points you can earn!
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 function BadgesExplainer() {
-  // Content remains the same as before
-  // ...
   const badgeCategories = [
     {
-      category: "Achievement Badges",
-      description:
-        "Earned by completing specific preparation milestones in the recruitment process",
+      title: "Engagement Badges",
+      description: "Awarded for interacting with the platform.",
       badges: [
         {
-          type: "written",
-          name: "Written Test",
-          description:
-            "Complete written test preparation materials and practice exams",
-          requirements: [
-            "Review written test materials",
-            "Score 80% or higher on practice test",
-            "Complete at least 3 practice sessions",
-          ],
+          name: "First Steps",
+          description: "Create an account.",
+          icon: "👣",
+          color: "bg-blue-100 text-blue-800",
         },
         {
-          type: "oral",
-          name: "Oral Board",
-          description:
-            "Prepare for oral board interviews through practice and study",
-          requirements: [
-            "Review interview question guides",
-            "Complete mock interview",
-            "Watch interview preparation videos",
-          ],
+          name: "Profile Pro",
+          description: "Complete your user profile.",
+          icon: "👤",
+          color: "bg-green-100 text-green-800",
         },
         {
-          type: "physical",
-          name: "Physical Test",
-          description:
-            "Prepare for the physical fitness requirements of the role",
-          requirements: [
-            "Review physical test requirements",
-            "Track workout progress",
-            "Complete fitness self-assessment",
-          ],
+          name: "Avid Reader",
+          description: "Read 5 informational pages.",
+          icon: "📚",
+          color: "bg-indigo-100 text-indigo-800",
         },
         {
-          type: "polygraph",
-          name: "Polygraph",
-          description:
-            "Learn about the polygraph process and prepare accordingly",
-          requirements: [
-            "Review polygraph information",
-            "Complete pre-polygraph questionnaire",
-            "Watch polygraph preparation video",
-          ],
-        },
-        {
-          type: "psychological",
-          name: "Psychological",
-          description:
-            "Understand and prepare for the psychological evaluation",
-          requirements: [
-            "Review psychological evaluation information",
-            "Complete self-assessment",
-            "Review common psychological test questions",
-          ],
+          name: " lorem-1",
+          description: "Read 5 informational pages.",
+          icon: "📚",
+          color: "bg-indigo-100 text-indigo-800",
         },
       ],
     },
     {
-      category: "Process Badges",
-      description:
-        "Earned by progressing through the application and recruitment process",
+      title: "Achievement Badges",
+      description: "Awarded for reaching milestones.",
       badges: [
         {
-          type: "chat-participation",
-          name: "Chat Participation",
-          description: "Engage with Sgt. Ken, our AI assistant",
-          requirements: [
-            "Ask at least 5 questions to Sgt. Ken",
-            "Engage in a conversation spanning multiple topics",
-            "Use the chat feature on 3 separate days",
-          ],
+          name: "Point Pioneer",
+          description: "Earn your first 1,000 points.",
+          icon: "🏆",
+          color: "bg-yellow-100 text-yellow-800",
         },
         {
-          type: "first-response",
-          name: "First Response",
-          description: "Receive your first response from Sgt. Ken",
-          requirements: [
-            "Ask your first question to Sgt. Ken",
-            "Read the complete response",
-            "Follow up with a related question",
-          ],
+          name: "Recruit Referrer",
+          description: "Successfully refer a new recruit.",
+          icon: "🤝",
+          color: "bg-pink-100 text-pink-800",
         },
         {
-          type: "application-started",
-          name: "Application Started",
-          description:
-            "Begin the application process for the SF Sheriff&apos;s Department",
-          requirements: [
-            "Create an account",
-            "Fill out basic profile information",
-            "Start the application form",
-          ],
+          name: "Trivia Titan",
+          description: "Score 100% on a trivia game.",
+          icon: "🧠",
+          color: "bg-purple-100 text-purple-800",
         },
         {
-          type: "application-completed",
-          name: "Application Completed",
-          description: "Complete the full application process",
-          requirements: [
-            "Fill out all required application fields",
-            "Upload necessary documents",
-            "Submit the completed application",
-          ],
-        },
-        {
-          type: "full",
-          name: "Full Process",
-          description:
-            "Complete all preparation areas in the recruitment process",
-          requirements: [
-            "Earn all achievement badges",
-            "Complete application",
-            "Attend orientation (if applicable)",
-          ],
+          name: " lorem-2",
+          description: "Score 100% on a trivia game.",
+          icon: "🧠",
+          color: "bg-purple-100 text-purple-800",
         },
       ],
     },
     {
-      category: "Participation Badges",
-      description:
-        "Earned through consistent engagement with the recruitment platform",
+      title: "Special Edition Badges",
+      description: "Limited-time badges for special events.",
       badges: [
         {
-          type: "frequent-user",
-          name: "Frequent User",
-          description: "Regularly engage with the recruitment platform",
-          requirements: [
-            "Log in for 7 consecutive days",
-            "Spend at least 10 minutes on the platform daily",
-            "Interact with multiple platform features",
-          ],
+          name: "Community Event",
+          description: "Attend a recruitment event.",
+          icon: "🎉",
+          color: "bg-red-100 text-red-800",
         },
         {
-          type: "resource-downloader",
-          name: "Resource Downloader",
-          description: "Download recruitment resources and materials",
-          requirements: [
-            "Download at least 5 different resources",
-            "Review downloaded materials",
-            "Apply knowledge from resources in interactions",
-          ],
+          name: "Holiday Hero",
+          description: "Log in during a holiday week.",
+          icon: "🎄",
+          color: "bg-teal-100 text-teal-800",
+        },
+        {
+          name: "Survey Superstar",
+          description: "Complete a user feedback survey.",
+          icon: "📝",
+          color: "bg-orange-100 text-orange-800",
+        },
+        {
+          name: " lorem-3",
+          description: "Complete a user feedback survey.",
+          icon: "📝",
+          color: "bg-orange-100 text-orange-800",
         },
       ],
     },
   ];
 
   return (
-    <>
-      <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
-          <CardTitle className="flex items-center">
-            <Award className="h-5 w-5 text-[#FFD700] mr-2" />
-            Badge System
-          </CardTitle>
-          <CardDescription className="text-gray-200">
-            Earn badges by completing specific actions and milestones in your
-            recruitment journey
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-8">
-            <div>
-              <p className="mb-6">
-                Our badge system recognizes your achievements and progress
-                throughout the recruitment process. Each badge represents a
-                specific accomplishment or milestone, showcasing your dedication
-                and preparation for a career with the San Francisco
-                Sheriff&apos;s Department.
-              </p>
-            </div>
-
-            {badgeCategories.map((category) => (
-              <div key={category.category} className="space-y-4">
-                <h3 className="text-xl font-semibold border-b pb-2">
-                  {category.category}
-                </h3>
-                <p className="text-muted-foreground mb-4">
-                  {category.description}
-                </p>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {category.badges.map((badge) => (
-                    <Card key={badge.type} className="border-[#0A3C1F]/20">
-                      <CardHeader className="pb-2">
-                        <div className="flex justify-center mb-2">
-                          <AchievementBadge
-                            type={badge.type as BadgeType}
-                            size="lg"
-                            earned={false}
-                          />
-                        </div>
-                        <CardTitle className="text-center text-lg">
-                          {badge.name}
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <p className="text-sm text-center mb-4">
-                          {badge.description}
-                        </p>
-                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                          <h4 className="text-sm font-medium mb-2">
-                            Requirements:
-                          </h4>
-                          <ul className="text-sm space-y-1">
-                            {badge.requirements.map((req, i) => (
-                              <li key={i} className="flex items-start">
-                                <CheckCircle className="h-3 w-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                                <span>{req}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            ))}
-
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-              <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">
-                Badge Benefits
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Recognition:</strong> Badges appear on your profile
-                    and leaderboard, showcasing your achievements to recruiters
-                    and other applicants.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Points:</strong> Each badge awards points that
-                    contribute to your overall score and leaderboard position.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Unlockable Content:</strong> Some badges unlock
-                    exclusive content, resources, or features on the platform.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Application Advantage:</strong> Badges demonstrate
-                    your commitment and preparation to recruiters reviewing your
-                    application.
-                  </span>
-                </li>
-              </ul>
+    <Card className="border-[#0A3C1F]/20">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Award className="mr-2 text-[#0A3C1F]" /> Collectible Badges
+        </CardTitle>
+        <CardDescription>
+          Show off your progress and dedication by collecting unique badges.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {badgeCategories.map((category) => (
+          <div key={category.title} className="mb-8 last:mb-0">
+            <h4 className="text-lg font-semibold mb-1">{category.title}</h4>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+              {category.description}
+            </p>
+            <div className="flex flex-wrap gap-4">
+              {category.badges.map((badge) => (
+                <AchievementBadge key={badge.name} badge={badge as BadgeType} />
+              ))}
             </div>
           </div>
-        </CardContent>
-      </Card>
-    </>
+        ))}
+
+        <div className="mt-8 text-center">
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
+            View all your collected badges on your profile page.
+          </p>
+          <Link href="/profile">
+            <Button
+              variant="outline"
+              className="border-[#0A3C1F] text-[#0A3C1F]"
+            >
+              Go to My Badges
+            </Button>
+          </Link>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 function UnlockableContentExplainer() {
-  // Content remains the same as before
-  // ...
-  const unlockablePages = [
+  const contentTiers = [
     {
-      name: "Free College Programs",
-      description:
-        "Comprehensive guide to free college and educational benefits available to deputies",
-      pointsRequired: 250,
-      imageUrl: "/ccsf_frontpg.jpg",
-      path: "/free-college",
-      featured: true,
-      badge: "🎓 Popular"
+      title: "Recruit Resources Pack",
+      points: 2000,
+      icon: <Download className="h-6 w-6 text-blue-500" />,
+      items: [
+        "Digital Study Guide for the P.O.S.T. Exam",
+        "Interview Tips from Senior Deputies (PDF)",
+        "Physical Fitness Training Plan",
+      ],
+      color: "border-blue-500/20 bg-blue-500/5",
     },
     {
-      name: "G.I. Bill Benefits",
-      description:
-        "Detailed information on using G.I. Bill benefits for law enforcement training",
-      pointsRequired: 300,
-      imageUrl: "/veterans-law-enforcement-training.png",
-      path: "/gi-bill",
-      featured: true,
-      badge: "🇺🇸 Veterans"
+      title: "Behind-the-Badge Video Series",
+      points: 4000,
+      icon: <Rocket className="h-6 w-6 text-purple-500" />,
+      items: [
+        "Day-in-the-Life of a Deputy (Ep. 1)",
+        "Tour of the new jail facility",
+        "K-9 Unit Training Session",
+      ],
+      color: "border-purple-500/20 bg-purple-500/5",
     },
     {
-      name: "Discounted Housing Programs",
-      description:
-        "Information about special housing programs for law enforcement in San Francisco",
-      pointsRequired: 500,
-      imageUrl: "/san-francisco-apartments.png",
-      path: "/discounted-housing",
-      featured: true,
-      badge: "🏠 Popular"
-    },
-    {
-      name: "Advanced Training Resources",
-      description:
-        "Specialized training materials and resources for serious applicants",
-      pointsRequired: 1000,
-      imageUrl: "/law-enforcement-training.png",
-      path: "/advanced-training",
-    },
-    {
-      name: "Interview Preparation Guide",
-      description:
-        "Comprehensive guide to acing the Sheriff&apos;s Department interview",
-      pointsRequired: 1500,
-      imageUrl: "/job-interview-preparation.png",
-      path: "/interview-guide",
-    },
-  ];
-
-  const unlockMethods = [
-    {
-      title: "Point Accumulation",
-      description:
-        "The primary method of unlocking content is by earning points through platform engagement and completing activities.",
-      icon: <Trophy className="h-6 w-6 text-[#0A3C1F]" />,
-    },
-    {
-      title: "Badge Collection",
-      description:
-        "Some content is unlocked by earning specific badges that demonstrate your knowledge in relevant areas.",
-      icon: <Award className="h-6 w-6 text-[#0A3C1F]" />,
-    },
-    {
-      title: "Application Progress",
-      description:
-        "Advancing through the application process automatically unlocks content relevant to your current stage.",
-      icon: <CheckCircle className="h-6 w-6 text-[#0A3C1F]" />,
-    },
-    {
-      title: "Special Events",
-      description:
-        "Participating in special events, webinars, or virtual information sessions can unlock exclusive content.",
-      icon: <Star className="h-6 w-6 text-[#0A3C1F]" />,
+      title: "Application Fast-Track",
+      points: 7500,
+      icon: <Clock className="h-6 w-6 text-green-500" />,
+      items: [
+        "Priority review of your application",
+        "Direct contact with a recruitment officer",
+        "Invitation to an exclusive pre-academy webinar",
+      ],
+      color: "border-green-500/20 bg-green-500/5",
     },
   ];
 
   return (
-    <>
-      <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
-          <CardTitle className="flex items-center">
-            <Lock className="h-5 w-5 text-[#FFD700] mr-2" />
-            Unlockable Content
-          </CardTitle>
-          <CardDescription className="text-gray-200">
-            Earn points and badges to unlock exclusive content and resources
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-8">
-            <div>
-              <p className="mb-6">
-                Our platform features exclusive content that becomes available
-                as you progress through your recruitment journey. Unlocking this
-                content not only provides valuable information but also
-                demonstrates your commitment to joining the San Francisco
-                Sheriff&apos;s Department.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-4">
-                How to Unlock Content
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {unlockMethods.map((method) => (
-                  <div key={method.title} className="border rounded-lg p-4">
-                    <div className="flex items-center mb-2">
-                      {method.icon}
-                      <h4 className="font-semibold ml-2">{method.title}</h4>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      {method.description}
-                    </p>
-                  </div>
+    <Card className="border-[#0A3C1F]/20">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Lock className="mr-2 text-[#0A3C1F]" /> Unlockable Content
+        </CardTitle>
+        <CardDescription>
+          Your points are keys to exclusive content and advantages.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          {contentTiers.map((tier) => (
+            <div
+              key={tier.title}
+              className={`p-6 rounded-lg border ${tier.color}`}
+            >
+              <div className="flex items-center space-x-4 mb-4">
+                {tier.icon}
+                <div>
+                  <h4 className="font-semibold">{tier.title}</h4>
+                  <p className="text-sm font-bold">
+                    Unlocks at {tier.points} Points
+                  </p>
+                </div>
+              </div>
+              <ul className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                {tier.items.map((item) => (
+                  <li key={item} className="flex items-center">
+                    <CheckCircle className="h-4 w-4 mr-2 text-green-500 flex-shrink-0" />
+                    <span>{item}</span>
+                  </li>
                 ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Unlockable Pages</h3>
-              {/* Featured Pages Section */}
-              <div className="mb-8">
-                <h4 className="text-lg font-semibold mb-4 text-[#0A3C1F] flex items-center">
-                  <Star className="h-5 w-5 text-[#FFD700] mr-2" />
-                  Most Popular Benefits
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                  {unlockablePages.filter(page => page.featured).map((page) => (
-                    <Card
-                      key={page.name}
-                      className="overflow-hidden border-2 border-[#FFD700] bg-gradient-to-br from-yellow-50 to-amber-50 shadow-lg hover:shadow-xl transition-all duration-300"
-                    >
-                      <div className="relative h-32">
-                        {page.badge && (
-                          <div className="absolute top-2 right-2 z-10">
-                            <Badge className="bg-[#FFD700] text-[#0A3C1F] font-semibold text-xs">
-                              {page.badge}
-                            </Badge>
-                          </div>
-                        )}
-                        <Image
-                          src={page.imageUrl || "/placeholder.svg"}
-                          alt={page.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent flex items-end">
-                          <div className="p-3 text-white">
-                            <h4 className="font-bold text-sm">{page.name}</h4>
-                            <div className="flex items-center">
-                              <Lock className="h-3 w-3 mr-1" />
-                              <span className="text-xs">
-                                {page.pointsRequired} points
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <CardContent className="pt-3 pb-3">
-                        <p className="text-xs text-muted-foreground mb-3">
-                          {page.description}
-                        </p>
-                        <Link href={page.path}>
-                          <Button
-                            size="sm"
-                            className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white text-xs"
-                          >
-                            Learn More
-                          </Button>
-                        </Link>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-
-              {/* Other Pages Section */}
-              <div>
-                <h4 className="text-lg font-semibold mb-4 text-[#0A3C1F]">Additional Resources</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {unlockablePages.filter(page => !page.featured).map((page) => (
-                    <Card
-                      key={page.name}
-                      className="overflow-hidden border-[#0A3C1F]/20"
-                    >
-                      <div className="relative h-40">
-                        <Image
-                          src={page.imageUrl || "/placeholder.svg"}
-                          alt={page.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end">
-                          <div className="p-4 text-white">
-                            <h4 className="font-bold text-lg">{page.name}</h4>
-                            <div className="flex items-center">
-                              <Lock className="h-4 w-4 mr-1" />
-                              <span className="text-sm">
-                                {page.pointsRequired} points required
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <CardContent className="pt-4">
-                        <p className="text-sm text-muted-foreground mb-4">
-                          {page.description}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <span className="text-xs text-muted-foreground">
-                              Unlock progress
-                            </span>
-                            <Progress value={0} className="h-2 w-24" />
-                          </div>
-                          <Link href={page.path}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-xs"
-                            >
-                              View Page
-                            </Button>
-                          </Link>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-              <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">
-                Benefits of Unlockable Content
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Exclusive Information:</strong> Access detailed
-                    information not available to casual visitors.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Preparation Advantage:</strong> Gain insights that
-                    will help you better prepare for the recruitment process.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Personalized Resources:</strong> Access content
-                    relevant to your specific interests and background.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Demonstration of Commitment:</strong> Unlocking
-                    content shows recruiters your dedication to the process.
-                  </span>
-                </li>
               </ul>
             </div>
-          </div>
-        </CardContent>
-      </Card>
-    </>
+          ))}
+        </div>
+        <div className="mt-8 bg-yellow-100/50 dark:bg-yellow-800/20 text-yellow-800 dark:text-yellow-200 p-4 rounded-lg text-center">
+          <p>
+            All unlocked content will appear automatically on your profile page
+            once you reach the required point threshold.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 function NFTRewardsExplainer() {
-  // Content remains the same as before
-  // ...
   return (
-    <>
-      <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
-          <CardTitle className="flex items-center">
-            <Star className="h-5 w-5 text-[#FFD700] mr-2" />
-            NFT Rewards
-          </CardTitle>
-          <CardDescription className="text-gray-200">
-            Earn exclusive digital collectibles that recognize your achievements
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-8">
-            <div>
-              <p className="mb-6">
-                Our platform offers exclusive NFT (Non-Fungible Token) rewards
-                to recognize outstanding achievements in the recruitment
-                process. These digital collectibles serve as permanent proof of
-                your accomplishments and may provide special benefits in the
-                future.
-              </p>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-4">
-                Available NFT Awards
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {NFT_AWARD_TIERS.map((tier) => (
-                  <Card key={tier.id} className="border-[#0A3C1F]/20">
-                    <CardHeader className="pb-2">
-                      <div className="aspect-square relative mb-2 bg-gray-100 rounded-md overflow-hidden">
-                        <Image
-                          src={
-                            tier.imageUrl ||
-                            "/placeholder.svg?height=200&width=200&query=nft award badge"
-                          }
-                          alt={tier.name}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
-                      </div>
-                      <CardTitle className="text-center text-lg">
-                        {tier.name}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-center mb-4">
-                        {tier.description}
-                      </p>
-                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                        <div className="flex justify-between text-sm mb-1">
-                          <span>Required Points:</span>
-                          <span className="font-medium">
-                            {tier.pointThreshold.toLocaleString()}
-                          </span>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-4">
-                How NFT Rewards Work
-              </h3>
-              <div className="space-y-4">
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">1. Earn Points</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Accumulate points through platform engagement, completing
-                    application steps, and earning badges.
-                  </p>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">
-                    2. Reach Point Thresholds
-                  </h4>
-                  <p className="text-sm text-muted-foreground">
-                    Each NFT award has a specific point threshold. Once you
-                    reach that threshold, you become eligible for the award.
-                  </p>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">3. Receive Your NFT</h4>
-                  <p className="text-sm text-muted-foreground">
-                    NFTs are automatically awarded when you reach the required
-                    point threshold. You&apos;ll receive a notification and the
-                    NFT will appear in your profile.
-                  </p>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-                  <h4 className="font-medium mb-2">4. Display and Share</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Your NFTs are displayed on your profile and can be shared on
-                    social media to showcase your achievements.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-              <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">
-                Benefits of NFT Rewards
-              </h3>
-              <ul className="space-y-2">
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Permanent Recognition:</strong> Unlike traditional
-                    digital badges, NFTs are permanent, verifiable records of
-                    your achievements.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Exclusive Status:</strong> NFTs are awarded only to
-                    top performers, making them a symbol of excellence.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Future Benefits:</strong> NFT holders may receive
-                    special benefits, access to exclusive events, or recognition
-                    in future department initiatives.
-                  </span>
-                </li>
-                <li className="flex items-start">
-                  <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2" />
-                  <span>
-                    <strong>Digital Portfolio:</strong> Build a collection of
-                    NFTs that showcase your journey and achievements in the
-                    recruitment process.
-                  </span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="text-center p-6 border rounded-lg bg-gradient-to-b from-[#0A3C1F]/10 to-transparent">
-              <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
-                Start Earning Your NFT Rewards Today!
-              </h3>
-              <p className="mb-4">
-                Begin your journey by creating an account, engaging with our
-                platform, and working toward your first NFT award.
-              </p>
-              <Link href="/awards">
-                <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-                  View Leaderboard
-                </Button>
-              </Link>
-            </div>
+    <Card className="border-[#0A3C1F]/20">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <Star className="mr-2 text-[#0A3C1F]" /> Digital Collectible (NFT)
+          Rewards
+        </CardTitle>
+        <CardDescription>
+          Top performers can earn a unique, blockchain-verified digital
+          collectible.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div>
+            <h4 className="text-lg font-semibold">
+              The "Founder's Badge" NFT
+            </h4>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">
+              As a special reward for our most dedicated candidates, we're
+              offering a limited edition "Founder's Badge" NFT. This isn't just
+              a digital image; it's a permanent, verifiable token on the
+              blockchain that proves you were one of the top early members of
+              our recruitment community.
+            </p>
+            <ul className="mt-4 space-y-2 text-sm">
+              <li className="flex items-center">
+                <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                <strong>Strictly Limited:</strong> Only the top 100 point-earners
+                are eligible.
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                <strong>Verifiable Achievement:</strong> A permanent digital trophy.
+              </li>
+              <li className="flex items-center">
+                <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                <strong>Future Perks:</strong> May unlock future rewards and
+                access.
+              </li>
+            </ul>
           </div>
-        </CardContent>
-      </Card>
-    </>
+          <div className="grid grid-cols-2 gap-4">
+            {NFT_AWARD_TIERS.slice(0, 4).map((tier, index) => (
+              <div
+                key={tier.name}
+                className="relative aspect-square rounded-lg overflow-hidden border-2 border-black/10 dark:border-white/10"
+              >
+                <Image
+                  src={tier.image}
+                  alt={`${tier.name} NFT Badge`}
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-black/50 flex items-end p-2">
+                  <span className="text-white font-bold text-xs drop-shadow-lg">
+                    {tier.name}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-8 bg-blue-100/50 dark:bg-blue-800/20 p-4 rounded-lg">
+          <h4 className="font-semibold text-blue-800 dark:text-blue-200">
+            How to Qualify
+          </h4>
+          <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+            Maintain your position in the top 100 on the leaderboard by the end
+            of the recruitment cycle. We'll contact eligible winners with
+            instructions on how to claim their NFT.
+          </p>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
 function TriviaGameExplainer() {
-  // Content remains the same as before
-  // ...
   return (
-    <>
-      <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
-          <CardTitle className="flex items-center">
-            <MessageSquare className="h-5 w-5 text-[#FFD700] mr-2" />
-            SF Trivia Game
-          </CardTitle>
-          <CardDescription className="text-gray-200">
-            Test your knowledge about San Francisco while earning points and
-            badges
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-6">
-          <div className="space-y-8">
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="md:w-2/3">
-                <h3 className="text-xl font-semibold mb-4">About SF Trivia</h3>
-                <p className="mb-4">
-                  The SF Trivia game is an exciting way to test your knowledge
-                  about San Francisco while earning points and competing with
-                  other recruits. Answer questions about the city&apos;s
-                  history, landmarks, culture, and more to climb the leaderboard
-                  and earn special badges.
-                </p>
-                <p className="mb-4">
-                  Each game consists of 5 challenging questions with
-                  multiple-choice answers. You&apos;ll have 30 seconds to answer
-                  each question, with bonus points awarded for speed and
-                  accuracy. It&apos;s a fun way to learn more about the city
-                  you&apos;ll be serving while advancing your recruitment
-                  journey.
-                </p>
-                <div className="mt-6">
-                  <Link href="/trivia">
-                    <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-                      Play SF Trivia Now
-                    </Button>
-                  </Link>
-                </div>
-              </div>
-              <div className="md:w-1/3 bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-                <h4 className="font-semibold text-[#0A3C1F] mb-3">
-                  Game Features
-                </h4>
-                <ul className="space-y-2">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                    <span>5 challenging questions per game</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                    <span>30-second timer for each question</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                    <span>Detailed explanations for each answer</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                    <span>Real-time leaderboard updates</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5 mr-2 flex-shrink-0" />
-                    <span>Special trivia badges to earn</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-4">
-                How to Earn Points with Trivia
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="border-[#0A3C1F]/20">
-                  <CardHeader className="pb-2">
-                    <div className="rounded-full p-2 w-12 h-12 bg-green-100 flex items-center justify-center mx-auto">
-                      <CheckCircle className="h-6 w-6 text-green-600" />
-                    </div>
-                    <CardTitle className="text-center text-lg mt-2">
-                      Correct Answers
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-sm mb-2">
-                      Earn 10 points for each correct answer
-                    </p>
-                    <div className="text-2xl font-bold text-[#0A3C1F]">
-                      +10 pts
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-[#0A3C1F]/20">
-                  <CardHeader className="pb-2">
-                    <div className="rounded-full p-2 w-12 h-12 bg-blue-100 flex items-center justify-center mx-auto">
-                      <Clock className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <CardTitle className="text-center text-lg mt-2">
-                      Speed Bonus
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-sm mb-2">
-                      Answer quickly for bonus points
-                    </p>
-                    <div className="text-2xl font-bold text-[#0A3C1F]">
-                      +5 pts
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-[#0A3C1F]/20">
-                  <CardHeader className="pb-2">
-                    <div className="rounded-full p-2 w-12 h-12 bg-purple-100 flex items-center justify-center mx-auto">
-                      <Trophy className="h-6 w-6 text-purple-600" />
-                    </div>
-                    <CardTitle className="text-center text-lg mt-2">
-                      Perfect Score
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-sm mb-2">
-                      Get all questions right for a bonus
-                    </p>
-                    <div className="text-2xl font-bold text-[#0A3C1F]">
-                      +25 pts
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Trivia Badges</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="border-[#0A3C1F]/20">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-center mb-2">
-                      <div className="w-16 h-16 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                        <Trophy className="h-8 w-8 text-[#0A3C1F]" />
-                      </div>
-                    </div>
-                    <CardTitle className="text-center text-lg">
-                      Trivia Participant
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-center mb-4">
-                      Awarded for completing your first trivia game
-                    </p>
-                    <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                      <h4 className="text-sm font-medium mb-2">
-                        Requirements:
-                      </h4>
-                      <ul className="text-sm space-y-1">
-                        <li className="flex items-start">
-                          <CheckCircle className="h-3 w-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                          <span>Complete one full trivia game</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="h-3 w-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                          <span>Answer all 5 questions</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-[#0A3C1F]/20">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-center mb-2">
-                      <div className="w-16 h-16 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                        <Trophy className="h-8 w-8 text-[#0A3C1F]" />
-                      </div>
-                    </div>
-                    <CardTitle className="text-center text-lg">
-                      Trivia Enthusiast
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-center mb-4">
-                      Awarded for completing 5 trivia games
-                    </p>
-                    <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                      <h4 className="text-sm font-medium mb-2">
-                        Requirements:
-                      </h4>
-                      <ul className="text-sm space-y-1">
-                        <li className="flex items-start">
-                          <CheckCircle className="h-3 w-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                          <span>Complete 5 full trivia games</span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="h-3 w-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                          <span>
-                            Earn at least 100 total points from trivia
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="border-[#0A3C1F]/20">
-                  <CardHeader className="pb-2">
-                    <div className="flex justify-center mb-2">
-                      <div className="w-16 h-16 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                        <Trophy className="h-8 w-8 text-[#0A3C1F]" />
-                      </div>
-                    </div>
-                    <CardTitle className="text-center text-lg">
-                      Trivia Master
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-center mb-4">
-                      Awarded for achieving 3 perfect scores
-                    </p>
-                    <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
-                      <h4 className="text-sm font-medium mb-2">
-                        Requirements:
-                      </h4>
-                      <ul className="text-sm space-y-1">
-                        <li className="flex items-start">
-                          <CheckCircle className="h-3 w-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                          <span>
-                            Get a perfect score (5/5) on 3 different games
-                          </span>
-                        </li>
-                        <li className="flex items-start">
-                          <CheckCircle className="h-3 w-3 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                          <span>
-                            Answer within the time limit for all questions
-                          </span>
-                        </li>
-                      </ul>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mb-4">Trivia Leaderboard</h3>
-              <p className="mb-4">
-                Compete with other recruits on the trivia leaderboard! The
-                leaderboard tracks your performance across all trivia games,
-                showing your total correct answers, accuracy percentage, and
-                overall ranking. Top performers are recognized and may receive
-                special rewards.
-              </p>
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-[#0A3C1F]/20">
-                <h4 className="font-medium mb-3">Leaderboard Metrics</h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="flex items-center">
-                    <div className="rounded-full p-2 bg-green-100 mr-3">
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium">Correct Answers</div>
-                      <div className="text-sm text-muted-foreground">
-                        Total correct answers across all games
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="rounded-full p-2 bg-blue-100 mr-3">
-                      <Trophy className="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium">Accuracy</div>
-                      <div className="text-sm text-muted-foreground">
-                        Percentage of correct answers
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center">
-                    <div className="rounded-full p-2 bg-purple-100 mr-3">
-                      <Star className="h-5 w-5 text-purple-600" />
-                    </div>
-                    <div>
-                      <div className="font-medium">Perfect Games</div>
-                      <div className="text-sm text-muted-foreground">
-                        Number of 5/5 scores
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent p-6 rounded-lg border border-[#0A3C1F]/20">
-              <div className="flex flex-col md:flex-row items-center">
-                <div className="md:w-2/3">
-                  <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
-                    Ready to Test Your San Francisco Knowledge?
-                  </h3>
-                  <p className="mb-4">
-                    Challenge yourself with our SF Trivia game! Answer questions
-                    about San Francisco&apos;s history, landmarks, culture, and
-                    more. Earn points, climb the leaderboard, and unlock special
-                    badges while preparing for your career with the San
-                    Francisco Sheriff&apos;s Department.
-                  </p>
-                  <Link href="/trivia">
-                    <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
-                      Play SF Trivia Now
-                    </Button>
-                  </Link>
-                </div>
-                <div className="md:w-1/3 flex justify-center mt-6 md:mt-0">
-                  <div className="w-32 h-32 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                    <Trophy className="h-16 w-16 text-[#0A3C1F]" />
-                  </div>
-                </div>
-              </div>
-            </div>
+    <Card className="border-[#0A3C1F]/20">
+      <CardHeader>
+        <CardTitle className="flex items-center">
+          <MessageSquare className="mr-2 text-[#0A3C1F]" /> San Francisco Trivia
+          Challenge
+        </CardTitle>
+        <CardDescription>
+          Test your knowledge about the city you want to serve.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="relative p-6 rounded-lg bg-gray-50 dark:bg-gray-800/50 overflow-hidden">
+          <div className="relative z-10">
+            <h4 className="text-lg font-semibold">
+              Ready for the Challenge?
+            </h4>
+            <p className="mt-2 text-gray-600 dark:text-gray-300">
+              Answer questions about San Francisco's history, landmarks, and
+              laws. Each correct answer earns you points. Score a perfect 100%
+              to earn the "Trivia Titan" badge!
+            </p>
+            <Link href="/trivia">
+              <Button className="mt-4 bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                Play Trivia Now
+              </Button>
+            </Link>
           </div>
-        </CardContent>
-      </Card>
-    </>
+        </div>
+
+        <div className="mt-6 grid md:grid-cols-3 gap-6 text-center">
+          <div>
+            <h5 className="font-semibold">Earn Points</h5>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Gain up to 100 points for each game you play.
+            </p>
+          </div>
+          <div>
+            <h5 className="font-semibold">Unlock a Badge</h5>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Get a perfect score to add the exclusive "Trivia Titan" badge to
+              your collection.
+            </p>
+          </div>
+          <div>
+            <h5 className="font-semibold">Learn About SF</h5>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Deepen your knowledge of the community you will serve.
+            </p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
-}
+} 

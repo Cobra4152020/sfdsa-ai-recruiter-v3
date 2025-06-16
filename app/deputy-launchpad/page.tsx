@@ -13,9 +13,9 @@ export const metadata: Metadata = {
 export default function DeputyLaunchpadPage() {
   return (
     <PageWrapper>
-      <main className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
+      <div className="flex-1 bg-white dark:bg-gray-900 pt-8 pb-12">
         <LaunchpadContent />
-      </main>
+      </div>
     </PageWrapper>
   );
-}
+} 
