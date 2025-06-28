@@ -32,242 +32,80 @@ import Link from "next/link";
 import type { Route } from "next";
 
 export default function ApplicationProcessPage() {
-  const steps = [
+  const phases = [
     {
-      step: 1,
+      phase: 1,
       title: "Initial Application",
-      icon: <FileText className="h-6 w-6" />,
-      description:
-        "Submit your comprehensive online application through the SF Sheriff's Department portal. Provide complete personal information, education history, employment background, and character references.",
-      timeframe: "1-2 days",
-      difficulty: "Easy",
-      requirements: [
-        "Valid California Driver's License",
-        "High school diploma or GED",
-        "Complete employment history (10 years)",
-        "Character references (3-5 people)",
-        "Personal statement essay"
-      ],
-      tips: [
-        "Gather all documents before starting",
-        "Double-check all information for accuracy",
-        "Save copies of everything you submit",
-        "Complete application in one session if possible"
-      ],
-      color: "blue"
+      icon: <FileText className="h-8 w-8 text-white" />,
+      color: "blue",
+      description: "The first step is to submit a complete and accurate online application.",
+      steps: [
+        {
+          title: "Online Application",
+          description: "Fill out the official SFSO application. Ensure all information about your work history, education, and personal details is correct.",
+          link: "/apply",
+          linkText: "Start Your Application",
+        }
+      ]
     },
     {
-      step: 2,
-      title: "Written Examination",
-      icon: <Brain className="h-6 w-6" />,
-      description:
-        "Complete a comprehensive written test evaluating reading comprehension, writing skills, mathematical reasoning, and basic law enforcement knowledge. Passing score is 70%.",
-      timeframe: "2-3 hours",
-      difficulty: "Moderate",
-      requirements: [
-        "Valid photo ID required",
-        "Arrive 30 minutes early",
-        "No electronic devices permitted",
-        "Pencils and materials provided"
-      ],
-      tips: [
-        "Study provided preparation materials",
-        "Get adequate rest the night before",
-        "Eat a healthy breakfast",
-        "Read all questions carefully"
-      ],
-      color: "green"
+      phase: 2,
+      title: "Written Exam & Physical Tests",
+      icon: <Zap className="h-8 w-8 text-white" />,
+      color: "green",
+      description: "This phase includes the NTN Corrections Test, the Physical Agility Test (PAT), a video scenario test, and an oral interview.",
+      steps: [
+        {
+          title: "NTN Corrections Written Exam",
+          description: "This exam consists of four parts: a video-based human relations test (REACT), a reading test, a count test, and an incident observation/report writing test. We offer practice modules for each.",
+          substeps: [
+              { title: "REACT Video Practice", link: "/practice-tests/react-exam" },
+              { title: "Count Test Practice", link: "/practice-tests/count-test" },
+              { title: "Incident Observation Practice", link: "/practice-tests/incident-observation" }
+          ]
+        },
+        {
+          title: "Physical Agility Test (PAT)",
+          description: "You must pass three timed events in sequence: a 500-yard run (< 2 min), a 99-yard obstacle course (< 35 sec), and a 165lb body drag (< 20 sec).",
+          link: "/practice-tests/physical-ability",
+          linkText: "View PAT Prep Guide",
+        },
+        {
+          title: "Video Scenario Test",
+          description: "After the PAT, you will watch a 53-second video and answer 10 questions. A minimum score of 80 out of 100 is required to pass.",
+        },
+        {
+          title: "Oral Interview",
+          description: "A panel interview with two sworn deputies. You will be asked 4 questions and must score at least 12 out of 20 points to pass.",
+        }
+      ]
     },
     {
-      step: 3,
-      title: "Physical Agility Test (PAT)",
-      icon: <Dumbbell className="h-6 w-6" />,
-      description:
-        "Demonstrate physical fitness through standardized exercises including push-ups, sit-ups, 1.5-mile run, and job-specific agility tasks. Must meet minimum standards in all categories.",
-      timeframe: "Half day",
-      difficulty: "Challenging",
-      requirements: [
-        "Athletic clothing and shoes",
-        "Medical clearance if needed",
-        "Hydration and light snack",
-        "Valid photo ID"
-      ],
-      tips: [
-        "Train consistently for 2-3 months",
-        "Practice specific test components",
-        "Warm up properly before testing",
-        "Follow all safety instructions"
-      ],
-      color: "orange"
-    },
-    {
-      step: 4,
-      title: "Oral Board Interview",
-      icon: <MessageSquare className="h-6 w-6" />,
-      description:
-        "Face a panel of experienced law enforcement professionals in a structured interview. Panel evaluates communication skills, decision-making, ethics, and job knowledge. Passing score is 70%.",
-      timeframe: "45-60 minutes",
-      difficulty: "Moderate",
-      requirements: [
-        "Professional business attire",
-        "Valid photo ID",
-        "Arrive 15 minutes early",
-        "Bring copies of all documents"
-      ],
-      tips: [
-        "Practice common law enforcement scenarios",
-        "Research current events and department policies",
-        "Prepare examples demonstrating your values",
-        "Maintain eye contact and speak clearly"
-      ],
-      color: "purple"
-    },
-    {
-      step: 5,
-      title: "Background Investigation",
-      icon: <Search className="h-6 w-6" />,
-      description:
-        "Undergo extensive background check including criminal history, employment verification, financial review, reference interviews, and social media screening. Complete honesty is essential.",
-      timeframe: "3-6 months",
-      difficulty: "Intensive",
-      requirements: [
-        "Complete background packet",
-        "Financial documents (5 years)",
-        "All addresses lived (10 years)",
-        "Complete reference information",
-        "Military records if applicable"
-      ],
-      tips: [
-        "Be completely honest about everything",
-        "Respond promptly to investigator requests",
-        "Prepare references in advance",
-        "Organize all required documents"
-      ],
-      color: "amber"
-    },
-    {
-      step: 6,
-      title: "Polygraph Examination",
-      icon: <Target className="h-6 w-6" />,
-      description:
-        "Complete a polygraph (lie detector) test to verify integrity and truthfulness regarding your background information, criminal history, drug use, and other relevant matters.",
-      timeframe: "3-4 hours",
-      difficulty: "Moderate",
-      requirements: [
-        "Well-rested and relaxed state",
-        "Valid photo ID",
-        "Comfortable clothing",
-        "No caffeine 4 hours prior"
-      ],
-      tips: [
-        "Review your background packet thoroughly",
-        "Be completely truthful about everything",
-        "Stay calm and follow instructions",
-        "Avoid caffeine and stimulants beforehand"
-      ],
-      color: "red"
-    },
-    {
-      step: 7,
-      title: "Medical Examination",
-      icon: <Heart className="h-6 w-6" />,
-      description:
-        "Complete comprehensive medical examination by department-approved physician including vision, hearing, cardiovascular, and general health assessment. Drug screening included.",
-      timeframe: "1-2 days",
-      difficulty: "Easy",
-      requirements: [
-        "Medical history records",
-        "Current medications list",
-        "Valid photo ID",
-        "Fasting if blood work required"
-      ],
-      tips: [
-        "Bring complete medical history",
-        "List all current medications",
-        "Fast if required for blood tests",
-        "Wear comfortable, accessible clothing"
-      ],
-      color: "teal"
-    },
-    {
-      step: 8,
-      title: "Psychological Evaluation",
-      icon: <Brain className="h-6 w-6" />,
-      description:
-        "Undergo psychological testing and clinical interview with licensed psychologist to assess mental health, personality traits, and suitability for law enforcement work.",
-      timeframe: "4-6 hours",
-      difficulty: "Moderate",
-      requirements: [
-        "Valid photo ID",
-        "Comfortable clothing",
-        "Well-rested state",
-        "Honest mindset"
-      ],
-      tips: [
-        "Answer all questions honestly",
-        "Get adequate rest beforehand",
-        "Don't try to game the system",
-        "Be yourself during the interview"
-      ],
-      color: "indigo"
-    },
-    {
-      step: 9,
-      title: "Final Interview & Appointment",
-      icon: <UserCheck className="h-6 w-6" />,
-      description:
-        "Meet with department leadership for final interview and conditional job offer. Discuss salary, benefits, academy start date, and complete pre-employment paperwork.",
-      timeframe: "1 day",
-      difficulty: "Easy",
-      requirements: [
-        "Professional attire",
-        "Valid photo ID",
-        "Social Security card",
-        "Bank information for direct deposit"
-      ],
-      tips: [
-        "Prepare questions about the position",
-        "Bring required documentation",
-        "Negotiate start date if needed",
-        "Review benefit options carefully"
-      ],
-      color: "green"
-    },
-    {
-      step: 10,
-      title: "Sheriff's Academy Training",
-      icon: <GraduationCap className="h-6 w-6" />,
-      description:
-        "Complete intensive 16-20 week training program covering law enforcement, corrections, firearms, defensive tactics, emergency response, and department policies. Paid training position.",
-      timeframe: "4-5 months",
-      difficulty: "Intensive",
-      requirements: [
-        "Physical fitness maintenance",
-        "Study materials and textbooks",
-        "Professional uniforms",
-        "Daily attendance required"
-      ],
-      tips: [
-        "Maintain excellent physical condition",
-        "Study consistently every day",
-        "Build relationships with classmates",
-        "Follow all academy rules strictly"
-      ],
-      color: "navy"
-    },
+      phase: 3,
+      title: "Background & Final Evaluation",
+      icon: <UserCheck className="h-8 w-8 text-white" />,
+      color: "amber",
+      description: "The final phase involves a thorough background investigation and final medical and psychological screenings.",
+      steps: [
+        {
+          title: "Personal History & Background",
+          description: "You will submit a comprehensive personal history statement. Our investigators will conduct a thorough background check.",
+          link: "/background-preparation",
+          linkText: "View Document Checklist",
+        },
+        {
+          title: "Psychological & Polygraph Exam",
+          description: "Assess your suitability for a career in law enforcement through a psychological evaluation and a polygraph test.",
+        },
+        {
+          title: "Medical Examination",
+          description: "A comprehensive medical exam to ensure you meet the physical health standards required for the job.",
+        }
+      ]
+    }
   ];
 
-  const getDifficultyColor = (difficulty: string) => {
-    const colors = {
-      "Easy": "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
-      "Moderate": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
-      "Challenging": "bg-orange-100 text-orange-800 dark:bg-orange-900/20 dark:text-orange-400",
-      "Intensive": "bg-red-100 text-red-800 dark:bg-red-900/20 dark:text-red-400"
-    };
-    return colors[difficulty as keyof typeof colors] || colors.Moderate;
-  };
-
-  const getStepColor = (color: string) => {
+  const getPhaseColor = (color: string) => {
     const colors = {
       blue: "bg-blue-600 dark:bg-blue-500",
       green: "bg-green-600 dark:bg-green-500", 
@@ -319,87 +157,64 @@ export default function ApplicationProcessPage() {
         </motion.div>
 
         {/* Process Timeline */}
-        <div className="space-y-8 mb-12">
-          {steps.map((step, index) => (
-            <motion.div
-              key={step.step}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="relative"
-            >
-              <Card className="bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30 hover:shadow-xl transition-all duration-300">
-                <CardHeader className="bg-white dark:bg-black">
-                  <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-                    <div className={`flex-shrink-0 w-16 h-16 ${getStepColor(step.color)} rounded-full flex items-center justify-center text-white shadow-lg mx-auto sm:mx-0`}>
-                      <div className="text-center">
-                        <div className="font-bold text-lg">{step.step}</div>
-                      </div>
-                    </div>
-                    <div className="flex-grow w-full">
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3">
-                        <CardTitle className="text-xl sm:text-2xl text-[#0A3C1F] dark:text-[#FFD700] flex items-center text-center sm:text-left justify-center sm:justify-start">
-                          <div className="mr-2 sm:mr-3 text-[#0A3C1F] dark:text-[#FFD700]">
-                            {step.icon}
-                          </div>
-                          {step.title}
-                        </CardTitle>
-                        <div className="flex flex-wrap justify-center sm:justify-start gap-2">
-                          <Badge className={`${getDifficultyColor(step.difficulty)} text-xs`}>
-                            {step.difficulty}
-                          </Badge>
-                          <Badge variant="outline" className="bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 text-xs">
-                            <Timer className="h-3 w-3 mr-1" />
-                            {step.timeframe}
-                          </Badge>
-                        </div>
-                      </div>
-                      <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed">
-                        {step.description}
-                      </p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="bg-white dark:bg-black">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
-                    <div>
-                      <h4 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-3 flex items-center justify-center sm:justify-start">
-                        <CheckCircle2 className="h-4 w-4 mr-2" />
-                        Requirements
-                      </h4>
-                      <ul className="space-y-2">
-                        {step.requirements.map((req, reqIndex) => (
-                          <li key={reqIndex} className="flex items-start text-gray-600 dark:text-gray-300">
-                            <div className="w-2 h-2 bg-[#0A3C1F] dark:bg-[#FFD700] rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                            <span className="text-sm leading-relaxed">{req}</span>
-                          </li>
-                        ))}
-                      </ul>
+        <div className="space-y-12">
+          {phases.map((phase) => (
+            <div key={phase.phase}>
+              <div className={`mb-8 p-6 rounded-3xl bg-gradient-to-r from-${phase.color}-500 to-${phase.color}-600 text-white shadow-lg`}>
+                <div className="flex items-center space-x-4">
+                    <div className={`bg-${phase.color}-400/50 p-3 rounded-full`}>
+                        {phase.icon}
                     </div>
                     <div>
-                      <h4 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-3 flex items-center justify-center sm:justify-start">
-                        <Star className="h-4 w-4 mr-2" />
-                        Success Tips
-                      </h4>
-                      <ul className="space-y-2">
-                        {step.tips.map((tip, tipIndex) => (
-                          <li key={tipIndex} className="flex items-start text-gray-600 dark:text-gray-300">
-                            <div className="w-2 h-2 bg-green-500 dark:bg-[#FFD700] rounded-full mt-2 mr-3 flex-shrink-0"></div>
-                            <span className="text-sm leading-relaxed">{tip}</span>
-                          </li>
-                        ))}
-                      </ul>
+                        <h2 className="text-3xl font-bold tracking-tight">Phase {phase.phase}: {phase.title}</h2>
+                        <p className="text-white/90 mt-1">{phase.description}</p>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-              {/* Connecting Arrow */}
-              {index < steps.length - 1 && (
-                <div className="flex justify-center mt-6 mb-2">
-                  <ArrowRight className="h-8 w-8 text-[#0A3C1F] dark:text-[#FFD700]" />
                 </div>
-              )}
-            </motion.div>
+              </div>
+
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {phase.steps.map((step, stepIndex) => (
+                  <motion.div
+                    key={stepIndex}
+                    className="h-full"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: stepIndex * 0.1 }}
+                  >
+                    <Card className="h-full flex flex-col shadow-md hover:shadow-xl transition-shadow duration-300">
+                      <CardHeader>
+                        <CardTitle className="text-xl">{step.title}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="flex-grow">
+                        <p className="text-gray-600 dark:text-gray-400">{step.description}</p>
+                        {step.substeps && (
+                            <div className="mt-4 space-y-2">
+                                {step.substeps.map((substep, i) => (
+                                     <Link href={substep.link as Route<string>} passHref key={i}>
+                                        <Button variant="outline" className="w-full justify-start">
+                                            <Zap className="mr-2 h-4 w-4 text-yellow-500" />
+                                            {substep.title}
+                                        </Button>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
+                      </CardContent>
+                      {step.link && (
+                        <div className="p-6 pt-0">
+                            <Link href={step.link as Route<string>} passHref>
+                                <Button className="w-full">
+                                    <ArrowRight className="mr-2 h-4 w-4" />
+                                    {step.linkText}
+                                </Button>
+                            </Link>
+                        </div>
+                      )}
+                    </Card>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
 

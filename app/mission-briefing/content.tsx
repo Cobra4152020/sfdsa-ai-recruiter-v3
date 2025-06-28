@@ -201,7 +201,7 @@ function RoleExplainer() {
             </div>
             <div className="md:w-1/3 relative h-48 md:h-auto rounded-lg overflow-hidden">
               <Image
-                src="/san-francisco-deputy-sheriff.png"
+                src="/IMG_2816.jpg"
                 alt="San Francisco Deputy Sheriff"
                 fill
                 className="object-cover"

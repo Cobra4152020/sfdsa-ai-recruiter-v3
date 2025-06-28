@@ -154,6 +154,11 @@ export function ImprovedHeader() {
           href: "/background-preparation",
           icon: <FileText className="w-4 h-4" />,
         },
+        {
+          label: "Practice Tests",
+          href: "/practice-tests",
+          icon: <Shield className="w-4 h-4" />,
+        },
       ],
     },
     gamification: {

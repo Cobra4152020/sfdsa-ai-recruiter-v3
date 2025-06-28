@@ -595,7 +595,7 @@ function UnlockableContentExplainer() {
   ];
 
   return (
-    <Card className="border-[#0A3C1F]/20">
+    <Card className="border-2 border-primary/20 shadow-lg transform transition-all hover:scale-[1.02] hover:shadow-2xl">
       <CardHeader>
         <CardTitle className="flex items-center">
           <Lock className="mr-2 text-[#0A3C1F]" /> Unlockable Content

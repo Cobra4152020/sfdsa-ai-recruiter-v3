@@ -7,6 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Lock, Star, Trophy } from "lucide-react";
 import Image from "next/image";
+import { useUserPoints } from "@/hooks/use-user-points";
 
 interface PointsGateProps {
   children: ReactNode;
@@ -25,10 +26,11 @@ export function PointsGate({
   pageDescription,
   imageUrl,
 }: PointsGateProps) {
-  const { currentUser, isLoading } = useUser();
-  
-  const userPoints = currentUser?.participation_count || 0;
+  const { currentUser, isLoading: isUserLoading } = useUser();
+  const { points: userPoints, isLoading: isPointsLoading } = useUserPoints(currentUser?.id);
 
+  const isLoading = isUserLoading || isPointsLoading;
+  
   if (isLoading) {
     // Loading state
     return (
