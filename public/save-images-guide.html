@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Badge Images Setup Guide</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .badge-item { border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px; }
+        .filename { background: #f0f0f0; padding: 5px; font-family: monospace; font-weight: bold; }
+        .highlight { background: yellow; padding: 2px 4px; }
+    </style>
+</head>
+<body>
+    <h1>🏅 Badge Images Setup Guide</h1>
+    
+    <p>You need to save 5 badge images from the chat conversation to make them appear on your badges page.</p>
+    
+    <h2>Required Images:</h2>
+    
+    <div class="badge-item">
+        <h3>1. Physical Test Badge</h3>
+        <p>Save the <strong>blue dumbbells/weights image</strong> as:</p>
+        <div class="filename">physical.png</div>
+    </div>
+    
+    <div class="badge-item">
+        <h3>2. Psychological Badge</h3>
+        <p>Save the <strong>brain with medical cross image</strong> as:</p>
+        <div class="filename">psychological.png</div>
+    </div>
+    
+    <div class="badge-item">
+        <h3>3. Oral Board Badge</h3>
+        <p>Save the <strong>interview scene with two people image</strong> as:</p>
+        <div class="filename">oral.png</div>
+    </div>
+    
+    <div class="badge-item">
+        <h3>4. Polygraph Badge</h3>
+        <p>Save the <strong>computer with analytics/graph image</strong> as:</p>
+        <div class="filename">polygraph.png</div>
+    </div>
+    
+    <div class="badge-item">
+        <h3>5. Written Test Badge</h3>
+        <p>Save the <strong>document with A+ grade and pencil image</strong> as:</p>
+        <div class="filename">written.png</div>
+    </div>
+    
+    <h2>Steps to Save:</h2>
+    <ol>
+        <li>Go back to the chat conversation</li>
+        <li>Right-click on each badge image</li>
+        <li>Select "Save image as..." or "Save picture as..."</li>
+        <li>Navigate to: <span class="highlight">sfdsa-ai-recruiter-v3/public/badges/</span></li>
+        <li>Use the exact filename shown above</li>
+        <li>Save as PNG format</li>
+    </ol>
+    
+    <h2>Verify Setup:</h2>
+    <p>After saving all 5 images, run this command in your terminal:</p>
+    <div class="filename">npm run verify-badges</div>
+    
+    <p>Then visit: <strong>http://localhost:3000/badges</strong> to see your custom images!</p>
+</body>
+</html> 

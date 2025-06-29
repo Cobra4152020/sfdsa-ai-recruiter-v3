@@ -15,10 +15,29 @@ export async function GET(request: NextRequest) {
 
     const supabase = getServiceSupabase();
 
-    // New permission-free method: Calculate total from activity logs
-    // Base points for application completion is 500
-    const BASE_POINTS = 500;
+    // Calculate total points from actual point logs (no artificial base points)
+    // Users start with 0 and earn points through activities
+    
+    // First try to get points from user_point_logs (the correct table for point tracking)
+    const { data: pointLogs, error: logError } = await supabase
+      .from('user_point_logs')
+      .select('points')
+      .eq('user_id', userId);
 
+    if (!logError && pointLogs && pointLogs.length > 0) {
+      const totalPoints = pointLogs.reduce((sum, entry) => sum + (entry.points || 0), 0);
+      
+      console.log(`[Points API] Calculated from point logs for ${userId}: ${totalPoints} points from ${pointLogs.length} entries`);
+      
+      return NextResponse.json({
+        success: true,
+        totalPoints,
+        userId,
+        source: 'user_point_logs'
+      });
+    }
+
+    // Fallback to user_points table if user_point_logs is empty
     const { data: activityData, error: activityError } = await supabase
       .from('user_points')
       .select('points')
@@ -26,19 +45,19 @@ export async function GET(request: NextRequest) {
 
     if (activityError) {
       console.error('Error fetching user_points activity:', activityError);
-      // Fallback to a default or error value if activity can't be fetched
+      // Return 0 points for new users instead of giving them free 500 points
       return NextResponse.json({
         success: true,
-        totalPoints: BASE_POINTS,
+        totalPoints: 0,
         userId,
-        source: 'fallback_base_points'
+        source: 'fallback_zero_points'
       });
     }
 
     const activityPoints = activityData.reduce((sum, entry) => sum + (entry.points || 0), 0);
-    const totalPoints = BASE_POINTS + activityPoints;
+    const totalPoints = activityPoints; // No artificial base points
 
-    console.log(`[Points API] Calculated total for ${userId}: ${totalPoints} (Base: ${BASE_POINTS}, Activity: ${activityPoints})`);
+    console.log(`[Points API] Calculated total for ${userId}: ${totalPoints} (Activity: ${activityPoints})`);
 
     return NextResponse.json({
       success: true,

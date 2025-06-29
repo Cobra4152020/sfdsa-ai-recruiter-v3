@@ -141,8 +141,8 @@ export default function AdminAuthCheck({
         debugData.steps.push("Checking admin role");
         
         // EMERGENCY BYPASS: Skip role check entirely for known admin user
-        if (user.id === "10278ec9-3a35-45bd-b051-eb6f805d0002") {
-          console.log("🚨 EMERGENCY BYPASS: Granting admin access to known admin user");
+        if (user.id === "d1de04f1-36ee-451c-a546-0d343c950f76") {
+          console.log("🚨 EMERGENCY BYPASS: Granting admin access to John Baker (refundpolice50@gmail.com)");
           setIsAdmin(true);
           setDebugInfo(debugData);
           return;

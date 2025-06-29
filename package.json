@@ -12,6 +12,7 @@
     "fix-tables": "tsx scripts/fix-table-checks.ts",
     "run-migrations": "tsx scripts/run-migrations.ts",
     "seed-trivia": "tsx scripts/seed-trivia-questions.ts",
+    "verify-badges": "node scripts/verify-badge-images.js",
     "vercel-build": "node scripts/deploy-build.js",
     "test": "jest",
     "test:watch": "jest --watch",

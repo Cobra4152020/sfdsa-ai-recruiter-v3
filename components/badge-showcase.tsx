@@ -53,95 +53,9 @@ export function BadgeShowcase() {
       console.error("Error fetching badges:", err);
       setError(err instanceof Error ? err.message : "Unknown error occurred");
 
-      // Fallback to static data if API fails
-      const staticBadges: Badge[] = [
-        {
-          id: "written",
-          badge_type: "written" as BadgeType,
-          name: "Written Test",
-          description: "Completed written test preparation",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "oral",
-          badge_type: "oral" as BadgeType,
-          name: "Oral Board",
-          description: "Prepared for oral board interviews",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "physical",
-          badge_type: "physical" as BadgeType,
-          name: "Physical Test",
-          description: "Completed physical test preparation",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "polygraph",
-          badge_type: "polygraph" as BadgeType,
-          name: "Polygraph",
-          description: "Learned about the polygraph process",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "psychological",
-          badge_type: "psychological" as BadgeType,
-          name: "Psychological",
-          description: "Prepared for psychological evaluation",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "full",
-          badge_type: "full" as BadgeType,
-          name: "Full Process",
-          description: "Completed all preparation areas",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "chat-participation",
-          badge_type: "chat-participation" as BadgeType,
-          name: "Chat Participation",
-          description: "Engaged with Sgt. Ken",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "first-response",
-          badge_type: "first-response" as BadgeType,
-          name: "First Response",
-          description: "Received first response from Sgt. Ken",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "application-started",
-          badge_type: "application-started" as BadgeType,
-          name: "Application Started",
-          description: "Started the application process",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "application-completed",
-          badge_type: "application-completed" as BadgeType,
-          name: "Application Completed",
-          description: "Completed the application process",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "frequent-user",
-          badge_type: "frequent-user" as BadgeType,
-          name: "Frequent User",
-          description: "Regularly engages with the recruitment platform",
-          created_at: new Date().toISOString(),
-        },
-        {
-          id: "resource-downloader",
-          badge_type: "resource-downloader" as BadgeType,
-          name: "Resource Downloader",
-          description: "Downloaded recruitment resources and materials",
-          created_at: new Date().toISOString(),
-        },
-      ];
-
-      setBadges(staticBadges);
+      // Don't use fallback data - this was causing duplicates
+      // Instead, show an error state and let the user retry
+      setBadges([]);
     } finally {
       setIsLoading(false);
     }
@@ -152,14 +66,18 @@ export function BadgeShowcase() {
   }, []);
 
   const applicationBadgeTypes: string[] = [
+    // Achievement Badges
     "written",
     "oral",
     "physical",
     "polygraph",
     "psychological",
-    "full",
+    // Process Badges
+    "chat-participation",
+    "first-response",
     "application-started",
     "application-completed",
+    "full",
   ];
 
   const filteredBadges = badges.filter((badge) => {
@@ -353,7 +271,7 @@ export function BadgeShowcase() {
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 mt-4">
                   {filteredBadges
                     .filter((badge) =>
-                      ["frequent-user", "resource-downloader"].includes(
+                      ["frequent-user", "resource-downloader", "hard-charger"].includes(
                         badge.badge_type,
                       ),
                     )

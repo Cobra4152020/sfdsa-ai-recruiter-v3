@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { getServiceSupabase } from "@/app/lib/supabase/server";
-import { addParticipationPoints } from "@/lib/points-service";
 
 export const dynamic = "force-dynamic";
 
@@ -49,16 +48,34 @@ export async function POST(request: Request) {
       pointsToAward = points; // Points calculated based on challenge type
     }
 
-    // Use the user-type-aware points service instead of manually updating users table
-    const success = await addParticipationPoints(
-      userId,
-      pointsToAward,
-      action,
-      `Awarded ${pointsToAward} points for ${action}`
-    );
+    // Use the new direct points API instead of the complex addParticipationPoints function
+    try {
+      const pointsResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/award-points-direct`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: userId,
+          points: pointsToAward,
+          action: action,
+          description: `Awarded ${pointsToAward} points for ${action}`
+        }),
+      });
 
-    if (!success) {
-      console.error('Error awarding points via participation service');
+      const pointsResult = await pointsResponse.json();
+      
+      if (!pointsResult.success) {
+        console.error('Error awarding points via direct API:', pointsResult);
+        return NextResponse.json({
+          success: false,
+          message: "Could not award points: " + pointsResult.message,
+        }, { status: 500 });
+      }
+
+      console.log('✅ Points awarded successfully via direct API:', pointsResult);
+    } catch (pointsError) {
+      console.error('Error calling direct points API:', pointsError);
       return NextResponse.json({
         success: false,
         message: "Could not award points",

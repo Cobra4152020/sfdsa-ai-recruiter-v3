@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Save Badge Images - SF Deputy Sheriff</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #0A3C1F;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 1.1em;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .badge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .badge-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 3px solid transparent;
+        }
+        
+        .badge-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            border-color: #0A3C1F;
+        }
+        
+        .badge-image {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: block;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+        
+        .badge-image:hover {
+            transform: scale(1.05);
+        }
+        
+        .badge-info h3 {
+            color: #0A3C1F;
+            margin: 0 0 10px 0;
+            font-size: 1.3em;
+            text-align: center;
+        }
+        
+        .filename {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #d63384;
+            margin: 10px 0;
+            text-align: center;
+            border: 2px solid #e9ecef;
+        }
+        
+        .description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .save-btn {
+            width: 100%;
+            background: linear-gradient(135deg, #0A3C1F 0%, #166534 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .save-btn:hover {
+            background: linear-gradient(135deg, #166534 0%, #0A3C1F 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(10, 60, 31, 0.4);
+        }
+        
+        .instructions {
+            background: #e3f2fd;
+            border: 2px solid #2196f3;
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+        
+        .instructions h2 {
+            color: #1976d2;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions ol {
+            color: #333;
+            line-height: 1.8;
+        }
+        
+        .instructions li {
+            margin-bottom: 8px;
+        }
+        
+        .path-highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-weight: bold;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏅 Save Badge Images</h1>
+        <p>Right-click each badge image below and save it with the exact filename shown. All images must be saved to the <span class="path-highlight">/public/badges/</span> folder.</p>
+    </div>
+    
+    <div class="badge-grid">
+        <div class="badge-card">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMTAiIGZpbGw9IiMzMzY2RkYiLz4KPHN2ZyB4PSIzMCIgeT0iMzAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0yMC41NyA5LjMyQzIwLjQzIDkuMTIgMjAuMjMgOC45NiAyMCA4Ljg1TDE4IDE2TDE2IDEzSDhMNiAxNkw0IDguODVDMy43NyA4Ljk2IDMuNTcgOS4xMiAzLjQzIDkuMzJDMy4zIDkuNTMgMy4yMyA5Ljc3IDMuMjMgMTBWMTRDMy4yMyAxNC44IDMuNTMgMTUuNTMgNC4xIDE2LjFDNC42NyAxNi42NyA1LjQgMTYuOTcgNi4yIDE2Ljk3SDE3LjhDMTguNiAxNi45NyAxOS4zMyAxNi42NyAxOS45IDE2LjFDMjAuNDcgMTUuNTMgMjAuNzcgMTQuOCAyMC43NyAxNFYxMEMyMC43NyA5Ljc3IDIwLjcgOS41MyAyMC41NyA5LjMyWiIvPgo8L3N2Zz4KPC9zdmc+" alt="Physical Test Badge" class="badge-image" onclick="showImagePlaceholder('physical')">
+            <div class="badge-info">
+                <h3>Physical Test</h3>
+                <div class="filename">physical.png</div>
+                <div class="description">Blue dumbbells/weights representing physical fitness preparation</div>
+                <button class="save-btn" onclick="alert('Right-click the image above and select Save As... then name it: physical.png')">💾 Click to Save Instructions</button>
+            </div>
+        </div>
+        
+        <div class="badge-card">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMTAiIGZpbGw9IiNGRjY2OTkiLz4KPHN2ZyB4PSIzMCIgeT0iMzAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xMCAyQzEwIDIuNTUgMTAuNDUgMyAxMSAzSDEzQzEzLjU1IDMgMTQgMi41NSAxNCAyVjEuNUMxNCAwLjY3IDEzLjMzIDAgMTIuNSAwSDE1LjVDMTYuMzMgMCAxNyAwLjY3IDE3IDEuNVYyQzE3IDMuMTEgMTYuMTEgNCAxNSA0SDE3QzE3LjU1IDQgMTggNC40NSAxOCA1VjdDMTggNy41NSAxNy41NSA4IDE3IDhIMTVDMTQuNDUgOCAxNCA3LjU1IDE0IDdWNkMxNCA1LjQ1IDEzLjU1IDUgMTMgNUgxMUMxMC40NSA1IDEwIDUuNDUgMTAgNlY3QzEwIDcuNTUgOS41NSA4IDkgOEg3QzYuNDUgOCA2IDcuNTUgNiA3VjVDNiA0LjQ1IDYuNDUgNCA3IDRIOUMxMC4xMSA0IDExIDMuMTEgMTEgMlY4SDEzVjEwSDEwWiIvPgo8L3N2Zz4KPC9zdmc+" alt="Psychological Badge" class="badge-image" onclick="showImagePlaceholder('psychological')">
+            <div class="badge-info">
+                <h3>Psychological Evaluation</h3>
+                <div class="filename">psychological.png</div>
+                <div class="description">Brain with medical cross representing psychological preparation</div>
+                <button class="save-btn" onclick="alert('Right-click the image above and select Save As... then name it: psychological.png')">💾 Click to Save Instructions</button>
+            </div>
+        </div>
+        
+        <div class="badge-card">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMTAiIGZpbGw9IiNGRkFBMDAiLz4KPHN2ZyB4PSIzMCIgeT0iMzAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xNiAySDhDNi45IDIgNiAyLjkgNiA0VjIwQzYgMjEuMSA2LjkgMjIgOCAyMkgxNkMxNy4xIDIyIDE4IDIxLjEgMTggMjBWNEMxOCAyLjkgMTcuMSAyIDE2IDJaTTE2IDIwSDhWNEgxNlYyMFpNOSA2SDdWN0g5VjZaTTkgOEg3VjlIOVY4Wk05IDEwSDdWMTFIOVYxMFpNOSAxMkg3VjEzSDlWMTJaTTkgMTRIN1YxNUg5VjE0WiIvPgo8L3N2Zz4KPC9zdmc+" alt="Oral Board Badge" class="badge-image" onclick="showImagePlaceholder('oral')">
+            <div class="badge-info">
+                <h3>Oral Board Interview</h3>
+                <div class="filename">oral.png</div>
+                <div class="description">Interview scene with two people representing oral board preparation</div>
+                <button class="save-btn" onclick="alert('Right-click the image above and select Save As... then name it: oral.png')">💾 Click to Save Instructions</button>
+            </div>
+        </div>
+        
+        <div class="badge-card">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMTAiIGZpbGw9IiM5OTMzRkYiLz4KPHN2ZyB4PSIzMCIgeT0iMzAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0yMCA0SDE4VjNDMTggMi40NSAxNy41NSAyIDE3IDJINkM1LjQ1IDIgNSAyLjQ1IDUgM1Y0SDRDMi45IDQgMiA0LjkgMiA2Vjc1QzIgMTYuMSAyLjkgMTcgNCAxN0g2VjE4QzYgMTguNTUgNi40NSAxOSA3IDE5SDE5QzE5LjU1IDE5IDIwIDE4LjU1IDIwIDE4VjE3SDE5QzIwLjEgMTcgMjEgMTYuMSAyMSAxNVY2QzIxIDQuOSAyMC4xIDQgMjAgNFpNMTggMTVINlY2SDE4VjE1WiIvPgo8L3N2Zz4KPC9zdmc+" alt="Polygraph Badge" class="badge-image" onclick="showImagePlaceholder('polygraph')">
+            <div class="badge-info">
+                <h3>Polygraph Process</h3>
+                <div class="filename">polygraph.png</div>
+                <div class="description">Computer with analytics/graph representing polygraph process learning</div>
+                <button class="save-btn" onclick="alert('Right-click the image above and select Save As... then name it: polygraph.png')">💾 Click to Save Instructions</button>
+            </div>
+        </div>
+        
+        <div class="badge-card">
+            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgdmlld0JveD0iMCAwIDEyMCAxMjAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIiByeD0iMTAiIGZpbGw9IiNGRjMzMzMiLz4KPHN2ZyB4PSIzMCIgeT0iMzAiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xNCAySDZDNC45IDIgNCAyLjkgNCA0VjIwQzQgMjEuMSA0LjkgMjIgNiAyMkgxOEMxOS4xIDIyIDIwIDIxLjEgMjAgMjBWOEwxNCAyWk0xOCAyMEg2VjRIOEMxMy4xIDEzLjkgMTMgMTMgMTMgMTJDMTMgMTEuNSAxMy4yIDExLjEgMTMuNSAxMC44TDE3IDcuNEwxOCAyMFoiLz4KPHN2ZyB4PSI2IiB5PSIxMCIgd2lkdGg9IjMiIGhlaWdodD0iMiIgZmlsbD0iI0ZGRkZGRiIvPgo8c3ZnIHg9IjYiIHk9IjEzIiB3aWR0aD0iNSIgaGVpZ2h0PSIyIiBmaWxsPSIjRkZGRkZGIi8+Cjwvc3ZnPgo8L3N2Zz4=" alt="Written Test Badge" class="badge-image" onclick="showImagePlaceholder('written')">
+            <div class="badge-info">
+                <h3>Written Test</h3>
+                <div class="filename">written.png</div>
+                <div class="description">Document with A+ grade and pencil representing written test preparation</div>
+                <button class="save-btn" onclick="alert('Right-click the image above and select Save As... then name it: written.png')">💾 Click to Save Instructions</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="instructions">
+        <h2>📋 Save Instructions</h2>
+        <ol>
+            <li>Go back to the chat and <strong>right-click on each of the 5 actual badge images</strong> that were shared earlier</li>
+            <li>Select <strong>"Save image as..."</strong> or <strong>"Save picture as..."</strong></li>
+            <li>Navigate to your project folder: <span class="path-highlight">sfdsa-ai-recruiter-v3/public/badges/</span></li>
+            <li>Use the <strong>exact filename</strong> shown above for each badge</li>
+            <li>Make sure to save as <strong>PNG format</strong></li>
+            <li>After saving all 5 images, run: <span class="path-highlight">npm run verify-badges</span></li>
+            <li>Visit <strong>http://localhost:3000/badges</strong> to see your custom images!</li>
+        </ol>
+        
+        <p><strong>⚠️ Important:</strong> The placeholder images above are just for reference. You need to save the actual 3D badge images from the chat conversation with the exact filenames shown.</p>
+    </div>
+    
+    <script>
+        function showImagePlaceholder(type) {
+            alert(`This is a placeholder for the ${type} badge. Please save the actual 3D badge image from the chat with the filename: ${type}.png`);
+        }
+    </script>
+</body>
+</html> 

@@ -69,12 +69,16 @@
   @apply text-muted-foreground hover:text-primary transition-colors duration-200;
 }
 
+.app-background {
+  background-image: linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background) / 0.8));
+}
+
 @layer base {
   * {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-transparent text-foreground;
     /* Prevent horizontal scroll on mobile */
     overflow-x: hidden;
     /* Smooth scrolling */

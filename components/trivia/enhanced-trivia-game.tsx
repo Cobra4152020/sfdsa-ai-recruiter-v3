@@ -658,54 +658,67 @@ export function EnhancedTriviaGame({
 
     // If this is the last question, end the game
     if (currentQuestionIndex === questions.length - 1) {
+      console.log('🎮 Game ending - last question reached');
+      console.log('🔐 Auth status:', { isLoggedIn, currentUser: !!currentUser, userId: currentUser?.id });
+      
       if (isLoggedIn && currentUser) {
         try {
+          console.log('📤 Submitting trivia results...');
+          const submissionData = {
+            userId: currentUser.id,
+            gameId: gameId,
+            score: isCorrect ? score + 1 : score,
+            totalQuestions: questions.length,
+            correctAnswers: isCorrect ? correctAnswers + 1 : correctAnswers,
+            timeSpent: questions.length * 30 - timeLeft,
+            requestId,
+          };
+          console.log('📦 Submission data:', submissionData);
+          
           const response = await fetch(submitEndpoint, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({
-              userId: currentUser.id,
-              gameId: gameId,
-              score: isCorrect ? score + 1 : score,
-              totalQuestions: questions.length,
-              correctAnswers: isCorrect ? correctAnswers + 1 : correctAnswers,
-              timeSpent: questions.length * 30 - timeLeft,
-              requestId,
-            }),
+            body: JSON.stringify(submissionData),
           });
 
+          console.log('📬 Submit response status:', response.status);
           const result = await response.json();
+          console.log('📥 Submit response data:', result);
 
           if (result.success) {
-            setPointsAwarded(
-              result.pointsAwarded || score * pointsPerQuestion + pointsPerGame,
-            );
+            const finalPoints = result.pointsAwarded || score * pointsPerQuestion + pointsPerGame;
+            console.log('💰 Final points awarded:', finalPoints);
+            setPointsAwarded(finalPoints);
 
             // If a badge was awarded, show the badge dialog
             if (result.badgeAwarded) {
+              console.log('🏆 Badge awarded:', result.badgeAwarded);
               setEarnedBadge(result.badgeAwarded);
               setTimeout(() => {
                 setShowBadgeDialog(true);
               }, 2000); // Show after feedback disappears
             } else {
+              console.log('🎯 No badge awarded, showing game over');
               setTimeout(() => {
                 setIsGameOver(true);
               }, 2000); // Show after feedback disappears
             }
           } else {
+            console.error('❌ Submit failed:', result);
             setTimeout(() => {
               setIsGameOver(true);
             }, 2000);
           }
         } catch (error) {
-          console.error(`Error submitting ${gameId} trivia results:`, error);
+          console.error(`❌ Error submitting ${gameId} trivia results:`, error);
           setTimeout(() => {
             setIsGameOver(true);
           }, 2000); // Show after feedback disappears
         }
       } else {
+        console.log('⚠️  User not logged in, showing game over without points');
         setTimeout(() => {
           setIsGameOver(true);
         }, 2000); // Show after feedback disappears

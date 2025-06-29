@@ -131,7 +131,27 @@ export async function addParticipationPoints(
       return false;
     }
 
-    // 2. Log the points activity if participation_points table exists
+    // 2. Log the points activity to user_point_logs (what dashboard reads from)
+    try {
+      const { error: logError } = await supabase
+        .from("user_point_logs")
+        .insert({
+          user_id: userId,
+          points,
+          action: activityType,
+          created_at: new Date().toISOString(),
+        });
+
+      if (logError) {
+        console.error("Error logging to user_point_logs:", logError);
+      } else {
+        console.log(`✅ Successfully logged ${points} points to user_point_logs for ${activityType}`);
+      }
+    } catch (logErr) {
+      console.error("Exception logging to user_point_logs:", logErr);
+    }
+
+    // 3. Also log to participation_points table if it exists (legacy/backup)
     try {
       const { error: insertError } = await supabase
         .from("participation_points")

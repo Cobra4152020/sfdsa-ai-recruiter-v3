@@ -23,12 +23,17 @@ import {
   FileText,
   CheckCircle,
   Clock,
-  Upload,
   MessageSquare,
   Bell,
   GamepadIcon,
   Award,
   Trophy,
+  Shield,
+  Lock,
+  AlertCircle,
+  CheckSquare,
+  ExternalLink,
+  GraduationCap,
 } from "lucide-react";
 import {
   AreaChart,
@@ -116,8 +121,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
     null,
   );
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [documentTitle, setDocumentTitle] = useState("");
-  const [documentFile, setDocumentFile] = useState<File | null>(null);
+
   const [messageText, setMessageText] = useState("");
   const [triviaStats, setTriviaStats] = useState<{
     gamesPlayed: number;
@@ -182,221 +186,102 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           console.log("Could not fetch real data, using fallback");
         }
 
-        // Create realistic points history based on actual total
-        const mockPointsHistory = Array.from({ length: 30 }, (_, i) => {
-          const date = new Date();
-          date.setDate(date.getDate() - 29 + i);
-          // Distribute points more realistically
-          const basePoints = actualUserPoints > 0 ? Math.floor(actualUserPoints / 30) : 10;
-          const variation = Math.floor(Math.random() * 20) - 10;
-          return {
-            date: date.toISOString().split("T")[0],
-            points: Math.max(0, basePoints + variation),
-          };
-        });
+        // Fetch real points history from the database
+        let realPointsHistory: PointsHistoryEntry[] = [];
+        try {
+          const historyResponse = await fetch(`/api/user/points-history?userId=${currentUser.id}`);
+          if (historyResponse.ok) {
+            const historyData = await historyResponse.json();
+            realPointsHistory = historyData.pointsHistory || [];
+            console.log('✅ Real points history loaded:', realPointsHistory.length, 'days');
+          } else {
+            console.warn('⚠️ Could not fetch real points history, using fallback');
+          }
+        } catch (historyError) {
+          console.warn('⚠️ Error fetching points history:', historyError);
+        }
 
-        const mockTasks: Task[] = [
-          {
-            id: "task1",
-            title: "Complete application form",
-            description: "Fill out the online application form",
-            status: "completed" as const,
-            dueDate: "2023-05-15",
-            priority: "high" as const,
-          },
-          {
-            id: "task2",
-            title: "Submit required documents",
-            description:
-              "Upload your ID, education certificates, and references",
-            status: "in-progress" as const,
-            dueDate: "2023-05-20",
-            priority: "high" as const,
-          },
-          {
-            id: "task3",
-            title: "Schedule written exam",
-            description: "Book your slot for the written examination",
-            status: "pending" as const,
-            dueDate: "2023-05-25",
-            priority: "medium" as const,
-          },
-          {
-            id: "task4",
-            title: "Prepare for physical fitness test",
-            description:
-              "Review requirements and practice for the physical fitness assessment",
-            status: "pending" as const,
-            dueDate: "2023-06-10",
-            priority: "medium" as const,
-          },
-          {
-            id: "task5",
-            title: "Background check forms",
-            description:
-              "Complete and submit background check authorization forms",
-            status: "pending" as const,
-            dueDate: "2023-06-15",
-            priority: "high" as const,
-          },
-          {
-            id: "task6",
-            title: "Play SF Trivia with Sgt. Ken",
-            description:
-              "Play the trivia game to learn more about San Francisco and earn points",
-            status: "in-progress" as const,
-            dueDate: "2023-05-30",
-            priority: "medium" as const,
-          },
-        ];
+        // If no real history available, create minimal fallback (not fake data)
+        if (realPointsHistory.length === 0) {
+          // Only show today with actual current points, rest at 0
+          const today = new Date().toISOString().split("T")[0];
+          realPointsHistory = Array.from({ length: 30 }, (_, i) => {
+            const date = new Date();
+            date.setDate(date.getDate() - 29 + i);
+            const dateStr = date.toISOString().split("T")[0];
+            return {
+              date: dateStr,
+              points: dateStr === today ? actualUserPoints : 0,
+            };
+          });
+        }
 
-        const mockAppointments: Appointment[] = [
-          {
-            id: "apt1",
-            title: "Written Exam",
-            date: "2023-05-28T10:00:00",
-            location: "SF Sheriff&apos;s Office - 1 Dr Carlton B Goodlett Pl",
-            status: "scheduled" as const,
-          },
-          {
-            id: "apt2",
-            title: "Physical Fitness Test",
-            date: "2023-06-15T09:00:00",
-            location: "SF Sheriff&apos;s Training Facility",
-            status: "pending" as const,
-          },
-          {
-            id: "apt3",
-            title: "Oral Interview",
-            date: "2023-06-30T13:00:00",
-            location: "SF Sheriff&apos;s Office - 1 Dr Carlton B Goodlett Pl",
-            status: "pending" as const,
-          },
-        ];
 
-        const mockDocuments: Document[] = [
-          {
-            id: "doc1",
-            title: "Application Form",
-            uploadDate: "2023-05-10T14:30:00",
-            status: "approved" as const,
-            type: "application",
-          },
-          {
-            id: "doc2",
-            title: "Driver&apos;s License",
-            uploadDate: "2023-05-10T14:35:00",
-            status: "approved" as const,
-            type: "identification",
-          },
-          {
-            id: "doc3",
-            title: "College Transcript",
-            uploadDate: "2023-05-10T14:40:00",
-            status: "pending" as const,
-            type: "education",
-          },
-        ];
 
-        const mockMessages = [
-          {
-            id: "msg1",
-            from: "Recruitment Team",
-            subject: "Application Received",
-            content:
-              "Thank you for submitting your application. We have received it and will begin processing shortly.",
-            date: "2023-05-11T09:15:00",
-            read: true,
-          },
-          {
-            id: "msg2",
-            from: "Sgt. Williams",
-            subject: "Document Verification",
-            content:
-              "Your identification documents have been verified. Please ensure you upload your education certificates as soon as possible.",
-            date: "2023-05-12T14:20:00",
-            read: true,
-          },
-          {
-            id: "msg3",
-            from: "Training Division",
-            subject: "Preparation Resources",
-            content:
-              "To help you prepare for the upcoming written exam, we&apos;ve attached some study materials and practice tests.",
-            date: "2023-05-15T11:30:00",
-            read: false,
-          },
-          {
-            id: "msg4",
-            from: "Sgt. Ken",
-            subject: "SF Trivia Game Updates",
-            content:
-              "New trivia questions have been added to the SF Trivia Game! Play now to earn more points and badges.",
-            date: "2023-05-16T10:45:00",
-            read: false,
-          },
-        ];
-
-        const mockNotifications = [
-          {
-            id: "notif1",
-            type: "document",
-            content:
-              "Your Driver&apos;s License has been verified and approved.",
-            date: "2023-05-12T14:25:00",
-            read: false,
-          },
-          {
-            id: "notif2",
-            type: "appointment",
-            content: "Your Written Exam is scheduled for May 28th at 10:00 AM.",
-            date: "2023-05-20T09:00:00",
-            read: false,
-          },
-          {
-            id: "notif3",
-            type: "message",
-            content: "You have a new message from the Training Division.",
-            date: "2023-05-15T11:35:00",
-            read: false,
-          },
-          {
-            id: "notif4",
-            type: "badge",
-            content:
-              "Congratulations! You&apos;ve earned the 'Trivia Enthusiast' badge.",
-            date: "2023-05-14T15:20:00",
-            read: false,
-          },
-          {
-            id: "notif5",
-            type: "points",
-            content:
-              "You&apos;ve reached 1,000 points! Keep up the great work.",
-            date: "2023-05-13T16:45:00",
-            read: false,
-          },
-        ];
-
-        // Mock trivia data
-        const mockTriviaStats = {
-          gamesPlayed: 12,
-          averageScore: 3.8,
-          bestScore: "5/5",
-          totalPointsEarned: 475,
-          badgesEarned: [
-            {
-              name: "Trivia Participant",
-              date: "2023-05-01",
-              description: "Completed your first trivia game",
-            },
-            {
-              name: "Trivia Enthusiast",
-              date: "2023-05-10",
-              description: "Played 10 trivia games",
-            },
-          ],
+        // Get real trivia stats
+        let realTriviaStats = {
+          gamesPlayed: 0,
+          averageScore: 0,
+          bestScore: "0/0",
+          totalPointsEarned: 0,
+          badgesEarned: [],
         };
+
+        try {
+          const triviaStatsResponse = await fetch(`/api/user/trivia-stats?userId=${currentUser.id}`);
+          if (triviaStatsResponse.ok) {
+            const triviaStatsData = await triviaStatsResponse.json();
+            if (triviaStatsData.success) {
+              realTriviaStats = triviaStatsData.stats;
+              console.log('✅ Real trivia stats loaded:', realTriviaStats);
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ Could not fetch real trivia stats:', error);
+        }
+
+        // Get real recent activity/notifications
+        let realNotifications = [];
+        try {
+          const activityResponse = await fetch(`/api/user/activity?userId=${currentUser.id}`);
+          if (activityResponse.ok) {
+            const activityData = await activityResponse.json();
+            if (activityData.success) {
+              realNotifications = activityData.activities;
+              console.log('✅ Real activity loaded:', realNotifications.length, 'activities');
+            }
+          }
+        } catch (error) {
+          console.warn('⚠️ Could not fetch real activity:', error);
+        }
+
+        // Create real tasks based on user progress
+        const realTasks = [
+          {
+            id: "trivia1",
+            title: "Play SF Trivia with Sgt. Ken",
+            description: "Test your knowledge about San Francisco and earn points",
+            status: realTriviaStats.gamesPlayed > 0 ? "completed" as const : "pending" as const,
+            dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            priority: "medium" as const,
+          },
+          {
+            id: "points1",
+            title: "Earn Your First 100 Points",
+            description: "Accumulate 100 points through various activities",
+            status: actualUserPoints >= 100 ? "completed" as const : actualUserPoints > 0 ? "in-progress" as const : "pending" as const,
+            dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            priority: "high" as const,
+          },
+          {
+            id: "profile1",
+            title: "Complete Your Profile",
+            description: "Fill out your profile information to get started",
+            status: "completed" as const,
+            dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+            priority: "high" as const,
+          },
+        ];
 
         setDashboardData({
           applicationProgress: actualUserPoints >= 500 ? 100 : Math.floor((actualUserPoints / 500) * 100),
@@ -404,15 +289,15 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           badgeCount: actualBadges,
           badgesThisMonth: badgesThisMonth,
           nftCount: 0,
-          pointsHistory: mockPointsHistory,
-          tasks: mockTasks,
-          appointments: mockAppointments,
-          documents: mockDocuments,
-          messages: mockMessages,
-          notifications: mockNotifications,
+          pointsHistory: realPointsHistory,
+          tasks: realTasks,
+          appointments: [], // Will add real appointments API later
+          documents: [], // Will add real documents API later  
+          messages: [], // Will add real messages API later
+          notifications: realNotifications,
         });
 
-        setTriviaStats(mockTriviaStats);
+        setTriviaStats(realTriviaStats);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         setError(
@@ -444,24 +329,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
     setSelectedDate(undefined);
   };
 
-  const handleUploadDocument = () => {
-    if (!documentTitle || !documentFile) {
-      toast({
-        title: "Missing information",
-        description: "Please provide both a title and a file",
-        variant: "destructive",
-      });
-      return;
-    }
 
-    toast({
-      title: "Document Uploaded",
-      description: `Your document "${documentTitle}" has been uploaded successfully.`,
-    });
-
-    setDocumentTitle("");
-    setDocumentFile(null);
-  };
 
   const handleSendMessage = () => {
     if (!messageText.trim()) {
@@ -531,7 +399,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="tasks">Tasks</TabsTrigger>
             <TabsTrigger value="appointments">Appointments</TabsTrigger>
-            <TabsTrigger value="documents">Documents</TabsTrigger>
+            <TabsTrigger value="background-prep">Background Prep</TabsTrigger>
             <TabsTrigger value="messages">Messages</TabsTrigger>
             <TabsTrigger value="trivia">Trivia Stats</TabsTrigger>
           </TabsList>
@@ -1228,175 +1096,238 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           </div>
         </TabsContent>
 
-        <TabsContent value="documents" className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Card>
+        <TabsContent value="background-prep" className="space-y-6">
+          {/* Point Gate Check */}
+          {(dashboardData?.pointsTotal || 0) < 75 ? (
+            <Card className="border-amber-200 bg-amber-50 dark:bg-amber-900/20">
               <CardHeader>
-                <CardTitle>Your Documents</CardTitle>
-                <CardDescription>
-                  Uploaded documents and their status
+                <CardTitle className="flex items-center gap-2 text-amber-800 dark:text-amber-200">
+                  <Lock className="h-5 w-5" />
+                  Background Preparation Guide - Locked
+                </CardTitle>
+                <CardDescription className="text-amber-700 dark:text-amber-300">
+                  Earn {75 - (dashboardData?.pointsTotal || 0)} more points to unlock this valuable preparation guide
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {dashboardData?.documents.map((document: Document) => (
-                    <div
-                      key={document.id}
-                      className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-                    >
-                      <div className="flex items-start space-x-3">
-                        <div className="bg-[#0A3C1F]/10 rounded-full p-2">
-                          <FileText className="h-4 w-4 text-[#0A3C1F]" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between">
-                            <h4 className="font-medium">{document.title}</h4>
-                            <Badge
-                              variant="outline"
-                              className={`${
-                                document.status === "approved"
-                                  ? "bg-green-50 text-green-600 border-green-200 dark:bg-green-900/20 dark:border-green-800"
-                                  : document.status === "rejected"
-                                    ? "bg-red-50 text-red-600 border-red-200 dark:bg-red-900/20 dark:border-red-800"
-                                    : "bg-yellow-50 text-yellow-600 border-yellow-200 dark:bg-yellow-900/20 dark:border-yellow-800"
-                              }`}
-                            >
-                              {document.status.charAt(0).toUpperCase() +
-                                document.status.slice(1)}
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Type:{" "}
-                            {document.type.charAt(0).toUpperCase() +
-                              document.type.slice(1)}
-                          </p>
-                          <p className="text-sm text-muted-foreground">
-                            Uploaded:{" "}
-                            {new Date(document.uploadDate).toLocaleString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex justify-end mt-4 space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "Document Downloaded",
-                              description: `"${document.title}" has been downloaded.`,
-                            });
-                          }}
-                        >
-                          Download
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => {
-                            toast({
-                              title: "Document Details",
-                              description: `Viewing details for "${document.title}"`,
-                            });
-                          }}
-                        >
-                          View Details
-                        </Button>
-                      </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-full bg-amber-200 dark:bg-amber-800 rounded-full h-2">
+                      <div 
+                        className="bg-amber-600 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${Math.min(((dashboardData?.pointsTotal || 0) / 75) * 100, 100)}%` }}
+                      />
                     </div>
-                  ))}
+                    <span className="text-sm font-medium text-amber-800 dark:text-amber-200">
+                      {dashboardData?.pointsTotal || 0}/75
+                    </span>
+                  </div>
+                  <p className="text-sm text-amber-700 dark:text-amber-300">
+                    🎯 <strong>Why unlock this?</strong> Get ahead of the competition by preparing your background investigation documents early. The more prepared you are, the faster you can get hired!
+                  </p>
+                  
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                    <h4 className="font-medium text-sm mb-3 flex items-center">
+                      <Trophy className="h-4 w-4 mr-2 text-yellow-500" />
+                      How to Earn Points Quickly
+                    </h4>
+                    <ul className="text-sm space-y-2 text-muted-foreground">
+                      <li className="flex items-center">
+                        <GamepadIcon className="h-3 w-3 mr-2 text-blue-500" />
+                        Play SF Trivia games (up to 100 points per perfect game)
+                      </li>
+                      <li className="flex items-center">
+                        <MessageSquare className="h-3 w-3 mr-2 text-green-500" />
+                        Attend Sgt. Ken's daily briefings (10 points each)
+                      </li>
+                      <li className="flex items-center">
+                        <CheckCircle className="h-3 w-3 mr-2 text-purple-500" />
+                        Complete recruitment tasks and activities
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Link href="/trivia" className="flex-1">
+                      <Button 
+                        className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                      >
+                        <GamepadIcon className="h-4 w-4 mr-2" />
+                        Play Trivia to Earn Points
+                      </Button>
+                    </Link>
+                    <Link href="/daily-briefing">
+                      <Button 
+                        variant="outline" 
+                        className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10"
+                      >
+                        <MessageSquare className="h-4 w-4 mr-2" />
+                        Daily Briefing
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </CardContent>
             </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Upload New Document</CardTitle>
-                <CardDescription>
-                  Submit required documents for your application
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="document-title">Document Title</Label>
-                    <Input
-                      id="document-title"
-                      placeholder="Enter document title"
-                      value={documentTitle}
-                      onChange={(e) => setDocumentTitle(e.target.value)}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="document-type">Document Type</Label>
-                    <select
-                      id="document-type"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          ) : (
+            <div className="space-y-6">
+              {/* Unlocked Header */}
+              <Card className="border-green-200 bg-green-50 dark:bg-green-900/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
+                    <CheckSquare className="h-5 w-5" />
+                    Background Preparation Guide - Unlocked!
+                  </CardTitle>
+                  <CardDescription className="text-green-700 dark:text-green-300">
+                    🎉 Congratulations! You've earned access to the complete background investigation preparation guide.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <Link href="/background-preparation" className="flex-1">
+                      <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Access Complete Background Prep Guide
+                      </Button>
+                    </Link>
+                    <Button 
+                      variant="outline" 
+                      className="border-green-600 text-green-700 hover:bg-green-50"
+                      onClick={() => {
+                        toast({
+                          title: "Feature Coming Soon",
+                          description: "Document tracking will be available in the full guide.",
+                        });
+                      }}
                     >
-                      <option value="">Select document type</option>
-                      <option value="identification">Identification</option>
-                      <option value="education">Education</option>
-                      <option value="employment">Employment History</option>
-                      <option value="reference">Reference</option>
-                      <option value="certification">Certification</option>
-                      <option value="other">Other</option>
-                    </select>
+                      <CheckSquare className="h-4 w-4 mr-2" />
+                      Track Progress
+                    </Button>
                   </div>
+                </CardContent>
+              </Card>
 
-                  <div>
-                    <Label htmlFor="document-file">Upload File</Label>
-                    <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md border-gray-300 dark:border-gray-600">
-                      <div className="space-y-1 text-center">
-                        <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                        <div className="flex text-sm text-gray-600 dark:text-gray-400">
-                          <label
-                            htmlFor="file-upload"
-                            className="relative cursor-pointer rounded-md font-medium text-[#0A3C1F] hover:text-[#0A3C1F]/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[#0A3C1F]"
-                          >
-                            <span>Upload a file</span>
-                            <input
-                              id="file-upload"
-                              name="file-upload"
-                              type="file"
-                              className="sr-only"
-                              onChange={(e) =>
-                                setDocumentFile(e.target.files?.[0] || null)
-                              }
-                            />
-                          </label>
-                          <p className="pl-1">or drag and drop</p>
+              {/* Quick Preview of What's Available */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <FileText className="h-5 w-5 text-[#0A3C1F]" />
+                      Complete Document Checklist
+                    </CardTitle>
+                    <CardDescription>
+                      Your guide includes all required documents with detailed instructions
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200">
+                        <Shield className="h-5 w-5 text-red-600" />
+                        <div>
+                          <h4 className="font-medium text-sm text-red-800 dark:text-red-300">Identity Documents</h4>
+                          <p className="text-xs text-red-600 dark:text-red-400">Birth certificate, driver's license, SSN card, passport</p>
                         </div>
-                        <p className="text-xs text-gray-500 dark:text-gray-400">
-                          PDF, PNG, JPG, GIF up to 10MB
-                        </p>
-                        {documentFile && (
-                          <p className="text-sm text-[#0A3C1F] font-medium mt-2">
-                            {documentFile.name}
-                          </p>
-                        )}
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200">
+                        <GraduationCap className="h-5 w-5 text-blue-600" />
+                        <div>
+                          <h4 className="font-medium text-sm text-blue-800 dark:text-blue-300">Education Records</h4>
+                          <p className="text-xs text-blue-600 dark:text-blue-400">High school & college transcripts (sealed)</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200">
+                        <Trophy className="h-5 w-5 text-green-600" />
+                        <div>
+                          <h4 className="font-medium text-sm text-green-800 dark:text-green-300">Employment History</h4>
+                          <p className="text-xs text-green-600 dark:text-green-400">10-year verification forms & references</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3 p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200">
+                        <AlertCircle className="h-5 w-5 text-purple-600" />
+                        <div>
+                          <h4 className="font-medium text-sm text-purple-800 dark:text-purple-300">Plus Much More</h4>
+                          <p className="text-xs text-purple-600 dark:text-purple-400">Military records, financial forms, references</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                    
+                    <Link href="/background-preparation">
+                      <Button variant="outline" className="w-full mt-4 border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10">
+                        View Complete Checklist
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
 
-                  <div>
-                    <Label htmlFor="document-notes">Notes (Optional)</Label>
-                    <Textarea
-                      id="document-notes"
-                      placeholder="Add any additional information about this document"
-                      className="min-h-[80px]"
-                    />
-                  </div>
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Trophy className="h-5 w-5 text-amber-500" />
+                      What Makes This Guide Special
+                    </CardTitle>
+                    <CardDescription>
+                      Advanced features to help you succeed in the background investigation
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-start gap-3">
+                        <div className="bg-blue-100 dark:bg-blue-900/20 rounded-full p-2">
+                          <CheckSquare className="h-4 w-4 text-blue-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm">Progress Tracking</h4>
+                          <p className="text-xs text-muted-foreground">Check off completed documents and track your progress toward readiness</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-start gap-3">
+                        <div className="bg-green-100 dark:bg-green-900/20 rounded-full p-2">
+                          <ExternalLink className="h-4 w-4 text-green-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm">Direct Links & Contacts</h4>
+                          <p className="text-xs text-muted-foreground">Official websites and phone numbers for each document source</p>
+                        </div>
+                      </div>
 
-                  <Button
-                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
-                    onClick={handleUploadDocument}
-                  >
-                    Upload Document
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+                      <div className="flex items-start gap-3">
+                        <div className="bg-purple-100 dark:bg-purple-900/20 rounded-full p-2">
+                          <Clock className="h-4 w-4 text-purple-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm">Time & Cost Estimates</h4>
+                          <p className="text-xs text-muted-foreground">Know exactly how long each document takes and what it costs</p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-start gap-3">
+                        <div className="bg-amber-100 dark:bg-amber-900/20 rounded-full p-2">
+                          <AlertCircle className="h-4 w-4 text-amber-600" />
+                        </div>
+                        <div>
+                          <h4 className="font-medium text-sm">Pro Tips & Warnings</h4>
+                          <p className="text-xs text-muted-foreground">Insider advice to avoid common pitfalls and delays</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <Link href="/background-preparation">
+                      <Button className="w-full mt-4 bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Start Background Preparation
+                      </Button>
+                    </Link>
+                  </CardContent>
+                </Card>
+              </div>
+
+
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="messages" className="space-y-6">

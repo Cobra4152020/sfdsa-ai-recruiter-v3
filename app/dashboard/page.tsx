@@ -227,30 +227,35 @@ export default function DashboardPage() {
       if (!currentUser?.id) return;
 
       try {
-        // Fetch user points
+        // Fetch user points from the correct source (user_point_logs)
         const pointsResponse = await fetch(`/api/user/points?userId=${currentUser.id}`);
+        let actualPoints = 0;
         if (pointsResponse.ok) {
           const pointsData = await pointsResponse.json();
-          setUserStats(prev => ({
-            ...prev,
-            totalPoints: pointsData.totalPoints || 0
-          }));
+          actualPoints = pointsData.totalPoints || 0;
+          console.log('✅ Dashboard loaded real points:', actualPoints);
         }
 
-        // Check for profile/user data to get actual points
+        // Get profile data for badges and other info (but DON'T override points)
         const profileResponse = await fetch(`/api/users/${currentUser.id}/profile`);
         if (profileResponse.ok) {
           const profileData = await profileResponse.json();
           const userProfile = profileData.profile;
-          const actualPoints = userProfile?.participation_count || 0;
+          
           setUserStats(prev => ({
             ...prev,
-            totalPoints: actualPoints,
+            totalPoints: actualPoints, // Use real points from user_point_logs, not stale participation_count
             achievements: userProfile?.badge_count || 0,
-            nextSteps: userProfile?.has_applied ? 1 : 3, // Fewer next steps if you've completed application
-            pointsThisMonth: actualPoints, // This should be calculated based on a date range
+            nextSteps: userProfile?.has_applied ? 1 : 3,
+            pointsThisMonth: actualPoints, // TODO: Calculate actual monthly points 
             badgesEarned: userProfile?.badge_count || 0,
             daysActive: userProfile?.created_at ? Math.ceil((new Date().getTime() - new Date(userProfile.created_at).getTime()) / (1000 * 60 * 60 * 24)) : 0
+          }));
+        } else {
+          // If profile fails, still set the correct points
+          setUserStats(prev => ({
+            ...prev,
+            totalPoints: actualPoints
           }));
         }
 

@@ -75,11 +75,12 @@ export function TriviaBadges({
     try {
       const supabase = getClientSideSupabase();
 
-      // Get user's earned badges
+      // Get user's earned badges from badge_progress table
       const { data: userBadges, error: badgesError } = await supabase
-        .from("badges")
-        .select("badge_type")
-        .eq("user_id", currentUser!.id);
+        .from("badge_progress")
+        .select("badge_id, is_unlocked")
+        .eq("user_id", currentUser!.id)
+        .eq("is_unlocked", true);
 
       if (badgesError) throw badgesError;
 
@@ -96,7 +97,7 @@ export function TriviaBadges({
       const updatedBadges = badges.map((badge) => {
         const isEarned =
           userBadges?.some(
-            (ub: { badge_type: string }) => ub.badge_type === badge.type,
+            (ub: { badge_id: string }) => ub.badge_id === badge.id,
           ) || false;
 
         let progress = 0;

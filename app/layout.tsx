@@ -89,7 +89,7 @@ export default function RootLayout({
                             <ImprovedHeader />
                             <main
                               id="main-content"
-                              className="flex-1 pt-12 sm:pt-16 md:pt-20 bg-background dark:bg-black w-full"
+                              className="flex-1 pt-12 sm:pt-16 md:pt-20 dark:bg-black w-full"
                             >
                               {children}
                             </main>

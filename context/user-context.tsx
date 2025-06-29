@@ -98,16 +98,38 @@ export const UserProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
         
         // Optionally fetch additional user data from your database here
         try {
-          const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('participation_count, has_applied, name, avatar_url')
+          // Try user_profiles first, then users table as fallback
+          let userData = null;
+          let userError = null;
+          
+          const { data: profileData, error: profileError } = await supabase
+            .from('user_profiles')
+            .select('participation_count, has_applied, full_name, avatar_url')
             .eq('id', session.user.id)
             .single();
             
+          if (profileData) {
+            userData = {
+              name: profileData.full_name,
+              avatar_url: profileData.avatar_url,
+              participation_count: profileData.participation_count,
+              has_applied: profileData.has_applied
+            };
+          } else {
+            // Fallback to users table
+            const { data: usersData, error: usersError } = await supabase
+              .from('users')
+              .select('participation_count, has_applied, name, avatar_url')
+              .eq('id', session.user.id)
+              .single();
+            userData = usersData;
+            userError = usersError;
+          }
+            
           if (!userError && userData) {
-            setCurrentUser(prev => prev ? {
-              ...prev,
-              name: userData.name || prev.name,
+                          setCurrentUser(prev => prev ? {
+                ...prev,
+                name: userData.name || prev.name,
               avatarUrl: userData.avatar_url || prev.avatarUrl,
               participation_count: userData.participation_count || 0,
               has_applied: userData.has_applied || false,
@@ -195,16 +217,29 @@ export const UserProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
     if (!currentUser) return;
     
     try {
-      // Update participation count in database
-      const { error } = await supabase
-        .from('users')
+      // Try updating user_profiles first, then users table as fallback
+      let updateError = null;
+      
+      const { error: profileError } = await supabase
+        .from('user_profiles')
         .update({ 
           participation_count: (currentUser.participation_count || 0) + 1 
         })
         .eq('id', currentUser.id);
         
-      if (error) {
-        console.error('Error updating participation:', error);
+      if (profileError) {
+        // Fallback to users table
+        const { error: usersError } = await supabase
+          .from('users')
+          .update({ 
+            participation_count: (currentUser.participation_count || 0) + 1 
+          })
+          .eq('id', currentUser.id);
+        updateError = usersError;
+      }
+        
+      if (updateError) {
+        console.error('Error updating participation:', updateError);
         return;
       }
       

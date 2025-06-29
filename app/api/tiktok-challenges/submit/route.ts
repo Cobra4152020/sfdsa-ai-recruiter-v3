@@ -77,7 +77,7 @@ export async function POST(req: Request) {
 
     // Integrate with live points system
     try {
-      const pointsResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3004'}/api/demo-user-points`, {
+      const pointsResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/demo-user-points`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ export async function POST(req: Request) {
     // Award badge using main badge system
     if (badgeToAward) {
       try {
-        const badgeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3004'}/api/badges`, {
+        const badgeResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/badges`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

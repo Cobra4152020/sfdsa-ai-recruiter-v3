@@ -102,22 +102,34 @@ export async function POST(request: NextRequest) {
       console.log('✅ Successfully logged activity');
     }
 
-    // Step 3: Calculate new total from user_points (permission-free approach)
-    console.log('🔧 Calculating total from user_points activity...');
-    const { data: pointsData, error: pointsError } = await supabase
-      .from('user_points')
+    // Step 3: Calculate new total from actual point logs (no artificial base points)
+    console.log('🔧 Calculating total from user_point_logs...');
+    const { data: pointLogs, error: pointLogsError } = await supabase
+      .from('user_point_logs')
       .select('points')
       .eq('user_id', userId);
 
-    let calculatedTotal = 500; // Base from application completion
-    if (!pointsError && pointsData) {
-      const activityPoints = pointsData.reduce((sum, entry) => sum + entry.points, 0);
-      calculatedTotal = 500 + activityPoints;
-      console.log('🔧 Points calculation:', { 
-        basePoints: 500, 
-        activityPoints, 
+    let calculatedTotal = 0; // Users start with 0 and earn points through actual activities
+    if (!pointLogsError && pointLogs) {
+      calculatedTotal = pointLogs.reduce((sum, entry) => sum + entry.points, 0);
+      console.log('🔧 Points calculation from logs:', { 
+        totalEntries: pointLogs.length, 
         calculatedTotal 
       });
+    } else {
+      // Fallback to user_points table if user_point_logs is empty
+      const { data: pointsData, error: pointsError } = await supabase
+        .from('user_points')
+        .select('points')
+        .eq('user_id', userId);
+        
+      if (!pointsError && pointsData) {
+        calculatedTotal = pointsData.reduce((sum, entry) => sum + entry.points, 0);
+        console.log('🔧 Points calculation from user_points fallback:', { 
+          totalEntries: pointsData.length, 
+          calculatedTotal 
+        });
+      }
     }
 
     // Success response with calculated total
