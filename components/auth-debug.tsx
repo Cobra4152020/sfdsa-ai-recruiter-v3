@@ -87,7 +87,7 @@ export function AuthDebug() {
       <CardContent>
         {loading ? (
           <div className="flex justify-center p-4">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#0A3C1F]"></div>
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           </div>
         ) : error ? (
           <div className="bg-red-50 p-4 rounded-md text-red-700 mb-4">
@@ -98,7 +98,7 @@ export function AuthDebug() {
           <div className="space-y-4">
             <div>
               <h3 className="font-medium mb-2">Session Status:</h3>
-              <div className="bg-gray-50 p-3 rounded-md overflow-auto max-h-40">
+              <div className="bg-muted p-3 rounded-md overflow-auto max-h-40">
                 <pre className="text-xs">
                   {JSON.stringify(sessionData, null, 2)}
                 </pre>
@@ -107,7 +107,7 @@ export function AuthDebug() {
 
             <div>
               <h3 className="font-medium mb-2">User Roles:</h3>
-              <div className="bg-gray-50 p-3 rounded-md overflow-auto max-h-40">
+              <div className="bg-muted p-3 rounded-md overflow-auto max-h-40">
                 <pre className="text-xs">
                   {JSON.stringify(userRoles, null, 2)}
                 </pre>

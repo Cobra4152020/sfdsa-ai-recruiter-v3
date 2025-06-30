@@ -19,15 +19,15 @@ export function TypingIndicator({ isTyping, className }: TypingIndicatorProps) {
     >
       <div className="flex space-x-1">
         <div
-          className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+          className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
           style={{ animationDelay: "0ms" }}
         ></div>
         <div
-          className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+          className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
           style={{ animationDelay: "150ms" }}
         ></div>
         <div
-          className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+          className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
           style={{ animationDelay: "300ms" }}
         ></div>
       </div>

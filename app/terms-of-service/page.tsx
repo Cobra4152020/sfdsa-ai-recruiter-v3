@@ -19,13 +19,13 @@ export default function TermsOfService() {
     <div className="container mx-auto px-4 py-12 max-w-3xl">
       <Card className="shadow-md">
         <CardHeader className="border-b bg-muted/50">
-          <CardTitle className="text-2xl font-bold text-[#0A3C1F]">
+          <CardTitle className="text-2xl font-bold text-primary">
             Terms of Service
           </CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-6 text-gray-700 dark:text-gray-300">
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Introduction
             </h2>
             <p>
@@ -43,7 +43,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Entertainment Purpose
             </h2>
             <p className="font-bold">
@@ -62,7 +62,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Account Registration
             </h2>
             <p>
@@ -80,7 +80,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               User Conduct
             </h2>
             <p className="mb-2">As a user of the Platform, you agree not to:</p>
@@ -114,7 +114,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Intellectual Property
             </h2>
             <p>
@@ -128,7 +128,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               User-Generated Content
             </h2>
             <p>
@@ -141,7 +141,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Termination
             </h2>
             <p>
@@ -153,7 +153,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Limitation of Liability
             </h2>
             <p>
@@ -167,7 +167,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Disclaimer
             </h2>
             <p>
@@ -179,7 +179,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Governing Law
             </h2>
             <p>
@@ -191,7 +191,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Changes to These Terms
             </h2>
             <p>
@@ -203,7 +203,7 @@ export default function TermsOfService() {
           </section>
 
           <section>
-            <h2 className="text-xl font-semibold text-[#0A3C1F] mb-2">
+            <h2 className="text-xl font-semibold text-primary mb-2">
               Contact Us
             </h2>
             <p>

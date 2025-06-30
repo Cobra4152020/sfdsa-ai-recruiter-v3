@@ -144,7 +144,7 @@ export function SocialFeed({ className, limit = 4 }: SocialFeedProps) {
 
               {item.badgeEarned && (
                 <div className="bg-[#F0F7F2] p-3 rounded-lg mb-3">
-                  <p className="text-sm font-medium text-[#0A3C1F]">
+                  <p className="text-sm font-medium text-primary">
                     🏆 Earned the {item.badgeEarned.name} badge!
                   </p>
                 </div>

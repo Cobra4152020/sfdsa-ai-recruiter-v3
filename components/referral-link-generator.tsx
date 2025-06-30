@@ -122,14 +122,14 @@ export function ReferralLinkGenerator() {
               />
               <Button
                 onClick={handleGenerateLink}
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="bg-primary hover:bg-primary/90"
                 disabled={isGenerating}
               >
                 {isGenerating ? "Generating..." : "Generate Link"}
               </Button>
             </div>
 
-            <div className="bg-gray-100 dark:bg-gray-800 p-4 rounded-md flex items-center">
+            <div className="bg-muted p-4 rounded-md flex items-center">
               <div className="flex-1 font-mono text-sm truncate">
                 {referralUrl}
               </div>
@@ -174,7 +174,7 @@ export function ReferralLinkGenerator() {
               <TabsContent value="copy" className="mt-4">
                 <Button
                   onClick={handleCopyLink}
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="w-full bg-primary hover:bg-primary/90"
                 >
                   <Copy className="h-4 w-4 mr-2" />
                   Copy Link to Clipboard
@@ -184,7 +184,7 @@ export function ReferralLinkGenerator() {
               <TabsContent value="email" className="mt-4">
                 <Button
                   onClick={shareViaEmail}
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="w-full bg-primary hover:bg-primary/90"
                 >
                   <Mail className="h-4 w-4 mr-2" />
                   Share via Email
@@ -194,7 +194,7 @@ export function ReferralLinkGenerator() {
               <TabsContent value="facebook" className="mt-4">
                 <Button
                   onClick={shareViaFacebook}
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="w-full bg-primary hover:bg-primary/90"
                 >
                   <Facebook className="h-4 w-4 mr-2" />
                   Share on Facebook
@@ -204,7 +204,7 @@ export function ReferralLinkGenerator() {
               <TabsContent value="twitter" className="mt-4">
                 <Button
                   onClick={shareViaTwitter}
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="w-full bg-primary hover:bg-primary/90"
                 >
                   <Twitter className="h-4 w-4 mr-2" />
                   Share on Twitter
@@ -214,7 +214,7 @@ export function ReferralLinkGenerator() {
               <TabsContent value="linkedin" className="mt-4">
                 <Button
                   onClick={shareViaLinkedIn}
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="w-full bg-primary hover:bg-primary/90"
                 >
                   <Linkedin className="h-4 w-4 mr-2" />
                   Share on LinkedIn
@@ -250,7 +250,7 @@ export function ReferralLinkGenerator() {
                 <tr className="border-b">
                   <td className="py-3 px-4">
                     <div className="flex items-center">
-                      <Link className="h-4 w-4 mr-2 text-[#0A3C1F]" />
+                      <Link className="h-4 w-4 mr-2 text-primary" />
                       <span className="text-sm font-medium truncate max-w-[200px]">
                         {baseReferralCode}
                       </span>
@@ -277,7 +277,7 @@ export function ReferralLinkGenerator() {
                 <tr className="border-b">
                   <td className="py-3 px-4">
                     <div className="flex items-center">
-                      <Link className="h-4 w-4 mr-2 text-[#0A3C1F]" />
+                      <Link className="h-4 w-4 mr-2 text-primary" />
                       <span className="text-sm font-medium truncate max-w-[200px]">
                         {baseReferralCode}-community-event
                       </span>

@@ -112,7 +112,7 @@ export function TriviaApiTest() {
                   {q.options.map((option: string, j: number) => (
                     <div
                       key={j}
-                      className={`p-2 rounded-md ${j === q.correctAnswer ? "bg-green-100 border border-green-300" : "bg-gray-50 border border-gray-200"}`}
+                      className={`p-2 rounded-md ${j === q.correctAnswer ? "bg-green-100 border border-green-300" : "bg-muted border border-gray-200"}`}
                     >
                       <span className="inline-block w-6">
                         {String.fromCharCode(65 + j)}.

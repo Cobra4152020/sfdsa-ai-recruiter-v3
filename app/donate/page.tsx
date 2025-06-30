@@ -158,7 +158,7 @@ export default function DonatePage() {
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="text-3xl font-bold text-[#0A3C1F] mb-4">
+            <h1 className="text-3xl font-bold text-primary mb-4">
               Support Protecting San Francisco
             </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -173,7 +173,7 @@ export default function DonatePage() {
           </div>
 
           {/* Organization Information */}
-          <div className="mb-10 bg-white rounded-lg border border-[#0A3C1F]/20 p-6">
+          <div className="mb-10 bg-white rounded-lg border border-primary/20 p-6">
             <div className="flex flex-col md:flex-row items-center justify-center gap-6 mb-6">
               <div className="flex-shrink-0">
                 <Image
@@ -185,7 +185,7 @@ export default function DonatePage() {
                 />
               </div>
               <div className="flex-grow max-w-xl">
-                <h2 className="text-xl font-bold text-[#0A3C1F] mb-2">
+                <h2 className="text-xl font-bold text-primary mb-2">
                   Protecting San Francisco
                 </h2>
                 <p className="text-gray-700">
@@ -208,7 +208,7 @@ export default function DonatePage() {
                 />
               </div>
               <div className="flex-grow max-w-xl">
-                <h2 className="text-xl font-bold text-[#0A3C1F] mb-2">
+                <h2 className="text-xl font-bold text-primary mb-2">
                   San Francisco Deputy Sheriffs&apos; Association
                 </h2>
                 <p className="text-gray-700">
@@ -220,8 +220,8 @@ export default function DonatePage() {
               </div>
             </div>
 
-            <div className="mt-6 p-4 bg-[#0A3C1F]/5 rounded-lg">
-              <p className="text-center font-medium text-[#0A3C1F]">
+            <div className="mt-6 p-4 bg-primary/5 rounded-lg">
+              <p className="text-center font-medium text-primary">
                 All donations made through this site are processed via Stripe and
                 Venmo and are directed to Protecting San Francisco, a registered
                 501(c)3 charitable organization.
@@ -230,22 +230,22 @@ export default function DonatePage() {
           </div>
 
           {/* Quick Stats Dashboard */}
-          <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+          <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-6 mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">501(c)3</div>
+                <div className="text-3xl font-bold text-primary">501(c)3</div>
                 <div className="text-sm text-gray-600 font-medium">Tax Deductible</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">$10+</div>
+                <div className="text-3xl font-bold text-primary">$10+</div>
                 <div className="text-sm text-gray-600 font-medium">Any Amount Helps</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">24/7</div>
+                <div className="text-3xl font-bold text-primary">24/7</div>
                 <div className="text-sm text-gray-600 font-medium">Secure Processing</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">100%</div>
+                <div className="text-3xl font-bold text-primary">100%</div>
                 <div className="text-sm text-gray-600 font-medium">Transparent Use</div>
               </div>
             </div>
@@ -253,7 +253,7 @@ export default function DonatePage() {
 
           {/* Quick Links */}
           <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold text-[#0A3C1F] mb-4 flex items-center">
+            <h3 className="text-lg font-semibold text-primary mb-4 flex items-center">
               <Info className="h-5 w-5 mr-2" />
               Related Information
             </h3>
@@ -280,12 +280,12 @@ export default function DonatePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-            <Card className="bg-white border-[#0A3C1F]/20 col-span-1">
+            <Card className="bg-white border-primary/20 col-span-1">
               <CardHeader className="text-center pb-2">
-                <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-                  <Coffee className="h-8 w-8 text-[#0A3C1F]" />
+                <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
+                  <Coffee className="h-8 w-8 text-primary" />
                 </div>
-                <CardTitle className="text-xl text-[#0A3C1F]">
+                <CardTitle className="text-xl text-primary">
                   Small Gift
                 </CardTitle>
               </CardHeader>
@@ -296,7 +296,7 @@ export default function DonatePage() {
                 <div className="flex justify-center space-x-2">
                   <Button
                     variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
+                    className="border-primary text-primary hover:bg-primary hover:text-white"
                     onClick={() => {
                       setDonationAmount("10");
                       setCustomAmount("");
@@ -312,12 +312,12 @@ export default function DonatePage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white border-[#0A3C1F]/20 col-span-1">
+            <Card className="bg-white border-primary/20 col-span-1">
               <CardHeader className="text-center pb-2">
-                <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-                  <HandHeart className="h-8 w-8 text-[#0A3C1F]" />
+                <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
+                  <HandHeart className="h-8 w-8 text-primary" />
                 </div>
-                <CardTitle className="text-xl text-[#0A3C1F]">
+                <CardTitle className="text-xl text-primary">
                   Supporter
                 </CardTitle>
               </CardHeader>
@@ -328,7 +328,7 @@ export default function DonatePage() {
                 <div className="flex justify-center space-x-2">
                   <Button
                     variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
+                    className="border-primary text-primary hover:bg-primary hover:text-white"
                     onClick={() => {
                       setDonationAmount("25");
                       setCustomAmount("");
@@ -344,12 +344,12 @@ export default function DonatePage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white border-[#0A3C1F]/20 col-span-1">
+            <Card className="bg-white border-primary/20 col-span-1">
               <CardHeader className="text-center pb-2">
-                <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-                  <Trophy className="h-8 w-8 text-[#0A3C1F]" />
+                <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
+                  <Trophy className="h-8 w-8 text-primary" />
                 </div>
-                <CardTitle className="text-xl text-[#0A3C1F]">Champion</CardTitle>
+                <CardTitle className="text-xl text-primary">Champion</CardTitle>
               </CardHeader>
               <CardContent className="text-center pt-2">
                 <p className="text-gray-600 mb-4">
@@ -358,7 +358,7 @@ export default function DonatePage() {
                 <div className="flex justify-center space-x-2">
                   <Button
                     variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
+                    className="border-primary text-primary hover:bg-primary hover:text-white"
                     onClick={() => {
                       setDonationAmount("50");
                       setCustomAmount("");
@@ -374,12 +374,12 @@ export default function DonatePage() {
               </CardContent>
             </Card>
 
-            <Card className="bg-white border-[#0A3C1F]/20 col-span-1">
+            <Card className="bg-white border-primary/20 col-span-1">
               <CardHeader className="text-center pb-2">
-                <div className="mx-auto bg-[#0A3C1F]/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
-                  <Heart className="h-8 w-8 text-[#0A3C1F]" />
+                <div className="mx-auto bg-primary/10 p-3 rounded-full w-16 h-16 flex items-center justify-center mb-2">
+                  <Heart className="h-8 w-8 text-primary" />
                 </div>
-                <CardTitle className="text-xl text-[#0A3C1F]">
+                <CardTitle className="text-xl text-primary">
                   Benefactor
                 </CardTitle>
               </CardHeader>
@@ -390,7 +390,7 @@ export default function DonatePage() {
                 <div className="flex justify-center space-x-2">
                   <Button
                     variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
+                    className="border-primary text-primary hover:bg-primary hover:text-white"
                     onClick={() => {
                       setDonationAmount("100");
                       setCustomAmount("");
@@ -420,7 +420,7 @@ export default function DonatePage() {
             <TabsContent value="one-time">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-[#0A3C1F]">
+                  <CardTitle className="text-primary">
                     Make a One-Time Donation
                   </CardTitle>
                   <CardDescription>
@@ -450,7 +450,7 @@ export default function DonatePage() {
                             />
                             <Label
                               htmlFor="amount-10"
-                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
+                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                               <span>$10</span>
                             </Label>
@@ -463,7 +463,7 @@ export default function DonatePage() {
                             />
                             <Label
                               htmlFor="amount-25"
-                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
+                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                               <span>$25</span>
                             </Label>
@@ -476,7 +476,7 @@ export default function DonatePage() {
                             />
                             <Label
                               htmlFor="amount-50"
-                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
+                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                               <span>$50</span>
                             </Label>
@@ -489,7 +489,7 @@ export default function DonatePage() {
                             />
                             <Label
                               htmlFor="amount-100"
-                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
+                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                               <span>$100</span>
                             </Label>
@@ -553,7 +553,7 @@ export default function DonatePage() {
                         <input
                           type="checkbox"
                           id="anonymous"
-                          className="h-4 w-4 rounded border-gray-300 text-[#0A3C1F] focus:ring-[#0A3C1F]"
+                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                           checked={isAnonymous}
                           onChange={(e) => setIsAnonymous(e.target.checked)}
                         />
@@ -569,7 +569,7 @@ export default function DonatePage() {
                         <input
                           type="checkbox"
                           id="allow-recognition"
-                          className="h-4 w-4 rounded border-gray-300 text-[#0A3C1F] focus:ring-[#0A3C1F]"
+                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                           checked={allowRecognition}
                           onChange={(e) => setAllowRecognition(e.target.checked)}
                         />
@@ -600,12 +600,12 @@ export default function DonatePage() {
                           <div
                             className={`border-2 rounded-md p-4 flex flex-col items-center cursor-pointer transition-colors ${
                               paymentMethod === "stripe"
-                                ? "border-[#0A3C1F] bg-[#0A3C1F]/5"
+                                ? "border-primary bg-primary/5"
                                 : "border-gray-200 hover:border-gray-300"
                             }`}
                             onClick={() => setPaymentMethod("stripe")}
                           >
-                            <CreditCard className="h-8 w-8 mb-2 text-[#0A3C1F]" />
+                            <CreditCard className="h-8 w-8 mb-2 text-primary" />
                             <span className="text-sm font-medium">
                               Credit Card
                             </span>
@@ -660,7 +660,7 @@ export default function DonatePage() {
                     {paymentMethod === "stripe" ? (
                       <Button
                         type="button"
-                        className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white w-full"
+                        className="bg-primary hover:bg-primary/90 text-white w-full"
                         disabled={
                           !donorEmail ||
                           (!donationAmount && !customAmount) ||
@@ -686,7 +686,7 @@ export default function DonatePage() {
             <TabsContent value="monthly">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-[#0A3C1F]">
+                  <CardTitle className="text-primary">
                     Become a Monthly Supporter
                   </CardTitle>
                   <CardDescription>
@@ -716,7 +716,7 @@ export default function DonatePage() {
                             />
                             <Label
                               htmlFor="monthly-5"
-                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
+                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                               <span>$5</span>
                             </Label>
@@ -729,7 +729,7 @@ export default function DonatePage() {
                             />
                             <Label
                               htmlFor="monthly-10"
-                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
+                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                               <span>$10</span>
                             </Label>
@@ -742,7 +742,7 @@ export default function DonatePage() {
                             />
                             <Label
                               htmlFor="monthly-25"
-                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
+                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                               <span>$25</span>
                             </Label>
@@ -755,7 +755,7 @@ export default function DonatePage() {
                             />
                             <Label
                               htmlFor="monthly-50"
-                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-[#0A3C1F] [&:has([data-state=checked])]:border-[#0A3C1F]"
+                              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
                             >
                               <span>$50</span>
                             </Label>
@@ -821,7 +821,7 @@ export default function DonatePage() {
                         <input
                           type="checkbox"
                           id="monthly-anonymous"
-                          className="h-4 w-4 rounded border-gray-300 text-[#0A3C1F] focus:ring-[#0A3C1F]"
+                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                           checked={isAnonymous}
                           onChange={(e) => setIsAnonymous(e.target.checked)}
                         />
@@ -837,7 +837,7 @@ export default function DonatePage() {
                         <input
                           type="checkbox"
                           id="allow-recognition"
-                          className="h-4 w-4 rounded border-gray-300 text-[#0A3C1F] focus:ring-[#0A3C1F]"
+                          className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
                           checked={allowRecognition}
                           onChange={(e) => setAllowRecognition(e.target.checked)}
                         />
@@ -868,9 +868,9 @@ export default function DonatePage() {
                         <Label>Payment Method</Label>
                         <div className="grid grid-cols-1 gap-4">
                           <div
-                            className={`border-2 rounded-md p-4 flex flex-col items-center cursor-pointer transition-colors border-[#0A3C1F] bg-[#0A3C1F]/5`}
+                            className={`border-2 rounded-md p-4 flex flex-col items-center cursor-pointer transition-colors border-primary bg-primary/5`}
                           >
-                            <CreditCard className="h-8 w-8 mb-2 text-[#0A3C1F]" />
+                            <CreditCard className="h-8 w-8 mb-2 text-primary" />
                             <span className="text-sm font-medium">
                               Credit Card
                             </span>
@@ -913,7 +913,7 @@ export default function DonatePage() {
                   <CardFooter className="flex justify-end pt-6 px-6">
                     <Button
                       type="button"
-                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white w-full"
+                      className="bg-primary hover:bg-primary/90 text-white w-full"
                       disabled={
                         !donorEmail ||
                         (!donationAmount && !customAmount) ||
@@ -930,19 +930,19 @@ export default function DonatePage() {
             </TabsContent>
           </Tabs>
 
-          <div className="mt-12 bg-white rounded-lg border border-[#0A3C1F]/20 p-6 max-w-3xl mx-auto">
-            <h2 className="text-xl font-bold text-[#0A3C1F] mb-6 text-center">
+          <div className="mt-12 bg-white rounded-lg border border-primary/20 p-6 max-w-3xl mx-auto">
+            <h2 className="text-xl font-bold text-primary mb-6 text-center">
               Your Donation&apos;s Impact
             </h2>
 
             <div className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="bg-primary/5 p-4 rounded-lg">
                   <div className="flex items-center mb-3">
-                    <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    <div className="bg-primary text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                       $10
                     </div>
-                    <h3 className="font-semibold text-[#0A3C1F]">
+                    <h3 className="font-semibold text-primary">
                       Recruit Information Package
                     </h3>
                   </div>
@@ -953,12 +953,12 @@ export default function DonatePage() {
                   </p>
                 </div>
 
-                <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="bg-primary/5 p-4 rounded-lg">
                   <div className="flex items-center mb-3">
-                    <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    <div className="bg-primary text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                       $25
                     </div>
-                    <h3 className="font-semibold text-[#0A3C1F]">
+                    <h3 className="font-semibold text-primary">
                       AI Assistant Improvements
                     </h3>
                   </div>
@@ -971,12 +971,12 @@ export default function DonatePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="bg-primary/5 p-4 rounded-lg">
                   <div className="flex items-center mb-3">
-                    <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    <div className="bg-primary text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                       $50
                     </div>
-                    <h3 className="font-semibold text-[#0A3C1F]">
+                    <h3 className="font-semibold text-primary">
                       Community Outreach
                     </h3>
                   </div>
@@ -987,12 +987,12 @@ export default function DonatePage() {
                   </p>
                 </div>
 
-                <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="bg-primary/5 p-4 rounded-lg">
                   <div className="flex items-center mb-3">
-                    <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    <div className="bg-primary text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                       $100
                     </div>
-                    <h3 className="font-semibold text-[#0A3C1F]">
+                    <h3 className="font-semibold text-primary">
                       Recruitment Workshop
                     </h3>
                   </div>
@@ -1005,12 +1005,12 @@ export default function DonatePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="bg-primary/5 p-4 rounded-lg">
                   <div className="flex items-center mb-3">
-                    <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    <div className="bg-primary text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                       $250
                     </div>
-                    <h3 className="font-semibold text-[#0A3C1F]">
+                    <h3 className="font-semibold text-primary">
                       Mentorship Program
                     </h3>
                   </div>
@@ -1021,12 +1021,12 @@ export default function DonatePage() {
                   </p>
                 </div>
 
-                <div className="bg-[#0A3C1F]/5 p-4 rounded-lg">
+                <div className="bg-primary/5 p-4 rounded-lg">
                   <div className="flex items-center mb-3">
-                    <div className="bg-[#0A3C1F] text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
+                    <div className="bg-primary text-white font-bold rounded-full w-12 h-12 flex items-center justify-center mr-3">
                       $500+
                     </div>
-                    <h3 className="font-semibold text-[#0A3C1F]">
+                    <h3 className="font-semibold text-primary">
                       Scholarship Support
                     </h3>
                   </div>
@@ -1048,12 +1048,12 @@ export default function DonatePage() {
             </div>
           </div>
 
-          <div className="mt-12 bg-[#0A3C1F]/5 rounded-lg p-6 max-w-3xl mx-auto">
-            <h2 className="text-xl font-bold text-[#0A3C1F] mb-4">Our Mission</h2>
+          <div className="mt-12 bg-primary/5 rounded-lg p-6 max-w-3xl mx-auto">
+            <h2 className="text-xl font-bold text-primary mb-4">Our Mission</h2>
             <div className="space-y-6">
               <div className="flex items-start">
                 <div className="mr-4 mt-1">
-                  <Users className="h-5 w-5 text-[#0A3C1F]" />
+                  <Users className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-medium">Diverse Recruitment</h3>
@@ -1066,7 +1066,7 @@ export default function DonatePage() {
               </div>
               <div className="flex items-start">
                 <div className="mr-4 mt-1">
-                  <BookOpen className="h-5 w-5 text-[#0A3C1F]" />
+                  <BookOpen className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-medium">Education & Preparation</h3>
@@ -1078,7 +1078,7 @@ export default function DonatePage() {
               </div>
               <div className="flex items-start">
                 <div className="mr-4 mt-1">
-                  <Building className="h-5 w-5 text-[#0A3C1F]" />
+                  <Building className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-medium">Community Connection</h3>
@@ -1091,7 +1091,7 @@ export default function DonatePage() {
               </div>
               <div className="flex items-start">
                 <div className="mr-4 mt-1">
-                  <Star className="h-5 w-5 text-[#0A3C1F]" />
+                  <Star className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <h3 className="font-medium">Excellence in Service</h3>

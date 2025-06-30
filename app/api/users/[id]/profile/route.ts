@@ -40,7 +40,10 @@ export async function GET(
           participation_count, 
           has_applied,
           created_at,
-          bio
+          bio,
+          user_profiles (
+            avatar_url
+          )
           `,
         )
         .eq("id", userId)
@@ -123,14 +126,14 @@ export async function GET(
           (award) => award.pointThreshold > (user.participation_count || 0),
         );
 
-      // Generate a placeholder avatar URL
-      const avatarUrl = `/placeholder.svg?height=64&width=64&query=user-${userId}`;
+      // Get avatar URL from user_profiles junction or use placeholder
+      const avatarUrl = user.user_profiles?.[0]?.avatar_url || `/placeholder.svg?height=64&width=64&query=user-${userId}`;
 
       return NextResponse.json({
         success: true,
         profile: {
           ...user,
-          avatar_url: avatarUrl, // Add placeholder avatar URL
+          avatar_url: avatarUrl, // Use approved profile photo if available, fallback to placeholder
           rank: rankData
             ? rankData.findIndex((u) => u.id === userId) + 1
             : null,

@@ -70,17 +70,17 @@ export function DonationImpactDisplay({
   if (!impact) return null;
 
   return (
-    <div className="mt-4 bg-[#0A3C1F]/5 p-4 rounded-lg">
-      <h3 className="font-semibold text-[#0A3C1F] mb-2">
+    <div className="mt-4 bg-primary/5 p-4 rounded-lg">
+      <h3 className="font-semibold text-primary mb-2">
         Your Donation Impact:
       </h3>
       <div className="flex items-start mb-1">
-        <Check className="h-5 w-5 text-[#0A3C1F] mr-2 mt-0.5 flex-shrink-0" />
+        <Check className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
         <p className="text-sm text-gray-700">{impact}</p>
       </div>
       {secondaryImpact && (
         <div className="flex items-start">
-          <Check className="h-5 w-5 text-[#0A3C1F] mr-2 mt-0.5 flex-shrink-0" />
+          <Check className="h-5 w-5 text-primary mr-2 mt-0.5 flex-shrink-0" />
           <p className="text-sm text-gray-700">{secondaryImpact}</p>
         </div>
       )}

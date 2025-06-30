@@ -725,7 +725,7 @@ export function TriviaGame({
     return (
       <Card className="shadow-md">
         <CardContent className="p-6 text-center">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] mb-4">
+          <h2 className="text-2xl font-bold text-primary mb-4">
             {fetchError ? "Error Loading Questions" : "Loading Questions..."}
           </h2>
 
@@ -738,7 +738,7 @@ export function TriviaGame({
 
           <Button
             onClick={fetchQuestions}
-            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            className="bg-primary hover:bg-primary/90"
           >
             <RefreshCw className="h-4 w-4 mr-2" />
             {fetchError ? "Try Again" : "Retry Loading Questions"}
@@ -977,14 +977,14 @@ export function TriviaGame({
               <Button
                 onClick={handleAnswerSubmit}
                 disabled={selectedAnswer === null}
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="bg-primary hover:bg-primary/90"
               >
                 Submit Answer
               </Button>
             ) : (
               <Button
                 onClick={handleNextQuestion}
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="bg-primary hover:bg-primary/90"
               >
                 {currentQuestionIndex === questions.length - 1
                   ? "See Results"
@@ -995,7 +995,7 @@ export function TriviaGame({
             <Button
               variant="outline"
               onClick={handleRestartGame}
-              className="border-[#0A3C1F] text-[#0A3C1F]"
+              className="border-primary text-primary"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Restart
@@ -1018,8 +1018,8 @@ export function TriviaGame({
           </DialogDescription>
 
           <div className="py-4 flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center mb-4">
-              <Share2 className="h-12 w-12 text-[#0A3C1F]" />
+            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Share2 className="h-12 w-12 text-primary" />
             </div>
             <p className="text-center mb-4">
               Help us recruit more deputies by sharing this trivia game on
@@ -1051,7 +1051,7 @@ export function TriviaGame({
               <Button
                 variant="outline"
                 onClick={() => handleShare("copy")}
-                className="border-[#0A3C1F] text-[#0A3C1F]"
+                className="border-primary text-primary"
               >
                 <Mail className="h-4 w-4 mr-2" />
                 Copy Link
@@ -1079,7 +1079,7 @@ export function TriviaGame({
             <div className="w-32 h-32 rounded-full bg-[#FFD700]/20 flex items-center justify-center mb-4">
               <Award className="h-16 w-16 text-[#FFD700]" />
             </div>
-            <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
+            <h3 className="text-xl font-bold text-primary mb-2">
               {getBadgeName(earnedBadge?.badge_type || "")}
             </h3>
             <p className="text-center text-gray-600">
@@ -1087,7 +1087,7 @@ export function TriviaGame({
             </p>
           </div>
           <DialogFooter>
-            <Button onClick={handleShareBadge} className="w-full bg-[#0A3C1F]">
+            <Button onClick={handleShareBadge} className="w-full bg-primary">
               <Share2 className="h-4 w-4 mr-2" />
               Share Badge
             </Button>
@@ -1130,14 +1130,14 @@ export function TriviaGame({
             <Button
               variant="outline"
               onClick={() => handleShare("copy")}
-              className="border-[#0A3C1F] text-[#0A3C1F]"
+              className="border-primary text-primary"
             >
               <Mail className="h-4 w-4 mr-2" />
               Copy Link
             </Button>
           </div>
 
-          <div className="bg-[#0A3C1F]/5 p-3 rounded-lg text-sm">
+          <div className="bg-primary/5 p-3 rounded-lg text-sm">
             <p className="font-medium">Customize your message:</p>
             <textarea
               className="w-full mt-2 p-2 border rounded-md text-sm"
@@ -1154,7 +1154,7 @@ export function TriviaGame({
 
       {/* Show explanation in study mode */}
       {mode === "study" && showExplanation && currentQuestion && (
-        <Card className="mt-4 bg-gray-50">
+        <Card className="mt-4 bg-muted">
           <CardContent className="pt-4">
             <h3 className="font-medium mb-2">Explanation</h3>
             <p className="text-sm text-gray-600">
@@ -1201,7 +1201,7 @@ export function TriviaGame({
           <CardContent>
             <div className="space-y-4">
               {reviewCards.map((card, index) => (
-                <Card key={index} className="bg-gray-50">
+                <Card key={index} className="bg-muted">
                   <CardContent className="pt-4">
                     <p className="font-medium mb-2">{card.question}</p>
                     <p className="text-sm text-green-600 mb-2">

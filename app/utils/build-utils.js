@@ -6,10 +6,10 @@
  * Determines if we're currently in a static build environment
  */
 export function isStaticBuild() {
-  // Check if we're running in a static build context (Vercel static export)
+  // Check if we're running in a static build context (Vercel static export) AND in production
   return (
-    process.env.NEXT_PUBLIC_STATIC_BUILD === "true" ||
-    process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === "true"
+    (process.env.NEXT_PUBLIC_STATIC_BUILD === "true" && process.env.NODE_ENV === "production") ||
+    (process.env.NEXT_PUBLIC_DISABLE_DATABASE_CHECKS === "true" && process.env.NODE_ENV === "production")
   );
 }
 

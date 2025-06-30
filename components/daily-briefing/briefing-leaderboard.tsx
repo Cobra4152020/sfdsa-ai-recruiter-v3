@@ -282,8 +282,8 @@ export function BriefingLeaderboard() {
                     key={entry.user_id}
                     className={`flex items-center p-3 rounded-lg ${
                       isCurrentUser
-                        ? "bg-[#0A3C1F]/10 dark:bg-[#FFD700]/10 border border-[#0A3C1F]/20 dark:border-[#FFD700]/20"
-                        : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
+                        ? "bg-primary/10 dark:bg-[#FFD700]/10 border border-primary/20 dark:border-[#FFD700]/20"
+                        : "hover:bg-accent/10 dark:hover:bg-gray-700/50"
                     }`}
                     variants={item}
                     whileHover={{ scale: 1.02, transition: { duration: 0.2 } }}
@@ -355,7 +355,7 @@ export function BriefingLeaderboard() {
                         {entry.username}
                         {isCurrentUser && (
                           <motion.span
-                            className="ml-2 text-xs bg-[#0A3C1F] dark:bg-[#FFD700] text-white dark:text-[#0A3C1F] px-2 py-0.5 rounded-full"
+                            className="ml-2 text-xs bg-primary dark:bg-[#FFD700] text-white dark:text-primary px-2 py-0.5 rounded-full"
                             initial={{ opacity: 0, scale: 0.5 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{
@@ -380,7 +380,7 @@ export function BriefingLeaderboard() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.4 + index * 0.1, duration: 0.5 }}
                     >
-                      <div className="font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+                      <div className="font-bold text-primary dark:text-[#FFD700]">
                         {entry.total_points}
                       </div>
                       <div className="text-xs text-gray-500 dark:text-gray-400">

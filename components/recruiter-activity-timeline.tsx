@@ -84,7 +84,7 @@ export function RecruiterActivityTimeline({
         return (
           <Badge
             variant="outline"
-            className="bg-gray-50 text-gray-800 border-gray-300"
+            className="bg-muted text-gray-800 border-gray-300"
           >
             Click
           </Badge>

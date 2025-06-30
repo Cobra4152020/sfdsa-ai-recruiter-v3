@@ -284,7 +284,7 @@ export function VolunteerApplicationForm() {
     <Card className="max-w-3xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <User className="h-6 w-6 mr-2 text-[#0A3C1F]" />
+          <User className="h-6 w-6 mr-2 text-primary" />
           Volunteer Recruiter Application
         </CardTitle>
         <p className="text-gray-600">
@@ -307,7 +307,7 @@ export function VolunteerApplicationForm() {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Personal Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               Personal Information
             </h3>
             
@@ -374,7 +374,7 @@ export function VolunteerApplicationForm() {
 
           {/* Address Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               <MapPin className="h-5 w-5 inline mr-2" />
               Address Information
             </h3>
@@ -438,7 +438,7 @@ export function VolunteerApplicationForm() {
 
           {/* Professional Background */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               <Briefcase className="h-5 w-5 inline mr-2" />
               Professional Background
             </h3>
@@ -490,7 +490,7 @@ export function VolunteerApplicationForm() {
 
           {/* Resume Upload */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               Supporting Documents
             </h3>
             
@@ -500,7 +500,7 @@ export function VolunteerApplicationForm() {
               </Label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
                 {resumeFile ? (
-                  <div className="flex items-center justify-between bg-gray-50 p-3 rounded-md">
+                  <div className="flex items-center justify-between bg-muted p-3 rounded-md">
                     <div className="flex items-center space-x-2">
                       <FileText className="h-5 w-5 text-blue-600" />
                       <span className="text-sm font-medium">{resumeFile.name}</span>
@@ -524,7 +524,7 @@ export function VolunteerApplicationForm() {
                     <div className="mt-4">
                       <Label
                         htmlFor="resume-upload"
-                        className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-gray-50 h-10 px-4 py-2"
+                        className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent/10 h-10 px-4 py-2"
                       >
                         <Paperclip className="h-4 w-4 mr-2" />
                         Choose Resume File
@@ -548,7 +548,7 @@ export function VolunteerApplicationForm() {
 
           {/* Consent and Agreement */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               Consent and Agreement
             </h3>
             
@@ -568,11 +568,11 @@ export function VolunteerApplicationForm() {
                   </Label>
                   <p className="text-xs text-gray-600">
                     I agree to the{" "}
-                    <a href="/terms-of-service" className="text-[#0A3C1F] hover:underline">
+                    <a href="/terms-of-service" className="text-primary hover:underline">
                       terms and conditions
                     </a>{" "}
                     and{" "}
-                    <a href="/privacy-policy" className="text-[#0A3C1F] hover:underline">
+                    <a href="/privacy-policy" className="text-primary hover:underline">
                       privacy policy
                     </a>
                   </p>
@@ -586,7 +586,7 @@ export function VolunteerApplicationForm() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 h-12"
+              className="w-full bg-primary hover:bg-primary/90 h-12"
             >
               {isSubmitting ? (
                 <>

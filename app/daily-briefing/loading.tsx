@@ -4,11 +4,11 @@ import { Loader2 } from "lucide-react";
 
 export default function DailyBriefingLoading() {
   return (
-    <main className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-8 pb-16">
+    <main className="min-h-screen bg-background pt-8 pb-16">
       <div className="container mx-auto px-4">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-bold text-[#0A3C1F] dark:text-[#FFD700] mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-primary dark:text-[#FFD700] mb-4">
               Sgt. Ken&apos;s Daily Briefing
             </h1>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -18,7 +18,7 @@ export default function DailyBriefingLoading() {
           </div>
 
           <div className="flex flex-col items-center justify-center min-h-[50vh]">
-            <Loader2 className="h-16 w-16 text-[#0A3C1F] dark:text-[#FFD700] animate-spin mb-6" />
+            <Loader2 className="h-16 w-16 text-primary dark:text-[#FFD700] animate-spin mb-6" />
             <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">
               Loading Sgt. Ken&apos;s Daily Briefing...
             </h2>

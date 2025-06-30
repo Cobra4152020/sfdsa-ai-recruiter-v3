@@ -16,9 +16,9 @@ export default function VolunteerPendingPage() {
       <Card className="max-w-md mx-auto">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
-            <Clock className="h-16 w-16 text-[#0A3C1F]" />
+            <Clock className="h-16 w-16 text-primary" />
           </div>
-          <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+          <CardTitle className="text-2xl font-bold text-center text-primary">
             Account Pending Verification
           </CardTitle>
           <CardDescription className="text-center">
@@ -59,7 +59,7 @@ export default function VolunteerPendingPage() {
           <div className="text-center text-sm text-gray-500">
             <p>
               If you have any questions, please{" "}
-              <Link href="/contact" className="text-[#0A3C1F] hover:underline">
+              <Link href="/contact" className="text-primary hover:underline">
                 contact us
               </Link>
               .

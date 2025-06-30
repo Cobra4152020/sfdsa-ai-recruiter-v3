@@ -318,7 +318,7 @@ export function RecruiterOnboarding() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-lg space-y-3">
+              <div className="bg-muted/50 p-4 rounded-lg space-y-3">
                 <div className="grid grid-cols-2 gap-x-4 gap-y-2">
                   <div>
                     <h4 className="text-sm font-medium text-gray-500 dark:text-gray-400">
@@ -487,7 +487,7 @@ export function RecruiterOnboarding() {
               </Button>
             </div>
           </CardContent>
-          <CardFooter className="bg-gray-50 dark:bg-gray-800/50 border-t px-6 py-4 text-center text-sm text-gray-500">
+          <CardFooter className="bg-muted/50 border-t px-6 py-4 text-center text-sm text-gray-500">
             If you have any questions, please contact us at{" "}
             <a
               href="mailto:email@protectingsanfrancisco.com"

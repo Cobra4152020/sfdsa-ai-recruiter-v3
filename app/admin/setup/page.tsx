@@ -55,14 +55,14 @@ export default function AdminSetupPage() {
   if (isLoading) {
     return (
       <div className="container mx-auto py-8 flex justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0A3C1F]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-[#0A3C1F] mb-6">Admin Setup</h1>
+      <h1 className="text-3xl font-bold text-primary mb-6">Admin Setup</h1>
 
       {error && (
         <Alert variant="destructive" className="mb-6">

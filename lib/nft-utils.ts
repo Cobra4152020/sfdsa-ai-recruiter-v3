@@ -30,37 +30,47 @@ export interface NFTAward {
   tokenId?: string;
   contractAddress?: string;
   blockchainExplorerUrl?: string;
+  comingSoon: boolean;
+  tier: "bronze" | "silver" | "gold" | "platinum";
 }
 
-// Define NFT award tiers
+// Define NFT award tiers - Coming Soon (not yet connected to blockchain)
 export const NFT_AWARD_TIERS: NFTAward[] = [
   {
     id: "bronze",
-    name: "Bronze Recruit",
-    description: "Awarded for reaching 1,000 participation points",
-    imageUrl: "/nft-awards/bronze-recruit.png",
+    name: "Bronze Recruit NFT",
+    description: "🚀 Coming Soon! Blockchain-verified achievement badge for reaching 1,000 participation points. This exclusive NFT will be minted on the blockchain once our Web3 integration is complete.",
+    imageUrl: "/nft-card.png",
     pointThreshold: 1000,
+    comingSoon: true,
+    tier: "bronze",
   },
   {
     id: "silver",
-    name: "Silver Recruit",
-    description: "Awarded for reaching 2,500 participation points",
-    imageUrl: "/nft-awards/silver-recruit.png",
+    name: "Silver Recruit NFT",
+    description: "🚀 Coming Soon! Blockchain-verified achievement badge for reaching 2,500 participation points. This exclusive NFT will be minted on the blockchain once our Web3 integration is complete.",
+    imageUrl: "/nft-card.png",
     pointThreshold: 2500,
+    comingSoon: true,
+    tier: "silver",
   },
   {
     id: "gold",
-    name: "Gold Recruit",
-    description: "Awarded for reaching 5,000 participation points",
-    imageUrl: "/nft-awards/gold-recruit.png",
+    name: "Gold Recruit NFT",
+    description: "🚀 Coming Soon! Blockchain-verified achievement badge for reaching 5,000 participation points. This exclusive NFT will be minted on the blockchain once our Web3 integration is complete.",
+    imageUrl: "/nft-card.png",
     pointThreshold: 5000,
+    comingSoon: true,
+    tier: "gold",
   },
   {
     id: "platinum",
-    name: "Platinum Recruit",
-    description: "Awarded for reaching 10,000 participation points",
-    imageUrl: "/nft-awards/platinum-recruit.png",
+    name: "Platinum Recruit NFT",
+    description: "🚀 Coming Soon! Blockchain-verified achievement badge for reaching 10,000 participation points. This exclusive NFT will be minted on the blockchain once our Web3 integration is complete.",
+    imageUrl: "/nft-card.png",
     pointThreshold: 10000,
+    comingSoon: true,
+    tier: "platinum",
   },
 ];
 

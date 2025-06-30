@@ -47,7 +47,7 @@ export function DatabaseSchemaUpdateButton() {
     <Button
       onClick={handleUpdate}
       disabled={isUpdating}
-      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/80"
+      className="bg-primary hover:bg-primary/80"
     >
       {isUpdating ? "Updating Schema..." : "Update Database Schema"}
     </Button>

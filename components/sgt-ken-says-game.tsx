@@ -444,14 +444,14 @@ export function SgtKenSaysGame() {
   return (
     <div className="space-y-6">
       {/* Sgt. Ken's Message */}
-      <Card className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border-[#0A3C1F]/20">
+      <Card className="bg-gradient-to-r from-primary/10 to-transparent border-primary/20">
         <CardContent className="p-6">
           <div className="flex items-center mb-4">
-            <div className="w-12 h-12 bg-[#0A3C1F] rounded-full flex items-center justify-center mr-4">
+            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mr-4">
               <span className="text-white font-bold text-lg">SK</span>
             </div>
             <div>
-              <h3 className="font-bold text-[#0A3C1F]">Sgt. Ken says:</h3>
+              <h3 className="font-bold text-primary">Sgt. Ken says:</h3>
               <p className="text-gray-700 italic">"{getCurrentPhrase()}"</p>
             </div>
           </div>
@@ -462,7 +462,7 @@ export function SgtKenSaysGame() {
                 Your Rank: {getRank()}
               </Badge>
               {gameState.gameStatus === 'won' && (
-                <Badge className="bg-[#0A3C1F] text-white">
+                <Badge className="bg-primary text-white">
                   +{gameState.points} Points
                 </Badge>
               )}
@@ -562,7 +562,7 @@ export function SgtKenSaysGame() {
                     }
                   }}
                 />
-                <Button onClick={submitGuess} className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                <Button onClick={submitGuess} className="bg-primary hover:bg-primary/90">
                   Submit
                 </Button>
               </div>
@@ -590,7 +590,7 @@ export function SgtKenSaysGame() {
               <div className="flex gap-2 justify-center">
                 <Button
                   onClick={() => setShowShareDialog(true)}
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="bg-primary hover:bg-primary/90"
                 >
                   <Share2 className="h-4 w-4 mr-2" />
                   Share Results
@@ -642,7 +642,7 @@ export function SgtKenSaysGame() {
               </Button>
             </div>
             
-            <div className="p-3 bg-gray-50 rounded text-sm">
+            <div className="p-3 bg-muted rounded text-sm">
               <strong>Preview:</strong>
               <div className="mt-2 whitespace-pre-line text-xs">
                 {generateShareText().substring(0, 200)}...
@@ -665,12 +665,12 @@ export function SgtKenSaysGame() {
           <div className="space-y-6">
             {/* Overall Stats */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <div className="text-2xl font-bold text-[#0A3C1F]">{gameState.totalGamesPlayed}</div>
+              <div className="text-center p-4 bg-muted rounded">
+                <div className="text-2xl font-bold text-primary">{gameState.totalGamesPlayed}</div>
                 <div className="text-sm text-gray-600">Games Played</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded">
-                <div className="text-2xl font-bold text-[#0A3C1F]">
+              <div className="text-center p-4 bg-muted rounded">
+                <div className="text-2xl font-bold text-primary">
                   {gameState.totalGamesPlayed > 0 ? Math.round((gameState.totalWins / gameState.totalGamesPlayed) * 100) : 0}%
                 </div>
                 <div className="text-sm text-gray-600">Win Rate</div>
@@ -679,17 +679,17 @@ export function SgtKenSaysGame() {
 
             {/* Streak & Rank */}
             <div className="space-y-3">
-              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-[#0A3C1F]/10 to-transparent rounded">
+              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-primary/10 to-transparent rounded">
                 <span className="font-medium">Current Streak</span>
                 <div className="flex items-center">
-                  <Zap className="h-4 w-4 text-[#0A3C1F] mr-1" />
-                  <span className="font-bold text-[#0A3C1F]">{gameState.streak} days</span>
+                  <Zap className="h-4 w-4 text-primary mr-1" />
+                  <span className="font-bold text-primary">{gameState.streak} days</span>
                 </div>
               </div>
               
-              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-[#0A3C1F]/10 to-transparent rounded">
+              <div className="flex justify-between items-center p-3 bg-gradient-to-r from-primary/10 to-transparent rounded">
                 <span className="font-medium">Current Rank</span>
-                <span className="font-bold text-[#0A3C1F]">{getRank()}</span>
+                <span className="font-bold text-primary">{getRank()}</span>
               </div>
             </div>
 
@@ -712,7 +712,7 @@ export function SgtKenSaysGame() {
                       </div>
                       <div className="flex justify-between">
                         <span>Points Earned:</span>
-                        <span className="font-medium text-[#0A3C1F]">+{gameState.points}</span>
+                        <span className="font-medium text-primary">+{gameState.points}</span>
                       </div>
                     </>
                   )}
@@ -721,7 +721,7 @@ export function SgtKenSaysGame() {
             )}
 
             {/* Motivational Message */}
-            <div className="text-center p-4 bg-[#0A3C1F]/5 rounded">
+            <div className="text-center p-4 bg-primary/5 rounded">
               <div className="text-sm text-gray-600 italic">
                 "Keep training, cadet. Every puzzle solved makes you a better deputy!"
               </div>

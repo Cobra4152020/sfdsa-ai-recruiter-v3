@@ -219,7 +219,7 @@ export function FormTest() {
                       {new Date(result.timestamp).toLocaleTimeString()}
                     </div>
                     {result.data && (
-                      <pre className="text-xs mt-2 bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-x-auto">
+                      <pre className="text-xs mt-2 bg-muted p-2 rounded overflow-x-auto">
                         {JSON.stringify(result.data, null, 2)}
                       </pre>
                     )}

@@ -204,7 +204,7 @@ export default function TikTokChallengesPage() {
         <header className="mb-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold flex items-center bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent">
+              <h1 className="text-4xl md:text-5xl font-bold flex items-center bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
                 <TikTokIcon className="h-10 w-10 mr-3" />
                 TikTok Recruitment Challenges
               </h1>
@@ -232,22 +232,22 @@ export default function TikTokChallengesPage() {
         </header>
 
         {/* Enhanced Quick Stats */}
-        <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+        <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-6 mb-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-3xl font-bold text-[#0A3C1F]">5</div>
+              <div className="text-3xl font-bold text-primary">5</div>
               <div className="text-sm text-gray-600 font-medium">Active Challenges</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-[#0A3C1F]">125-200</div>
+              <div className="text-3xl font-bold text-primary">125-200</div>
               <div className="text-sm text-gray-600 font-medium">Points Per Challenge</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-[#0A3C1F]">🎖️</div>
+              <div className="text-3xl font-bold text-primary">🎖️</div>
               <div className="text-sm text-gray-600 font-medium">Unique Badges</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-[#0A3C1F]">∞</div>
+              <div className="text-3xl font-bold text-primary">∞</div>
               <div className="text-sm text-gray-600 font-medium">Resubmissions</div>
             </div>
           </div>
@@ -305,7 +305,7 @@ export default function TikTokChallengesPage() {
         {/* Enhanced How It Works Section */}
         <div className="mt-12 bg-gradient-to-br from-gray-50 to-white border rounded-xl p-8 shadow-sm">
           <div className="text-center mb-8">
-            <h2 className="text-2xl font-bold text-[#0A3C1F] mb-3">
+            <h2 className="text-2xl font-bold text-primary mb-3">
               How TikTok Challenges Work
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
@@ -315,7 +315,7 @@ export default function TikTokChallengesPage() {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/80 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Video className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-semibold text-lg mb-3">1. Choose & Create</h3>
@@ -326,7 +326,7 @@ export default function TikTokChallengesPage() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/80 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-semibold text-lg mb-3">2. Submit & Earn</h3>
@@ -337,7 +337,7 @@ export default function TikTokChallengesPage() {
             </div>
             
             <div className="text-center">
-              <div className="w-16 h-16 bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/80 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Trophy className="h-8 w-8 text-white" />
               </div>
               <h3 className="font-semibold text-lg mb-3">3. Climb & Lead</h3>

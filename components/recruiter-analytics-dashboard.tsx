@@ -370,7 +370,7 @@ export function RecruiterAnalyticsDashboard() {
   if (isLoading && !dashboardData) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -379,7 +379,7 @@ export function RecruiterAnalyticsDashboard() {
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-[#0A3C1F]">
+          <h2 className="text-2xl font-bold text-primary">
             Recruiter Analytics Dashboard
           </h2>
           <p className="text-gray-600">
@@ -524,7 +524,7 @@ export function RecruiterAnalyticsDashboard() {
                 <CardContent>
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="p-4 bg-gray-50 border rounded-lg">
+                      <div className="p-4 bg-muted border rounded-lg">
                         <h3 className="font-medium text-gray-800">
                           Your Performance
                         </h3>

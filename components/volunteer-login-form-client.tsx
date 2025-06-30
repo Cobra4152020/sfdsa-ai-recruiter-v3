@@ -134,7 +134,7 @@ export function VolunteerLoginFormClient() {
             <Label htmlFor="password">Password</Label>
             <Link
               href="/forgot-password"
-              className="text-sm text-[#0A3C1F] hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               Forgot password?
             </Link>
@@ -180,7 +180,7 @@ export function VolunteerLoginFormClient() {
 
         <Button
           type="submit"
-          className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+          className="w-full bg-primary hover:bg-primary/90 text-white"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -206,7 +206,7 @@ export function VolunteerLoginFormClient() {
       <Button
         type="button"
         variant="outline"
-        className="w-full border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10"
+        className="w-full border-primary text-primary hover:bg-primary/10"
         onClick={handleMagicLinkLogin}
         disabled={isLoading}
       >
@@ -218,7 +218,7 @@ export function VolunteerLoginFormClient() {
           Don&apos;t have an account?{" "}
           <Link
             href="/volunteer-register"
-            className="text-[#0A3C1F] hover:underline font-medium"
+            className="text-primary hover:underline font-medium"
           >
             Register as a Volunteer Recruiter
           </Link>
@@ -226,7 +226,7 @@ export function VolunteerLoginFormClient() {
         <p className="text-sm text-gray-600">
           <Link
             href="/resend-confirmation"
-            className="text-[#0A3C1F] hover:underline"
+            className="text-primary hover:underline"
           >
             Resend confirmation email
           </Link>

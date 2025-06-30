@@ -142,7 +142,7 @@ export default function FreeCollegeContent() {
                 <GraduationCap className="h-12 w-12 text-white" />
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-[#0A3C1F] mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-primary mb-4">
               🎓 Free College Programs
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -189,7 +189,7 @@ export default function FreeCollegeContent() {
 
           {/* Education Programs */}
           <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-[#0A3C1F] text-center mb-8">
+            <h2 className="text-3xl font-bold text-primary text-center mb-8">
               Available Education Programs
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -197,7 +197,7 @@ export default function FreeCollegeContent() {
                 <Card key={index} className="hover:shadow-xl transition-all duration-300 border-l-4 border-l-blue-500">
                   <CardHeader>
                     <div className="flex items-center gap-4">
-                      <div className="p-3 bg-gray-50 rounded-lg">
+                      <div className="p-3 bg-muted rounded-lg">
                         {program.icon}
                       </div>
                       <div>
@@ -212,7 +212,7 @@ export default function FreeCollegeContent() {
                   <CardContent>
                     <p className="text-gray-600 mb-4">{program.description}</p>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-[#0A3C1F]">Key Benefits:</h4>
+                      <h4 className="font-semibold text-primary">Key Benefits:</h4>
                       <ul className="space-y-1">
                         {program.benefits.map((benefit, idx) => (
                           <li key={idx} className="flex items-center gap-2 text-sm">
@@ -230,7 +230,7 @@ export default function FreeCollegeContent() {
 
           {/* Eligibility Process */}
           <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-[#0A3C1F] text-center">
+            <h2 className="text-3xl font-bold text-primary text-center">
               How to Qualify for Education Benefits
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
@@ -238,12 +238,12 @@ export default function FreeCollegeContent() {
                 <Card key={index} className="text-center relative">
                   <CardContent className="p-6">
                     <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                      <div className="w-8 h-8 bg-[#0A3C1F] text-white rounded-full flex items-center justify-center font-bold">
+                      <div className="w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center font-bold">
                         {step.step}
                       </div>
                     </div>
                     <div className="mt-4">
-                      <h3 className="font-semibold text-[#0A3C1F] mb-2">{step.title}</h3>
+                      <h3 className="font-semibold text-primary mb-2">{step.title}</h3>
                       <p className="text-sm text-gray-600">{step.description}</p>
                     </div>
                   </CardContent>
@@ -254,12 +254,12 @@ export default function FreeCollegeContent() {
 
           {/* Popular Programs */}
           <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-[#0A3C1F] text-center">
+            <h2 className="text-3xl font-bold text-primary text-center">
               Popular Partner Programs
             </h2>
             <div className="overflow-x-auto">
               <table className="w-full bg-white rounded-lg shadow-lg">
-                <thead className="bg-[#0A3C1F] text-white">
+                <thead className="bg-primary text-white">
                   <tr>
                     <th className="p-4 text-left">School</th>
                     <th className="p-4 text-left">Program</th>
@@ -270,7 +270,7 @@ export default function FreeCollegeContent() {
                 </thead>
                 <tbody>
                   {popularPrograms.map((program, index) => (
-                    <tr key={index} className="border-b hover:bg-gray-50">
+                    <tr key={index} className="border-b hover:bg-accent/10">
                       <td className="p-4 font-medium">{program.school}</td>
                       <td className="p-4">{program.program}</td>
                       <td className="p-4">
@@ -288,7 +288,7 @@ export default function FreeCollegeContent() {
           </div>
 
           {/* Investment in Your Future */}
-          <Card className="bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/90 text-white">
+          <Card className="bg-gradient-to-br from-primary to-primary/90 text-white">
             <CardContent className="p-8 text-center">
               <Star className="h-12 w-12 text-[#FFD700] mx-auto mb-4" />
               <h2 className="text-3xl font-bold mb-4">We Invest In Your Future</h2>
@@ -312,7 +312,7 @@ export default function FreeCollegeContent() {
               </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/apply">
-                  <Button size="lg" className="bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 font-semibold">
+                  <Button size="lg" className="bg-[#FFD700] text-primary hover:bg-[#FFD700]/90 font-semibold">
                     <Target className="mr-2 h-5 w-5" />
                     Start Your Application
                   </Button>

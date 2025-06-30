@@ -157,8 +157,8 @@ export function BadgeLeaderboard({
                 transition={{ delay: index * 0.1 }}
                 className={`flex items-center justify-between p-4 rounded-lg ${
                   entry.userId === currentUserId
-                    ? "bg-[#F0F7F2] border border-[#0A3C1F]"
-                    : "bg-gray-50"
+                    ? "bg-[#F0F7F2] border border-primary"
+                    : "bg-muted"
                 }`}
               >
                 <div className="flex items-center gap-4">

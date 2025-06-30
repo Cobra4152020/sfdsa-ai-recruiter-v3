@@ -641,7 +641,7 @@ export function UnifiedAuthModal() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 h-11"
+                  className="w-full bg-primary hover:bg-primary/90 h-11"
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating Account..." : "Create Account & Earn 50 Points"}
@@ -650,7 +650,7 @@ export function UnifiedAuthModal() {
                 <div className="text-center">
                   <button
                     type="button"
-                    className="text-sm text-[#0A3C1F] hover:underline"
+                    className="text-sm text-primary hover:underline"
                     onClick={() => setActiveTab("signin")}
                   >
                     Already have an account? <span className="font-medium">Sign in</span>

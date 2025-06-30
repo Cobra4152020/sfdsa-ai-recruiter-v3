@@ -21,7 +21,7 @@ export function MobileFooter() {
 
   if (!mounted) {
     return (
-      <footer className="bg-[#0A3C1F] text-white">
+      <footer className="bg-primary text-white">
         <div className="container mx-auto px-4 py-3 md:py-12">
           <div className="animate-pulse">
             <div className="h-12 bg-gray-700 rounded mb-3"></div>
@@ -37,7 +37,7 @@ export function MobileFooter() {
 
   return (
     <footer
-      className="bg-[#0A3C1F] text-white"
+      className="bg-primary text-white"
       role="contentinfo"
       aria-label="Site footer"
     >
@@ -60,7 +60,7 @@ export function MobileFooter() {
             </button>
             <Button
               onClick={() => handleNavigation("/donate")}
-              className="py-1 px-3 text-xs bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 font-semibold"
+              className="py-1 px-3 text-xs bg-[#FFD700] text-primary hover:bg-[#FFD700]/90 font-semibold"
               aria-label="Support our mission"
             >
               Donate
@@ -281,7 +281,7 @@ export function MobileFooter() {
                   </p>
                   <Button
                     onClick={() => handleNavigation("/donate")}
-                    className="block mt-4 w-full transform transition-transform duration-200 hover:scale-105 bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 font-semibold"
+                    className="block mt-4 w-full transform transition-transform duration-200 hover:scale-105 bg-[#FFD700] text-primary hover:bg-[#FFD700]/90 font-semibold"
                     aria-label="Support our mission - Make a donation"
                   >
                     Support Our Mission

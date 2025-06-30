@@ -5,7 +5,8 @@ import type { Badge } from "@/lib/badge-utils";
 import { AchievementBadge } from "./achievement-badge";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import { Share2, Lock, CheckCircle, Trophy, Info } from "lucide-react";
+import { Share2, CheckCircle, Trophy, Info } from "lucide-react";
+import { CustomLockIcon } from "@/components/ui/custom-lock-icon";
 import {
   Card,
   CardContent,
@@ -94,7 +95,7 @@ export function BadgeDetailCard({
             <AchievementBadge type={badge.id} size="lg" earned={earned} />
             {!earned && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-full">
-                <Lock className="h-6 w-6 text-white/90" />
+                <CustomLockIcon size="lg" className="text-white/90" />
               </div>
             )}
           </div>

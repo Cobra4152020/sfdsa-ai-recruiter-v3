@@ -26,7 +26,7 @@ export default function SFDayTripsTriviaPage() {
     <PageWrapper>
       <main className="container mx-auto px-4 py-8">
         <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">{gameName}</h1>
+          <h1 className="text-3xl font-bold text-primary mb-2">{gameName}</h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
             {gameDescription}
           </p>

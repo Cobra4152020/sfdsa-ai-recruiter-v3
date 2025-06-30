@@ -102,7 +102,7 @@ export function DonationLeaderboard({
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Donation Leaderboard</CardTitle>
-          <DollarSign className="h-5 w-5 text-[#0A3C1F]" />
+          <DollarSign className="h-5 w-5 text-primary" />
         </div>
         <CardDescription>Top contributors making a difference</CardDescription>
       </CardHeader>

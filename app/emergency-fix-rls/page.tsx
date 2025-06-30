@@ -160,7 +160,7 @@ export default function EmergencyRLSFixPage() {
         )}
 
         {/* What This Does */}
-        <div className="mt-6 bg-gray-50 p-4 rounded-lg">
+        <div className="mt-6 bg-muted p-4 rounded-lg">
           <h3 className="font-medium text-gray-800 mb-2">🔧 What This Emergency Fix Does:</h3>
           <ul className="text-sm text-gray-600 space-y-1">
             <li>• <strong>Bypasses ALL authentication</strong> using service role key</li>

@@ -270,7 +270,7 @@ export function RecruiterContactForm() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+              className="w-full bg-primary hover:bg-primary/90"
             >
               {isSubmitting ? (
                 <>
@@ -286,7 +286,7 @@ export function RecruiterContactForm() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="bg-gray-50 dark:bg-gray-800/50 border-t px-6 py-4">
+        <CardFooter className="bg-muted/50 border-t px-6 py-4">
           <div className="text-sm text-gray-500 dark:text-gray-400">
             <p className="mb-2">
               <strong>Note:</strong> The email will be sent from our official

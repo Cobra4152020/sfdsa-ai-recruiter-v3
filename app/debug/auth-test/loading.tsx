@@ -12,7 +12,7 @@ export default function AuthTestLoading() {
       <div className="max-w-3xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-[#0A3C1F]">
+            <CardTitle className="text-2xl font-bold text-primary">
               Authentication Diagnostic Tool
             </CardTitle>
             <CardDescription>
@@ -23,7 +23,7 @@ export default function AuthTestLoading() {
           <CardContent className="space-y-6">
             <div className="text-center py-4">
               <div
-                className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-[#0A3C1F] rounded-full"
+                className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-primary rounded-full"
                 aria-hidden="true"
               ></div>
               <p className="mt-2">Loading authentication diagnostic tool...</p>

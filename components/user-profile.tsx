@@ -45,7 +45,7 @@ export function UserProfile() {
               src={currentUser.avatarUrl || ""}
               alt={currentUser.name || "User"}
             />
-            <AvatarFallback className="bg-[#0A3C1F] text-white">
+            <AvatarFallback className="bg-primary text-white">
               {userInitials}
             </AvatarFallback>
           </Avatar>

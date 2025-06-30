@@ -245,7 +245,7 @@ export default function ContactPage() {
     <PageWrapper>
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6">
             📞 Contact Us
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
@@ -259,22 +259,22 @@ export default function ContactPage() {
           </p>
 
           {/* Quick Stats */}
-          <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+          <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-6 mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">24/7</div>
+                <div className="text-3xl font-bold text-primary">24/7</div>
                 <div className="text-sm text-gray-600 font-medium">Online Support</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">4hr</div>
+                <div className="text-3xl font-bold text-primary">4hr</div>
                 <div className="text-sm text-gray-600 font-medium">Urgent Response</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">8</div>
+                <div className="text-3xl font-bold text-primary">8</div>
                 <div className="text-sm text-gray-600 font-medium">Contact Methods</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">95%</div>
+                <div className="text-3xl font-bold text-primary">95%</div>
                 <div className="text-sm text-gray-600 font-medium">Satisfaction Rate</div>
               </div>
             </div>
@@ -285,7 +285,7 @@ export default function ContactPage() {
           {/* Enhanced Contact Form */}
           <div className="lg:col-span-2">
             <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white">
+              <CardHeader className="bg-gradient-to-r from-primary to-primary/90 text-white">
                 <CardTitle className="flex items-center text-xl">
                   <MessageSquare className="h-6 w-6 mr-3" />
                   Send Us a Message
@@ -484,7 +484,7 @@ export default function ContactPage() {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 shadow-md hover:shadow-lg transition-all"
+                    className="w-full bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
                   >
                     {isSubmitting ? (
                       <>
@@ -507,7 +507,7 @@ export default function ContactPage() {
           <div className="space-y-6">
             {/* Contact Information */}
             <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-              <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white">
+              <CardHeader className="bg-gradient-to-r from-primary to-primary/90 text-white">
                 <CardTitle className="flex items-center">
                   <Phone className="h-5 w-5 mr-2" />
                   Contact Information
@@ -516,7 +516,7 @@ export default function ContactPage() {
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div className="flex items-start">
-                    <Mail className="h-5 w-5 text-[#0A3C1F] mr-3 mt-0.5" />
+                    <Mail className="h-5 w-5 text-primary mr-3 mt-0.5" />
                     <div>
                       <p className="font-medium">Recruitment Email</p>
                       <a 
@@ -528,7 +528,7 @@ export default function ContactPage() {
                     </div>
                   </div>
                   <div className="flex items-start">
-                    <Phone className="h-5 w-5 text-[#0A3C1F] mr-3 mt-0.5" />
+                    <Phone className="h-5 w-5 text-primary mr-3 mt-0.5" />
                     <div>
                       <p className="font-medium">Recruitment Phone</p>
                       <a 
@@ -540,7 +540,7 @@ export default function ContactPage() {
                     </div>
                   </div>
                   <div className="flex items-start">
-                    <MapPin className="h-5 w-5 text-[#0A3C1F] mr-3 mt-0.5" />
+                    <MapPin className="h-5 w-5 text-primary mr-3 mt-0.5" />
                     <div>
                       <p className="font-medium">Main Office</p>
                       <p className="text-sm text-gray-600">

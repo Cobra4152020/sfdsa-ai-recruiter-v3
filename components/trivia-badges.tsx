@@ -427,14 +427,14 @@ export function TriviaBadges() {
             <Button
               variant="outline"
               onClick={() => handleShare("email")}
-              className="border-[#0A3C1F] text-[#0A3C1F]"
+              className="border-primary text-primary"
             >
               <Mail className="h-4 w-4 mr-2" />
               Email
             </Button>
           </div>
 
-          <div className="bg-[#0A3C1F]/5 p-3 rounded-lg text-sm">
+          <div className="bg-primary/5 p-3 rounded-lg text-sm">
             <p className="font-medium">Customize your message:</p>
             <textarea
               className="w-full mt-2 p-2 border rounded-md text-sm"

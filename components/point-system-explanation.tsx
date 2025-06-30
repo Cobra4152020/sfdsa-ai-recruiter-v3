@@ -144,7 +144,7 @@ export function PointSystemExplanation({
             </p>
 
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <div className="bg-muted p-4 rounded-lg">
                 <h3 className="font-semibold text-lg mb-2">Earn Points By:</h3>
                 <ul className="space-y-2 list-disc list-inside text-gray-600 dark:text-gray-300">
                   <li>Engaging with our AI assistant</li>
@@ -155,7 +155,7 @@ export function PointSystemExplanation({
                 </ul>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+              <div className="bg-muted p-4 rounded-lg">
                 <h3 className="font-semibold text-lg mb-2">
                   Benefits Include:
                 </h3>
@@ -255,7 +255,7 @@ export function PointSystemExplanation({
                           ? "bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800"
                           : isNext
                             ? "bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800"
-                            : "bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
+                            : "bg-muted border-border"
                       }`}
                     >
                       <div className="flex items-start">
@@ -303,7 +303,7 @@ export function PointSystemExplanation({
                 {pointActivities.map((activity) => (
                   <div
                     key={activity.name}
-                    className="flex items-start p-4 rounded-lg border bg-gray-50 dark:bg-gray-800/50"
+                    className="flex items-start p-4 rounded-lg border bg-muted"
                   >
                     <div className="rounded-full p-2 mr-3 bg-white dark:bg-gray-800 shadow-sm">
                       {activity.icon}

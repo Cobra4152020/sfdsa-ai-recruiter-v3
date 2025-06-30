@@ -4,8 +4,10 @@ import type { NextRequest } from "next/server";
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
   // Skip database-dependent API routes during static build
+  // Only block API routes if we're specifically in a static build AND in production
   if (
     process.env.NEXT_PUBLIC_STATIC_BUILD === "true" &&
+    process.env.NODE_ENV === "production" &&
     request.nextUrl.pathname.startsWith("/api/")
   ) {
     // For API routes during static build, return an empty 200 response

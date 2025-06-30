@@ -151,7 +151,7 @@ export function DropdownNav({
       onKeyDown={handleKeyDown}
     >
       <button
-        className="flex items-center text-[#0A3C1F] dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white py-2 transition-all duration-200 group"
+        className="flex items-center text-primary dark:text-[#FFD700] hover:text-[#FFD700] dark:hover:text-white py-2 transition-all duration-200 group"
         aria-expanded={isOpen}
         aria-haspopup="true"
         aria-controls={isOpen ? "dropdown-menu" : undefined}
@@ -183,7 +183,7 @@ export function DropdownNav({
       {isOpen && (
         <div
           id="dropdown-menu"
-          className="absolute left-0 mt-2 w-64 bg-[#0A3C1F] dark:bg-[#0A3C1F] rounded-lg shadow-lg overflow-hidden z-50 border border-[#FFD700]/20"
+          className="absolute left-0 mt-2 w-64 bg-primary dark:bg-primary rounded-lg shadow-lg overflow-hidden z-50 border border-[#FFD700]/20"
           role="menu"
           aria-orientation="vertical"
           aria-labelledby="dropdown-button"

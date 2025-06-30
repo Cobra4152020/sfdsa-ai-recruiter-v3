@@ -88,7 +88,7 @@ export function AdminLoginForm() {
   return (
     <Card className="border-t-4 border-t-[#0A3C1F] shadow-lg">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+        <CardTitle className="text-2xl font-bold text-center text-primary">
           Admin Access
         </CardTitle>
         <CardDescription className="text-center">
@@ -97,8 +97,8 @@ export function AdminLoginForm() {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="flex justify-center mb-6">
-          <div className="bg-[#0A3C1F]/10 p-6 rounded-full">
-            <Shield className="h-12 w-12 text-[#0A3C1F]" />
+          <div className="bg-primary/10 p-6 rounded-full">
+            <Shield className="h-12 w-12 text-primary" />
           </div>
         </div>
 
@@ -136,7 +136,7 @@ export function AdminLoginForm() {
           </div>
           <Button
             type="submit"
-            className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+            className="w-full bg-primary hover:bg-primary/90 text-white"
             disabled={isLoading}
           >
             {isLoading ? "Authenticating..." : "Login to Admin Dashboard"}

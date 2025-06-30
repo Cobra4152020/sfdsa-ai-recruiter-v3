@@ -17,7 +17,32 @@ type BadgeType =
   | "first-response"
   | "frequent-user"
   | "resource-downloader"
-  | "hard-charger";
+  | "hard-charger"
+  | "trivia-titan"
+  | "sf-baseball-participant"
+  | "sf-baseball-enthusiast" 
+  | "sf-baseball-master"
+  | "sf-basketball-participant"
+  | "sf-basketball-enthusiast"
+  | "sf-basketball-master"
+  | "sf-districts-participant"
+  | "sf-districts-enthusiast"
+  | "sf-districts-master"
+  | "sf-football-participant"
+  | "sf-football-enthusiast"
+  | "sf-football-master"
+  | "sf-day-trips-participant"
+  | "sf-day-trips-enthusiast"
+  | "sf-day-trips-master"
+  | "sf-tourist-spots-participant"
+  | "sf-tourist-spots-enthusiast"
+  | "sf-tourist-spots-master"
+  | "point-pioneer"
+  | "recruit-referrer"
+  | "document-master"
+  | "community-event"
+  | "holiday-hero"
+  | "survey-superstar";
 
 interface Badge {
   id: string;
@@ -160,6 +185,264 @@ const staticBadges: Badge[] = [
     created_at: "2024-01-13T00:00:00Z",
     points: 300,
     difficulty: "Expert",
+    category: "participation",
+  },
+  // Trivia & Game Badges
+  {
+    id: "trivia-titan",
+    badge_type: "trivia-titan",
+    name: "Trivia Titan",
+    description: "Score 100% on any trivia game",
+    created_at: "2024-01-14T00:00:00Z",
+    points: 200,
+    difficulty: "Hard",
+    category: "achievement",
+  },
+  // SF Baseball Trivia Badges
+  {
+    id: "sf-baseball-participant",
+    badge_type: "sf-baseball-participant",
+    name: "Baseball Participant",
+    description: "Complete your first SF Baseball trivia round",
+    created_at: "2024-01-15T00:00:00Z",
+    points: 25,
+    difficulty: "Easy",
+    category: "participation",
+  },
+  {
+    id: "sf-baseball-enthusiast",
+    badge_type: "sf-baseball-enthusiast",
+    name: "Baseball Enthusiast",
+    description: "Complete 5 SF Baseball trivia rounds",
+    created_at: "2024-01-16T00:00:00Z",
+    points: 100,
+    difficulty: "Medium",
+    category: "participation",
+  },
+  {
+    id: "sf-baseball-master",
+    badge_type: "sf-baseball-master",
+    name: "Baseball Master",
+    description: "Achieve 3 perfect scores in SF Baseball trivia",
+    created_at: "2024-01-17T00:00:00Z",
+    points: 250,
+    difficulty: "Expert",
+    category: "achievement",
+  },
+  // SF Basketball Trivia Badges
+  {
+    id: "sf-basketball-participant",
+    badge_type: "sf-basketball-participant",
+    name: "Basketball Participant",
+    description: "Complete your first SF Basketball trivia round",
+    created_at: "2024-01-18T00:00:00Z",
+    points: 25,
+    difficulty: "Easy",
+    category: "participation",
+  },
+  {
+    id: "sf-basketball-enthusiast",
+    badge_type: "sf-basketball-enthusiast",
+    name: "Basketball Enthusiast",
+    description: "Complete 5 SF Basketball trivia rounds",
+    created_at: "2024-01-19T00:00:00Z",
+    points: 100,
+    difficulty: "Medium",
+    category: "participation",
+  },
+  {
+    id: "sf-basketball-master",
+    badge_type: "sf-basketball-master",
+    name: "Basketball Master",
+    description: "Achieve 3 perfect scores in SF Basketball trivia",
+    created_at: "2024-01-20T00:00:00Z",
+    points: 250,
+    difficulty: "Expert",
+    category: "achievement",
+  },
+  // SF Districts Trivia Badges
+  {
+    id: "sf-districts-participant",
+    badge_type: "sf-districts-participant",
+    name: "Districts Participant",
+    description: "Complete your first SF Districts trivia round",
+    created_at: "2024-01-21T00:00:00Z",
+    points: 25,
+    difficulty: "Easy",
+    category: "participation",
+  },
+  {
+    id: "sf-districts-enthusiast",
+    badge_type: "sf-districts-enthusiast",
+    name: "Districts Enthusiast",
+    description: "Complete 5 SF Districts trivia rounds",
+    created_at: "2024-01-22T00:00:00Z",
+    points: 100,
+    difficulty: "Medium",
+    category: "participation",
+  },
+  {
+    id: "sf-districts-master",
+    badge_type: "sf-districts-master",
+    name: "Districts Master",
+    description: "Achieve 3 perfect scores in SF Districts trivia",
+    created_at: "2024-01-23T00:00:00Z",
+    points: 250,
+    difficulty: "Expert",
+    category: "achievement",
+  },
+  // SF Football Trivia Badges
+  {
+    id: "sf-football-participant",
+    badge_type: "sf-football-participant",
+    name: "Football Participant",
+    description: "Complete your first SF Football trivia round",
+    created_at: "2024-01-24T00:00:00Z",
+    points: 25,
+    difficulty: "Easy",
+    category: "participation",
+  },
+  {
+    id: "sf-football-enthusiast",
+    badge_type: "sf-football-enthusiast",
+    name: "Football Enthusiast",
+    description: "Complete 5 SF Football trivia rounds",
+    created_at: "2024-01-25T00:00:00Z",
+    points: 100,
+    difficulty: "Medium",
+    category: "participation",
+  },
+  {
+    id: "sf-football-master",
+    badge_type: "sf-football-master",
+    name: "Football Master",
+    description: "Achieve 3 perfect scores in SF Football trivia",
+    created_at: "2024-01-26T00:00:00Z",
+    points: 250,
+    difficulty: "Expert",
+    category: "achievement",
+  },
+  // SF Day Trips Trivia Badges
+  {
+    id: "sf-day-trips-participant",
+    badge_type: "sf-day-trips-participant",
+    name: "Day Trips Participant",
+    description: "Complete your first SF Day Trips trivia round",
+    created_at: "2024-01-27T00:00:00Z",
+    points: 25,
+    difficulty: "Easy",
+    category: "participation",
+  },
+  {
+    id: "sf-day-trips-enthusiast",
+    badge_type: "sf-day-trips-enthusiast",
+    name: "Day Trips Enthusiast",
+    description: "Complete 5 SF Day Trips trivia rounds",
+    created_at: "2024-01-28T00:00:00Z",
+    points: 100,
+    difficulty: "Medium",
+    category: "participation",
+  },
+  {
+    id: "sf-day-trips-master",
+    badge_type: "sf-day-trips-master",
+    name: "Day Trips Master",
+    description: "Achieve 3 perfect scores in SF Day Trips trivia",
+    created_at: "2024-01-29T00:00:00Z",
+    points: 250,
+    difficulty: "Expert",
+    category: "achievement",
+  },
+  // SF Tourist Spots Trivia Badges
+  {
+    id: "sf-tourist-spots-participant",
+    badge_type: "sf-tourist-spots-participant",
+    name: "Tourist Spots Participant",
+    description: "Complete your first SF Tourist Spots trivia round",
+    created_at: "2024-01-30T00:00:00Z",
+    points: 25,
+    difficulty: "Easy",
+    category: "participation",
+  },
+  {
+    id: "sf-tourist-spots-enthusiast",
+    badge_type: "sf-tourist-spots-enthusiast",
+    name: "Tourist Spots Enthusiast",
+    description: "Complete 5 SF Tourist Spots trivia rounds",
+    created_at: "2024-01-31T00:00:00Z",
+    points: 100,
+    difficulty: "Medium",
+    category: "participation",
+  },
+  {
+    id: "sf-tourist-spots-master",
+    badge_type: "sf-tourist-spots-master",
+    name: "Tourist Spots Master",
+    description: "Achieve 3 perfect scores in SF Tourist Spots trivia",
+    created_at: "2024-02-01T00:00:00Z",
+    points: 250,
+    difficulty: "Expert",
+    category: "achievement",
+  },
+  // Special Achievement Badges
+  {
+    id: "point-pioneer",
+    badge_type: "point-pioneer",
+    name: "Point Pioneer",
+    description: "Earn your first 1,000 points",
+    created_at: "2024-02-02T00:00:00Z",
+    points: 100,
+    difficulty: "Medium",
+    category: "achievement",
+  },
+  {
+    id: "recruit-referrer",
+    badge_type: "recruit-referrer",
+    name: "Recruit Referrer",
+    description: "Successfully refer a new recruit",
+    created_at: "2024-02-03T00:00:00Z",
+    points: 200,
+    difficulty: "Hard",
+    category: "participation",
+  },
+  {
+    id: "document-master",
+    badge_type: "document-master",
+    name: "Document Master",
+    description: "Complete all background preparation documents",
+    created_at: "2024-02-04T00:00:00Z",
+    points: 150,
+    difficulty: "Medium",
+    category: "achievement",
+  },
+  {
+    id: "community-event",
+    badge_type: "community-event",
+    name: "Community Event",
+    description: "Attend a recruitment event",
+    created_at: "2024-02-05T00:00:00Z",
+    points: 100,
+    difficulty: "Easy",
+    category: "participation",
+  },
+  {
+    id: "holiday-hero",
+    badge_type: "holiday-hero",
+    name: "Holiday Hero",
+    description: "Log in during a holiday week",
+    created_at: "2024-02-06T00:00:00Z",
+    points: 50,
+    difficulty: "Easy",
+    category: "participation",
+  },
+  {
+    id: "survey-superstar",
+    badge_type: "survey-superstar",
+    name: "Survey Superstar",
+    description: "Complete a user feedback survey",
+    created_at: "2024-02-07T00:00:00Z",
+    points: 75,
+    difficulty: "Easy",
     category: "participation",
   },
 ];

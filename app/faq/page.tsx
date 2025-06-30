@@ -23,7 +23,7 @@ import {
   CheckCircle,
   ExternalLink
 } from "lucide-react";
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
+import AskSgtKenButton from "@/components/ask-sgt-ken-button";
 import Link from "next/link";
 
 interface FAQItem {
@@ -217,7 +217,7 @@ export default function FAQPage() {
         <div className="max-w-6xl mx-auto">
           {/* Header Section */}
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6">
               Frequently Asked Questions
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
@@ -229,7 +229,7 @@ export default function FAQPage() {
             <div className="flex justify-center mb-8">
               <AskSgtKenButton 
                 variant="default"
-                className="bg-[#FFD700] text-[#0A3C1F] hover:bg-[#FFD700]/90 px-8 py-3 text-lg font-semibold shadow-lg"
+                className="bg-[#FFD700] text-primary hover:bg-[#FFD700]/90 px-8 py-3 text-lg font-semibold shadow-lg"
               />
             </div>
           </div>
@@ -251,7 +251,7 @@ export default function FAQPage() {
                   <Button
                     variant={selectedCategory === "All" ? "default" : "outline"}
                     onClick={() => setSelectedCategory("All")}
-                    className={selectedCategory === "All" ? "bg-[#0A3C1F] text-white" : ""}
+                    className={selectedCategory === "All" ? "bg-primary text-white" : ""}
                   >
                     All
                   </Button>
@@ -260,7 +260,7 @@ export default function FAQPage() {
                       key={category}
                       variant={selectedCategory === category ? "default" : "outline"}
                       onClick={() => setSelectedCategory(category)}
-                      className={selectedCategory === category ? "bg-[#0A3C1F] text-white" : ""}
+                      className={selectedCategory === category ? "bg-primary text-white" : ""}
                     >
                       {category}
                     </Button>
@@ -293,11 +293,11 @@ export default function FAQPage() {
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                          <IconComponent className="h-4 w-4 text-[#0A3C1F]" />
+                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+                          <IconComponent className="h-4 w-4 text-primary" />
                         </div>
                         <div>
-                          <CardTitle className="text-left text-lg text-[#0A3C1F]">{faq.question}</CardTitle>
+                          <CardTitle className="text-left text-lg text-primary">{faq.question}</CardTitle>
                           <Badge variant="outline" className="mt-1 text-xs">
                             {faq.category}
                           </Badge>
@@ -343,7 +343,7 @@ export default function FAQPage() {
                 </Button>
                 <AskSgtKenButton 
                   variant="default"
-                  className="bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90"
+                  className="bg-primary text-white hover:bg-primary/90"
                 />
               </div>
             </Card>

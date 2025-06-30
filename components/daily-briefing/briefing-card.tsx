@@ -201,8 +201,8 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
           <p className="text-sm text-gray-500 dark:text-gray-400">{formattedDate}</p>
         </CardHeader>
         <CardContent className="pt-4 bg-white dark:bg-black">
-          <div className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/10 border border-[#0A3C1F]/10 dark:border-[#FFD700]/30 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-2">
+          <div className="bg-primary/5 dark:bg-[#FFD700]/10 border border-primary/10 dark:border-[#FFD700]/30 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-primary dark:text-[#FFD700] mb-2">
               Briefing Information
             </h3>
             <p className="text-gray-700 dark:text-gray-300">
@@ -235,7 +235,7 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
             onClick={handleAttend}
             disabled={isAttended || isLoading}
             variant={isAttended ? "outline" : "default"}
-            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:hover:bg-[#FFD700]/90 text-white dark:text-black border-[#0A3C1F] dark:border-[#FFD700]"
+            className="bg-primary hover:bg-primary/90 dark:bg-[#FFD700] dark:hover:bg-[#FFD700]/90 text-white dark:text-black border-primary dark:border-[#FFD700]"
           >
             {isLoading
               ? "Processing..."
@@ -246,7 +246,7 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
           <Button
             variant="outline"
             onClick={handleShare}
-            className="border-[#0A3C1F] dark:border-[#FFD700] text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/5 dark:hover:bg-[#FFD700]/10"
+            className="border-primary dark:border-[#FFD700] text-primary dark:text-[#FFD700] hover:bg-primary/5 dark:hover:bg-[#FFD700]/10"
           >
             <Share2 className="h-4 w-4 mr-2" />
             Share Briefing
@@ -280,14 +280,14 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
               {validBriefing?.cycle_day && (
                 <Badge
                   variant="outline"
-                  className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50"
+                  className="bg-primary/5 dark:bg-[#FFD700]/20 text-primary dark:text-[#FFD700] border-primary/20 dark:border-[#FFD700]/50"
                 >
                   Day {validBriefing.cycle_day}/365
                 </Badge>
               )}
               <Badge
                 variant="outline"
-                className="bg-[#0A3C1F]/10 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50"
+                className="bg-primary/10 dark:bg-[#FFD700]/20 text-primary dark:text-[#FFD700] border-primary/20 dark:border-[#FFD700]/50"
               >
                 {validBriefing?.theme || "General"}
               </Badge>
@@ -320,8 +320,8 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
           {validBriefing.keyPoints &&
             Array.isArray(validBriefing.keyPoints) &&
             validBriefing.keyPoints.length > 0 && (
-              <div className="mt-6 bg-[#0A3C1F]/5 dark:bg-[#FFD700]/10 border border-[#0A3C1F]/10 dark:border-[#FFD700]/30 rounded-lg p-4">
-                <h3 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-2">
+              <div className="mt-6 bg-primary/5 dark:bg-[#FFD700]/10 border border-primary/10 dark:border-[#FFD700]/30 rounded-lg p-4">
+                <h3 className="font-semibold text-primary dark:text-[#FFD700] mb-2">
                   Key Points:
                 </h3>
                 <ul className="list-disc pl-5 space-y-1">
@@ -344,7 +344,7 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
             onClick={handleAttend}
             disabled={isAttended || isLoading}
             variant={isAttended ? "outline" : "default"}
-            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:hover:bg-[#FFD700]/90 text-white dark:text-black border-[#0A3C1F] dark:border-[#FFD700]"
+            className="bg-primary hover:bg-primary/90 dark:bg-[#FFD700] dark:hover:bg-[#FFD700]/90 text-white dark:text-black border-primary dark:border-[#FFD700]"
           >
             {isLoading
               ? "Processing..."
@@ -355,7 +355,7 @@ export function BriefingCard({ briefing }: BriefingCardProps) {
           <Button
             variant="outline"
             onClick={handleShare}
-            className="border-[#0A3C1F] dark:border-[#FFD700] text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/5 dark:hover:bg-[#FFD700]/10"
+            className="border-primary dark:border-[#FFD700] text-primary dark:text-[#FFD700] hover:bg-primary/5 dark:hover:bg-[#FFD700]/10"
           >
             <Share2 className="h-4 w-4 mr-2" />
             Share Briefing

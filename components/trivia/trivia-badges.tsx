@@ -152,8 +152,8 @@ export function TriviaBadges({
               key={badge.id}
               className={`p-3 rounded-lg border ${
                 badge.earned
-                  ? "bg-[#0A3C1F]/10 border-[#0A3C1F]/30"
-                  : "bg-gray-50 border-gray-200 dark:bg-gray-800/50 dark:border-gray-700"
+                  ? "bg-primary/10 border-primary/30"
+                  : "bg-muted border-border"
               }`}
             >
               <div className="flex items-center">
@@ -178,7 +178,7 @@ export function TriviaBadges({
                   <Button
                     size="sm"
                     variant="outline"
-                    className="h-8 border-[#0A3C1F] text-[#0A3C1F]"
+                    className="h-8 border-primary text-primary"
                     onClick={() => handleShare(badge)}
                   >
                     <Share2 className="h-3.5 w-3.5 mr-1" />
@@ -207,13 +207,13 @@ export function TriviaBadges({
           ))}
 
           {!isLoggedIn && (
-            <div className="bg-[#0A3C1F]/5 p-3 rounded-lg text-center">
+            <div className="bg-primary/5 p-3 rounded-lg text-center">
               <p className="text-sm text-gray-600 mb-2">
                 Sign in to track your badge progress!
               </p>
               <Button
                 size="sm"
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="bg-primary hover:bg-primary/90"
                 onClick={() => (window.location.href = `/trivia/${gameId}`)}
               >
                 Sign In

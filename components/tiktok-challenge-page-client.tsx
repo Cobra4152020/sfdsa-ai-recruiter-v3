@@ -317,7 +317,7 @@ export function TikTokChallengePageClient({
                   <p className="text-gray-700">{challenge.instructions}</p>
 
                   {challenge.requirements && (
-                    <div className="mt-4 border border-gray-200 rounded-lg p-4 bg-gray-50">
+                    <div className="mt-4 border border-gray-200 rounded-lg p-4 bg-muted">
                       <h3 className="font-medium text-gray-900 mb-2">
                         Requirements:
                       </h3>
@@ -382,7 +382,7 @@ export function TikTokChallengePageClient({
                       {leaderboard.map((entry, index) => (
                         <div
                           key={entry.userId}
-                          className="flex items-center p-3 rounded-lg hover:bg-gray-50 transition-colors border"
+                          className="flex items-center p-3 rounded-lg hover:bg-accent/10 transition-colors border"
                         >
                           <div className="flex-shrink-0 w-6 text-center">
                             <span className="font-medium text-gray-600">

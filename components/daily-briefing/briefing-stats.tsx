@@ -36,13 +36,13 @@ export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
         <Card className="bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
-              <Users className="h-4 w-4 mr-2 text-[#0A3C1F] dark:text-[#FFD700]" />
+              <Users className="h-4 w-4 mr-2 text-primary dark:text-[#FFD700]" />
               Total Attendees
             </CardTitle>
           </CardHeader>
           <CardContent>
             <motion.div
-              className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]"
+              className="text-2xl font-bold text-primary dark:text-[#FFD700]"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.2, duration: 0.5, type: "spring" }}
@@ -66,13 +66,13 @@ export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
         <Card className="bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
-              <Share2 className="h-4 w-4 mr-2 text-[#0A3C1F] dark:text-[#FFD700]" />
+              <Share2 className="h-4 w-4 mr-2 text-primary dark:text-[#FFD700]" />
               Total Shares
             </CardTitle>
           </CardHeader>
           <CardContent>
             <motion.div
-              className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]"
+              className="text-2xl font-bold text-primary dark:text-[#FFD700]"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.3, duration: 0.5, type: "spring" }}
@@ -96,13 +96,13 @@ export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
         <Card className="bg-white dark:bg-gray-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
-              <Award className="h-4 w-4 mr-2 text-[#0A3C1F] dark:text-[#FFD700]" />
+              <Award className="h-4 w-4 mr-2 text-primary dark:text-[#FFD700]" />
               Your Platforms
             </CardTitle>
           </CardHeader>
           <CardContent>
             <motion.div
-              className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]"
+              className="text-2xl font-bold text-primary dark:text-[#FFD700]"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.4, duration: 0.5, type: "spring" }}
@@ -132,7 +132,7 @@ export function BriefingStats({ stats, userStreak = 0 }: BriefingStatsProps) {
           </CardHeader>
           <CardContent>
             <motion.div
-              className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]"
+              className="text-2xl font-bold text-primary dark:text-[#FFD700]"
               initial={{ opacity: 0, scale: 0.5 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.5, duration: 0.5, type: "spring" }}

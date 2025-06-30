@@ -194,7 +194,7 @@ export default function EmailDiagnosticsPage() {
                   </Alert>
 
                   {testResults.config.details && (
-                    <div className="mt-4 border rounded-md p-4 bg-gray-50">
+                    <div className="mt-4 border rounded-md p-4 bg-muted">
                       <h4 className="font-medium mb-2">
                         Configuration Details:
                       </h4>
@@ -260,7 +260,7 @@ export default function EmailDiagnosticsPage() {
                   </Alert>
 
                   {testResults.delivery.details && (
-                    <div className="mt-4 border rounded-md p-4 bg-gray-50">
+                    <div className="mt-4 border rounded-md p-4 bg-muted">
                       <h4 className="font-medium mb-2">Delivery Details:</h4>
                       <pre className="text-xs overflow-auto p-2 bg-gray-100 rounded">
                         {JSON.stringify(testResults.delivery.details, null, 2)}
@@ -330,7 +330,7 @@ export default function EmailDiagnosticsPage() {
                   </Alert>
 
                   {testResults.volunteer.details && (
-                    <div className="mt-4 border rounded-md p-4 bg-gray-50">
+                    <div className="mt-4 border rounded-md p-4 bg-muted">
                       <h4 className="font-medium mb-2">Details:</h4>
                       <pre className="text-xs overflow-auto p-2 bg-gray-100 rounded">
                         {JSON.stringify(testResults.volunteer.details, null, 2)}

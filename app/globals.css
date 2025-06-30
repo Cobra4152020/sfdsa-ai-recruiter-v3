@@ -2,62 +2,191 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom 3D Button Animations */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-10px) rotate(180deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px hsl(var(--primary) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px hsl(var(--primary) / 0.6), 0 0 30px hsl(var(--primary) / 0.4);
+  }
+}
+
+@keyframes bounce-few {
+  0%, 10%, 20%, 30%, 100% {
+    transform: translateY(0);
+  }
+  5% {
+    transform: translateY(-8px);
+  }
+  15% {
+    transform: translateY(-6px);
+  }
+  25% {
+    transform: translateY(-4px);
+  }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-ripple {
+  animation: ripple 0.6s ease-out;
+}
+
+.animate-shimmer {
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+.animate-bounce-few {
+  animation: bounce-few 2s ease-in-out;
+}
+
+@keyframes glass-shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-15deg);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%) skewX(-15deg);
+    opacity: 0;
+  }
+}
+
+@keyframes float-glow {
+  0%, 100% {
+    transform: translateY(0px) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.05);
+    opacity: 0.9;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.8);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+.animate-glass-shimmer {
+  animation: glass-shimmer 3s ease-in-out infinite;
+}
+
+.animate-float-glow {
+  animation: float-glow 4s ease-in-out infinite;
+}
+
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+}
+
+/* Gradient background for radial effects */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
 @layer base {
   :root {
-    /* Light mode - Sheriff's Department Green & Tan Uniforms */
-    --background: 39 44% 97%; /* Warm tan/cream */
-    --foreground: 148 63% 13%; /* Deep sheriff green */
-    --card: 0 0% 100%; /* Pure white */
-    --card-foreground: 148 63% 13%; /* Deep sheriff green */
+    /* Light mode - Professional Forest Green & White */
+    --background: 0 0% 98%; /* Clean white background */
+    --foreground: 156 48% 15%; /* Deep forest green text */
+    --card: 0 0% 100%; /* Pure white cards */
+    --card-foreground: 156 48% 15%; /* Deep forest green on cards */
     --popover: 0 0% 100%;
-    --popover-foreground: 148 63% 13%;
-    --primary: 148 63% 13%; /* Sheriff green */
+    --popover-foreground: 156 48% 15%;
+    --primary: 156 48% 15%; /* Deep forest green */
     --primary-foreground: 0 0% 100%; /* White text on green */
-    --secondary: 48 100% 50%; /* Sheriff gold */
-    --secondary-foreground: 148 63% 13%; /* Green text on gold */
-    --muted: 39 20% 90%; /* Light tan */
-    --muted-foreground: 148 30% 30%; /* Muted green */
-    --accent: 48 100% 50%; /* Sheriff gold accent */
-    --accent-foreground: 148 63% 13%;
+    --secondary: 0 0% 94%; /* Light gray secondary */
+    --secondary-foreground: 156 48% 15%; /* Forest green text on gray */
+    --muted: 0 0% 94%; /* Light gray for muted areas */
+    --muted-foreground: 156 20% 35%; /* Muted forest green */
+    --accent: 156 48% 20%; /* Slightly lighter forest green accent */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-    --border: 39 20% 85%; /* Light tan border */
-    --input: 39 20% 85%;
-    --ring: 148 63% 13%; /* Sheriff green focus ring */
+    --border: 0 0% 88%; /* Light gray borders */
+    --input: 0 0% 97%; /* Very light gray inputs */
+    --ring: 156 48% 15%; /* Forest green focus ring */
     --radius: 0.5rem;
-    --chart-1: 148 63% 13%;
-    --chart-2: 48 100% 50%;
-    --chart-3: 39 44% 80%;
-    --chart-4: 148 40% 40%;
-    --chart-5: 48 80% 60%;
+    --chart-1: 156 48% 15%;
+    --chart-2: 0 0% 50%;
+    --chart-3: 156 30% 40%;
+    --chart-4: 0 0% 70%;
+    --chart-5: 156 20% 60%;
   }
 
   .dark {
-    /* Dark mode - Deep True Blacks with Yellow Accents */
-    --background: 0 0% 2%; /* Very deep black base */
-    --foreground: 48 100% 75%; /* Bright yellow text */
-    --card: 0 0% 5%; /* Deep black for cards */
-    --card-foreground: 48 100% 75%; /* Yellow text on cards */
-    --popover: 0 0% 7%; /* Slightly lighter black for popovers */
-    --popover-foreground: 48 100% 75%;
-    --primary: 48 100% 65%; /* Vibrant yellow for buttons */
-    --primary-foreground: 0 0% 2%; /* Deep black text on yellow */
-    --secondary: 0 0% 8%; /* Very dark black for secondary elements */
-    --secondary-foreground: 48 100% 75%; /* Yellow text on dark */
-    --muted: 0 0% 6%; /* Deep black for muted areas */
-    --muted-foreground: 48 30% 60%; /* Muted yellow text */
-    --accent: 48 100% 70%; /* Bright yellow accent */
-    --accent-foreground: 0 0% 2%;
+    /* Dark mode - Teal & Charcoal (Modern Clean) */
+    --background: 0 0% 8%; /* Rich charcoal base */
+    --foreground: 0 0% 95%; /* Clean white text */
+    --card: 0 0% 12%; /* Darker charcoal cards */
+    --card-foreground: 0 0% 95%; /* Clean white text on cards */
+    --popover: 0 0% 12%; /* Darker charcoal for popovers */
+    --popover-foreground: 0 0% 95%;
+    --primary: 175 65% 45%; /* Bright clean teal for buttons */
+    --primary-foreground: 0 0% 100%; /* White text on teal */
+    --secondary: 0 0% 15%; /* Dark charcoal secondary */
+    --secondary-foreground: 0 0% 90%; /* Light gray text on dark */
+    --muted: 0 0% 10%; /* Very dark charcoal for muted areas */
+    --muted-foreground: 0 0% 65%; /* Muted gray text */
+    --accent: 175 60% 50%; /* Bright teal accent */
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 70% 55%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 12%; /* Dark black borders for contrast */
-    --input: 0 0% 4%; /* Very dark input backgrounds */
-    --ring: 48 100% 65%; /* Yellow focus ring */
-    --chart-1: 48 100% 65%;
-    --chart-2: 0 0% 15%;
-    --chart-3: 48 80% 50%;
-    --chart-4: 0 0% 20%;
-    --chart-5: 48 60% 45%;
+    --border: 0 0% 18%; /* Charcoal borders for subtle definition */
+    --input: 0 0% 10%; /* Dark charcoal input backgrounds */
+    --ring: 175 65% 45%; /* Bright teal focus ring */
+    --chart-1: 175 65% 45%;
+    --chart-2: 0 0% 30%;
+    --chart-3: 175 50% 55%;
+    --chart-4: 0 0% 45%;
+    --chart-5: 175 40% 65%;
   }
 }
 
@@ -363,8 +492,8 @@ button:not(.no-hover):hover {
   .shadow-inner { box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.6); }
   
   /* Yellow glow effects for interactive elements */
-  .ring-primary { box-shadow: 0 0 0 3px hsl(48 100% 65% / 0.3); }
-  .focus\\:ring-primary:focus { box-shadow: 0 0 0 3px hsl(48 100% 65% / 0.5); }
+  .ring-primary { box-shadow: 0 0 0 3px hsl(175 65% 45% / 0.3); }
+  .focus\:ring-primary:focus { box-shadow: 0 0 0 3px hsl(175 65% 45% / 0.5); }
   
   /* Raised button effect */
   .btn-3d {

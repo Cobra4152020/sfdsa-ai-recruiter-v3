@@ -28,9 +28,9 @@ export function volunteerConfirmation({
           padding: 20px;
         }
         .header {
-          background-color: #0A3C1F;
+          background-color: #2dd4bf;
           color: white;
-          padding: 20px;
+          padding: 30px 20px;
           text-align: center;
         }
         .content {

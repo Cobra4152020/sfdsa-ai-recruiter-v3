@@ -108,7 +108,7 @@ export default function TriviaDiagnosticsPage() {
                   {Object.keys(diagnosticResults.questionsAvailable || {}).map(
                     (gameId) => (
                       <Card key={gameId} className="overflow-hidden">
-                        <CardHeader className="bg-gray-50 p-4">
+                        <CardHeader className="bg-muted p-4">
                           <CardTitle className="text-lg">
                             {formatGameName(gameId)}
                           </CardTitle>

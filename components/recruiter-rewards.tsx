@@ -202,7 +202,7 @@ export function RecruiterRewards() {
                     className={`flex gap-4 p-4 rounded-lg border ${
                       canRedeem && !isLimitReached
                         ? "border-green-200 bg-green-50"
-                        : "border-gray-200 bg-gray-50"
+                        : "border-border bg-muted"
                     }`}
                   >
                     <div className="h-20 w-20 rounded overflow-hidden bg-white border flex items-center justify-center">

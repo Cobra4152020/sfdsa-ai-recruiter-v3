@@ -7,7 +7,7 @@ export function Leaderboard() {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Engagement Champions */}
       <div className="bg-white dark:bg-black rounded-lg shadow-md overflow-hidden">
-        <div className="bg-[#0A3C1F] dark:bg-[#0A3C1F] p-4 flex items-center justify-between">
+        <div className="bg-primary dark:bg-primary p-4 flex items-center justify-between">
           <div className="flex items-center">
             <Trophy className="h-6 w-6 text-[#FFD700] mr-2" />
             <h2 className="text-xl font-bold text-white">
@@ -46,7 +46,7 @@ export function Leaderboard() {
 
       {/* Top Applicants */}
       <div className="bg-white dark:bg-black rounded-lg shadow-md overflow-hidden">
-        <div className="bg-[#0A3C1F] dark:bg-[#0A3C1F] p-4 flex items-center justify-between">
+        <div className="bg-primary dark:bg-primary p-4 flex items-center justify-between">
           <div className="flex items-center">
             <Trophy className="h-6 w-6 text-[#FFD700] mr-2" />
             <h2 className="text-xl font-bold text-white">Top Applicants</h2>
@@ -63,7 +63,7 @@ export function Leaderboard() {
           <p className="text-lg mb-6">
             Ready to take the next step? Apply now to join our top applicants!
           </p>
-          <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white font-medium">
+          <Button className="bg-primary hover:bg-primary/90 text-white font-medium">
             Apply Now
           </Button>
         </div>

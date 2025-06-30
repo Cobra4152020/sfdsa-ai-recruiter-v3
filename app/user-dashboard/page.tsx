@@ -173,7 +173,7 @@ export default function UserDashboard() {
     <div className="container mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#0A3C1F]">
+          <h1 className="text-3xl font-bold text-primary">
             Welcome, {user?.user_metadata?.full_name || user?.email}
           </h1>
           <p className="text-gray-600">
@@ -198,14 +198,14 @@ export default function UserDashboard() {
             <CardDescription>Your recruitment points</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-[#0A3C1F]">
+            <div className="text-3xl font-bold text-primary">
               {stats.points}
             </div>
           </CardContent>
           <CardFooter className="pt-0">
             <Link
               href="/awards"
-              className="text-sm text-[#0A3C1F] hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               View leaderboard
             </Link>
@@ -218,14 +218,14 @@ export default function UserDashboard() {
             <CardDescription>Your position on the leaderboard</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-[#0A3C1F]">
+            <div className="text-3xl font-bold text-primary">
               #{stats.rank}
             </div>
           </CardContent>
           <CardFooter className="pt-0">
             <Link
               href="/awards"
-              className="text-sm text-[#0A3C1F] hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               View all recruits
             </Link>
@@ -238,14 +238,14 @@ export default function UserDashboard() {
             <CardDescription>Completed recruitment activities</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-[#0A3C1F]">
+            <div className="text-3xl font-bold text-primary">
               {stats.completedActivities}
             </div>
           </CardContent>
           <CardFooter className="pt-0">
             <Link
               href="/gamification"
-              className="text-sm text-[#0A3C1F] hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               Find more activities
             </Link>
@@ -272,8 +272,8 @@ export default function UserDashboard() {
             <CardContent>
               <div className="space-y-8">
                 <div className="flex items-start gap-4">
-                  <div className="bg-[#0A3C1F]/10 p-3 rounded-full">
-                    <Shield className="h-6 w-6 text-[#0A3C1F]" />
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Shield className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-medium">Complete Your Profile</h3>
@@ -293,8 +293,8 @@ export default function UserDashboard() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="bg-[#0A3C1F]/10 p-3 rounded-full">
-                    <Award className="h-6 w-6 text-[#0A3C1F]" />
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <Award className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-medium">Earn More Badges</h3>
@@ -314,8 +314,8 @@ export default function UserDashboard() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="bg-[#0A3C1F]/10 p-3 rounded-full">
-                    <FileText className="h-6 w-6 text-[#0A3C1F]" />
+                  <div className="bg-primary/10 p-3 rounded-full">
+                    <FileText className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-medium">Submit Your Application</h3>
@@ -356,7 +356,7 @@ export default function UserDashboard() {
                       key={badge.id}
                       className="flex flex-col items-center text-center"
                     >
-                      <div className="w-20 h-20 bg-[#0A3C1F]/10 rounded-full flex items-center justify-center mb-2">
+                      <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-2">
                         <Image
                           src={
                             badge.badges
@@ -495,7 +495,7 @@ export default function UserDashboard() {
                         <Button
                           asChild
                           variant="link"
-                          className="p-0 h-auto text-[#0A3C1F]"
+                          className="p-0 h-auto text-primary"
                         >
                           <Link href={notification.action_url!}>
                             {notification.action_text || "View"}

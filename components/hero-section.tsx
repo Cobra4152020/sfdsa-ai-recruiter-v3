@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle, DollarSign } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { RippleBackground } from "@/components/ui/grid-background";
 
 const heroImages = [
   "/1-2-1260x720.jpg",
@@ -28,7 +29,9 @@ export function HeroSection() {
   const [currentImage, setCurrentImage] = useState(heroImages[0]);
 
   useEffect(() => {
-    setCurrentImage(heroImages[Math.floor(Math.random() * heroImages.length)]);
+    // Select a random image on each page load/refresh
+    const randomIndex = Math.floor(Math.random() * heroImages.length);
+    setCurrentImage(heroImages[randomIndex]);
   }, []);
 
   const handleApplyNow = () => {
@@ -44,37 +47,20 @@ export function HeroSection() {
   };
 
   return (
-    <section className="bg-transparent dark:bg-transparent text-foreground pt-20 pb-12 sm:pt-24 sm:pb-16 relative mt-12 md:mt-16">
-      {/* Background pattern */}
-      <div
-        className="absolute inset-0 z-0 opacity-40 dark:opacity-20"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fillRule=\"evenodd\"%3E%3Cg fill=\"hsl(148, 63%, 13%)\" fillOpacity=\"0.4\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-          backgroundSize: "30px 30px",
-        }}
-        aria-hidden="true"
-      />
-      <div
-        className="absolute inset-0 z-0 opacity-0 dark:opacity-10"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg width=\"60\" height=\"60\" viewBox=\"0 0 60 60\" xmlns=\"http://www.w3.org/2000/svg\"%3E%3Cg fill=\"none\" fillRule=\"evenodd\"%3E%3Cg fill=\"hsl(48, 100%, 65%)\" fillOpacity=\"0.4\"%3E%3Cpath d=\"M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-          backgroundSize: "30px 30px",
-        }}
-        aria-hidden="true"
-      />
-
+    <RippleBackground 
+      variant="hero" 
+      className="bg-transparent dark:bg-transparent text-foreground pt-20 pb-12 sm:pt-24 sm:pb-16 mt-12 md:mt-16"
+    >
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12 sm:mb-16">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-            Join the <span className="text-primary">San Francisco</span>{" "}
+            Start Your <span className="text-primary">$118K+</span>{" "}
             <br className="hidden sm:inline" />
-            Sheriff&apos;s Office
+            Law Enforcement Career
           </h1>
           <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto px-4 sm:px-0">
-            Embark on a rewarding career in law enforcement. Protect our
-            community with honor and integrity.
+            Join the San Francisco Sheriff's Department. Protect our community with honor, 
+            integrity, and excellent benefits from day one.
           </p>
         </div>
 
@@ -83,20 +69,25 @@ export function HeroSection() {
           <div className="transform-gpu bg-card/80 backdrop-blur-sm p-6 sm:p-8 rounded-xl border border-border shadow-lg hover:shadow-xl transition-all duration-300 ease-out hover:translate-y-[-4px] dark:shadow-[4px_4px_20px_0px_rgba(0,0,0,0.6)] h-[460px] flex flex-col justify-between">
             <div>
               <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 flex items-center">
-                <span className="text-primary mr-2" aria-hidden="true"></span>
+                <DollarSign className="text-primary mr-2 h-6 w-6" />
                 <span>Starting Salary: $118,768</span>
               </h2>
+              <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mb-6">
+                <p className="text-sm font-semibold text-primary mb-1"> Now Hiring!</p>
+                <p className="text-xs text-muted-foreground">Apply now - next academy class starts soon</p>
+              </div>
               <ul className="space-y-3 sm:space-y-4">
-                <li className="flex items-start"><span className="text-primary mr-2 mt-1 flex-shrink-0"></span><span className="text-sm sm:text-base">Full medical, dental, and vision benefits</span></li>
-                <li className="flex items-start"><span className="text-primary mr-2 mt-1 flex-shrink-0"></span><span className="text-sm sm:text-base">Paid academy training (23 weeks)</span></li>
-                <li className="flex items-start"><span className="text-primary mr-2 mt-1 flex-shrink-0"></span><span className="text-sm sm:text-base">Career advancement opportunities</span></li>
-                <li className="flex items-start"><span className="text-primary mr-2 mt-1 flex-shrink-0"></span><span className="text-sm sm:text-base">Retirement plan with pension</span></li>
-                <li className="flex items-start"><span className="text-primary mr-2 mt-1 flex-shrink-0"></span><span className="text-sm sm:text-base">Tuition reimbursement program</span></li>
+                <li className="flex items-start"><CheckCircle className="text-primary mr-3 mt-0.5 flex-shrink-0 h-5 w-5" /><span className="text-sm sm:text-base"><strong>100% Paid Training:</strong> 23-week academy + full salary</span></li>
+                <li className="flex items-start"><CheckCircle className="text-primary mr-3 mt-0.5 flex-shrink-0 h-5 w-5" /><span className="text-sm sm:text-base"><strong>Premium Benefits:</strong> Medical, dental, vision included</span></li>
+                <li className="flex items-start"><CheckCircle className="text-primary mr-3 mt-0.5 flex-shrink-0 h-5 w-5" /><span className="text-sm sm:text-base"><strong>Secure Future:</strong> Pension + retirement plan (3% @ 58)</span></li>
+                <li className="flex items-start"><CheckCircle className="text-primary mr-3 mt-0.5 flex-shrink-0 h-5 w-5" /><span className="text-sm sm:text-base"><strong>Career Growth:</strong> Clear advancement opportunities</span></li>
+                <li className="flex items-start"><CheckCircle className="text-primary mr-3 mt-0.5 flex-shrink-0 h-5 w-5" /><span className="text-sm sm:text-base"><strong>Education Support:</strong> Tuition reimbursement program</span></li>
               </ul>
             </div>
-            <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4">
-              <Button onClick={handleApplyNow} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base sm:text-lg py-4 sm:py-6">Apply Now</Button>
-              <Button onClick={handleMoreInfo} variant="outline" className="w-full bg-card hover:bg-card/90 text-primary border-primary font-medium text-base sm:text-lg py-4 sm:py-6">Get More Information</Button>
+            <div className="mt-6 sm:mt-8 space-y-3">
+              <Button onClick={handleApplyNow} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base sm:text-lg py-4 sm:py-6 shadow-lg hover:shadow-xl transition-all duration-300">
+                Apply Now - Start Your Career
+              </Button>
             </div>
           </div>
 
@@ -122,14 +113,21 @@ export function HeroSection() {
         </div>
 
         <div className="text-center mt-12 sm:mt-16">
-          <p className="text-muted-foreground mb-2 text-sm sm:text-base">
-            Ready to serve your community? Let&apos;s get started!
-          </p>
-          <button onClick={handleSignUp} className="text-primary hover:text-primary/80 flex items-center justify-center mx-auto text-sm sm:text-base">
-            Sign up for updates <ArrowRight className="ml-2 h-4 w-4" />
-          </button>
+          <div className="bg-muted/30 rounded-lg p-6 max-w-2xl mx-auto">
+            <p className="text-muted-foreground mb-3 text-sm sm:text-base font-medium">
+               Join 600+ Deputies Who Chose Excellence
+            </p>
+            <div className="flex items-center justify-center gap-6 text-xs sm:text-sm text-muted-foreground mb-4">
+              <span>✓ Equal Opportunity Employer</span>
+              <span> Veterans Welcomed</span>
+              <span> Diverse Team</span>
+            </div>
+            <Button onClick={handleMoreInfo} className="bg-primary hover:bg-primary/90 text-primary-foreground font-medium px-6 py-3">
+              Learn More About The Process <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
-    </section>
+    </RippleBackground>
   );
 }

@@ -166,7 +166,7 @@ export function UserProfileDialog({
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <div className="bg-muted p-3 rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1 flex items-center">
                     <Trophy className="h-4 w-4 mr-1" />
                     Points
@@ -175,7 +175,7 @@ export function UserProfileDialog({
                     {userStats?.totalPoints?.toLocaleString() || 0}
                   </div>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <div className="bg-muted p-3 rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1 flex items-center">
                     <Medal className="h-4 w-4 mr-1" />
                     Badges
@@ -184,7 +184,7 @@ export function UserProfileDialog({
                     {userProfile.badge_count || 0}
                   </div>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <div className="bg-muted p-3 rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1 flex items-center">
                     <Award className="h-4 w-4 mr-1" />
                     NFT Awards
@@ -193,7 +193,7 @@ export function UserProfileDialog({
                     {userProfile.nft_count || 0}
                   </div>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                <div className="bg-muted p-3 rounded-lg">
                   <div className="text-sm text-muted-foreground mb-1 flex items-center">
                     <Calendar className="h-4 w-4 mr-1" />
                     Joined

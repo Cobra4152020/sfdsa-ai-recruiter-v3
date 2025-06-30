@@ -231,12 +231,12 @@ export function RecruiterConversionFunnel({
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-[#0A3C1F]/10 rounded-lg">
-            <h3 className="font-medium text-[#0A3C1F]">
+          <div className="mt-6 p-4 bg-primary/10 rounded-lg">
+            <h3 className="font-medium text-primary">
               Overall Conversion Rate
             </h3>
             <div className="flex items-center mt-2">
-              <div className="text-2xl font-bold text-[#0A3C1F]">
+              <div className="text-2xl font-bold text-primary">
                 {rates.overallRate.toFixed(1)}%
               </div>
               <div className="ml-2 text-sm text-gray-600">

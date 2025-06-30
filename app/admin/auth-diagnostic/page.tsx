@@ -107,7 +107,7 @@ export default function AuthDiagnosticPage() {
             <Button
               onClick={runDiagnostic}
               disabled={isLoading || !email}
-              className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+              className="bg-primary hover:bg-primary/90"
             >
               {isLoading ? (
                 <span className="flex items-center">
@@ -270,7 +270,7 @@ export default function AuthDiagnosticPage() {
                 <Button
                   onClick={handleFix}
                   disabled={isLoading}
-                  className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F]"
+                  className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-primary"
                 >
                   {isLoading ? "Fixing..." : "Fix Issues"}
                 </Button>

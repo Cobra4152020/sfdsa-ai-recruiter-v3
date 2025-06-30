@@ -109,7 +109,7 @@ export default function AdminDashboard() {
     <div className="container mx-auto py-8 px-4">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-[#0A3C1F]">Admin Dashboard</h1>
+          <h1 className="text-3xl font-bold text-primary">Admin Dashboard</h1>
           <p className="text-gray-600">Manage your recruitment platform</p>
         </div>
         <Button

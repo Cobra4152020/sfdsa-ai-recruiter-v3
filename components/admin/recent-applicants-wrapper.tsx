@@ -60,7 +60,7 @@ export function RecentApplicantsWrapper({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-bold text-[#0A3C1F]">
+            <CardTitle className="text-lg font-bold text-primary">
               Recent Applicants
             </CardTitle>
             <CardDescription>Latest deputy sheriff applicants</CardDescription>
@@ -68,7 +68,7 @@ export function RecentApplicantsWrapper({
           {onViewAll && (
             <Button
               variant="outline"
-              className="text-[#0A3C1F]"
+              className="text-primary"
               onClick={onViewAll}
             >
               View All

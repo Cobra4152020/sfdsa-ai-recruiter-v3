@@ -151,7 +151,7 @@ export default function TestPointsDebugPage() {
           </div>
 
           {debugData && (
-            <div className="bg-gray-50 p-4 rounded-lg">
+            <div className="bg-muted p-4 rounded-lg">
               <h3 className="font-medium mb-2">API Response:</h3>
               <pre className="text-xs overflow-auto">
                 {JSON.stringify(debugData, null, 2)}

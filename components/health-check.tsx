@@ -71,7 +71,7 @@ export function HealthCheck({ data }: HealthCheckProps) {
       <div className="space-y-2">
         <h3 className="font-medium mb-2">Component Status</h3>
 
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
           <div className="flex items-center">
             <StatusIcon status={data.database.status} />
             <span className="ml-2">Database</span>
@@ -92,7 +92,7 @@ export function HealthCheck({ data }: HealthCheckProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
           <div className="flex items-center">
             <StatusIcon status={data.email.status} />
             <span className="ml-2">Email Service</span>
@@ -113,7 +113,7 @@ export function HealthCheck({ data }: HealthCheckProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
           <div className="flex items-center">
             <StatusIcon status={data.auth.status} />
             <span className="ml-2">Authentication</span>
@@ -134,7 +134,7 @@ export function HealthCheck({ data }: HealthCheckProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center justify-between p-3 bg-muted rounded-lg">
           <div className="flex items-center">
             <StatusIcon status={data.storage.status} />
             <span className="ml-2">Storage</span>

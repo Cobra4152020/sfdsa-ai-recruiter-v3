@@ -137,7 +137,7 @@ export default function AccessibilityStatement() {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6">
             ♿ Accessibility Statement
           </h1>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
@@ -146,22 +146,22 @@ export default function AccessibilityStatement() {
           </p>
 
           {/* Quick Stats */}
-          <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+          <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-6 mb-8">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">WCAG 2.1</div>
+                <div className="text-3xl font-bold text-primary">WCAG 2.1</div>
                 <div className="text-sm text-gray-600 font-medium">Level AA Standard</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">24/7</div>
+                <div className="text-3xl font-bold text-primary">24/7</div>
                 <div className="text-sm text-gray-600 font-medium">Accessibility Support</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">100%</div>
+                <div className="text-3xl font-bold text-primary">100%</div>
                 <div className="text-sm text-gray-600 font-medium">Keyboard Navigable</div>
               </div>
               <div>
-                <div className="text-3xl font-bold text-[#0A3C1F]">4.5:1</div>
+                <div className="text-3xl font-bold text-primary">4.5:1</div>
                 <div className="text-sm text-gray-600 font-medium">Color Contrast Ratio</div>
               </div>
             </div>
@@ -173,7 +173,7 @@ export default function AccessibilityStatement() {
           <div className="lg:col-span-2 space-y-8">
             {/* Our Commitment */}
             <Card className="shadow-lg">
-              <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white">
+              <CardHeader className="bg-gradient-to-r from-primary to-primary/90 text-white">
                 <CardTitle className="flex items-center text-xl">
                   <Heart className="h-6 w-6 mr-3" />
                   Our Commitment to Accessibility
@@ -285,7 +285,7 @@ export default function AccessibilityStatement() {
                     <h3 className="font-semibold text-gray-900 mb-3">Compliance Standards</h3>
                     <div className="space-y-3">
                       {complianceStandards.map((standard, index) => (
-                        <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div key={index} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                           <div>
                             <div className="font-medium">{standard.standard}</div>
                             <div className="text-sm text-gray-600">{standard.description}</div>
@@ -473,7 +473,7 @@ export default function AccessibilityStatement() {
 
         {/* Footer Information */}
         <div className="mt-12">
-          <Card className="bg-gray-50 border border-gray-200">
+          <Card className="bg-muted border border-gray-200">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -486,7 +486,7 @@ export default function AccessibilityStatement() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <Badge variant="outline" className="bg-[#0A3C1F]/10 text-[#0A3C1F] border-[#0A3C1F]/20">
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
                     Accessibility First
                   </Badge>
                 </div>

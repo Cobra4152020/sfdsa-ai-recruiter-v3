@@ -104,7 +104,7 @@ export default function PlayTheGamePage() {
       >
         <div className="container py-8">
           <div className="text-center mb-12">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6">
               🎮 Play & Earn Points
             </h1>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
@@ -113,22 +113,22 @@ export default function PlayTheGamePage() {
             </p>
             
             {/* Quick Stats */}
-            <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+            <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-6 mb-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">5</div>
+                  <div className="text-3xl font-bold text-primary">5</div>
                   <div className="text-sm text-gray-600 font-medium">Games Available</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">60-220</div>
+                  <div className="text-3xl font-bold text-primary">60-220</div>
                   <div className="text-sm text-gray-600 font-medium">Points Per Game</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">🏆</div>
+                  <div className="text-3xl font-bold text-primary">🏆</div>
                   <div className="text-sm text-gray-600 font-medium">Achievement Badges</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">∞</div>
+                  <div className="text-3xl font-bold text-primary">∞</div>
                   <div className="text-sm text-gray-600 font-medium">Replay Value</div>
                 </div>
               </div>
@@ -146,11 +146,11 @@ export default function PlayTheGamePage() {
                   <CardHeader className="pb-4">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
-                        <div className="bg-[#0A3C1F] p-3 rounded-xl mr-4 shadow-md">
+                        <div className="bg-primary p-3 rounded-xl mr-4 shadow-md">
                           <Icon className="h-7 w-7 text-white" />
                         </div>
                         <div>
-                          <CardTitle className="text-xl font-bold text-[#0A3C1F] mb-1">
+                          <CardTitle className="text-xl font-bold text-primary mb-1">
                             {game.title}
                           </CardTitle>
                           <CardDescription className="text-gray-700 max-w-2xl">
@@ -187,7 +187,7 @@ export default function PlayTheGamePage() {
                       </div>
                       <Button
                         asChild
-                        className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 shadow-md hover:shadow-lg transition-all"
+                        className="bg-primary hover:bg-primary/90 shadow-md hover:shadow-lg transition-all"
                       >
                         <Link href={game.link}>
                           Play Now
@@ -298,7 +298,7 @@ export default function PlayTheGamePage() {
           </div>
 
           {/* Call to Action */}
-          <div className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 rounded-xl p-8 text-center text-white">
+          <div className="bg-gradient-to-r from-primary to-primary/90 rounded-xl p-8 text-center text-white">
             <h2 className="text-2xl font-bold mb-4">Ready to Show Your Potential?</h2>
             <p className="text-lg mb-6 opacity-90">
               Every game you play demonstrates your commitment to becoming a SF Deputy Sheriff. 
@@ -308,7 +308,7 @@ export default function PlayTheGamePage() {
               <Button 
                 asChild 
                 variant="secondary" 
-                className="bg-white text-[#0A3C1F] hover:bg-gray-100 font-semibold"
+                className="bg-white text-primary hover:bg-gray-100 font-semibold"
               >
                 <Link href="/trivia">
                   <Brain className="h-4 w-4 mr-2" />
@@ -318,7 +318,7 @@ export default function PlayTheGamePage() {
               <Button 
                 asChild 
                 variant="outline" 
-                className="border-white text-white hover:bg-white hover:text-[#0A3C1F]"
+                className="border-white text-white hover:bg-white hover:text-primary"
               >
                 <Link href="/leaderboard">
                   <Trophy className="h-4 w-4 mr-2" />

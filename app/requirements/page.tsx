@@ -162,8 +162,8 @@ export default function RequirementsPage() {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center mb-6">
-            <Shield className="h-12 w-12 text-[#0A3C1F] dark:text-[#FFD700] mr-4" />
-            <h1 className="text-4xl md:text-5xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+            <Shield className="h-12 w-12 text-primary dark:text-[#FFD700] mr-4" />
+            <h1 className="text-4xl md:text-5xl font-bold text-primary dark:text-[#FFD700]">
               Deputy Sheriff Requirements
             </h1>
           </div>
@@ -172,11 +172,11 @@ export default function RequirementsPage() {
             needed to join the San Francisco Sheriff's Department and serve your community.
           </p>
           <div className="flex items-center justify-center mt-6 space-x-4">
-            <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50">
+            <Badge variant="outline" className="bg-primary/5 dark:bg-[#FFD700]/20 text-primary dark:text-[#FFD700] border-primary/20 dark:border-[#FFD700]/50">
               <Clock className="h-3 w-3 mr-1" />
               Application Process: 4-8 months
             </Badge>
-            <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50">
+            <Badge variant="outline" className="bg-primary/5 dark:bg-[#FFD700]/20 text-primary dark:text-[#FFD700] border-primary/20 dark:border-[#FFD700]/50">
               <Target className="h-3 w-3 mr-1" />
                                   Starting Salary: $118K+
             </Badge>
@@ -233,7 +233,7 @@ export default function RequirementsPage() {
           className="mb-12"
         >
           <Card className="bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
-            <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 dark:from-black dark:to-gray-900 text-white dark:text-[#FFD700]">
+            <CardHeader className="bg-gradient-to-r from-primary to-primary/80 dark:from-black dark:to-gray-900 text-white dark:text-[#FFD700]">
               <CardTitle className="flex items-center text-xl">
                 <GraduationCap className="h-6 w-6 mr-3" />
                 Testing & Selection Process
@@ -243,12 +243,12 @@ export default function RequirementsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {testingProcess.map((test, index) => (
                   <div key={test.step} className="relative">
-                    <div className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/10 border border-[#0A3C1F]/10 dark:border-[#FFD700]/30 rounded-lg p-4 h-full hover:shadow-lg transition-all duration-300">
+                    <div className="bg-primary/5 dark:bg-[#FFD700]/10 border border-primary/10 dark:border-[#FFD700]/30 rounded-lg p-4 h-full hover:shadow-lg transition-all duration-300">
                       <div className="flex items-center mb-3">
-                        <div className="bg-[#0A3C1F] dark:bg-[#FFD700] text-white dark:text-black w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-3">
+                        <div className="bg-primary dark:bg-[#FFD700] text-white dark:text-black w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm mr-3">
                           {test.step}
                         </div>
-                        <h3 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] text-sm">{test.title}</h3>
+                        <h3 className="font-semibold text-primary dark:text-[#FFD700] text-sm">{test.title}</h3>
                       </div>
                       <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 leading-relaxed">{test.description}</p>
                       <div className="space-y-1">
@@ -263,7 +263,7 @@ export default function RequirementsPage() {
                       </div>
                     </div>
                     {index < testingProcess.length - 1 && (
-                      <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-[#0A3C1F] dark:text-[#FFD700]">
+                      <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2 text-primary dark:text-[#FFD700]">
                         →
                       </div>
                     )}
@@ -283,7 +283,7 @@ export default function RequirementsPage() {
         >
           <Card className="bg-white dark:bg-black border-gray-200 dark:border-[#FFD700]/30">
             <CardHeader className="bg-white dark:bg-black">
-              <CardTitle className="flex items-center text-[#0A3C1F] dark:text-[#FFD700]">
+              <CardTitle className="flex items-center text-primary dark:text-[#FFD700]">
                 <Star className="h-6 w-6 mr-3" />
                 Preferred Qualifications (Bonus Points)
               </CardTitle>
@@ -294,9 +294,9 @@ export default function RequirementsPage() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {preferredQualifications.map((qual, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-[#0A3C1F]/5 dark:bg-[#FFD700]/10 border border-[#0A3C1F]/10 dark:border-[#FFD700]/30 rounded-lg hover:shadow-md transition-all duration-200">
+                  <div key={index} className="flex items-center justify-between p-4 bg-primary/5 dark:bg-[#FFD700]/10 border border-primary/10 dark:border-[#FFD700]/30 rounded-lg hover:shadow-md transition-all duration-200">
                     <span className="text-gray-700 dark:text-gray-300 flex-1">{qual.text}</span>
-                    <Badge variant="secondary" className="ml-3 bg-[#0A3C1F] dark:bg-[#FFD700] text-white dark:text-black">
+                    <Badge variant="secondary" className="ml-3 bg-primary dark:bg-[#FFD700] text-white dark:text-black">
                       {qual.points}
                     </Badge>
                   </div>
@@ -339,7 +339,7 @@ export default function RequirementsPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.7 }}
         >
-          <Card className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 dark:from-black dark:to-gray-900 text-white dark:text-[#FFD700] border-[#0A3C1F] dark:border-[#FFD700]/30">
+          <Card className="bg-gradient-to-r from-primary to-primary/80 dark:from-black dark:to-gray-900 text-white dark:text-[#FFD700] border-primary dark:border-[#FFD700]/30">
             <CardContent className="p-8">
               <div className="text-center">
                 <Trophy className="h-12 w-12 mx-auto mb-4 text-white dark:text-[#FFD700]" />
@@ -352,7 +352,7 @@ export default function RequirementsPage() {
                   <Link href={"/apply" as Route}>
                     <Button 
                       size="lg" 
-                      className="bg-white dark:bg-[#FFD700] text-[#0A3C1F] dark:text-black hover:bg-gray-100 dark:hover:bg-[#FFD700]/90 font-semibold px-8"
+                      className="bg-white dark:bg-[#FFD700] text-primary dark:text-black hover:bg-gray-100 dark:hover:bg-[#FFD700]/90 font-semibold px-8"
                     >
                       <Zap className="h-5 w-5 mr-2" />
                       Start Application

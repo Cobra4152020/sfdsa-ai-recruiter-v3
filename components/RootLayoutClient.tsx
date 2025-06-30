@@ -8,7 +8,7 @@ import { AuthModalProvider } from "@/context/auth-modal-context";
 import { ImprovedHeader } from "@/components/improved-header";
 import { ImprovedFooter } from "@/components/improved-footer";
 import { UnifiedAuthModal } from "@/components/unified-auth-modal";
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
+import AskSgtKenButton from "@/components/ask-sgt-ken-button";
 import { WebSocketErrorHandler } from "@/components/websocket-error-handler";
 import { ErrorMonitor } from "@/components/error-monitor";
 import PerformanceMonitor from "@/components/performance-monitor";

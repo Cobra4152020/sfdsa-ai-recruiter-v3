@@ -453,7 +453,7 @@ export function EnhancedLeaderboard({
                         className={`flex items-center p-3 rounded-lg transition-all ${
                           user.is_current_user
                             ? "bg-green-50 border border-green-200"
-                            : "hover:bg-gray-50"
+                            : "hover:bg-accent/10"
                         } ${user.rank && user.rank < 4 ? "shadow-sm" : ""}`}
                       >
                         <div className="flex items-center justify-center w-8 mr-3">
@@ -506,7 +506,7 @@ export function EnhancedLeaderboard({
                             {user.trending && (
                               <Badge
                                 variant="outline"
-                                className="bg-[#FFD700]/10 text-[#0A3C1F] text-xs"
+                                className="bg-[#FFD700]/10 text-primary text-xs"
                               >
                                 <TrendingUp className="h-3 w-3 mr-1" /> 
                                 <span className="hidden xs:inline">Trending</span>
@@ -521,7 +521,7 @@ export function EnhancedLeaderboard({
                               variant={
                                 user.liked_by_user ? "default" : "outline"
                               }
-                              className={`${user.liked_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"} transition-all text-xs px-2 py-1`}
+                              className={`${user.liked_by_user ? "bg-primary text-white" : "border-primary text-primary"} transition-all text-xs px-2 py-1`}
                               onClick={() => handleLike(user.id)}
                             >
                               <Heart
@@ -534,7 +534,7 @@ export function EnhancedLeaderboard({
                               variant={
                                 user.shared_by_user ? "default" : "outline"
                               }
-                              className={`${user.shared_by_user ? "bg-[#0A3C1F] text-white" : "border-[#0A3C1F] text-[#0A3C1F]"} transition-all text-xs px-2 py-1`}
+                              className={`${user.shared_by_user ? "bg-primary text-white" : "border-primary text-primary"} transition-all text-xs px-2 py-1`}
                               onClick={() => handleShare(user.id)}
                             >
                               <Share2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />

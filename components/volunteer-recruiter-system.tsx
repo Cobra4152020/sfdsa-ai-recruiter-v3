@@ -20,7 +20,7 @@ export function VolunteerRecruiterSystem() {
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -83,7 +83,7 @@ export function VolunteerRecruiterSystem() {
               
               <p className="text-sm text-gray-600">
                 If you believe this is an error, please contact our support team at{" "}
-                <a href="mailto:support@sfdeputysheriff.com" className="text-[#0A3C1F] hover:underline">
+                <a href="mailto:support@sfdeputysheriff.com" className="text-primary hover:underline">
                   support@sfdeputysheriff.com
                 </a>
               </p>
@@ -159,8 +159,8 @@ export function VolunteerRecruiterSystem() {
             </p>
 
             {/* Quick Start Guide */}
-            <div className="bg-[#0A3C1F]/5 border border-[#0A3C1F]/20 rounded-lg p-6 mt-6">
-              <h3 className="text-[#0A3C1F] font-semibold mb-4">Quick Start Guide</h3>
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-6 mt-6">
+              <h3 className="text-primary font-semibold mb-4">Quick Start Guide</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <h4 className="font-medium">1. Generate Your Referral Link</h4>

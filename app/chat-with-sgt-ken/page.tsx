@@ -15,7 +15,13 @@ import {
   Clock,
   Star,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  Shield,
+  UserPlus,
+  Mic,
+  MicOff,
+  Volume2,
+  VolumeX
 } from "lucide-react";
 import { useUser } from "@/context/user-context";
 import { useAuthModal } from "@/context/auth-modal-context";
@@ -26,6 +32,8 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 import { PageWrapper } from "@/components/page-wrapper";
+import { voiceService } from "@/lib/voice-service";
+import { useRouter } from "next/navigation";
 
 interface Message {
   content: string;
@@ -36,10 +44,11 @@ interface Message {
   id?: string;
   isTyping?: boolean;
   displayedContent?: string;
+  quickReplies?: string[];
 }
 
 export default function ChatWithSgtKenPage() {
-  const { currentUser } = useUser();
+  const { currentUser, incrementParticipation, isLoggedIn } = useUser();
   const { openModal } = useAuthModal();
   const { toast } = useToast();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -49,14 +58,23 @@ export default function ChatWithSgtKenPage() {
   const [totalPointsEarned, setTotalPointsEarned] = useState(0);
   const [messageCount, setMessageCount] = useState(0);
   const [typingMessageId, setTypingMessageId] = useState<string | null>(null);
+  
+  // Voice-related state
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(true);
+  const [autoSpeak, setAutoSpeak] = useState(true);
 
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const { addMessage } = useMessageHistory();
   useScrollToBottom(scrollAreaRef, messages);
 
+  const router = useRouter();
+
   // Typing effect function - slowed down for better readability
-  const startTypingEffect = (messageId: string, content: string, delay: number = 90) => {
+  const startTypingEffect = (messageId: string, content: string, delay: number = 140) => {
     setTypingMessageId(messageId);
     let currentIndex = 0;
     
@@ -94,6 +112,90 @@ export default function ChatWithSgtKenPage() {
     "How do I apply for the position?",
     "What career advancement opportunities exist?"
   ];
+
+  const handleVoiceInput = async () => {
+    if (!voiceService.isListeningSupported()) {
+      toast({
+        title: "Voice Not Supported",
+        description: "Your browser doesn't support voice input. Try Chrome, Edge, or Safari.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsListening(true);
+    try {
+      const transcript = await voiceService.startListening();
+      if (transcript.trim()) {
+        setInput(transcript);
+        toast({
+          title: "Voice Captured! 🎤",
+          description: `"${transcript}"`,
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: "No Speech Detected",
+          description: "Please try speaking again or check your microphone.",
+          variant: "default",
+          duration: 3000,
+        });
+      }
+    } catch (error) {
+      console.error('Voice input error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
+      if (errorMessage.includes('permission') || errorMessage.includes('denied')) {
+        toast({
+          title: "Microphone Permission Required",
+          description: "Please allow microphone access in your browser settings and try again.",
+          variant: "destructive",
+          duration: 5000,
+        });
+      } else if (errorMessage.includes('not available')) {
+        toast({
+          title: "Microphone Not Available",
+          description: "Please check that your microphone is connected and working.",
+          variant: "destructive",
+          duration: 4000,
+        });
+      } else {
+        toast({
+          title: "Voice Input Issue",
+          description: "Speech recognition temporarily unavailable. Please type your message instead.",
+          variant: "default",
+          duration: 4000,
+        });
+      }
+    } finally {
+      setIsListening(false);
+    }
+  };
+
+  const speakMessage = async (text: string) => {
+    if (!voiceService.isSpeakingSupported() || !voiceEnabled) return;
+
+    setIsSpeaking(true);
+    try {
+      await voiceService.speak(text);
+    } catch (error) {
+      console.error('Speech error:', error);
+    } finally {
+      setIsSpeaking(false);
+    }
+  };
+
+  const stopSpeaking = () => {
+    voiceService.stopSpeaking();
+    setIsSpeaking(false);
+  };
+
+  const toggleVoice = () => {
+    setVoiceEnabled(!voiceEnabled);
+    if (isSpeaking) {
+      stopSpeaking();
+    }
+  };
 
   const handleSendMessage = async () => {
     console.log('[CHAT] handleSendMessage triggered.');
@@ -184,6 +286,13 @@ export default function ChatWithSgtKenPage() {
       }, 300);
       setMessageCount(prev => prev + 1);
 
+      // Auto-speak Sgt. Ken's response if voice is enabled
+      if (autoSpeak && voiceEnabled) {
+        setTimeout(() => {
+          speakMessage(data.message);
+        }, 1000); // Small delay to let typing effect start
+      }
+
       // Update points earned
       if (data.pointsAwarded) {
         setTotalPointsEarned(prev => prev + data.pointsAwarded);
@@ -213,6 +322,13 @@ export default function ChatWithSgtKenPage() {
       };
       
       setMessages((prevMessages) => [...prevMessages, fallbackMessage]);
+      
+      // Auto-speak fallback message if voice is enabled
+      if (autoSpeak && voiceEnabled) {
+        setTimeout(() => {
+          speakMessage(fallbackMessage.content);
+        }, 500);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -374,6 +490,53 @@ export default function ChatWithSgtKenPage() {
                       className="flex-1 text-sm sm:text-base"
                       disabled={isLoading}
                     />
+                    
+                    {/* Voice Controls */}
+                    {voiceService.isListeningSupported() && (
+                      <Button
+                        type="button"
+                        onClick={handleVoiceInput}
+                        disabled={isLoading || isListening || isSpeaking}
+                        className={`flex-shrink-0 px-3 shadow-md hover:shadow-lg transition-all ${
+                          isListening 
+                            ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" 
+                            : "bg-blue-500 hover:bg-blue-600 text-white"
+                        }`}
+                        aria-label={isListening ? "Listening..." : "Voice input"}
+                      >
+                        {isListening ? <MicOff className="h-4 w-4 sm:h-5 sm:w-5" /> : <Mic className="h-4 w-4 sm:h-5 sm:w-5" />}
+                      </Button>
+                    )}
+                    
+                    {voiceService.isSpeakingSupported() && (
+                      <Button
+                        type="button"
+                        onClick={isSpeaking ? stopSpeaking : toggleVoice}
+                        className={`flex-shrink-0 px-3 shadow-md hover:shadow-lg transition-all ${
+                          isSpeaking 
+                            ? "bg-red-500 hover:bg-red-600 text-white animate-pulse" 
+                            : voiceEnabled 
+                              ? "bg-green-500 hover:bg-green-600 text-white" 
+                              : "bg-gray-400 hover:bg-accent/100 text-white"
+                        }`}
+                        aria-label={
+                          isSpeaking 
+                            ? "Stop speaking" 
+                            : voiceEnabled 
+                              ? "Voice enabled" 
+                              : "Voice disabled"
+                        }
+                      >
+                        {isSpeaking ? (
+                          <VolumeX className="h-4 w-4 sm:h-5 sm:w-5" />
+                        ) : voiceEnabled ? (
+                          <Volume2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                        ) : (
+                          <VolumeX className="h-4 w-4 sm:h-5 sm:w-5" />
+                        )}
+                      </Button>
+                    )}
+                    
                     <Button
                       onClick={handleSendMessage}
                       disabled={isLoading || !input.trim()}

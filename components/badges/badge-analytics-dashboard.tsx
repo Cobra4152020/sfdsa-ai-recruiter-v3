@@ -150,7 +150,7 @@ export default function BadgeAnalyticsDashboard({
                       key={badge.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className="p-4 bg-gray-50 rounded-lg"
+                      className="p-4 bg-muted rounded-lg"
                     >
                       <div className="flex items-center justify-between">
                         <div>

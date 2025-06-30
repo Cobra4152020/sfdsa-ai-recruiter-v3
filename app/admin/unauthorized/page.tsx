@@ -6,7 +6,7 @@ import { PageWrapper } from "@/components/page-wrapper";
 export default function UnauthorizedPage() {
   return (
     <PageWrapper>
-      <div className="flex min-h-[calc(100vh-theme(spacing.16))] flex-col items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 lg:px-8">
+      <div className="flex min-h-[calc(100vh-theme(spacing.16))] flex-col items-center justify-center bg-muted px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md text-center">
           <div className="mx-auto flex h-24 w-24 items-center justify-center rounded-full bg-red-100">
             <ShieldAlert className="h-12 w-12 text-red-600" />

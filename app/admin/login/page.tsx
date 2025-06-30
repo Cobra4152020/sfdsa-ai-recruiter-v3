@@ -23,8 +23,8 @@ export default function AdminLoginPage() {
           <Card className="border-t-4 border-t-[#0A3C1F] shadow-lg">
             <CardHeader className="space-y-1">
               <div className="flex items-center justify-center mb-4">
-                <Shield className="h-10 w-10 text-[#0A3C1F] mr-2" />
-                <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+                <Shield className="h-10 w-10 text-primary mr-2" />
+                <CardTitle className="text-2xl font-bold text-center text-primary">
                   Admin Login
                 </CardTitle>
               </div>

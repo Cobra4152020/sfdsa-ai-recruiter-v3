@@ -153,7 +153,7 @@ export default function VolunteerLoginPage() {
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center mb-4">
               <Shield className="h-10 w-10 text-[#FFD700] mr-2" />
-              <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+              <CardTitle className="text-2xl font-bold text-center text-primary">
                 Volunteer Recruiter Login
               </CardTitle>
             </div>
@@ -184,7 +184,7 @@ export default function VolunteerLoginPage() {
                   <Label htmlFor="password">Password</Label>
                   <Link
                     href="/forgot-password"
-                    className="text-sm text-[#0A3C1F] hover:underline"
+                    className="text-sm text-primary hover:underline"
                   >
                     Forgot password?
                   </Link>
@@ -232,7 +232,7 @@ export default function VolunteerLoginPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="w-full bg-primary hover:bg-primary/90"
                 disabled={isLoading}
               >
                 {isLoading ? (
@@ -273,20 +273,20 @@ export default function VolunteerLoginPage() {
                 Don&apos;t have an account?{" "}
                 <Link
                   href="/volunteer-register"
-                  className="text-[#0A3C1F] hover:underline"
+                  className="text-primary hover:underline"
                 >
                   Register as a Volunteer Recruiter
                 </Link>
               </p>
               <p className="text-xs text-gray-500">
                 By signing in, you agree to our{" "}
-                <Link href="/terms" className="text-[#0A3C1F] hover:underline">
+                <Link href="/terms" className="text-primary hover:underline">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
                 <Link
                   href="/privacy"
-                  className="text-[#0A3C1F] hover:underline"
+                  className="text-primary hover:underline"
                 >
                   Privacy Policy
                 </Link>

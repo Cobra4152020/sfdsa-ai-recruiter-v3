@@ -972,10 +972,10 @@ export function EnhancedTriviaGame({
     return (
       <Card className="shadow-md">
         <CardContent className="p-6 text-center">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] mb-4">Game Over!</h2>
+          <h2 className="text-2xl font-bold text-primary mb-4">Game Over!</h2>
 
-          <div className="bg-[#0A3C1F]/10 rounded-lg p-6 mb-6">
-            <div className="text-4xl font-bold text-[#0A3C1F] mb-2">
+          <div className="bg-primary/10 rounded-lg p-6 mb-6">
+            <div className="text-4xl font-bold text-primary mb-2">
               {score} / {questions.length}
             </div>
             <p className="text-gray-600">
@@ -988,7 +988,7 @@ export function EnhancedTriviaGame({
 
             {isLoggedIn && (
               <div className="mt-4 p-3 bg-[#FFD700]/20 rounded-lg">
-                <p className="font-semibold text-[#0A3C1F]">
+                <p className="font-semibold text-primary">
                   <Trophy className="h-5 w-5 inline-block mr-2" />
                   You earned {pointsAwarded} points!
                 </p>
@@ -999,7 +999,7 @@ export function EnhancedTriviaGame({
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Button
               onClick={handleRestartGame}
-              className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+              className="bg-primary hover:bg-primary/90"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Play Again
@@ -1009,7 +1009,7 @@ export function EnhancedTriviaGame({
               <Button
                 onClick={() => setShowShareDialog(true)}
                 variant="outline"
-                className="border-[#0A3C1F] text-[#0A3C1F]"
+                className="border-primary text-primary"
               >
                 <Share2 className="h-4 w-4 mr-2" />
                 Share Results
@@ -1018,7 +1018,7 @@ export function EnhancedTriviaGame({
               <Button
                 onClick={() => (window.location.href = "/badges")}
                 variant="outline"
-                className="border-[#0A3C1F] text-[#0A3C1F]"
+                className="border-primary text-primary"
               >
                 <Award className="h-4 w-4 mr-2" />
                 View Badges
@@ -1035,7 +1035,7 @@ export function EnhancedTriviaGame({
     return (
       <Card className="shadow-md">
         <CardContent className="p-6 text-center">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] mb-4">
+          <h2 className="text-2xl font-bold text-primary mb-4">
             {fetchError ? "Error Loading Questions" : "Loading Questions..."}
           </h2>
 
@@ -1058,7 +1058,7 @@ export function EnhancedTriviaGame({
 
           <Button
             onClick={fetchQuestions}
-            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            className="bg-primary hover:bg-primary/90"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -1134,7 +1134,7 @@ export function EnhancedTriviaGame({
           </div>
 
           {/* Volume Control */}
-          <div className="mb-4 flex items-center space-x-2 bg-gray-50 dark:bg-gray-800 p-2 rounded-lg">
+          <div className="mb-4 flex items-center space-x-2 bg-muted p-2 rounded-lg">
             <button
               onClick={toggleMute}
               className="p-1 rounded-md hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
@@ -1173,7 +1173,7 @@ export function EnhancedTriviaGame({
           </div>
 
           {/* Question Image with Feedback Overlay */}
-          <div className="mb-4 rounded-lg overflow-hidden relative w-full h-48 md:h-64 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center">
+          <div className="mb-4 rounded-lg overflow-hidden relative w-full h-48 md:h-64 bg-muted rounded-lg overflow-hidden flex items-center justify-center">
             {imageLoadError[currentQuestionIndex] ||
             !currentQuestion.imageUrl ? (
               <div className="text-center text-gray-500 dark:text-gray-400 p-4">
@@ -1327,14 +1327,14 @@ export function EnhancedTriviaGame({
               <Button
                 onClick={handleSubmitClick}
                 disabled={selectedAnswer === null}
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="bg-primary hover:bg-primary/90"
               >
                 Submit Answer
               </Button>
             ) : (
               <Button
                 onClick={handleNextQuestion}
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="bg-primary hover:bg-primary/90"
               >
                 {currentQuestionIndex === questions.length - 1
                   ? "See Results"
@@ -1345,7 +1345,7 @@ export function EnhancedTriviaGame({
             <Button
               variant="outline"
               onClick={handleRestartGame}
-              className="border-[#0A3C1F] text-[#0A3C1F]"
+              className="border-primary text-primary"
             >
               <RefreshCw className="h-4 w-4 mr-2" />
               Restart
@@ -1380,8 +1380,8 @@ export function EnhancedTriviaGame({
           </DialogDescription>
 
           <div className="py-4 flex flex-col items-center">
-            <div className="w-24 h-24 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center mb-4">
-              <Share2 className="h-12 w-12 text-[#0A3C1F]" />
+            <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <Share2 className="h-12 w-12 text-primary" />
             </div>
             <p className="text-center mb-4">
               Help us recruit more deputies by sharing this trivia game on
@@ -1413,7 +1413,7 @@ export function EnhancedTriviaGame({
               <Button
                 variant="outline"
                 onClick={() => handleShare("copy")}
-                className="border-[#0A3C1F] text-[#0A3C1F]"
+                className="border-primary text-primary"
               >
                 <Mail className="h-4 w-4 mr-2" />
                 Copy Link
@@ -1441,7 +1441,7 @@ export function EnhancedTriviaGame({
             <div className="w-32 h-32 rounded-full bg-[#FFD700]/20 flex items-center justify-center mb-4">
               <Award className="h-16 w-16 text-[#FFD700]" />
             </div>
-            <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
+            <h3 className="text-xl font-bold text-primary mb-2">
               {getBadgeName(earnedBadge?.badge_type || "")}
             </h3>
             <p className="text-center text-gray-600">
@@ -1449,7 +1449,7 @@ export function EnhancedTriviaGame({
             </p>
           </div>
           <DialogFooter>
-            <Button onClick={handleShareBadge} className="w-full bg-[#0A3C1F]">
+            <Button onClick={handleShareBadge} className="w-full bg-primary">
               <Share2 className="h-4 w-4 mr-2" />
               Share Badge
             </Button>
@@ -1492,14 +1492,14 @@ export function EnhancedTriviaGame({
             <Button
               variant="outline"
               onClick={() => handleShare("copy")}
-              className="border-[#0A3C1F] text-[#0A3C1F]"
+              className="border-primary text-primary"
             >
               <Mail className="h-4 w-4 mr-2" />
               Copy Link
             </Button>
           </div>
 
-          <div className="bg-[#0A3C1F]/5 p-3 rounded-lg text-sm">
+          <div className="bg-primary/5 p-3 rounded-lg text-sm">
             <p className="font-medium">Customize your message:</p>
             <textarea
               className="w-full mt-2 p-2 border rounded-md text-sm"

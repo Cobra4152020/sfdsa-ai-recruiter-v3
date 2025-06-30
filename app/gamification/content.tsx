@@ -11,23 +11,24 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Trophy,
-  Award,
-  Lock,
   Star,
+  Medal,
   Zap,
-  MessageSquare,
-  FileText,
-  Download,
+  Target,
   Clock,
-  CheckCircle,
   Users,
-  Gift,
+  Award,
+  CheckCircle,
+  ArrowRight,
   Share2,
+  Download,
+  Rocket,
+  Image,
 } from "lucide-react";
+import { CustomLockIcon } from "@/components/ui/custom-lock-icon";
 import { AchievementBadge } from "@/components/achievement-badge";
 import { Progress } from "@/components/ui/progress";
 import { NFT_AWARD_TIERS } from "@/lib/nft-utils";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -50,7 +51,7 @@ export default function GamificationExplainer() {
     <div className="container mx-auto px-4 py-4">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">
+          <h1 className="text-3xl font-bold text-primary mb-2">
             Recruitment Gamification System
           </h1>
           <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -77,14 +78,14 @@ export default function GamificationExplainer() {
               <Users className="h-4 w-4 mr-2 hidden sm:inline" /> Referrals
             </TabsTrigger>
             <TabsTrigger value="unlockables" className="text-sm sm:text-base">
-              <Lock className="h-4 w-4 mr-2 hidden sm:inline" /> Unlockable
+              <CustomLockIcon size="sm" className="mr-2" /> Unlockable
               Content
             </TabsTrigger>
             <TabsTrigger value="nfts" className="text-sm sm:text-base">
               <Star className="h-4 w-4 mr-2 hidden sm:inline" /> NFT Rewards
             </TabsTrigger>
             <TabsTrigger value="trivia" className="text-sm sm:text-base">
-              <MessageSquare className="h-4 w-4 mr-2 hidden sm:inline" /> SF
+              <Target className="h-4 w-4 mr-2 hidden sm:inline" /> SF
               Trivia
             </TabsTrigger>
           </TabsList>
@@ -114,8 +115,8 @@ export default function GamificationExplainer() {
           </TabsContent>
         </Tabs>
 
-        <Card className="mt-12 border-[#0A3C1F]/20">
-          <CardHeader className="bg-[#0A3C1F] text-white">
+        <Card className="mt-12 border-primary/20">
+          <CardHeader className="bg-primary text-white">
             <CardTitle className="flex items-center">
               <Zap className="h-5 w-5 mr-2" /> Get Started Now
             </CardTitle>
@@ -135,7 +136,7 @@ export default function GamificationExplainer() {
                   with our platform to earn your first points and badges.
                 </p>
                 <Link href="/awards">
-                  <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                  <Button className="bg-primary hover:bg-primary/90">
                     View Leaderboard
                   </Button>
                 </Link>
@@ -151,7 +152,7 @@ export default function GamificationExplainer() {
                 <Link href="/profile">
                   <Button
                     variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
+                    className="border-primary text-primary"
                   >
                     Go to Profile
                   </Button>
@@ -207,9 +208,9 @@ export default function GamificationExplainer() {
             </Button>
           </div>
 
-          <div className="bg-[#0A3C1F]/10 border border-[#0A3C1F]/20 rounded-lg p-4 mt-4">
-            <h4 className="font-medium text-[#0A3C1F] flex items-center">
-              <Award className="mr-2 h-4 w-4 text-[#0A3C1F]" />
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mt-4">
+            <h4 className="font-medium text-primary flex items-center">
+              <Award className="mr-2 h-4 w-4 text-primary" />
               Referral Tip
             </h4>
             <p className="text-sm mt-1">
@@ -261,20 +262,20 @@ function PointsSystemExplainer() {
       points: 5,
       description:
         "Earn points for each meaningful interaction with our AI assistant",
-      icon: <MessageSquare className="h-8 w-8 text-blue-500" />,
+      icon: <Target className="h-8 w-8 text-blue-500" />,
     },
     {
       name: "Complete Practice Tests",
       points: 20,
       description: "Earn points for each practice test you complete",
-      icon: <FileText className="h-8 w-8 text-green-500" />,
+      icon: <Download className="h-8 w-8 text-green-500" />,
     },
     {
       name: "Review Application Materials",
       points: 10,
       description:
         "Earn points for reviewing application documents and resources",
-      icon: <FileText className="h-8 w-8 text-purple-500" />,
+      icon: <Download className="h-8 w-8 text-purple-500" />,
     },
     {
       name: "Submit Application",
@@ -287,7 +288,7 @@ function PointsSystemExplainer() {
 
   const pointCategories = [
     {
-      icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
+      icon: <Target className="h-5 w-5 text-blue-500" />,
       title: "Chat Interactions",
       description:
         "Earn points by chatting with our AI assistant and asking questions about the recruitment process.",
@@ -329,7 +330,7 @@ function PointsSystemExplainer() {
       points: "100 points per successful referral",
     },
     {
-      icon: <Gift className="h-5 w-5 text-pink-500" />,
+      icon: <Rocket className="h-5 w-5 text-pink-500" />,
       title: "Donations",
       description:
         "Support the SFDSA through donations to earn points and special recognition.",
@@ -351,13 +352,13 @@ function PointsSystemExplainer() {
         "Test your knowledge about San Francisco and law enforcement",
       points:
         "10 points per correct answer, 25 bonus points for perfect scores",
-      icon: <MessageSquare className="h-5 w-5 text-blue-500" />,
+      icon: <Target className="h-5 w-5 text-blue-500" />,
     },
     {
       name: "Word Constructor",
       description: "Build words related to law enforcement and public safety",
       points: "5 points per word, bonus points for longer words",
-      icon: <FileText className="h-5 w-5 text-green-500" />,
+      icon: <Download className="h-5 w-5 text-green-500" />,
     },
     {
       name: "Memory Match",
@@ -376,7 +377,7 @@ function PointsSystemExplainer() {
   return (
     <>
       <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
+        <CardHeader className="bg-primary text-white">
           <CardTitle className="flex items-center">
             <Trophy className="h-5 w-5 text-[#FFD700] mr-2" />
             Points System Overview
@@ -394,7 +395,7 @@ function PointsSystemExplainer() {
                 {pointActivities.map((activity) => (
                   <div
                     key={activity.name}
-                    className="flex items-start p-4 rounded-lg border bg-gray-50 dark:bg-gray-800/50"
+                    className="flex items-start p-4 rounded-lg border bg-muted/50"
                   >
                     <div className="rounded-full p-2 mr-3 bg-white dark:bg-gray-800 shadow-sm">
                       {activity.icon}
@@ -402,7 +403,7 @@ function PointsSystemExplainer() {
                     <div>
                       <div className="flex items-center">
                         <h4 className="font-medium">{activity.name}</h4>
-                        <span className="ml-2 px-2 py-0.5 rounded-full bg-[#0A3C1F] text-white text-xs">
+                        <span className="ml-2 px-2 py-0.5 rounded-full bg-primary text-white text-xs">
                           +{activity.points} pts
                         </span>
                       </div>
@@ -426,7 +427,7 @@ function PointsSystemExplainer() {
                       <p className="text-sm text-muted-foreground">
                         {category.description}
                       </p>
-                      <div className="mt-2 text-sm font-medium text-[#0A3C1F]">
+                      <div className="mt-2 text-sm font-medium text-primary">
                         {category.points}
                       </div>
                     </div>
@@ -451,7 +452,7 @@ function PointsSystemExplainer() {
                       <p className="text-sm text-muted-foreground">
                         {game.description}
                       </p>
-                      <div className="mt-2 text-sm font-medium text-[#0A3C1F]">
+                      <div className="mt-2 text-sm font-medium text-primary">
                         {game.points}
                       </div>
                     </div>
@@ -462,7 +463,7 @@ function PointsSystemExplainer() {
                 <Link href="/games">
                   <Button
                     variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
+                    className="border-primary text-primary"
                   >
                     Play Games
                   </Button>
@@ -499,8 +500,8 @@ function PointsSystemExplainer() {
               </div>
             </div>
 
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20 mt-8">
-              <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20 mt-8">
+              <h3 className="font-semibold text-lg mb-2 text-primary">
                 Points and Leaderboard
               </h3>
               <p>
@@ -514,7 +515,7 @@ function PointsSystemExplainer() {
                 <Link href="/awards">
                   <Button
                     variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
+                    className="border-primary text-primary"
                   >
                     View Leaderboard
                   </Button>
@@ -547,7 +548,7 @@ function ReferralRewardsExplainer({
       count: 3,
       reward: "Connector Badge",
       description: "Refer 3 potential recruits",
-      icon: <Award className="h-5 w-5 text-[#0A3C1F]" />,
+      icon: <Award className="h-5 w-5 text-primary" />,
       achieved: referralCount >= 3,
     },
     {
@@ -568,7 +569,7 @@ function ReferralRewardsExplainer({
       count: 25,
       reward: "VIP Recruitment Event Access",
       description: "Refer 25 potential recruits",
-      icon: <Gift className="h-5 w-5 text-[#0A3C1F]" />,
+      icon: <Rocket className="h-5 w-5 text-primary" />,
       achieved: referralCount >= 25,
     },
   ];
@@ -584,7 +585,7 @@ function ReferralRewardsExplainer({
   return (
     <>
       <Card className="w-full shadow-md">
-        <CardHeader className="bg-[#0A3C1F] text-white">
+        <CardHeader className="bg-primary text-white">
           <CardTitle className="flex items-center">
             <Users className="mr-2 h-5 w-5" />
             Referral Rewards Program
@@ -603,7 +604,7 @@ function ReferralRewardsExplainer({
                 </p>
               </div>
               <Button
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                className="bg-primary hover:bg-primary/90 text-white"
                 onClick={() => setShowShareDialog(true)}
               >
                 <Share2 className="mr-2 h-4 w-4" />
@@ -637,13 +638,13 @@ function ReferralRewardsExplainer({
                   key={tier.count}
                   className={`p-4 border rounded-lg transition-all ${
                     tier.achieved
-                      ? "bg-[#0A3C1F]/5 border-[#0A3C1F]/20"
+                      ? "bg-primary/5 border-primary/20"
                       : "border-gray-200"
                   }`}
                 >
                   <div className="flex items-center mb-2">
                     <div
-                      className={`p-2 rounded-full ${tier.achieved ? "bg-[#0A3C1F]/10" : "bg-gray-100"}`}
+                      className={`p-2 rounded-full ${tier.achieved ? "bg-primary/10" : "bg-gray-100"}`}
                     >
                       {tier.icon}
                     </div>
@@ -660,7 +661,7 @@ function ReferralRewardsExplainer({
                       {tier.count} Referrals
                     </span>
                     {tier.achieved ? (
-                      <Badge className="bg-[#0A3C1F] text-white">
+                      <Badge className="bg-primary text-white">
                         Unlocked
                       </Badge>
                     ) : (
@@ -849,7 +850,7 @@ function BadgesExplainer() {
   return (
     <>
       <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
+        <CardHeader className="bg-primary text-white">
           <CardTitle className="flex items-center">
             <Award className="h-5 w-5 text-[#FFD700] mr-2" />
             Badge System
@@ -882,7 +883,7 @@ function BadgesExplainer() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {category.badges.map((badge) => (
-                    <Card key={badge.type} className="border-[#0A3C1F]/20">
+                    <Card key={badge.type} className="border-primary/20">
                       <CardHeader className="pb-2">
                         <div className="flex justify-center mb-2">
                           <AchievementBadge
@@ -899,7 +900,7 @@ function BadgesExplainer() {
                         <p className="text-sm text-center mb-4">
                           {badge.description}
                         </p>
-                        <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                        <div className="bg-muted p-3 rounded-lg">
                           <h4 className="text-sm font-medium mb-2">
                             Requirements:
                           </h4>
@@ -919,8 +920,8 @@ function BadgesExplainer() {
               </div>
             ))}
 
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-              <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <h3 className="font-semibold text-lg mb-2 text-primary">
                 Badge Benefits
               </h3>
               <ul className="space-y-2">
@@ -1004,34 +1005,34 @@ function UnlockableContentExplainer() {
       title: "Point Accumulation",
       description:
         "The primary method of unlocking content is by earning points through platform engagement and completing activities.",
-      icon: <Trophy className="h-6 w-6 text-[#0A3C1F]" />,
+      icon: <Trophy className="h-6 w-6 text-primary" />,
     },
     {
       title: "Badge Collection",
       description:
         "Some content is unlocked by earning specific badges that demonstrate your knowledge in relevant areas.",
-      icon: <Award className="h-6 w-6 text-[#0A3C1F]" />,
+      icon: <Award className="h-6 w-6 text-primary" />,
     },
     {
       title: "Application Progress",
       description:
         "Advancing through the application process automatically unlocks content relevant to your current stage.",
-      icon: <CheckCircle className="h-6 w-6 text-[#0A3C1F]" />,
+      icon: <CheckCircle className="h-6 w-6 text-primary" />,
     },
     {
       title: "Special Events",
       description:
         "Participating in special events, webinars, or virtual information sessions can unlock exclusive content.",
-      icon: <Star className="h-6 w-6 text-[#0A3C1F]" />,
+      icon: <Star className="h-6 w-6 text-primary" />,
     },
   ];
 
   return (
     <>
       <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
+        <CardHeader className="bg-primary text-white">
           <CardTitle className="flex items-center">
-            <Lock className="h-5 w-5 text-[#FFD700] mr-2" />
+            <CustomLockIcon size="md" className="text-[#FFD700] mr-2" />
             Unlockable Content
           </CardTitle>
           <CardDescription className="text-gray-200">
@@ -1075,7 +1076,7 @@ function UnlockableContentExplainer() {
                 {unlockablePages.map((page) => (
                   <Card
                     key={page.name}
-                    className="overflow-hidden border-[#0A3C1F]/20"
+                    className="overflow-hidden border-primary/20"
                   >
                     <div className="relative h-40">
                       <Image
@@ -1089,7 +1090,7 @@ function UnlockableContentExplainer() {
                         <div className="p-4 text-white">
                           <h4 className="font-bold text-lg">{page.name}</h4>
                           <div className="flex items-center">
-                            <Lock className="h-4 w-4 mr-1" />
+                            <CustomLockIcon size="sm" className="mr-1" />
                             <span className="text-sm">
                               {page.pointsRequired} points required
                             </span>
@@ -1124,8 +1125,8 @@ function UnlockableContentExplainer() {
               </div>
             </div>
 
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-              <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <h3 className="font-semibold text-lg mb-2 text-primary">
                 Benefits of Unlockable Content
               </h3>
               <ul className="space-y-2">
@@ -1170,7 +1171,7 @@ function NFTRewardsExplainer() {
   return (
     <>
       <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
+        <CardHeader className="bg-primary text-white">
           <CardTitle className="flex items-center">
             <Star className="h-5 w-5 text-[#FFD700] mr-2" />
             NFT Rewards
@@ -1197,7 +1198,7 @@ function NFTRewardsExplainer() {
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {NFT_AWARD_TIERS.map((tier) => (
-                  <Card key={tier.id} className="border-[#0A3C1F]/20">
+                  <Card key={tier.id} className="border-primary/20">
                     <CardHeader className="pb-2">
                       <div className="aspect-square relative mb-2 bg-gray-100 rounded-md overflow-hidden">
                         <Image
@@ -1219,7 +1220,7 @@ function NFTRewardsExplainer() {
                       <p className="text-sm text-center mb-4">
                         {tier.description}
                       </p>
-                      <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                      <div className="bg-muted p-3 rounded-lg">
                         <div className="flex justify-between text-sm mb-1">
                           <span>Required Points:</span>
                           <span className="font-medium">
@@ -1238,14 +1239,14 @@ function NFTRewardsExplainer() {
                 How NFT Rewards Work
               </h3>
               <div className="space-y-4">
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-muted p-4 rounded-lg">
                   <h4 className="font-medium mb-2">1. Earn Points</h4>
                   <p className="text-sm text-muted-foreground">
                     Accumulate points through platform engagement, completing
                     application steps, and earning badges.
                   </p>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-muted p-4 rounded-lg">
                   <h4 className="font-medium mb-2">
                     2. Reach Point Thresholds
                   </h4>
@@ -1254,7 +1255,7 @@ function NFTRewardsExplainer() {
                     reach that threshold, you become eligible for the award.
                   </p>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-muted p-4 rounded-lg">
                   <h4 className="font-medium mb-2">3. Receive Your NFT</h4>
                   <p className="text-sm text-muted-foreground">
                     NFTs are automatically awarded when you reach the required
@@ -1262,7 +1263,7 @@ function NFTRewardsExplainer() {
                     NFT will appear in your profile.
                   </p>
                 </div>
-                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
+                <div className="bg-muted p-4 rounded-lg">
                   <h4 className="font-medium mb-2">4. Display and Share</h4>
                   <p className="text-sm text-muted-foreground">
                     Your NFTs are displayed on your profile and can be shared on
@@ -1272,8 +1273,8 @@ function NFTRewardsExplainer() {
               </div>
             </div>
 
-            <div className="bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-              <h3 className="font-semibold text-lg mb-2 text-[#0A3C1F]">
+            <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
+              <h3 className="font-semibold text-lg mb-2 text-primary">
                 Benefits of NFT Rewards
               </h3>
               <ul className="space-y-2">
@@ -1311,8 +1312,8 @@ function NFTRewardsExplainer() {
               </ul>
             </div>
 
-            <div className="text-center p-6 border rounded-lg bg-gradient-to-b from-[#0A3C1F]/10 to-transparent">
-              <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
+            <div className="text-center p-6 border rounded-lg bg-gradient-to-b from-primary/10 to-transparent">
+              <h3 className="text-xl font-bold text-primary mb-2">
                 Start Earning Your NFT Rewards Today!
               </h3>
               <p className="mb-4">
@@ -1320,7 +1321,7 @@ function NFTRewardsExplainer() {
                 platform, and working toward your first NFT award.
               </p>
               <Link href="/awards">
-                <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                <Button className="bg-primary hover:bg-primary/90">
                   View Leaderboard
                 </Button>
               </Link>
@@ -1336,9 +1337,9 @@ function TriviaGameExplainer() {
   return (
     <>
       <Card>
-        <CardHeader className="bg-[#0A3C1F] text-white">
+        <CardHeader className="bg-primary text-white">
           <CardTitle className="flex items-center">
-            <MessageSquare className="h-5 w-5 text-[#FFD700] mr-2" />
+            <Target className="h-5 w-5 text-[#FFD700] mr-2" />
             SF Trivia Game
           </CardTitle>
           <CardDescription className="text-gray-200">
@@ -1368,14 +1369,14 @@ function TriviaGameExplainer() {
                 </p>
                 <div className="mt-6">
                   <Link href="/trivia">
-                    <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                    <Button className="bg-primary hover:bg-primary/90">
                       Play SF Trivia Now
                     </Button>
                   </Link>
                 </div>
               </div>
-              <div className="md:w-1/3 bg-[#0A3C1F]/5 p-4 rounded-lg border border-[#0A3C1F]/20">
-                <h4 className="font-semibold text-[#0A3C1F] mb-3">
+              <div className="md:w-1/3 bg-primary/5 p-4 rounded-lg border border-primary/20">
+                <h4 className="font-semibold text-primary mb-3">
                   Game Features
                 </h4>
                 <ul className="space-y-2">
@@ -1408,7 +1409,7 @@ function TriviaGameExplainer() {
                 How to Earn Points with Trivia
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Card className="border-[#0A3C1F]/20">
+                <Card className="border-primary/20">
                   <CardHeader className="pb-2">
                     <div className="rounded-full p-2 w-12 h-12 bg-green-100 flex items-center justify-center mx-auto">
                       <CheckCircle className="h-6 w-6 text-green-600" />
@@ -1421,13 +1422,13 @@ function TriviaGameExplainer() {
                     <p className="text-sm mb-2">
                       Earn 10 points for each correct answer
                     </p>
-                    <div className="text-2xl font-bold text-[#0A3C1F]">
+                    <div className="text-2xl font-bold text-primary">
                       +10 pts
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="border-[#0A3C1F]/20">
+                <Card className="border-primary/20">
                   <CardHeader className="pb-2">
                     <div className="rounded-full p-2 w-12 h-12 bg-blue-100 flex items-center justify-center mx-auto">
                       <Clock className="h-6 w-6 text-blue-600" />
@@ -1440,16 +1441,16 @@ function TriviaGameExplainer() {
                     <p className="text-sm mb-2">
                       Answer quickly for bonus points
                     </p>
-                    <div className="text-2xl font-bold text-[#0A3C1F]">
+                    <div className="text-2xl font-bold text-primary">
                       +5 pts
                     </div>
                   </CardContent>
                 </Card>
 
-                <Card className="border-[#0A3C1F]/20">
+                <Card className="border-primary/20">
                   <CardHeader className="pb-2">
                     <div className="rounded-full p-2 w-12 h-12 bg-purple-100 flex items-center justify-center mx-auto">
-                      <Trophy className="h-6 w-6 text-purple-600" />
+                      <Target className="h-6 w-6 text-purple-600" />
                     </div>
                     <CardTitle className="text-center text-lg mt-2">
                       Perfect Score
@@ -1459,7 +1460,7 @@ function TriviaGameExplainer() {
                     <p className="text-sm mb-2">
                       Get all questions right for a bonus
                     </p>
-                    <div className="text-2xl font-bold text-[#0A3C1F]">
+                    <div className="text-2xl font-bold text-primary">
                       +25 pts
                     </div>
                   </CardContent>
@@ -1470,11 +1471,11 @@ function TriviaGameExplainer() {
             <div>
               <h3 className="text-xl font-semibold mb-4">Trivia Badges</h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Card className="border-[#0A3C1F]/20">
+                <Card className="border-primary/20">
                   <CardHeader className="pb-2">
                     <div className="flex justify-center mb-2">
-                      <div className="w-16 h-16 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                        <Trophy className="h-8 w-8 text-[#0A3C1F]" />
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Target className="h-8 w-8 text-primary" />
                       </div>
                     </div>
                     <CardTitle className="text-center text-lg">
@@ -1485,7 +1486,7 @@ function TriviaGameExplainer() {
                     <p className="text-sm text-center mb-4">
                       Awarded for completing your first trivia game
                     </p>
-                    <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                    <div className="bg-muted p-3 rounded-lg">
                       <h4 className="text-sm font-medium mb-2">
                         Requirements:
                       </h4>
@@ -1503,11 +1504,11 @@ function TriviaGameExplainer() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-[#0A3C1F]/20">
+                <Card className="border-primary/20">
                   <CardHeader className="pb-2">
                     <div className="flex justify-center mb-2">
-                      <div className="w-16 h-16 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                        <Trophy className="h-8 w-8 text-[#0A3C1F]" />
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Target className="h-8 w-8 text-primary" />
                       </div>
                     </div>
                     <CardTitle className="text-center text-lg">
@@ -1518,7 +1519,7 @@ function TriviaGameExplainer() {
                     <p className="text-sm text-center mb-4">
                       Awarded for completing 5 trivia games
                     </p>
-                    <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                    <div className="bg-muted p-3 rounded-lg">
                       <h4 className="text-sm font-medium mb-2">
                         Requirements:
                       </h4>
@@ -1538,11 +1539,11 @@ function TriviaGameExplainer() {
                   </CardContent>
                 </Card>
 
-                <Card className="border-[#0A3C1F]/20">
+                <Card className="border-primary/20">
                   <CardHeader className="pb-2">
                     <div className="flex justify-center mb-2">
-                      <div className="w-16 h-16 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                        <Trophy className="h-8 w-8 text-[#0A3C1F]" />
+                      <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Target className="h-8 w-8 text-primary" />
                       </div>
                     </div>
                     <CardTitle className="text-center text-lg">
@@ -1553,7 +1554,7 @@ function TriviaGameExplainer() {
                     <p className="text-sm text-center mb-4">
                       Awarded for achieving 3 perfect scores
                     </p>
-                    <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+                    <div className="bg-muted p-3 rounded-lg">
                       <h4 className="text-sm font-medium mb-2">
                         Requirements:
                       </h4>
@@ -1586,7 +1587,7 @@ function TriviaGameExplainer() {
                 overall ranking. Top performers are recognized and may receive
                 special rewards.
               </p>
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-[#0A3C1F]/20">
+              <div className="bg-muted p-4 rounded-lg border border-primary/20">
                 <h4 className="font-medium mb-3">Leaderboard Metrics</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="flex items-center">
@@ -1602,7 +1603,7 @@ function TriviaGameExplainer() {
                   </div>
                   <div className="flex items-center">
                     <div className="rounded-full p-2 bg-blue-100 mr-3">
-                      <Trophy className="h-5 w-5 text-blue-600" />
+                      <Target className="h-5 w-5 text-blue-600" />
                     </div>
                     <div>
                       <div className="font-medium">Accuracy</div>
@@ -1626,10 +1627,10 @@ function TriviaGameExplainer() {
               </div>
             </div>
 
-            <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent p-6 rounded-lg border border-[#0A3C1F]/20">
+            <div className="bg-gradient-to-r from-primary/10 to-transparent p-6 rounded-lg border border-primary/20">
               <div className="flex flex-col md:flex-row items-center">
                 <div className="md:w-2/3">
-                  <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
+                  <h3 className="text-xl font-bold text-primary mb-2">
                     Ready to Test Your San Francisco Knowledge?
                   </h3>
                   <p className="mb-4">
@@ -1640,14 +1641,14 @@ function TriviaGameExplainer() {
                     Francisco Sheriff&apos;s Department.
                   </p>
                   <Link href="/trivia">
-                    <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                    <Button className="bg-primary hover:bg-primary/90">
                       Play SF Trivia Now
                     </Button>
                   </Link>
                 </div>
                 <div className="md:w-1/3 flex justify-center mt-6 md:mt-0">
-                  <div className="w-32 h-32 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-                    <Trophy className="h-16 w-16 text-[#0A3C1F]" />
+                  <div className="w-32 h-32 rounded-full bg-primary/10 flex items-center justify-center">
+                    <Target className="h-16 w-16 text-primary" />
                   </div>
                 </div>
               </div>

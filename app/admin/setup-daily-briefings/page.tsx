@@ -56,7 +56,7 @@ export default async function SetupDailyBriefingsPage() {
                 {briefings.map((briefing) => (
                   <div
                     key={briefing.id}
-                    className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                    className="p-4 bg-muted rounded-lg"
                   >
                     <h3 className="font-semibold">{briefing.title}</h3>
                     <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">

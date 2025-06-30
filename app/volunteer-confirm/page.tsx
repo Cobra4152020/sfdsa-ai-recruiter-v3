@@ -68,7 +68,7 @@ export default function VolunteerConfirmPage() {
           <CardContent className="space-y-6">
             {status === "loading" && (
               <div className="flex flex-col items-center justify-center py-8">
-                <Loader2 className="h-12 w-12 text-[#0A3C1F] animate-spin mb-4" />
+                <Loader2 className="h-12 w-12 text-primary animate-spin mb-4" />
                 <p className="text-center text-gray-600">
                   Confirming your email address...
                 </p>
@@ -99,7 +99,7 @@ export default function VolunteerConfirmPage() {
               {status === "success" ? (
                 <Button
                   onClick={() => router.push("/volunteer-login")}
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="bg-primary hover:bg-primary/90"
                 >
                   Log In to Your Account
                 </Button>
@@ -107,7 +107,7 @@ export default function VolunteerConfirmPage() {
                 <Button
                   onClick={() => router.push("/volunteer-register")}
                   variant="outline"
-                  className="border-[#0A3C1F] text-[#0A3C1F]"
+                  className="border-primary text-primary"
                 >
                   Back to Registration
                 </Button>

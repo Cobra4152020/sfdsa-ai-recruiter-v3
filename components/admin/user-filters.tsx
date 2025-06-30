@@ -67,7 +67,7 @@ export function ApplicantFilters({
   }
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
+    <div className="bg-muted p-4 rounded-lg border space-y-4">
       <div className="flex flex-col md:flex-row gap-4">
         <div className="w-full md:w-1/4">
           <Label htmlFor="search">Search</Label>

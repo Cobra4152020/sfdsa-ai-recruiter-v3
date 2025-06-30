@@ -66,7 +66,7 @@ export function DonorCard({ donor, tierColor }: DonorCardProps) {
           </div>
         )}
       </CardContent>
-      <CardFooter className="border-t bg-gray-50 py-2 px-6">
+      <CardFooter className="border-t bg-muted py-2 px-6">
         <div className="flex items-center justify-between w-full text-xs text-gray-500">
           <span>{formattedDate}</span>
         </div>

@@ -11,7 +11,7 @@ export default function TestPage() {
   return (
     <main className="container mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">
+        <h1 className="text-3xl font-bold text-primary mb-2">
           Application Testing
         </h1>
         <p className="text-gray-600">

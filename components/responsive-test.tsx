@@ -124,7 +124,7 @@ export function ResponsiveTest() {
           </div>
           <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-[#0A3C1F] rounded-full"
+              className="h-full bg-primary rounded-full"
               style={{
                 width: `${Math.min((currentWidth / 1920) * 100, 100)}%`,
               }}
@@ -153,7 +153,7 @@ export function ResponsiveTest() {
                     ? "bg-green-50 border-green-200"
                     : breakpoint.status === "fail"
                       ? "bg-red-50 border-red-200"
-                      : "bg-gray-50 border-gray-200"
+                      : "bg-muted border-gray-200"
                 }`}
               >
                 <div className="mr-3">{breakpoint.icon}</div>

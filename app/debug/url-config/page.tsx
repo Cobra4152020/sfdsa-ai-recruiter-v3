@@ -13,7 +13,7 @@ export default function URLConfigPage() {
       <div className="max-w-3xl mx-auto">
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-[#0A3C1F]">
+            <CardTitle className="text-2xl font-bold text-primary">
               URL Configuration Debug
             </CardTitle>
             <CardDescription>

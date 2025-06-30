@@ -84,7 +84,7 @@ export default async function JourneyPerformancePage() {
               {performance?.map((item) => (
                 <div
                   key={item.id}
-                  className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg"
+                  className="p-4 bg-muted rounded-lg"
                 >
                   <h3 className="font-semibold">{item.title}</h3>
                   <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">

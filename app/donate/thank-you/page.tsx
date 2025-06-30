@@ -48,8 +48,8 @@ export default function ThankYouPage() {
           </Button>
         </CardFooter>
       </Card>
-      <div className="mt-8 p-6 bg-[#0A3C1F]/5 rounded-lg">
-        <h3 className="text-lg font-semibold text-[#0A3C1F] mb-2">
+      <div className="mt-8 p-6 bg-primary/5 rounded-lg">
+        <h3 className="text-lg font-semibold text-primary mb-2">
           Donor Recognition
         </h3>
         <p className="text-gray-600 mb-4">
@@ -57,7 +57,7 @@ export default function ThankYouPage() {
           on our{" "}
           <a
             href="/donor-recognition"
-            className="text-[#0A3C1F] font-medium hover:underline"
+            className="text-primary font-medium hover:underline"
           >
             Donor Recognition Wall
           </a>{" "}
@@ -68,7 +68,7 @@ export default function ThankYouPage() {
           contact us at{" "}
           <a
             href="mailto:donations@protectingsanfrancisco.com"
-            className="text-[#0A3C1F] font-medium hover:underline"
+            className="text-primary font-medium hover:underline"
           >
             donations@protectingsanfrancisco.com
           </a>

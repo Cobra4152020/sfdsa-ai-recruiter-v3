@@ -131,8 +131,8 @@ export default function ApplicationProcessPage() {
           className="text-center mb-12"
         >
           <div className="flex items-center justify-center mb-6">
-            <Shield className="h-12 w-12 text-[#0A3C1F] dark:text-[#FFD700] mr-4" />
-            <h1 className="text-4xl md:text-5xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+            <Shield className="h-12 w-12 text-primary dark:text-[#FFD700] mr-4" />
+            <h1 className="text-4xl md:text-5xl font-bold text-primary dark:text-[#FFD700]">
               Application Process
             </h1>
           </div>
@@ -141,15 +141,15 @@ export default function ApplicationProcessPage() {
             to join our team and serve your community with pride and distinction.
           </p>
           <div className="flex flex-wrap items-center justify-center mt-6 gap-3 md:gap-6">
-            <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
+            <Badge variant="outline" className="bg-primary/5 dark:bg-[#FFD700]/20 text-primary dark:text-[#FFD700] border-primary/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
               <Clock className="h-3 w-3 mr-1" />
               <span className="hidden sm:inline">Total Process: </span>6-12 months
             </Badge>
-            <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
+            <Badge variant="outline" className="bg-primary/5 dark:bg-[#FFD700]/20 text-primary dark:text-[#FFD700] border-primary/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
               <Star className="h-3 w-3 mr-1" />
               <span className="hidden sm:inline">Competitive </span>Selection
             </Badge>
-            <Badge variant="outline" className="bg-[#0A3C1F]/5 dark:bg-[#FFD700]/20 text-[#0A3C1F] dark:text-[#FFD700] border-[#0A3C1F]/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
+            <Badge variant="outline" className="bg-primary/5 dark:bg-[#FFD700]/20 text-primary dark:text-[#FFD700] border-primary/20 dark:border-[#FFD700]/50 text-xs md:text-sm">
               <Zap className="h-3 w-3 mr-1" />
               <span className="hidden sm:inline">Paid </span>Academy Training
             </Badge>

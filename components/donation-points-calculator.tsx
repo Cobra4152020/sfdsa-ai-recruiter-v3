@@ -67,7 +67,7 @@ export function DonationPointsCalculator() {
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="text-lg">Points Calculator</CardTitle>
-          <Calculator className="h-5 w-5 text-[#0A3C1F]" />
+          <Calculator className="h-5 w-5 text-primary" />
         </div>
         <CardDescription>
           See how many points you&apos;ll earn for your donation
@@ -105,7 +105,7 @@ export function DonationPointsCalculator() {
               <span className="text-sm font-medium">
                 Points you&apos;ll earn:
               </span>
-              <span className="text-2xl font-bold text-[#0A3C1F]">
+              <span className="text-2xl font-bold text-primary">
                 {pointsEarned.toLocaleString()}
               </span>
             </div>
@@ -120,7 +120,7 @@ export function DonationPointsCalculator() {
             <div className="flex justify-between items-center">
               <span className="text-sm font-medium">
                 You&apos;ll earn approximately{" "}
-                <span className="font-semibold text-[#0A3C1F]">
+                <span className="font-semibold text-primary">
                   {pointsEarned.toLocaleString()} points
                 </span>{" "}
                 with this donation

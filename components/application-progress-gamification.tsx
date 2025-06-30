@@ -258,7 +258,7 @@ Join me on the journey to become a San Francisco Deputy Sheriff!
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="bg-[#0A3C1F] text-white p-6">
+        <div className="bg-primary text-white p-6">
           <div className="animate-pulse">
             <div className="h-6 bg-white/20 rounded mb-2 w-1/3"></div>
             <div className="h-4 bg-white/20 rounded w-1/2"></div>
@@ -278,7 +278,7 @@ Join me on the journey to become a San Francisco Deputy Sheriff!
   if (error) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-red-200 overflow-hidden">
-        <div className="bg-[#0A3C1F] text-white p-6">
+        <div className="bg-primary text-white p-6">
           <h3 className="text-xl font-semibold flex items-center gap-3">
             <FaTrophy className="h-6 w-6" />
             Your Application Journey
@@ -299,7 +299,7 @@ Join me on the journey to become a San Francisco Deputy Sheriff!
     <>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         {/* Sheriff Green Header */}
-        <div className="bg-[#0A3C1F] text-white p-6">
+        <div className="bg-primary text-white p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-xl font-semibold flex items-center gap-3">
               <FaTrophy className="h-6 w-6" />

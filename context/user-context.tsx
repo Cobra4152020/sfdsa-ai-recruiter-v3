@@ -215,41 +215,35 @@ export const UserProvider: React.FC<PropsWithChildren<{}>> = ({ children }) => {
 
   const incrementParticipation = async () => {
     if (!currentUser) return;
-    
+
     try {
-      // Try updating user_profiles first, then users table as fallback
-      let updateError = null;
-      
-      const { error: profileError } = await supabase
-        .from('user_profiles')
-        .update({ 
-          participation_count: (currentUser.participation_count || 0) + 1 
+      const { error } = await supabase
+        .from('users')
+        .update({
+          participation_count: (currentUser.participation_count || 0) + 1,
         })
-        .eq('id', currentUser.id);
-        
-      if (profileError) {
-        // Fallback to users table
-        const { error: usersError } = await supabase
-          .from('users')
-          .update({ 
-            participation_count: (currentUser.participation_count || 0) + 1 
-          })
-          .eq('id', currentUser.id);
-        updateError = usersError;
-      }
-        
-      if (updateError) {
-        console.error('Error updating participation:', updateError);
+        .eq('id', currentUser.id)
+        .select()
+        .single();
+
+      if (error) {
+        console.error('Error updating participation count:', error.message);
         return;
       }
-      
-      // Update local state
-      setCurrentUser(prev => prev ? {
-        ...prev,
-        participation_count: (prev.participation_count || 0) + 1
-      } : null);
+
+      setCurrentUser(prev =>
+        prev
+          ? {
+              ...prev,
+              participation_count: (prev.participation_count || 0) + 1,
+            }
+          : null
+      );
     } catch (err) {
-      console.error('Error incrementing participation:', err);
+      console.error(
+        'Error incrementing participation:',
+        err instanceof Error ? err.message : err || 'Unknown error'
+      );
     }
   };
 

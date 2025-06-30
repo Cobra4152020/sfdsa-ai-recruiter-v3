@@ -81,7 +81,7 @@ export function EnhancedSocialLogin({
         type="button"
         variant={variant}
         size={buttonSize}
-        className="w-full flex items-center justify-center bg-white hover:bg-gray-50 text-black"
+        className="w-full flex items-center justify-center bg-white hover:bg-accent/10 text-black"
         onClick={() => handleSocialLogin("google")}
         disabled={isLoading !== null}
       >

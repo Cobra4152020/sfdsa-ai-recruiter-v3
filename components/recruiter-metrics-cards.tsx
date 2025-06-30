@@ -76,12 +76,12 @@ export function RecruiterMetricsCards({ metrics }: RecruiterMetricsCardsProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm font-medium text-gray-500">Total Hires</p>
-              <h3 className="text-2xl font-bold text-[#0A3C1F]">
+              <h3 className="text-2xl font-bold text-primary">
                 {metrics.totalHires}
               </h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-              <UserCheck className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <UserCheck className="h-6 w-6 text-primary" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -97,12 +97,12 @@ export function RecruiterMetricsCards({ metrics }: RecruiterMetricsCardsProps) {
               <p className="text-sm font-medium text-gray-500">
                 Conversion Rate
               </p>
-              <h3 className="text-2xl font-bold text-[#0A3C1F]">
+              <h3 className="text-2xl font-bold text-primary">
                 {metrics.conversionRate}%
               </h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-              <Percent className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Percent className="h-6 w-6 text-primary" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -118,12 +118,12 @@ export function RecruiterMetricsCards({ metrics }: RecruiterMetricsCardsProps) {
               <p className="text-sm font-medium text-gray-500">
                 Avg Time to Hire
               </p>
-              <h3 className="text-2xl font-bold text-[#0A3C1F]">
+              <h3 className="text-2xl font-bold text-primary">
                 {metrics.averageTimeToHire} days
               </h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-              <Clock className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Clock className="h-6 w-6 text-primary" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -139,12 +139,12 @@ export function RecruiterMetricsCards({ metrics }: RecruiterMetricsCardsProps) {
               <p className="text-sm font-medium text-gray-500">
                 Active Referrals
               </p>
-              <h3 className="text-2xl font-bold text-[#0A3C1F]">
+              <h3 className="text-2xl font-bold text-primary">
                 {metrics.activeReferrals}
               </h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-              <Users className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <Users className="h-6 w-6 text-primary" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -160,12 +160,12 @@ export function RecruiterMetricsCards({ metrics }: RecruiterMetricsCardsProps) {
               <p className="text-sm font-medium text-gray-500">
                 Pending Applications
               </p>
-              <h3 className="text-2xl font-bold text-[#0A3C1F]">
+              <h3 className="text-2xl font-bold text-primary">
                 {metrics.pendingApplications}
               </h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-              <FileText className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <FileText className="h-6 w-6 text-primary" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -181,12 +181,12 @@ export function RecruiterMetricsCards({ metrics }: RecruiterMetricsCardsProps) {
               <p className="text-sm font-medium text-gray-500">
                 Total Link Clicks
               </p>
-              <h3 className="text-2xl font-bold text-[#0A3C1F]">
+              <h3 className="text-2xl font-bold text-primary">
                 {metrics.totalClicks}
               </h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-              <MousePointer className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <MousePointer className="h-6 w-6 text-primary" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -202,12 +202,12 @@ export function RecruiterMetricsCards({ metrics }: RecruiterMetricsCardsProps) {
               <p className="text-sm font-medium text-gray-500">
                 Click-to-Referral Rate
               </p>
-              <h3 className="text-2xl font-bold text-[#0A3C1F]">
+              <h3 className="text-2xl font-bold text-primary">
                 {metrics.clickToReferralRate}%
               </h3>
             </div>
-            <div className="h-12 w-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+              <TrendingUp className="h-6 w-6 text-primary" />
             </div>
           </div>
           <p className="text-xs text-gray-500 mt-2">

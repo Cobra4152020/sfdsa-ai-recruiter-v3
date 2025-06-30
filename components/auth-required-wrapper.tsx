@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { 
-  Lock, 
   Trophy, 
   Star, 
   MessageSquare, 
@@ -18,6 +17,7 @@ import {
   CheckCircle,
   Clock
 } from "lucide-react";
+import { CustomLockIcon } from "@/components/ui/custom-lock-icon";
 
 interface AuthRequiredWrapperProps {
   children: React.ReactNode;
@@ -75,9 +75,9 @@ export function AuthRequiredWrapper({
     locked_content: {
       title: "Premium Content",
       description: "Access exclusive recruitment resources and materials",
-      icon: <Lock className="h-6 w-6 text-gray-600" />,
+      icon: <CustomLockIcon size="lg" className="text-gray-600" />,
       pointsRequired: minimumPoints,
-      color: "bg-gray-50 border-gray-200"
+      color: "bg-muted border-gray-200"
     }
   };
 
@@ -111,7 +111,7 @@ export function AuthRequiredWrapper({
     return (
       <div className={`min-h-[400px] flex items-center justify-center ${className}`}>
         <div className="text-center space-y-4">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F] mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
           <p className="text-gray-600">Loading...</p>
         </div>
       </div>
@@ -195,7 +195,7 @@ export function AuthRequiredWrapper({
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Button 
                 onClick={() => openModal("signup", "recruit", "")}
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white px-8 py-3"
+                className="bg-primary hover:bg-primary/90 text-white px-8 py-3"
                 size="lg"
               >
                 <Trophy className="h-5 w-5 mr-2" />
@@ -204,7 +204,7 @@ export function AuthRequiredWrapper({
               <Button 
                 onClick={() => openModal("signin", "recruit", "")}
                 variant="outline"
-                className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/5 px-8 py-3"
+                className="border-primary text-primary hover:bg-primary/5 px-8 py-3"
                 size="lg"
               >
                 Already have an account? Sign In
@@ -246,7 +246,7 @@ export function AuthRequiredWrapper({
             {!heroImage && (
               <>
                 <div className="mx-auto mb-4 p-4 bg-white rounded-full shadow-sm">
-                  <Lock className="h-6 w-6 text-gray-600" />
+                  <CustomLockIcon size="lg" className="text-gray-600" />
                 </div>
                 <CardTitle className="text-2xl">
                   {title || `${config.title} Locked`}
@@ -285,7 +285,7 @@ export function AuthRequiredWrapper({
             <div className="text-center">
               <Button 
                 onClick={() => window.location.href = "/apply"}
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="bg-primary hover:bg-primary/90"
               >
                 Apply Now for 500 Points
               </Button>

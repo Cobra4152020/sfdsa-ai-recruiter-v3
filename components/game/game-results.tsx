@@ -115,10 +115,10 @@ export function GameResults({ score, totalQuestions, timeUsed, answers, onRestar
                 {rank.name}
               </Badge>
             </motion.div>
-            <CardTitle className="text-3xl font-bold text-[#0A3C1F] mb-2">
+            <CardTitle className="text-3xl font-bold text-primary mb-2">
               Challenge Complete!
             </CardTitle>
-            <div className="text-4xl font-bold text-[#0A3C1F] mb-2">
+            <div className="text-4xl font-bold text-primary mb-2">
               {percentage}%
             </div>
             <p className="text-lg text-gray-600 dark:text-gray-300">
@@ -135,8 +135,8 @@ export function GameResults({ score, totalQuestions, timeUsed, answers, onRestar
             </div>
 
             {/* Sgt. Ken's Feedback */}
-            <div className="bg-[#0A3C1F]/5 border border-[#0A3C1F]/20 rounded-lg p-6">
-              <h3 className="font-semibold text-[#0A3C1F] mb-3 text-lg">
+            <div className="bg-primary/5 border border-primary/20 rounded-lg p-6">
+              <h3 className="font-semibold text-primary mb-3 text-lg">
                 💬 Sgt. Ken Says:
               </h3>
               <p className="text-gray-700 dark:text-gray-300 italic text-left">
@@ -177,7 +177,7 @@ export function GameResults({ score, totalQuestions, timeUsed, answers, onRestar
                 </Button>
                 <Button
                   onClick={onRestart}
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 flex items-center gap-2"
+                  className="bg-primary hover:bg-primary/90 flex items-center gap-2"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Try Again
@@ -195,8 +195,8 @@ export function GameResults({ score, totalQuestions, timeUsed, answers, onRestar
             </div>
 
             {/* Encourage Action */}
-            <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-[#0A3C1F]/5 rounded-lg p-6 mt-8">
-              <h3 className="font-semibold text-[#0A3C1F] mb-3">
+            <div className="bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg p-6 mt-8">
+              <h3 className="font-semibold text-primary mb-3">
                 Ready for the Real Challenge?
               </h3>
               <p className="text-gray-700 dark:text-gray-300 mb-4">
@@ -205,7 +205,7 @@ export function GameResults({ score, totalQuestions, timeUsed, answers, onRestar
               </p>
               <Button 
                 variant="outline"
-                className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F] hover:text-white"
+                className="border-primary text-primary hover:bg-primary hover:text-white"
                 onClick={() => window.open('https://sfdeputysheriff.com', '_blank')}
               >
                 Learn About Careers

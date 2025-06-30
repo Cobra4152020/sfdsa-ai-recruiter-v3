@@ -110,7 +110,7 @@ export function VolunteerApprovalList({
         <div
           key={volunteer.id}
           id={`volunteer-${volunteer.id}`}
-          className="border rounded-lg p-4 bg-gray-50"
+          className="border rounded-lg p-4 bg-muted"
         >
           <div className="flex justify-between items-start">
             <div>

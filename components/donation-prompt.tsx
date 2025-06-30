@@ -69,11 +69,11 @@ export function DonationPrompt({
   return (
     <div className={`flex items-center gap-2 ${className}`}>
       <p className="text-sm text-gray-600">
-        <Coffee className="h-4 w-4 text-[#0A3C1F] inline-block mr-1" />
+        <Coffee className="h-4 w-4 text-primary inline-block mr-1" />
         If you appreciate my assistance, consider{" "}
         <Link
           href="/donate"
-          className="text-[#0A3C1F] font-medium hover:underline"
+          className="text-primary font-medium hover:underline"
         >
           buying me a coffee!
         </Link>

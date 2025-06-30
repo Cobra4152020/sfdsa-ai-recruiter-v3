@@ -46,7 +46,7 @@ export function NotificationItem({ notification }: NotificationItemProps) {
   const NotificationContent = () => (
     <div
       className={cn(
-        "flex items-start p-4 hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors",
+        "flex items-start p-4 hover:bg-accent/10 dark:hover:bg-gray-700/50 transition-colors",
         !notification.is_read && "bg-blue-50/50 dark:bg-blue-900/10",
       )}
       onMouseEnter={() => setIsHovering(true)}

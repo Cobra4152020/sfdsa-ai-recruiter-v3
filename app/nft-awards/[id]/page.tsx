@@ -8,7 +8,8 @@ export async function generateStaticParams() {
   }));
 }
 
-export default function NFTAwardPage({ params }: { params: { id: string } }) {
-  const award = NFT_AWARD_TIERS.find((award) => award.id === params.id);
+export default async function NFTAwardPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const award = NFT_AWARD_TIERS.find((award) => award.id === id);
   return <NFTAwardPageClient award={award} />;
 }

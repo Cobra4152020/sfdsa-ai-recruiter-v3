@@ -21,7 +21,7 @@ export function DashboardStats({
           <CardTitle className="text-sm font-medium">
             Total Challenges
           </CardTitle>
-          <Award className="h-4 w-4 text-[#0A3C1F]" />
+          <Award className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{challengesCount}</div>
@@ -36,7 +36,7 @@ export function DashboardStats({
           <CardTitle className="text-sm font-medium">
             Total Applicants
           </CardTitle>
-          <Users className="h-4 w-4 text-[#0A3C1F]" />
+          <Users className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{applicantsCount}</div>
@@ -47,7 +47,7 @@ export function DashboardStats({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Badge Shares</CardTitle>
-          <Share2 className="h-4 w-4 text-[#0A3C1F]" />
+          <Share2 className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{badgeSharesCount}</div>
@@ -58,7 +58,7 @@ export function DashboardStats({
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Daily Briefings</CardTitle>
-          <FileText className="h-4 w-4 text-[#0A3C1F]" />
+          <FileText className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{briefingsCount}</div>

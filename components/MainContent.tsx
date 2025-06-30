@@ -94,7 +94,7 @@ export default function MainContent({
           <div className="bg-[#FFD700]/20 p-3 rounded-lg border border-[#FFD700] mb-4">
             <Link
               href="/trivia"
-              className="flex items-center justify-between text-[#0A3C1F] hover:underline"
+              className="flex items-center justify-between text-primary hover:underline"
             >
               <span className="font-medium">Play SF Trivia with Sgt. Ken!</span>
               <span className="flex items-center">
@@ -113,7 +113,7 @@ export default function MainContent({
                 className={`max-w-[80%] rounded-xl p-3 ${
                   message.role === "assistant"
                     ? "bg-[#F0F0F0] dark:bg-[#2A2A2A] text-black dark:text-white"
-                    : "bg-[#0A3C1F] text-white"
+                    : "bg-primary text-white"
                 }`}
               >
                 {message.role === "assistant" && index === messages.length - 1
@@ -126,7 +126,7 @@ export default function MainContent({
                         key={i}
                         onClick={() => handleQuickReply(reply)}
                         disabled={isLoading}
-                        className="text-xs px-3 py-1 rounded-full bg-[#FFD700] text-[#0A3C1F] font-medium hover:bg-[#FFD700]/80 transition-colors"
+                        className="text-xs px-3 py-1 rounded-full bg-[#FFD700] text-primary font-medium hover:bg-[#FFD700]/80 transition-colors"
                       >
                         {reply}
                       </button>
@@ -143,15 +143,15 @@ export default function MainContent({
                 <div className="flex items-center">
                   <div className="flex space-x-1">
                     <div
-                      className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+                      className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
                       style={{ animationDelay: "0ms" }}
                     ></div>
                     <div
-                      className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+                      className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
                       style={{ animationDelay: "150ms" }}
                     ></div>
                     <div
-                      className="w-2 h-2 bg-[#0A3C1F]/60 rounded-full animate-bounce"
+                      className="w-2 h-2 bg-primary/60 rounded-full animate-bounce"
                       style={{ animationDelay: "300ms" }}
                     ></div>
                   </div>
@@ -173,13 +173,13 @@ export default function MainContent({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type your message..."
-            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0A3C1F] dark:bg-[#2A2A2A] dark:text-white dark:border-gray-600"
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary dark:bg-[#2A2A2A] dark:text-white dark:border-gray-600"
             disabled={isLoading}
           />
           <Button
             type="submit"
             disabled={isLoading || !input.trim()}
-            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white p-2 rounded-lg"
+            className="bg-primary hover:bg-primary/90 text-white p-2 rounded-lg"
           >
             <Send className="h-5 w-5" />
           </Button>

@@ -125,7 +125,7 @@ export function NotificationToast({
             <div className="mt-3">
               <a
                 href={actionUrl}
-                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90"
+                className="inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md bg-primary text-white hover:bg-primary/90"
               >
                 {actionLabel}
               </a>

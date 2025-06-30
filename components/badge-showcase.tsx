@@ -80,11 +80,48 @@ export function BadgeShowcase() {
     "full",
   ];
 
+  const triviaBadgeTypes: string[] = [
+    "trivia-titan",
+    "sf-baseball-participant",
+    "sf-baseball-enthusiast", 
+    "sf-baseball-master",
+    "sf-basketball-participant",
+    "sf-basketball-enthusiast",
+    "sf-basketball-master",
+    "sf-districts-participant",
+    "sf-districts-enthusiast",
+    "sf-districts-master",
+    "sf-football-participant",
+    "sf-football-enthusiast",
+    "sf-football-master",
+    "sf-day-trips-participant",
+    "sf-day-trips-enthusiast",
+    "sf-day-trips-master",
+    "sf-tourist-spots-participant",
+    "sf-tourist-spots-enthusiast",
+    "sf-tourist-spots-master",
+  ];
+
+  const specialBadgeTypes: string[] = [
+    "point-pioneer",
+    "recruit-referrer",
+    "document-master",
+    "community-event",
+    "holiday-hero",
+    "survey-superstar",
+  ];
+
   const filteredBadges = badges.filter((badge) => {
     if (category === "all") return true;
     if (category === "application")
       return applicationBadgeTypes.includes(badge.badge_type);
-    return !applicationBadgeTypes.includes(badge.badge_type);
+    if (category === "trivia")
+      return triviaBadgeTypes.includes(badge.badge_type);
+    if (category === "special")
+      return specialBadgeTypes.includes(badge.badge_type);
+    if (category === "participation")
+      return ["frequent-user", "resource-downloader", "hard-charger"].includes(badge.badge_type);
+    return false;
   });
 
   if (error && badges.length === 0) {
@@ -132,6 +169,12 @@ export function BadgeShowcase() {
               </TabsTrigger>
               <TabsTrigger value="participation" className="text-white data-[state=active]:bg-white data-[state=active]:text-primary">
                 Participation
+              </TabsTrigger>
+              <TabsTrigger value="trivia" className="text-white data-[state=active]:bg-white data-[state=active]:text-primary">
+                Trivia
+              </TabsTrigger>
+              <TabsTrigger value="special" className="text-white data-[state=active]:bg-white data-[state=active]:text-primary">
+                Special
               </TabsTrigger>
             </TabsList>
           </Tabs>
@@ -275,6 +318,86 @@ export function BadgeShowcase() {
                         badge.badge_type,
                       ),
                     )
+                    .map((badge) => (
+                      <TooltipProvider key={badge.id}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex flex-col items-center text-center p-4 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
+                              <div className="relative">
+                                <AchievementBadge
+                                  type={badge.badge_type}
+                                  size="lg"
+                                  earned={false}
+                                />
+                              </div>
+                              <h4 className="font-medium mt-3 text-sm text-gray-900 dark:text-gray-100">
+                                {badge.name}
+                              </h4>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p className="font-medium">{badge.name}</p>
+                            <p className="text-sm mt-1">{badge.description}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {(category === "all" || category === "trivia") && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold mb-3 text-primary dark:text-accent">
+                  🧠 Trivia & Game Badges
+                </h3>
+                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                  Test your knowledge of San Francisco and earn these special trivia badges.
+                  Each game series offers participant, enthusiast, and master level achievements.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 mt-4">
+                  {filteredBadges
+                    .filter((badge) => triviaBadgeTypes.includes(badge.badge_type))
+                    .map((badge) => (
+                      <TooltipProvider key={badge.id}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="flex flex-col items-center text-center p-4 rounded-lg hover:bg-primary/5 transition-colors cursor-pointer">
+                              <div className="relative">
+                                <AchievementBadge
+                                  type={badge.badge_type}
+                                  size="lg"
+                                  earned={false}
+                                />
+                              </div>
+                              <h4 className="font-medium mt-3 text-sm text-gray-900 dark:text-gray-100">
+                                {badge.name}
+                              </h4>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs">
+                            <p className="font-medium">{badge.name}</p>
+                            <p className="text-sm mt-1">{badge.description}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    ))}
+                </div>
+              </div>
+            )}
+
+            {(category === "all" || category === "special") && (
+              <div className="mb-8">
+                <h3 className="text-xl font-semibold mb-3 text-primary dark:text-accent">
+                  ⭐ Special Achievement Badges
+                </h3>
+                <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+                  These special badges recognize exceptional achievements and milestones
+                  in your recruitment journey. Earn them through dedication and community engagement.
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-6 mt-4">
+                  {filteredBadges
+                    .filter((badge) => specialBadgeTypes.includes(badge.badge_type))
                     .map((badge) => (
                       <TooltipProvider key={badge.id}>
                         <Tooltip>

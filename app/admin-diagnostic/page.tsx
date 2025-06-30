@@ -165,7 +165,7 @@ export default function AdminDiagnosticPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-[#0A3C1F] mb-6 text-center">
+      <h1 className="text-3xl font-bold text-primary mb-6 text-center">
         Admin Account Diagnostic
       </h1>
 
@@ -201,7 +201,7 @@ export default function AdminDiagnosticPage() {
         <CardFooter>
           <Button
             onClick={runDiagnostic}
-            className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            className="w-full bg-primary hover:bg-primary/90"
             disabled={isLoading}
           >
             {isLoading ? (

@@ -15,7 +15,9 @@ export async function GET() {
         `
         id,
         name,
-        avatar_url,
+        user_profiles (
+          avatar_url
+        ),
         trivia_attempts:trivia_attempts(
           id,
           score,
@@ -59,7 +61,7 @@ export async function GET() {
       return {
         user_id: user.id,
         name: user.name,
-        avatar_url: user.avatar_url,
+        avatar_url: user.user_profiles?.[0]?.avatar_url || null,
         attempts_count: attemptsCount,
         total_correct_answers: totalCorrectAnswers,
         total_questions: totalQuestions,

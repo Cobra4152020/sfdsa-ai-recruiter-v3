@@ -55,8 +55,8 @@ export function DonorRecognitionWall() {
   async function fetchDonors() {
     setIsLoading(true);
     
-    // Check if we're in a static build - skip API calls
-    const isStaticBuild = process.env.NEXT_PUBLIC_STATIC_BUILD === "true";
+    // Check if we're in a static build AND production - skip API calls
+    const isStaticBuild = process.env.NEXT_PUBLIC_STATIC_BUILD === "true" && process.env.NODE_ENV === "production";
     
     if (isStaticBuild) {
       // Use fallback data for static builds
@@ -152,7 +152,7 @@ export function DonorRecognitionWall() {
     <div className="space-y-8">
       {/* Header with enhanced design */}
       <div className="text-center mb-10">
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
+        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6">
           🏆 Donor Recognition Wall
         </h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
@@ -161,22 +161,22 @@ export function DonorRecognitionWall() {
         </p>
 
         {/* Stats Dashboard */}
-        <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+        <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-6 mb-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-3xl font-bold text-[#0A3C1F]">{totalDonors}</div>
+              <div className="text-3xl font-bold text-primary">{totalDonors}</div>
               <div className="text-sm text-gray-600 font-medium">Total Donors</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-[#0A3C1F]">${totalAmount.toLocaleString()}</div>
+              <div className="text-3xl font-bold text-primary">${totalAmount.toLocaleString()}</div>
               <div className="text-sm text-gray-600 font-medium">Total Donations</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-[#0A3C1F]">{recurringDonors}</div>
+              <div className="text-3xl font-bold text-primary">{recurringDonors}</div>
               <div className="text-sm text-gray-600 font-medium">Recurring Donors</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-[#0A3C1F]">${Math.round(totalAmount / (totalDonors || 1))}</div>
+              <div className="text-3xl font-bold text-primary">${Math.round(totalAmount / (totalDonors || 1))}</div>
               <div className="text-sm text-gray-600 font-medium">Average Gift</div>
             </div>
           </div>
@@ -240,7 +240,7 @@ export function DonorRecognitionWall() {
       </div>
 
       {showFilters && (
-        <div className="bg-gray-50 p-4 rounded-lg border space-y-4">
+        <div className="bg-muted p-4 rounded-lg border space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <Label htmlFor="min-amount">Minimum Amount</Label>
@@ -349,7 +349,7 @@ export function DonorRecognitionWall() {
             )}
 
             {filteredDonors.length === 0 && (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <div className="text-center py-12 bg-muted rounded-lg">
                 <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-500">
                   No donors found
@@ -372,7 +372,7 @@ export function DonorRecognitionWall() {
                 showTitle={false}
               />
             ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <div className="text-center py-12 bg-muted rounded-lg">
                 <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-500">
                   No benefactors found
@@ -395,7 +395,7 @@ export function DonorRecognitionWall() {
                 showTitle={false}
               />
             ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <div className="text-center py-12 bg-muted rounded-lg">
                 <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-500">
                   No champions found
@@ -418,7 +418,7 @@ export function DonorRecognitionWall() {
                 showTitle={false}
               />
             ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <div className="text-center py-12 bg-muted rounded-lg">
                 <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-500">
                   No supporters found
@@ -441,7 +441,7 @@ export function DonorRecognitionWall() {
                 showTitle={false}
               />
             ) : (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <div className="text-center py-12 bg-muted rounded-lg">
                 <Heart className="h-12 w-12 text-gray-300 mx-auto mb-4" />
                 <h3 className="text-xl font-semibold text-gray-500">
                   No friends found
@@ -455,8 +455,8 @@ export function DonorRecognitionWall() {
         </Tabs>
       )}
 
-      <div className="bg-[#0A3C1F]/5 p-6 rounded-lg mt-12">
-        <h2 className="text-xl font-bold text-[#0A3C1F] mb-4">
+      <div className="bg-primary/5 p-6 rounded-lg mt-12">
+        <h2 className="text-xl font-bold text-primary mb-4">
           Become a Recognized Donor
         </h2>
         <p className="text-gray-600 mb-4">
@@ -466,7 +466,7 @@ export function DonorRecognitionWall() {
         </p>
         <div className="flex justify-center mt-6">
           <Button
-            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            className="bg-primary hover:bg-primary/90"
             size="lg"
             asChild
           >
@@ -482,7 +482,7 @@ export function DonorRecognitionWall() {
           (or removed), please contact us at{" "}
           <a
             href="mailto:donations@protectingsanfrancisco.com"
-            className="text-[#0A3C1F] hover:underline"
+            className="text-primary hover:underline"
           >
             donations@protectingsanfrancisco.com
           </a>

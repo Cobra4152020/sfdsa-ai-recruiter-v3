@@ -159,7 +159,7 @@ export default function SettingsPage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back to Dashboard
         </Button>
-        <h1 className="text-3xl font-bold text-[#0A3C1F]">Account Settings</h1>
+        <h1 className="text-3xl font-bold text-primary">Account Settings</h1>
       </div>
 
       <Tabs defaultValue="profile" className="max-w-3xl mx-auto">

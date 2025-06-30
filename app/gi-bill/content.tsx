@@ -115,7 +115,7 @@ export default function GIBillContent() {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6">
               🇺🇸 G.I. Bill Benefits
             </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
@@ -124,22 +124,22 @@ export default function GIBillContent() {
             </p>
 
             {/* Quick Stats */}
-            <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+            <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-6 mb-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">100%</div>
+                  <div className="text-3xl font-bold text-primary">100%</div>
                   <div className="text-sm text-gray-600 font-medium">Tuition Coverage</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">$2,000+</div>
+                  <div className="text-3xl font-bold text-primary">$2,000+</div>
                   <div className="text-sm text-gray-600 font-medium">Monthly Housing</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">$1,000</div>
+                  <div className="text-3xl font-bold text-primary">$1,000</div>
                   <div className="text-sm text-gray-600 font-medium">Books & Supplies</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">24/7</div>
+                  <div className="text-3xl font-bold text-primary">24/7</div>
                   <div className="text-sm text-gray-600 font-medium">Veteran Support</div>
                 </div>
               </div>
@@ -168,7 +168,7 @@ export default function GIBillContent() {
                       <p className="text-white/80">
                         Continue your service to the community in a new role
                       </p>
-                      <Badge className="mt-2 bg-[#FFD700] text-[#0A3C1F]">
+                      <Badge className="mt-2 bg-[#FFD700] text-primary">
                         Veteran Preferred
                       </Badge>
                     </div>
@@ -334,7 +334,7 @@ export default function GIBillContent() {
               </Tabs>
 
               {/* Call to Action */}
-              <Card className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white shadow-lg">
+              <Card className="bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg">
                 <CardContent className="p-8 text-center">
                   <h2 className="text-3xl font-bold mb-3">
                     Ready to Serve Again?
@@ -345,7 +345,7 @@ export default function GIBillContent() {
                   </p>
                   <div className="flex flex-col sm:flex-row justify-center gap-4">
                     <Link href="/apply">
-                      <Button size="lg" className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-semibold">
+                      <Button size="lg" className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-primary font-semibold">
                         Apply Now
                       </Button>
                     </Link>

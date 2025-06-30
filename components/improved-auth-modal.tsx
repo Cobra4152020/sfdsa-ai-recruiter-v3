@@ -246,7 +246,7 @@ export function ImprovedAuthModal() {
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
       <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden">
         {/* Header with gradient background */}
-        <div className="bg-gradient-to-r from-[#0A3C1F] to-[#1B5E20] text-white p-6">
+        <div className="bg-gradient-to-r from-primary to-[#1B5E20] text-white p-6">
           <DialogHeader className="flex flex-row items-center justify-between space-y-0">
             <div>
               <DialogTitle className="text-2xl font-bold">
@@ -326,7 +326,7 @@ export function ImprovedAuthModal() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 h-11"
+                  className="w-full bg-primary hover:bg-primary/90 h-11"
                   disabled={isLoading}
                 >
                   {isLoading ? "Signing In..." : "Sign In"}
@@ -335,7 +335,7 @@ export function ImprovedAuthModal() {
                 <div className="text-center">
                   <button
                     type="button"
-                    className="text-sm text-[#0A3C1F] hover:underline"
+                    className="text-sm text-primary hover:underline"
                     onClick={() => setActiveTab("signup")}
                   >
                     Don't have an account? <span className="font-medium">Sign up free</span>
@@ -471,7 +471,7 @@ export function ImprovedAuthModal() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 h-11"
+                  className="w-full bg-primary hover:bg-primary/90 h-11"
                   disabled={isLoading}
                 >
                   {isLoading ? "Creating Account..." : "Create Account & Earn 50 Points"}
@@ -480,7 +480,7 @@ export function ImprovedAuthModal() {
                 <div className="text-center">
                   <button
                     type="button"
-                    className="text-sm text-[#0A3C1F] hover:underline"
+                    className="text-sm text-primary hover:underline"
                     onClick={() => setActiveTab("signin")}
                   >
                     Already have an account? <span className="font-medium">Sign in</span>

@@ -71,8 +71,8 @@ export async function GET() {
         title: `Sgt. Ken's Daily Briefing - ${data.theme}`,
         content: `
           <div class="space-y-6">
-            <div class="bg-gradient-to-r from-[#0A3C1F]/10 to-[#0A3C1F]/5 border-l-4 border-[#0A3C1F] p-4 rounded-r-lg">
-              <h3 class="text-xl font-bold text-[#0A3C1F] mb-3">📣 Sgt. Ken Says...</h3>
+            <div class="bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary p-4 rounded-r-lg">
+              <h3 class="text-xl font-bold text-primary mb-3">📣 Sgt. Ken Says...</h3>
               <p class="text-gray-800 leading-relaxed">${data.sgt_ken_take || 'Stay focused, stay safe, and remember why we serve our community.'}</p>
             </div>
 
@@ -97,7 +97,7 @@ export async function GET() {
               <p class="text-yellow-700 font-medium">${data.call_to_action || 'Justice needs boots on the ground. Yours. Become a Deputy → https://www.sfdeputysheriff.com/apply'}</p>
             </div>
 
-            <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <div class="bg-muted border border-gray-200 rounded-lg p-4">
               <h4 class="text-lg font-semibold text-gray-800 mb-3">📋 Daily Reminders</h4>
               <ul class="space-y-2 text-gray-700">
                 <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> Carry this inspiration with you throughout your shift</li>
@@ -162,8 +162,8 @@ export async function GET() {
       title: `Sgt. Ken's Daily Briefing - ${selectedBriefing.theme}`,
       content: `
         <div class="space-y-6">
-          <div class="bg-gradient-to-r from-[#0A3C1F]/10 to-[#0A3C1F]/5 border-l-4 border-[#0A3C1F] p-4 rounded-r-lg">
-            <h3 class="text-xl font-bold text-[#0A3C1F] mb-3">📣 Sgt. Ken Says...</h3>
+          <div class="bg-gradient-to-r from-primary/10 to-primary/5 border-l-4 border-primary p-4 rounded-r-lg">
+            <h3 class="text-xl font-bold text-primary mb-3">📣 Sgt. Ken Says...</h3>
             <p class="text-gray-800 leading-relaxed">${selectedBriefing.sgt_ken_take || 'Stay focused, stay safe, and remember why we serve our community.'}</p>
           </div>
 
@@ -188,7 +188,7 @@ export async function GET() {
             <p class="text-yellow-700 font-medium">${selectedBriefing.call_to_action || 'Justice needs boots on the ground. Yours. Become a Deputy → https://www.sfdeputysheriff.com/apply'}</p>
           </div>
 
-          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+          <div class="bg-muted border border-gray-200 rounded-lg p-4">
             <h4 class="text-lg font-semibold text-gray-800 mb-3">📋 Daily Reminders</h4>
             <ul class="space-y-2 text-gray-700">
               <li class="flex items-start"><span class="text-green-500 mr-2">✓</span> Carry this inspiration with you throughout your shift</li>

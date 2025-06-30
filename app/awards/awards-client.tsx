@@ -30,7 +30,7 @@ class ErrorBoundary extends React.Component<
       return (
         <div className="max-w-7xl mx-auto px-4 pt-8 pb-8">
           <div className="text-center mt-8">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+            <h1 className="text-4xl font-bold text-primary mb-4">
               Top Recruit Awards
             </h1>
             <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
@@ -39,7 +39,7 @@ class ErrorBoundary extends React.Component<
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="mt-4 px-4 py-2 bg-[#0A3C1F] text-white rounded hover:bg-[#0A3C1F]/90 transition-colors"
+                className="mt-4 px-4 py-2 bg-primary text-white rounded hover:bg-primary/90 transition-colors"
               >
                 Refresh Page
               </button>
@@ -79,10 +79,10 @@ export default function AwardsClient() {
       <main className="container mx-auto px-4 pt-8 pb-8">
         <div className="mb-16 text-center mt-12">
           <div className="relative">
-            <h1 className="text-5xl md:text-6xl font-bold text-[#0A3C1F] mb-6 relative z-10">
+            <h1 className="text-5xl md:text-6xl font-bold text-primary mb-6 relative z-10">
               Top Recruit Awards
             </h1>
-            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-[#0A3C1F] via-[#FFD700] to-[#0A3C1F] rounded-full"></div>
+            <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-primary via-[#FFD700] to-primary rounded-full"></div>
           </div>
           <p className="text-xl text-gray-600 mx-auto leading-relaxed mt-8">
             Maximize your impact! Share, refer, and compete to earn points, unlock exclusive badges, and help us find the best candidates.
@@ -95,7 +95,7 @@ export default function AwardsClient() {
 
         <div className="mb-16">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-[#0A3C1F] mb-4">
+            <h2 className="text-3xl font-bold text-primary mb-4">
               🚀 Go Viral & Earn Big
             </h2>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -106,7 +106,7 @@ export default function AwardsClient() {
         </div>
 
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-[#0A3C1F] text-center mb-8">
+          <h2 className="text-3xl font-bold text-primary text-center mb-8">
             Traditional Sharing & Referrals
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -122,7 +122,7 @@ export default function AwardsClient() {
 
         <div className="mt-20">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#0A3C1F] mb-4">
+            <h2 className="text-3xl font-bold text-primary mb-4">
               Live Community Leaderboard
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto mb-6">

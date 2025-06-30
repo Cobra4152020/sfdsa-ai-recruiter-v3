@@ -26,21 +26,21 @@ export default function GamesPage() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <Link href="/daily-briefing" className="group">
             <Card className="overflow-hidden transition-all duration-300 hover:shadow-lg">
-              <CardHeader className="bg-[#0A3C1F] dark:bg-[#121212] text-white p-4">
+              <CardHeader className="bg-primary dark:bg-[#121212] text-white p-4">
                 <CardTitle className="text-xl text-[#FFD700]">
                   Sgt. Ken&apos;s Daily Briefing
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="aspect-video bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
-                  <div className="absolute inset-0 flex items-center justify-center bg-[#0A3C1F]/10 dark:bg-[#FFD700]/10">
-                    <Calendar className="h-16 w-16 text-[#0A3C1F] dark:text-[#FFD700] opacity-50 group-hover:scale-110 transition-transform duration-300" />
+                <div className="aspect-video bg-muted relative overflow-hidden">
+                  <div className="absolute inset-0 flex items-center justify-center bg-primary/10 dark:bg-[#FFD700]/10">
+                    <Calendar className="h-16 w-16 text-primary dark:text-[#FFD700] opacity-50 group-hover:scale-110 transition-transform duration-300" />
                   </div>
                 </div>
               </CardContent>
               <CardFooter className="p-4 bg-white dark:bg-gray-800">
                 <div>
-                  <h3 className="font-medium text-[#0A3C1F] dark:text-[#FFD700] mb-1">
+                  <h3 className="font-medium text-primary dark:text-[#FFD700] mb-1">
                     Daily Motivation & Points
                   </h3>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -64,7 +64,7 @@ export default function GamesPage() {
               <CardFooter className="mt-auto pt-4">
                 <Button
                   asChild
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                  className="w-full bg-primary hover:bg-primary/90 text-white"
                 >
                   <Link href={game.href}>
                     Play Now
@@ -76,7 +76,7 @@ export default function GamesPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border border-gray-200">
+        <div className="text-center py-12 bg-muted rounded-lg border border-gray-200">
           <h3 className="text-xl font-semibold mb-2">New Games Coming Soon!</h3>
           <p className="text-gray-600 mb-6">
             We&apos;re developing exciting new games to help you earn
@@ -86,7 +86,7 @@ export default function GamesPage() {
           </p>
           <Button
             asChild
-            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+            className="bg-primary hover:bg-primary/90 text-white"
           >
             <Link href="/trivia">
               Play Trivia
@@ -96,7 +96,7 @@ export default function GamesPage() {
         </div>
       )}
 
-      <div className="mt-8 p-4 bg-[#0A3C1F]/5 rounded-lg border border-[#0A3C1F]/20">
+      <div className="mt-8 p-4 bg-primary/5 rounded-lg border border-primary/20">
         <h3 className="text-lg font-semibold mb-2">Earning Points</h3>
         <p className="mb-4">
           Playing games is a great way to earn participation points and increase

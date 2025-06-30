@@ -216,7 +216,7 @@ export function RealTimeLeaderboard({
                   <p
                     className={cn(
                       "font-medium",
-                      entry.isCurrentUser && "text-[#0A3C1F]",
+                      entry.isCurrentUser && "text-primary",
                     )}
                   >
                     {entry.name} {entry.isCurrentUser && "(You)"}
@@ -234,7 +234,7 @@ export function RealTimeLeaderboard({
               <div className="flex items-center gap-2">
                 <Badge
                   variant="outline"
-                  className="bg-[#F0F7F2] text-[#0A3C1F] border-[#0A3C1F]"
+                  className="bg-[#F0F7F2] text-primary border-primary"
                 >
                   {entry.points} pts
                 </Badge>

@@ -16,7 +16,7 @@ export default function VolunteerLoginPage() {
           <CardHeader className="space-y-1">
             <div className="flex items-center justify-center mb-4">
               <Shield className="h-10 w-10 text-[#FFD700] mr-2" />
-              <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+              <CardTitle className="text-2xl font-bold text-center text-primary">
                 Volunteer Recruiter Login
               </CardTitle>
             </div>
@@ -29,7 +29,7 @@ export default function VolunteerLoginPage() {
           </CardContent>
         </Card>
 
-        <div className="mt-8 bg-gray-50 rounded-lg p-4 border border-gray-200">
+        <div className="mt-8 bg-muted rounded-lg p-4 border border-gray-200">
           <h3 className="text-sm font-medium text-gray-700 mb-2">
             Why become a Volunteer Recruiter?
           </h3>

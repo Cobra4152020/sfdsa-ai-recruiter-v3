@@ -51,7 +51,7 @@ export default function LaunchpadContent() {
   return (
     <div className="mx-auto px-4 py-8 max-w-3xl">
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2">
+        <h1 className="text-3xl font-bold text-primary mb-2">
           Deputy Launchpad
         </h1>
         <p className="text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
@@ -115,8 +115,8 @@ export default function LaunchpadContent() {
         </TabsContent>
       </Tabs>
 
-      <Card className="mt-12 border-[#0A3C1F]/20">
-        <CardHeader className="bg-[#0A3C1F] text-white">
+      <Card className="mt-12 border-primary/20">
+        <CardHeader className="bg-primary text-white">
           <CardTitle className="flex items-center">
             <Rocket className="h-5 w-5 mr-2" /> Launch Your Career
           </CardTitle>
@@ -136,7 +136,7 @@ export default function LaunchpadContent() {
                 with our platform to earn your first points and badges.
               </p>
               <Link href="/awards">
-                <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+                <Button className="bg-primary hover:bg-primary/90">
                   View Leaderboard
                 </Button>
               </Link>
@@ -152,7 +152,7 @@ export default function LaunchpadContent() {
               <Link href="/profile">
                 <Button
                   variant="outline"
-                  className="border-[#0A3C1F] text-[#0A3C1F]"
+                  className="border-primary text-primary"
                 >
                   Go to Profile
                 </Button>
@@ -212,9 +212,9 @@ export default function LaunchpadContent() {
             </Button>
           </div>
 
-          <div className="bg-[#0A3C1F]/10 border border-[#0A3C1F]/20 rounded-lg p-4 mt-4">
-            <h4 className="font-medium text-[#0A3C1F] flex items-center">
-              <Award className="mr-2 h-4 w-4 text-[#0A3C1F]" />
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mt-4">
+            <h4 className="font-medium text-primary flex items-center">
+              <Award className="mr-2 h-4 w-4 text-primary" />
               Referral Tip
             </h4>
             <p className="text-sm mt-1">
@@ -265,10 +265,10 @@ function PointsSystemExplainer() {
   ];
 
   return (
-    <Card className="border-[#0A3C1F]/20">
+    <Card className="border-primary/20">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Trophy className="mr-2 text-[#0A3C1F]" /> How the Points System Works
+          <Trophy className="mr-2 text-primary" /> How the Points System Works
         </CardTitle>
         <CardDescription>
           Earn points for engaging with our platform. The more you explore, the
@@ -278,8 +278,8 @@ function PointsSystemExplainer() {
       <CardContent>
         <div className="space-y-4">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-[#0A3C1F]/10 rounded-full">
-              <CheckCircle className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="p-3 bg-primary/10 rounded-full">
+              <CheckCircle className="h-6 w-6 text-primary" />
             </div>
             <div>
               <h4 className="font-semibold">Complete Your Profile</h4>
@@ -290,8 +290,8 @@ function PointsSystemExplainer() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-[#0A3C1F]/10 rounded-full">
-              <FileText className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="p-3 bg-primary/10 rounded-full">
+              <FileText className="h-6 w-6 text-primary" />
             </div>
             <div>
               <h4 className="font-semibold">Read Informational Pages</h4>
@@ -302,8 +302,8 @@ function PointsSystemExplainer() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-[#0A3C1F]/10 rounded-full">
-              <Zap className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="p-3 bg-primary/10 rounded-full">
+              <Zap className="h-6 w-6 text-primary" />
             </div>
             <div>
               <h4 className="font-semibold">Play SF Trivia</h4>
@@ -314,8 +314,8 @@ function PointsSystemExplainer() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-[#0A3C1F]/10 rounded-full">
-              <Users className="h-6 w-6 text-[#0A3C1F]" />
+            <div className="p-3 bg-primary/10 rounded-full">
+              <Users className="h-6 w-6 text-primary" />
             </div>
             <div>
               <h4 className="font-semibold">Refer a Friend</h4>
@@ -360,10 +360,10 @@ function ReferralRewardsExplainer({
   setShowShareDialog: (show: boolean) => void;
 }) {
   return (
-    <Card className="border-[#0A3C1F]/20">
+    <Card className="border-primary/20">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Users className="mr-2 text-[#0A3C1F]" /> Refer a Recruit, Earn
+          <Users className="mr-2 text-primary" /> Refer a Recruit, Earn
           Rewards
         </CardTitle>
         <CardDescription>
@@ -372,15 +372,15 @@ function ReferralRewardsExplainer({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-center bg-gray-50 dark:bg-gray-800/50 p-6 rounded-lg">
-          <h3 className="text-2xl font-bold text-[#0A3C1F]">
+        <div className="text-center bg-muted/50 p-6 rounded-lg">
+          <h3 className="text-2xl font-bold text-primary">
             Earn 500 Points
           </h3>
           <p className="text-gray-600 dark:text-gray-300 mt-1">
             For every friend who signs up using your unique referral link.
           </p>
           <Button
-            className="mt-4 bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+            className="mt-4 bg-primary hover:bg-primary/90"
             onClick={() => setShowShareDialog(true)}
           >
             <Share2 className="mr-2 h-4 w-4" />
@@ -406,11 +406,11 @@ function ReferralRewardsExplainer({
           </ol>
         </div>
 
-        <div className="mt-6 bg-[#0A3C1F]/10 p-4 rounded-lg">
-          <h4 className="font-semibold text-[#0A3C1F] flex items-center">
+        <div className="mt-6 bg-primary/10 p-4 rounded-lg">
+          <h4 className="font-semibold text-primary flex items-center">
             <Gift className="mr-2 h-4 w-4" /> Unlimited Referrals
           </h4>
-          <p className="text-sm text-[#0A3C1F]/80 mt-1">
+          <p className="text-sm text-primary/80 mt-1">
             There's no limit to how many people you can refer or how many
             points you can earn!
           </p>
@@ -445,8 +445,8 @@ function BadgesExplainer() {
           color: "bg-indigo-100 text-indigo-800",
         },
         {
-          name: " lorem-1",
-          description: "Read 5 informational pages.",
+          name: "frequent-user",
+          description: "Visit the platform regularly.",
           icon: "📚",
           color: "bg-indigo-100 text-indigo-800",
         },
@@ -469,14 +469,14 @@ function BadgesExplainer() {
           color: "bg-pink-100 text-pink-800",
         },
         {
-          name: "Trivia Titan",
+          name: "trivia-titan",
           description: "Score 100% on a trivia game.",
           icon: "🧠",
           color: "bg-purple-100 text-purple-800",
         },
         {
-          name: " lorem-2",
-          description: "Score 100% on a trivia game.",
+          name: "resource-downloader",
+          description: "Download study materials.",
           icon: "🧠",
           color: "bg-purple-100 text-purple-800",
         },
@@ -505,8 +505,8 @@ function BadgesExplainer() {
           color: "bg-orange-100 text-orange-800",
         },
         {
-          name: " lorem-3",
-          description: "Complete a user feedback survey.",
+          name: "hard-charger",
+          description: "Show exceptional dedication.",
           icon: "📝",
           color: "bg-orange-100 text-orange-800",
         },
@@ -515,10 +515,10 @@ function BadgesExplainer() {
   ];
 
   return (
-    <Card className="border-[#0A3C1F]/20">
+    <Card className="border-primary/20">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Award className="mr-2 text-[#0A3C1F]" /> Collectible Badges
+          <Award className="mr-2 text-primary" /> Collectible Badges
         </CardTitle>
         <CardDescription>
           Show off your progress and dedication by collecting unique badges.
@@ -533,7 +533,7 @@ function BadgesExplainer() {
             </p>
             <div className="flex flex-wrap gap-4">
               {category.badges.map((badge) => (
-                <AchievementBadge key={badge.name} badge={badge as BadgeType} />
+                <AchievementBadge key={badge.name} type={badge.name as BadgeType} earned={false} />
               ))}
             </div>
           </div>
@@ -546,7 +546,7 @@ function BadgesExplainer() {
           <Link href="/profile">
             <Button
               variant="outline"
-              className="border-[#0A3C1F] text-[#0A3C1F]"
+              className="border-primary text-primary"
             >
               Go to My Badges
             </Button>
@@ -598,7 +598,7 @@ function UnlockableContentExplainer() {
     <Card className="border-2 border-primary/20 shadow-lg transform transition-all hover:scale-[1.02] hover:shadow-2xl">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Lock className="mr-2 text-[#0A3C1F]" /> Unlockable Content
+          <Lock className="mr-2 text-primary" /> Unlockable Content
         </CardTitle>
         <CardDescription>
           Your points are keys to exclusive content and advantages.
@@ -644,10 +644,10 @@ function UnlockableContentExplainer() {
 
 function NFTRewardsExplainer() {
   return (
-    <Card className="border-[#0A3C1F]/20">
+    <Card className="border-primary/20">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Star className="mr-2 text-[#0A3C1F]" /> Digital Collectible (NFT)
+          <Star className="mr-2 text-primary" /> Digital Collectible (NFT)
           Rewards
         </CardTitle>
         <CardDescription>
@@ -692,7 +692,7 @@ function NFTRewardsExplainer() {
                 className="relative aspect-square rounded-lg overflow-hidden border-2 border-black/10 dark:border-white/10"
               >
                 <Image
-                  src={tier.image}
+                  src={tier.imageUrl}
                   alt={`${tier.name} NFT Badge`}
                   fill
                   className="object-cover"
@@ -724,10 +724,10 @@ function NFTRewardsExplainer() {
 
 function TriviaGameExplainer() {
   return (
-    <Card className="border-[#0A3C1F]/20">
+    <Card className="border-primary/20">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <MessageSquare className="mr-2 text-[#0A3C1F]" /> San Francisco Trivia
+          <MessageSquare className="mr-2 text-primary" /> San Francisco Trivia
           Challenge
         </CardTitle>
         <CardDescription>
@@ -735,7 +735,7 @@ function TriviaGameExplainer() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="relative p-6 rounded-lg bg-gray-50 dark:bg-gray-800/50 overflow-hidden">
+        <div className="relative p-6 rounded-lg bg-muted/50 overflow-hidden">
           <div className="relative z-10">
             <h4 className="text-lg font-semibold">
               Ready for the Challenge?
@@ -746,7 +746,7 @@ function TriviaGameExplainer() {
               to earn the "Trivia Titan" badge!
             </p>
             <Link href="/trivia">
-              <Button className="mt-4 bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+              <Button className="mt-4 bg-primary hover:bg-primary/90">
                 Play Trivia Now
               </Button>
             </Link>

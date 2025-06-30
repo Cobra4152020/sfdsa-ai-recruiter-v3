@@ -114,7 +114,7 @@ export function GameShare({
     <>
       <Button
         onClick={() => setShowShareDialog(true)}
-        className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+        className="bg-primary hover:bg-primary/90 text-white"
       >
         <Share2 className="mr-2 h-4 w-4" />
         Share Your Score

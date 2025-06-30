@@ -400,7 +400,7 @@ export default function CouldYouMakeTheCutPage() {
                     />
                   </div>
                   
-                  <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg mb-6">
+                  <div className="bg-muted p-4 rounded-lg mb-6">
                     <p className="text-lg leading-relaxed">
                       {currentScenario.scenario}
                     </p>

@@ -76,7 +76,7 @@ export function BadgeEarnedPopup({
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
           >
-            <div className="relative bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 p-4 text-white">
+            <div className="relative bg-gradient-to-r from-primary to-primary/80 p-4 text-white">
               <h2 className="text-xl font-bold text-center">Badge Earned!</h2>
               <Button
                 variant="ghost"
@@ -109,7 +109,7 @@ export function BadgeEarnedPopup({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
               >
-                <h3 className="text-lg font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+                <h3 className="text-lg font-bold text-primary dark:text-[#FFD700]">
                   {badgeName}
                 </h3>
                 <p className="mt-1 text-gray-600 dark:text-gray-300">
@@ -124,7 +124,7 @@ export function BadgeEarnedPopup({
                 transition={{ delay: 0.5 }}
               >
                 <Button
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                  className="bg-primary hover:bg-primary/90 text-white"
                   onClick={handleClose}
                 >
                   Continue

@@ -29,10 +29,10 @@ function ensureEnvVars() {
   // Create a .env.production file if it doesn't exist
   const envFile = path.join(process.cwd(), ".env.production");
   const envVars = [
-    "NEXT_PUBLIC_DISABLE_DATABASE_CHECKS=true",
     "DISABLE_DB_DURING_BUILD=true",
     "SKIP_DATABASE_VALIDATION=true",
-    "NEXT_PUBLIC_STATIC_BUILD=true",
+    // Removed NEXT_PUBLIC_STATIC_BUILD and NEXT_PUBLIC_DISABLE_DATABASE_CHECKS
+    // to prevent API routes from being blocked on Vercel
   ];
 
   fs.writeFileSync(envFile, envVars.join("\n") + "\n");

@@ -15,6 +15,8 @@ export async function POST(req: NextRequest) {
 
     console.log('🔍 Chat API called with message:', message?.substring(0, 50) + '...');
     console.log('🔍 OpenAI API Key available:', !!process.env.OPENAI_API_KEY);
+    console.log('🔍 Google API Key available:', !!process.env.GOOGLE_CUSTOM_SEARCH_API_KEY);
+    console.log('🔍 Google Search Engine ID available:', !!process.env.GOOGLE_CUSTOM_SEARCH_ENGINE_ID);
     console.log('🔍 Environment:', process.env.NODE_ENV);
 
     if (!message) {
@@ -24,15 +26,45 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Fetch user information for personalized responses
+    let userName = null;
+    if (userId) {
+      try {
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+        
+        if (supabaseUrl && supabaseKey) {
+          const supabase = createSupabaseClient(supabaseUrl, supabaseKey);
+          const { data: userData, error: userError } = await supabase
+            .from("users")
+            .select("name, email")
+            .eq("id", userId)
+            .single();
+            
+          if (!userError && userData) {
+            userName = userData.name || userData.email?.split('@')[0] || null;
+            console.log('👤 User name found:', userName);
+          }
+        }
+      } catch (userFetchError) {
+        console.error("Error fetching user data:", userFetchError);
+        // Continue without user name
+      }
+    }
+
     let responseText: string;
     let actualSearchUsed = false;
 
     // Try enhanced OpenAI service first
     try {
       console.log('🤖 Attempting OpenAI API call...');
-      const result = await generateChatResponse(message, chatHistory || []);
+      const result = await generateChatResponse(message, chatHistory || [], userName);
       responseText = result.response;
       actualSearchUsed = result.searchUsed || false;
+      
+      console.log('📊 OpenAI Result - Success:', result.success);
+      console.log('📊 OpenAI Result - Search Used:', result.searchUsed);
+      console.log('📊 OpenAI Result - Error:' , result.error || 'None');
       
       if (result.success) {
         console.log('✅ OpenAI API call successful');
@@ -42,7 +74,8 @@ export async function POST(req: NextRequest) {
     } catch (error) {
       console.error("❌ OpenAI service error, falling back to knowledge base:", error);
       // Fallback to local knowledge base
-      responseText = `Hey there! ${generateResponse(message)}`;
+      const greeting = userName ? `Hey ${userName}!` : "Hey there!";
+      responseText = `${greeting} ${generateResponse(message)}`;
       actualSearchUsed = false;
     }
 
@@ -77,31 +110,34 @@ export async function POST(req: NextRequest) {
             console.log('🔧 Attempting to call unified API at:', pointsUrl);
             console.log('🔧 Environment:', process.env.NODE_ENV);
             
-            const pointsPayload = {
-              userId,
-              pointsToAdd: actualSearchUsed ? 7 : 5, // Bonus for current info
-              action: 'chat_participation',
-              description: `Chatted with Sgt. Ken${actualSearchUsed ? ' (with current info bonus)' : ''}`
-            };
-            console.log('🔧 Points payload:', pointsPayload);
+            if (userId) { // Ensure user is logged in before awarding points
+              const pointsPayload = {
+                userId,
+                pointsToAdd: actualSearchUsed ? 7 : 5, // Bonus for current info
+                action: 'chat_participation',
+                description: `Chatted with Sgt. Ken${actualSearchUsed ? ' (with current info bonus)' : ''}`,
+                source: 'sgt_ken_chat' // Added source for unified API
+              };
+              console.log('🔧 Points payload:', pointsPayload);
 
-            const pointsResponse = await fetch(pointsUrl, {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify(pointsPayload),
-            });
+              const pointsResponse = await fetch(pointsUrl, {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(pointsPayload),
+              });
 
-            console.log('🔧 Points response status:', pointsResponse.status);
-            console.log('🔧 Points response ok:', pointsResponse.ok);
+              console.log('🔧 Points response status:', pointsResponse.status);
+              console.log('🔧 Points response ok:', pointsResponse.ok);
 
-            if (!pointsResponse.ok) {
-              const errorText = await pointsResponse.text();
-              console.error('❌ Failed to award chat participation points:', errorText);
-            } else {
-              const responseData = await pointsResponse.json();
-              console.log('✅ Successfully awarded chat points via unified API:', responseData);
+              if (!pointsResponse.ok) {
+                const errorText = await pointsResponse.text();
+                console.error('❌ Failed to award chat participation points:', errorText);
+              } else {
+                const responseData = await pointsResponse.json();
+                console.log('✅ Successfully awarded chat points via unified API:', responseData);
+              }
             }
           } catch (pointsError) {
             console.error("❌ Error awarding participation points:", pointsError);
@@ -120,7 +156,8 @@ export async function POST(req: NextRequest) {
 
     // Return the response with enhanced metadata
     return NextResponse.json({
-      message: responseText,
+      response: responseText, // Use 'response' to match frontend expectations
+      message: responseText,  // Keep 'message' for backward compatibility
       success: true,
       searchUsed: actualSearchUsed,
       pointsAwarded: actualSearchUsed ? 7 : 5,
@@ -140,7 +177,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error: "Failed to process chat request",
-        message: fallbackResponse,
+        response: fallbackResponse, // Use 'response' to match frontend expectations
+        message: fallbackResponse,  // Keep 'message' for backward compatibility
         success: false,
         offline: true,
         searchUsed: false,

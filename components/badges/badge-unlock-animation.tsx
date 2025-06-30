@@ -42,10 +42,10 @@ export function BadgeUnlockAnimation({
             transition={{ delay: 0.2 }}
             className="mb-6"
           >
-            <div className="mx-auto w-24 h-24 bg-[#0A3C1F] rounded-full flex items-center justify-center mb-4">
+            <div className="mx-auto w-24 h-24 bg-primary rounded-full flex items-center justify-center mb-4">
               <Trophy className="h-12 w-12 text-white" />
             </div>
-            <h2 className="text-2xl font-bold text-[#0A3C1F] mb-2">
+            <h2 className="text-2xl font-bold text-primary mb-2">
               Badge Unlocked!
             </h2>
             <p className="text-gray-600 mb-4">{badge.name}</p>
@@ -69,7 +69,7 @@ export function BadgeUnlockAnimation({
             transition={{ delay: 0.8 }}
           >
             <p className="text-gray-600 mb-4">{badge.description}</p>
-            <div className="text-lg font-semibold text-[#0A3C1F]">
+            <div className="text-lg font-semibold text-primary">
               +{badge.points} Points
             </div>
           </motion.div>

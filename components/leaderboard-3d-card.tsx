@@ -305,7 +305,7 @@ export function Leaderboard3DCard({
           <Link href={`/profile/${id}`} prefetch={false}>
             <Button
               size="sm"
-              className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+              className="bg-primary hover:bg-primary/90 text-white"
             >
               View Profile
             </Button>

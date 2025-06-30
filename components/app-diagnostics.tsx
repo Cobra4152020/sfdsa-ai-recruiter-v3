@@ -297,7 +297,7 @@ export function AppDiagnostics() {
                 <AccordionItem value="user-agent">
                   <AccordionTrigger>User Agent</AccordionTrigger>
                   <AccordionContent>
-                    <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded text-sm font-mono overflow-x-auto">
+                    <div className="p-2 bg-muted rounded text-sm font-mono overflow-x-auto">
                       {browserInfo.userAgent}
                     </div>
                   </AccordionContent>
@@ -307,13 +307,13 @@ export function AppDiagnostics() {
                   <AccordionTrigger>Display Information</AccordionTrigger>
                   <AccordionContent>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                      <div className="p-2 bg-muted rounded">
                         <div className="text-xs text-gray-500">Screen Size</div>
                         <div>
                           {browserInfo.screenWidth} × {browserInfo.screenHeight}
                         </div>
                       </div>
-                      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                      <div className="p-2 bg-muted rounded">
                         <div className="text-xs text-gray-500">
                           Viewport Size
                         </div>
@@ -322,11 +322,11 @@ export function AppDiagnostics() {
                           {browserInfo.viewportHeight}
                         </div>
                       </div>
-                      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                      <div className="p-2 bg-muted rounded">
                         <div className="text-xs text-gray-500">Pixel Ratio</div>
                         <div>{browserInfo.devicePixelRatio}</div>
                       </div>
-                      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                      <div className="p-2 bg-muted rounded">
                         <div className="text-xs text-gray-500">
                           Color Scheme
                         </div>
@@ -342,11 +342,11 @@ export function AppDiagnostics() {
                   <AccordionTrigger>Platform Information</AccordionTrigger>
                   <AccordionContent>
                     <div className="grid grid-cols-2 gap-2">
-                      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                      <div className="p-2 bg-muted rounded">
                         <div className="text-xs text-gray-500">Platform</div>
                         <div>{browserInfo.platform}</div>
                       </div>
-                      <div className="p-2 bg-gray-100 dark:bg-gray-800 rounded">
+                      <div className="p-2 bg-muted rounded">
                         <div className="text-xs text-gray-500">Language</div>
                         <div>{browserInfo.language}</div>
                       </div>

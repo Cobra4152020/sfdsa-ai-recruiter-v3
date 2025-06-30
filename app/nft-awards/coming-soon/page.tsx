@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 
 export default function ComingSoonPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0A3C1F] to-[#072613] text-white">
+    <div className="min-h-screen bg-gradient-to-b from-primary to-[#072613] text-white">
       <div className="container mx-auto px-4 py-16 flex flex-col items-center justify-center min-h-[80vh]">
         <div className="bg-black/20 backdrop-blur-sm p-8 rounded-xl border border-white/10 max-w-2xl w-full text-center">
           <div className="flex justify-center mb-6">
@@ -69,7 +69,7 @@ export default function ComingSoonPage() {
 
             <Button
               asChild
-              className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F]"
+              className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-primary"
             >
               <Link href="/badges">Explore Badge Gallery</Link>
             </Button>

@@ -16,7 +16,32 @@ export type BadgeType =
   | "deep-diver"
   | "quick-learner"
   | "persistent-explorer"
-  | "dedicated-applicant";
+  | "dedicated-applicant"
+  | "trivia-titan"
+  | "sf-baseball-participant"
+  | "sf-baseball-enthusiast"
+  | "sf-baseball-master"
+  | "sf-basketball-participant"
+  | "sf-basketball-enthusiast"
+  | "sf-basketball-master"
+  | "sf-districts-participant"
+  | "sf-districts-enthusiast"
+  | "sf-districts-master"
+  | "sf-football-participant"
+  | "sf-football-enthusiast"
+  | "sf-football-master"
+  | "sf-day-trips-participant"
+  | "sf-day-trips-enthusiast"
+  | "sf-day-trips-master"
+  | "sf-tourist-spots-participant"
+  | "sf-tourist-spots-enthusiast"
+  | "sf-tourist-spots-master"
+  | "point-pioneer"
+  | "recruit-referrer"
+  | "document-master"
+  | "community-event"
+  | "holiday-hero"
+  | "survey-superstar";
 
 export type BadgeCategory = "achievement" | "process" | "participation";
 

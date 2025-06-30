@@ -68,7 +68,7 @@ export default function SetupLoggingPage() {
             <ArrowLeft className="h-4 w-4 mr-2" />
             Back to Dashboard
           </Button>
-          <h1 className="text-3xl font-bold text-[#0A3C1F]">
+          <h1 className="text-3xl font-bold text-primary">
             Logging Configuration
           </h1>
         </div>

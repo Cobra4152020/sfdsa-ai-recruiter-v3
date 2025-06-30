@@ -1,64 +1,68 @@
 export const videoTheme = {
-  colors: {
+  primary: {
+    light: "#2dd4bf", // Modern teal for light mode
+    dark: "#2dd4bf",  // Same teal for dark mode
+  },
+  accent: {
+    light: "#0891b2", // Darker teal accent
+    dark: "#22d3ee",  // Brighter teal accent for dark mode
+  },
+  background: {
+    light: "#f8fafc",
+    dark: "#0f172a",
+  },
+  text: {
+    light: "#1e293b",
+    dark: "#f1f5f9",
+  },
+  gradients: {
+    primary: [
+      { position: 0, color: "#2dd4bf" },
+      { position: 1, color: "#0891b2" },
+    ],
+    accent: [
+      { position: 0, color: "#22d3ee" },
+      { position: 1, color: "#0891b2" },
+    ],
+  },
+  overlay: {
+    light: "#2dd4bf",
+    dark: "#2dd4bf",
+  },
+  button: {
     primary: {
-      light: "#0A3C1F",
-      dark: "#FFD700",
+      background: "#2dd4bf",
+      hover: "#22d3ee",
+      text: "#ffffff",
     },
-    accent: {
-      light: "#FFD700",
-      dark: "#0A3C1F",
-    },
-    white: "#FFFFFF",
-    background: {
-      primary: {
-        light: "#0A3C1F",
-        dark: "#121212",
-      },
-      gradient: {
-        light: [
-          { position: 0, color: "#0A3C1F" },
-          { position: 1, color: "#072815" },
-        ],
-        dark: [
-          { position: 0, color: "#121212" },
-          { position: 1, color: "#000000" },
-        ],
-      },
-    },
-    text: {
-      primary: {
-        light: "#FFFFFF",
-        dark: "#FFD700",
-      },
-      accent: {
-        light: "#FFD700",
-        dark: "#FFFFFF",
-      },
-      dark: {
-        light: "#0A3C1F",
-        dark: "#FFD700",
-      },
-    },
-    particles: {
-      primary: {
-        light: "#FFD700",
-        dark: "#FFD700",
-      },
-      secondary: {
-        light: "#FFFFFF",
-        dark: "#0A3C1F",
+    secondary: {
+      background: "transparent",
+      border: "#2dd4bf",
+      text: "#2dd4bf",
+      hover: {
+        background: "#2dd4bf",
+        text: "#ffffff",
       },
     },
   },
-  effects: {
-    shine: {
-      opacity: 0.3,
+  badge: {
+    background: "#f0fdfa",
+    border: "#2dd4bf",
+    text: "#0f766e",
+  },
+  controls: {
+    primary: "#2dd4bf",
+    background: "rgba(45, 212, 191, 0.1)",
+    hover: "#22d3ee",
+  },
+  particles: {
+    primary: {
+      light: "#FFD700",
+      dark: "#FFD700",
     },
-    particles: {
-      defaultColor: {
-        light: "#FFD700",
-        dark: "#FFD700",
-      },
+    secondary: {
+      light: "#FFFFFF",
+      dark: "#0A3C1F",
     },
   },
 };

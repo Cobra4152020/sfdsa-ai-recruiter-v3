@@ -320,7 +320,7 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                       <Button
                         type="button"
                         variant="link"
-                        className="text-sm text-[#0A3C1F]"
+                        className="text-sm text-primary"
                         onClick={() => setResetPassword(true)}
                       >
                         Forgot password?
@@ -363,7 +363,7 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
               <div className="space-y-2">
                 <Button
                   type="submit"
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                  className="w-full bg-primary hover:bg-primary/90 text-white"
                   disabled={isLoading}
                 >
                   {isLoading
@@ -489,11 +489,11 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
                 <Checkbox id="terms" required />
                 <Label htmlFor="terms" className="text-sm">
                   I agree to the{" "}
-                  <a href="#" className="text-[#0A3C1F] hover:underline">
+                  <a href="#" className="text-primary hover:underline">
                     Terms of Service
                   </a>{" "}
                   and{" "}
-                  <a href="#" className="text-[#0A3C1F] hover:underline">
+                  <a href="#" className="text-primary hover:underline">
                     Privacy Policy
                   </a>
                 </Label>
@@ -501,7 +501,7 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
 
               <Button
                 type="submit"
-                className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                className="w-full bg-primary hover:bg-primary/90 text-white"
                 disabled={isLoading}
               >
                 {isLoading ? "Creating account..." : "Create Account"}
@@ -549,7 +549,7 @@ export function AuthForm({ onSuccess, className }: AuthFormProps) {
             : "Already have an account? "}
           <Button
             variant="link"
-            className="p-0 text-[#0A3C1F]"
+            className="p-0 text-primary"
             onClick={() =>
               setActiveTab(activeTab === "signin" ? "signup" : "signin")
             }

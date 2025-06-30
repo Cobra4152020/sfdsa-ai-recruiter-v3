@@ -115,7 +115,7 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
   return (
     <>
       <Card className={className}>
-        <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 text-white">
+        <CardHeader className="bg-gradient-to-r from-primary to-primary/80 text-white">
           <CardTitle className="flex items-center">
             <Eye className="mr-2 h-5 w-5" />
             Refer a Recruit
@@ -150,7 +150,7 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
               </div>
               <Button
                 type="submit"
-                className="mt-2 bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                className="mt-2 bg-primary hover:bg-primary/90 text-white"
               >
                 <Eye className="mr-2 h-4 w-4" />
                 Send Referral
@@ -166,21 +166,21 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
             <ul className="space-y-2 text-sm">
               <li className="flex justify-between">
                 <span>1 Recruit Referred</span>
-                <span className="text-[#0A3C1F] font-medium">+100 Points</span>
+                <span className="text-primary font-medium">+100 Points</span>
               </li>
               <li className="flex justify-between">
                 <span>3 Recruits Referred</span>
-                <span className="text-[#0A3C1F] font-medium">
+                <span className="text-primary font-medium">
                   &quot;Connector&quot; Badge
                 </span>
               </li>
               <li className="flex justify-between">
                 <span>5 Recruits Referred</span>
-                <span className="text-[#0A3C1F] font-medium">+500 Points</span>
+                <span className="text-primary font-medium">+500 Points</span>
               </li>
               <li className="flex justify-between">
                 <span>10 Recruits Referred</span>
-                <span className="text-[#0A3C1F] font-medium">
+                <span className="text-primary font-medium">
                   &quot;Recruitment Champion&quot; NFT
                 </span>
               </li>
@@ -209,7 +209,7 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
                 readOnly
                 className="flex-1"
               />
-              <Button onClick={handleCopyLink} className="ml-2 bg-[#0A3C1F]">
+              <Button onClick={handleCopyLink} className="ml-2 bg-primary">
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
@@ -219,9 +219,9 @@ export function ReferRecruiter({ className }: ReferRecruiterProps) {
             </p>
           </div>
 
-          <div className="bg-[#0A3C1F]/10 border border-[#0A3C1F]/20 rounded-lg p-4 mt-4">
-            <h4 className="font-medium text-[#0A3C1F] flex items-center">
-              <Award className="mr-2 h-4 w-4 text-[#0A3C1F]" />
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mt-4">
+            <h4 className="font-medium text-primary flex items-center">
+              <Award className="mr-2 h-4 w-4 text-primary" />
               Referral Tip
             </h4>
             <p className="text-sm mt-1">

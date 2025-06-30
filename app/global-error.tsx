@@ -24,7 +24,7 @@ export default function GlobalError({
             <ShieldLogo className="w-16 h-16" />
           </div>
           <div className="text-center max-w-md">
-            <h1 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700] mb-4">
+            <h1 className="text-2xl font-bold text-primary dark:text-[#FFD700] mb-4">
               Something went wrong
             </h1>
             <p className="text-gray-600 dark:text-gray-300 mb-8">
@@ -33,13 +33,13 @@ export default function GlobalError({
             <div className="space-y-4">
               <button
                 onClick={reset}
-                className="px-4 py-2 bg-[#0A3C1F] text-white hover:bg-[#0A3C1F]/90 dark:bg-[#FFD700] dark:text-[#0A3C1F] dark:hover:bg-[#FFD700]/90 rounded"
+                className="px-4 py-2 bg-primary text-white hover:bg-primary/90 dark:bg-[#FFD700] dark:text-primary dark:hover:bg-[#FFD700]/90 rounded"
               >
                 Try again
               </button>
               <button
                 onClick={() => (window.location.href = "/")}
-                className="ml-4 px-4 py-2 border border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10 dark:border-[#FFD700] dark:text-[#FFD700] dark:hover:bg-[#FFD700]/10 rounded"
+                className="ml-4 px-4 py-2 border border-primary text-primary hover:bg-primary/10 dark:border-[#FFD700] dark:text-[#FFD700] dark:hover:bg-[#FFD700]/10 rounded"
               >
                 Return home
               </button>

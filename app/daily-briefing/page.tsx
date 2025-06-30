@@ -120,7 +120,7 @@ export default function DailyBriefingPage() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="relative mb-12 rounded-2xl overflow-hidden bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 dark:from-black dark:to-gray-900"
+            className="relative mb-12 rounded-2xl overflow-hidden bg-gradient-to-r from-primary to-primary/80 dark:from-black dark:to-gray-900"
           >
             <div className="absolute inset-0 bg-black/20 dark:bg-black/40" />
             <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 p-8 lg:p-12">
@@ -211,7 +211,7 @@ export default function DailyBriefingPage() {
             <div className="lg:col-span-2 space-y-6">
               {loading ? (
                 <Card className="shadow-lg border-gray-200 dark:border-[#FFD700]/30">
-                  <CardHeader className="bg-[#0A3C1F] dark:bg-black text-white dark:text-[#FFD700]">
+                  <CardHeader className="bg-primary dark:bg-black text-white dark:text-[#FFD700]">
                     <div className="flex justify-between items-center">
                       <Skeleton className="h-6 w-48 bg-white/20 dark:bg-[#FFD700]/20" />
                       <div className="flex space-x-4">
@@ -250,16 +250,16 @@ export default function DailyBriefingPage() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="grid grid-cols-1 md:grid-cols-3 gap-4"
               >
-                <Card className="bg-gradient-to-br from-[#0A3C1F]/5 to-[#0A3C1F]/10 dark:from-black dark:to-gray-900 border-[#0A3C1F]/20 dark:border-[#FFD700]/30 hover:shadow-lg transition-all duration-300">
+                <Card className="bg-gradient-to-br from-primary/5 to-primary/10 dark:from-black dark:to-gray-900 border-primary/20 dark:border-[#FFD700]/30 hover:shadow-lg transition-all duration-300">
                   <CardContent className="p-6 text-center">
-                    <div className="bg-[#0A3C1F]/10 dark:bg-[#FFD700]/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Target className="h-8 w-8 text-[#0A3C1F] dark:text-[#FFD700]" />
+                    <div className="bg-primary/10 dark:bg-[#FFD700]/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Target className="h-8 w-8 text-primary dark:text-[#FFD700]" />
                     </div>
-                    <h3 className="font-semibold text-[#0A3C1F] dark:text-[#FFD700] mb-2">Daily Points</h3>
-                    <p className="text-3xl font-bold text-[#0A3C1F] dark:text-[#FFD700] mb-1">25</p>
+                    <h3 className="font-semibold text-primary dark:text-[#FFD700] mb-2">Daily Points</h3>
+                    <p className="text-3xl font-bold text-primary dark:text-[#FFD700] mb-1">25</p>
                     <p className="text-sm text-gray-600 dark:text-gray-400">Available today</p>
                     <div className="mt-3 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                      <div className="bg-[#0A3C1F] dark:bg-[#FFD700] h-2 rounded-full w-1/3 transition-all duration-500"></div>
+                      <div className="bg-primary dark:bg-[#FFD700] h-2 rounded-full w-1/3 transition-all duration-500"></div>
                     </div>
                   </CardContent>
                 </Card>
@@ -304,7 +304,7 @@ export default function DailyBriefingPage() {
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
                 <Card className="shadow-md border-gray-200 dark:border-[#FFD700]/30">
-                  <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 dark:from-black dark:to-gray-900 text-white dark:text-[#FFD700]">
+                  <CardHeader className="bg-gradient-to-r from-primary to-primary/80 dark:from-black dark:to-gray-900 text-white dark:text-[#FFD700]">
                     <CardTitle className="flex items-center">
                       <Star className="h-5 w-5 mr-2" />
                       How to Earn Points & Advance Your Career
@@ -312,27 +312,27 @@ export default function DailyBriefingPage() {
                   </CardHeader>
                   <CardContent className="p-6 bg-white dark:bg-black">
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                      <div className="text-center p-6 bg-[#0A3C1F]/5 dark:bg-gray-900 rounded-xl border border-[#0A3C1F]/10 dark:border-[#FFD700]/20 hover:shadow-lg transition-all duration-300">
-                        <div className="bg-[#0A3C1F] dark:bg-[#FFD700] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="text-center p-6 bg-primary/5 dark:bg-gray-900 rounded-xl border border-primary/10 dark:border-[#FFD700]/20 hover:shadow-lg transition-all duration-300">
+                        <div className="bg-primary dark:bg-[#FFD700] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
                           <CheckCircle className="h-6 w-6 text-white dark:text-black" />
                         </div>
-                        <div className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700] mb-2">5 Points</div>
+                        <div className="text-2xl font-bold text-primary dark:text-[#FFD700] mb-2">5 Points</div>
                         <p className="text-sm font-medium dark:text-gray-300">Mark as attended</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Daily participation</p>
                       </div>
-                      <div className="text-center p-6 bg-[#0A3C1F]/5 dark:bg-gray-900 rounded-xl border border-[#0A3C1F]/10 dark:border-[#FFD700]/20 hover:shadow-lg transition-all duration-300">
-                        <div className="bg-[#0A3C1F] dark:bg-[#FFD700] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="text-center p-6 bg-primary/5 dark:bg-gray-900 rounded-xl border border-primary/10 dark:border-[#FFD700]/20 hover:shadow-lg transition-all duration-300">
+                        <div className="bg-primary dark:bg-[#FFD700] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
                           <Trophy className="h-6 w-6 text-white dark:text-black" />
                         </div>
-                        <div className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700] mb-2">10 Points</div>
+                        <div className="text-2xl font-bold text-primary dark:text-[#FFD700] mb-2">10 Points</div>
                         <p className="text-sm font-medium dark:text-gray-300">Complete daily quiz</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Test your knowledge</p>
                       </div>
-                      <div className="text-center p-6 bg-[#0A3C1F]/5 dark:bg-gray-900 rounded-xl border border-[#0A3C1F]/10 dark:border-[#FFD700]/20 hover:shadow-lg transition-all duration-300">
-                        <div className="bg-[#0A3C1F] dark:bg-[#FFD700] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <div className="text-center p-6 bg-primary/5 dark:bg-gray-900 rounded-xl border border-primary/10 dark:border-[#FFD700]/20 hover:shadow-lg transition-all duration-300">
+                        <div className="bg-primary dark:bg-[#FFD700] w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-4">
                           <Share2 className="h-6 w-6 text-white dark:text-black" />
                         </div>
-                        <div className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700] mb-2">15 Points</div>
+                        <div className="text-2xl font-bold text-primary dark:text-[#FFD700] mb-2">15 Points</div>
                         <p className="text-sm font-medium dark:text-gray-300">Share on social media</p>
                         <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Spread awareness</p>
                       </div>
@@ -389,7 +389,7 @@ export default function DailyBriefingPage() {
                 transition={{ duration: 0.5, delay: 0.4 }}
               >
                 <Card className="shadow-md border-gray-200 dark:border-[#FFD700]/30">
-                  <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 dark:from-black dark:to-gray-900">
+                  <CardHeader className="bg-gradient-to-r from-primary to-primary/80 dark:from-black dark:to-gray-900">
                     <CardTitle className="text-white dark:text-[#FFD700] flex items-center">
                       <Rocket className="h-5 w-5 mr-2" />
                       Quick Actions
@@ -399,7 +399,7 @@ export default function DailyBriefingPage() {
                     <Link href="/trivia">
                       <Button 
                         variant="outline" 
-                        className="w-full justify-start border-[#0A3C1F]/20 dark:border-[#FFD700]/30 text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/5 dark:hover:bg-[#FFD700]/10 transition-all duration-200"
+                        className="w-full justify-start border-primary/20 dark:border-[#FFD700]/30 text-primary dark:text-[#FFD700] hover:bg-primary/5 dark:hover:bg-[#FFD700]/10 transition-all duration-200"
                       >
                         <Trophy className="h-4 w-4 mr-3" />
                         Daily Trivia Challenge
@@ -409,7 +409,7 @@ export default function DailyBriefingPage() {
                     <Link href="/badges">
                       <Button 
                         variant="outline" 
-                        className="w-full justify-start border-[#0A3C1F]/20 dark:border-[#FFD700]/30 text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/5 dark:hover:bg-[#FFD700]/10 transition-all duration-200"
+                        className="w-full justify-start border-primary/20 dark:border-[#FFD700]/30 text-primary dark:text-[#FFD700] hover:bg-primary/5 dark:hover:bg-[#FFD700]/10 transition-all duration-200"
                       >
                         <Star className="h-4 w-4 mr-3" />
                         View Your Badges
@@ -419,7 +419,7 @@ export default function DailyBriefingPage() {
                     <Link href="/leaderboard">
                       <Button 
                         variant="outline" 
-                        className="w-full justify-start border-[#0A3C1F]/20 dark:border-[#FFD700]/30 text-[#0A3C1F] dark:text-[#FFD700] hover:bg-[#0A3C1F]/5 dark:hover:bg-[#FFD700]/10 transition-all duration-200"
+                        className="w-full justify-start border-primary/20 dark:border-[#FFD700]/30 text-primary dark:text-[#FFD700] hover:bg-primary/5 dark:hover:bg-[#FFD700]/10 transition-all duration-200"
                       >
                         <Users className="h-4 w-4 mr-3" />
                         View Leaderboard
@@ -429,7 +429,7 @@ export default function DailyBriefingPage() {
                     <Link href="/deputy-launchpad">
                       <Button 
                         variant="default" 
-                        className="w-full justify-start bg-[#0A3C1F] dark:bg-[#FFD700] hover:bg-[#0A3C1F]/90 dark:hover:bg-[#FFD700]/90 text-white dark:text-black transition-all duration-200"
+                        className="w-full justify-start bg-primary dark:bg-[#FFD700] hover:bg-primary/90 dark:hover:bg-[#FFD700]/90 text-white dark:text-black transition-all duration-200"
                       >
                         <Shield className="h-4 w-4 mr-3" />
                         Deputy Launchpad

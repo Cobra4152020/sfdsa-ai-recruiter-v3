@@ -8,11 +8,10 @@ import {
   GraduationCap, 
   Home, 
   Flag, 
-  Lock, 
   Star,
-  ArrowRight,
-  Zap
+  ArrowRight
 } from "lucide-react";
+import { CustomLockIcon } from "@/components/ui/custom-lock-icon";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -83,19 +82,19 @@ export function PopularLockedBenefits() {
                 <Star className="h-8 w-8 text-primary-foreground" />
               </div>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-              Exclusive Deputy Benefits
+            <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+              Exclusive Member Resources
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-              Unlock access to detailed information about the premium benefits and programs available to San Francisco Deputy Sheriffs. 
-              These resources are available after you demonstrate your commitment to the recruitment process.
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+              Dive deeper into the premium benefits and programs available to San Francisco Deputy Sheriffs. 
+              Unlock detailed guides and resources as you engage with our recruitment process.
             </p>
             <div className="flex flex-wrap gap-3 justify-center mt-6">
               <Badge className="bg-primary text-primary-foreground px-4 py-2 text-sm font-semibold">
-                Most Popular Benefits
+                For Serious Candidates
               </Badge>
               <Badge variant="outline" className="border-primary text-primary px-4 py-2">
-                Points Required to Unlock
+                Earn Points to Access
               </Badge>
             </div>
           </div>
@@ -127,7 +126,7 @@ export function PopularLockedBenefits() {
                   
                   {/* Lock Indicator */}
                   <div className="absolute bottom-4 left-4 flex items-center text-white">
-                    <Lock className="h-4 w-4 mr-2" />
+                    <CustomLockIcon size="sm" className="mr-2" />
                     <span className="text-sm font-medium">
                       {benefit.pointsRequired} points to unlock
                     </span>
@@ -190,7 +189,7 @@ export function PopularLockedBenefits() {
           {/* Call to Action */}
           <Card className="bg-gradient-to-br from-primary to-primary/90 text-primary-foreground">
             <CardContent className="p-8 text-center">
-              <Zap className="h-12 w-12 text-primary-foreground mx-auto mb-4" />
+              <CustomLockIcon size="xl" locked={true} className="mx-auto mb-4" />
               <h3 className="text-3xl font-bold mb-4">
                 Unlock These Benefits Today
               </h3>

@@ -72,6 +72,8 @@ export function donationReceiptTemplate({
     <body>
       <div class="header">
         <img src="https://sfdeputysheriff.com/logo.png" alt="SFDSA Logo" class="logo">
+        <h2 style="
+          color: #2dd4bf;
         <h1>Thank You for Your Donation!</h1>
       </div>
       

@@ -154,7 +154,7 @@ export function BadgeDisplay() {
       case "Medium": return "text-yellow-600 bg-yellow-50";
       case "Hard": return "text-orange-600 bg-orange-50";
       case "Expert": return "text-red-600 bg-red-50";
-      default: return "text-gray-600 bg-gray-50";
+      default: return "text-gray-600 bg-muted";
     }
   };
 

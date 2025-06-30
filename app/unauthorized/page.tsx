@@ -36,13 +36,13 @@ export default function UnauthorizedPage() {
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
-          <Button asChild className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+          <Button asChild className="w-full bg-primary hover:bg-primary/90">
             <Link href="/">Return to Home Page</Link>
           </Button>
           <div className="text-center text-sm text-gray-500">
             <p>
               If you believe this is an error, please{" "}
-              <Link href="/contact" className="text-[#0A3C1F] hover:underline">
+              <Link href="/contact" className="text-primary hover:underline">
                 contact support
               </Link>
               .

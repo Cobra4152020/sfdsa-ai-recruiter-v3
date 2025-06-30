@@ -89,7 +89,7 @@ export default function CreateBriefingPage() {
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-8 text-[#0A3C1F]">
+      <h1 className="text-3xl font-bold mb-8 text-primary">
         Create Daily Briefing
       </h1>
 

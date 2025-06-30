@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
-import { AskSgtKenButton } from "@/components/ask-sgt-ken-button";
+import AskSgtKenButton from "@/components/ask-sgt-ken-button";
 
 export default function SupportPage() {
   const [name, setName] = useState("");
@@ -29,7 +29,7 @@ export default function SupportPage() {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-[#0A3C1F] mb-6">
+        <h1 className="text-3xl font-bold text-primary mb-6">
           Contact Support
         </h1>
         <Card className="p-6">

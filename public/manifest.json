@@ -1,11 +1,11 @@
 {
-  "name": "SFDSA AI Recruiter",
-  "short_name": "SFDSA Recruiter",
-  "description": "San Francisco Deputy Sheriffs' Association AI Recruiter",
+  "name": "SF Deputy Sheriff Recruitment",
+  "short_name": "SF Sheriff",
+  "description": "San Francisco Deputy Sheriff Recruitment Platform",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0A3C1F",
-  "theme_color": "#0A3C1F",
+  "background_color": "#2dd4bf",
+  "theme_color": "#2dd4bf",
   "orientation": "portrait",
   "icons": [
     {

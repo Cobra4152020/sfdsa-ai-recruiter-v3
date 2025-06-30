@@ -251,7 +251,7 @@ export function TikTokChallengeModal({
 
             <div className="space-y-6 my-4">
               <div
-                className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer"
+                className="border-2 border-dashed rounded-lg p-6 text-center hover:bg-accent/10 transition-colors cursor-pointer"
                 onClick={handleUploadClick}
               >
                 <input

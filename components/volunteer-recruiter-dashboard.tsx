@@ -379,7 +379,7 @@ export function VolunteerRecruiterDashboard({
     return (
       <div className={className}>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </div>
     );
@@ -408,7 +408,7 @@ export function VolunteerRecruiterDashboard({
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Users className="h-8 w-8 text-[#0A3C1F]" />
+              <Users className="h-8 w-8 text-primary" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">
                   Total Referrals
@@ -422,7 +422,7 @@ export function VolunteerRecruiterDashboard({
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <UserPlus className="h-8 w-8 text-[#0A3C1F]" />
+              <UserPlus className="h-8 w-8 text-primary" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">
                   Active Referrals
@@ -436,7 +436,7 @@ export function VolunteerRecruiterDashboard({
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Trophy className="h-8 w-8 text-[#0A3C1F]" />
+              <Trophy className="h-8 w-8 text-primary" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">
                   Total Points
@@ -450,7 +450,7 @@ export function VolunteerRecruiterDashboard({
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center">
-              <Award className="h-8 w-8 text-[#0A3C1F]" />
+              <Award className="h-8 w-8 text-primary" />
               <div className="ml-4">
                 <p className="text-sm font-medium text-gray-600">
                   Conversion Rate
@@ -464,7 +464,7 @@ export function VolunteerRecruiterDashboard({
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+          <h2 className="text-2xl font-bold text-primary dark:text-[#FFD700]">
             Volunteer Recruiter Dashboard
           </h2>
           <TabsList>
@@ -587,8 +587,8 @@ export function VolunteerRecruiterDashboard({
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="bg-[#0A3C1F]/5 p-4 rounded-lg flex items-center justify-between mb-4">
-                  <code className="text-lg font-mono font-bold text-[#0A3C1F]">
+                <div className="bg-primary/5 p-4 rounded-lg flex items-center justify-between mb-4">
+                  <code className="text-lg font-mono font-bold text-primary">
                     {referralCode}
                   </code>
                   <Button
@@ -614,7 +614,7 @@ export function VolunteerRecruiterDashboard({
                   <div className="flex space-x-2">
                     <Input placeholder="Enter email address" type="email" />
                     <Button
-                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                      className="bg-primary hover:bg-primary/90 text-white"
                       onClick={handleSendReferral}
                     >
                       <Mail className="h-4 w-4 mr-2" />
@@ -741,7 +741,7 @@ export function VolunteerRecruiterDashboard({
                                   ? "bg-purple-50 text-purple-600 border-purple-200"
                                   : referral.status === "applied"
                                     ? "bg-yellow-50 text-yellow-600 border-yellow-200"
-                                    : "bg-gray-50 text-gray-600 border-gray-200"
+                                    : "bg-muted text-gray-600 border-gray-200"
                           }`}
                         >
                           {referral.status === "hired"
@@ -768,7 +768,7 @@ export function VolunteerRecruiterDashboard({
                     <div className="flex justify-between items-center mt-4">
                       <div className="text-sm">
                         <span className="font-medium">Points earned:</span>{" "}
-                        <span className="text-[#0A3C1F] font-bold">
+                        <span className="text-primary font-bold">
                           {referral.points}
                         </span>
                       </div>
@@ -899,7 +899,7 @@ export function VolunteerRecruiterDashboard({
                     />
                   </div>
                   <Button
-                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
                     onClick={(e) => {
                       e.preventDefault();
                       toast({
@@ -932,7 +932,7 @@ export function VolunteerRecruiterDashboard({
                   {dashboardData.badges.map((badge: Badge) => (
                     <div key={badge.id} className="flex items-start space-x-4">
                       <div className="relative">
-                        <div className="w-12 h-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                           <Image
                             src={badge.image || "/placeholder.svg"}
                             alt={badge.name}
@@ -984,7 +984,7 @@ export function VolunteerRecruiterDashboard({
                 <div className="space-y-6">
                   {dashboardData.nfts.map((nft: NFT) => (
                     <div key={nft.id} className="flex items-start space-x-4">
-                      <div className="w-12 h-12 rounded-full bg-[#0A3C1F]/10 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
                         <Image
                           src={nft.image || "/placeholder.svg"}
                           alt={nft.name}
@@ -1013,9 +1013,9 @@ export function VolunteerRecruiterDashboard({
                   ))}
                 </div>
 
-                <div className="mt-6 bg-[#0A3C1F]/5 rounded-lg p-4">
+                <div className="mt-6 bg-primary/5 rounded-lg p-4">
                   <h3 className="font-medium mb-2 flex items-center">
-                    <Trophy className="h-4 w-4 mr-2 text-[#0A3C1F]" />
+                    <Trophy className="h-4 w-4 mr-2 text-primary" />
                     About NFT Awards
                   </h3>
                   <p className="text-sm text-muted-foreground">
@@ -1026,7 +1026,7 @@ export function VolunteerRecruiterDashboard({
                   </p>
                   <Button
                     variant="link"
-                    className="text-[#0A3C1F] p-0 h-auto mt-2"
+                    className="text-primary p-0 h-auto mt-2"
                     onClick={() => {
                       toast({
                         title: "Coming Soon",
@@ -1051,9 +1051,9 @@ export function VolunteerRecruiterDashboard({
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-3 bg-[#0A3C1F]/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
                   <div className="flex items-center">
-                    <UserPlus className="h-5 w-5 mr-3 text-[#0A3C1F]" />
+                    <UserPlus className="h-5 w-5 mr-3 text-primary" />
                     <div>
                       <h4 className="font-medium">Successful Referrals</h4>
                       <p className="text-sm text-muted-foreground">
@@ -1063,9 +1063,9 @@ export function VolunteerRecruiterDashboard({
                   </div>
                   <div className="text-xl font-bold">500</div>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-[#0A3C1F]/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
                   <div className="flex items-center">
-                    <Users className="h-5 w-5 mr-3 text-[#0A3C1F]" />
+                    <Users className="h-5 w-5 mr-3 text-primary" />
                     <div>
                       <h4 className="font-medium">Active Referrals</h4>
                       <p className="text-sm text-muted-foreground">
@@ -1075,9 +1075,9 @@ export function VolunteerRecruiterDashboard({
                   </div>
                   <div className="text-xl font-bold">250</div>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-[#0A3C1F]/5 rounded-lg">
+                <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg">
                   <div className="flex items-center">
-                    <Share2 className="h-5 w-5 mr-3 text-[#0A3C1F]" />
+                    <Share2 className="h-5 w-5 mr-3 text-primary" />
                     <div>
                       <h4 className="font-medium">Social Sharing</h4>
                       <p className="text-sm text-muted-foreground">
@@ -1094,7 +1094,7 @@ export function VolunteerRecruiterDashboard({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-3 border rounded-lg">
                     <div className="flex items-center mb-2">
-                      <Star className="h-4 w-4 mr-2 text-[#0A3C1F]" />
+                      <Star className="h-4 w-4 mr-2 text-primary" />
                       <h4 className="font-medium">Refer Quality Candidates</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1104,7 +1104,7 @@ export function VolunteerRecruiterDashboard({
                   </div>
                   <div className="p-3 border rounded-lg">
                     <div className="flex items-center mb-2">
-                      <Star className="h-4 w-4 mr-2 text-[#0A3C1F]" />
+                      <Star className="h-4 w-4 mr-2 text-primary" />
                       <h4 className="font-medium">Share on Social Media</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1114,7 +1114,7 @@ export function VolunteerRecruiterDashboard({
                   </div>
                   <div className="p-3 border rounded-lg">
                     <div className="flex items-center mb-2">
-                      <Star className="h-4 w-4 mr-2 text-[#0A3C1F]" />
+                      <Star className="h-4 w-4 mr-2 text-primary" />
                       <h4 className="font-medium">Attend Recruitment Events</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1124,7 +1124,7 @@ export function VolunteerRecruiterDashboard({
                   </div>
                   <div className="p-3 border rounded-lg">
                     <div className="flex items-center mb-2">
-                      <Star className="h-4 w-4 mr-2 text-[#0A3C1F]" />
+                      <Star className="h-4 w-4 mr-2 text-primary" />
                       <h4 className="font-medium">Provide Testimonials</h4>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -1154,8 +1154,8 @@ export function VolunteerRecruiterDashboard({
                     className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                   >
                     <div className="flex items-start space-x-4">
-                      <div className="bg-[#0A3C1F]/10 rounded-full p-3 mt-1">
-                        <Calendar className="h-5 w-5 text-[#0A3C1F]" />
+                      <div className="bg-primary/10 rounded-full p-3 mt-1">
+                        <Calendar className="h-5 w-5 text-primary" />
                       </div>
                       <div className="flex-1">
                         <div className="flex flex-col sm:flex-row sm:items-center justify-between">
@@ -1192,7 +1192,7 @@ export function VolunteerRecruiterDashboard({
                           <Button
                             variant="outline"
                             size="sm"
-                            className="border-[#0A3C1F] text-[#0A3C1F]"
+                            className="border-primary text-primary"
                             onClick={() => {
                               toast({
                                 title: "RSVP Confirmed",
@@ -1279,7 +1279,7 @@ export function VolunteerRecruiterDashboard({
                     />
                   </div>
                   <Button
-                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
                     onClick={(e) => {
                       e.preventDefault();
                       toast({
@@ -1306,7 +1306,7 @@ export function VolunteerRecruiterDashboard({
                 <div className="space-y-4">
                   <div className="p-3 border rounded-lg flex items-center justify-between">
                     <div className="flex items-center">
-                      <FileText className="h-5 w-5 mr-3 text-[#0A3C1F]" />
+                      <FileText className="h-5 w-5 mr-3 text-primary" />
                       <div>
                         <h4 className="font-medium">
                           Recruitment Talking Points
@@ -1322,7 +1322,7 @@ export function VolunteerRecruiterDashboard({
                   </div>
                   <div className="p-3 border rounded-lg flex items-center justify-between">
                     <div className="flex items-center">
-                      <FileText className="h-5 w-5 mr-3 text-[#0A3C1F]" />
+                      <FileText className="h-5 w-5 mr-3 text-primary" />
                       <div>
                         <h4 className="font-medium">
                           Recruitment Flyer Templates
@@ -1338,7 +1338,7 @@ export function VolunteerRecruiterDashboard({
                   </div>
                   <div className="p-3 border rounded-lg flex items-center justify-between">
                     <div className="flex items-center">
-                      <FileText className="h-5 w-5 mr-3 text-[#0A3C1F]" />
+                      <FileText className="h-5 w-5 mr-3 text-primary" />
                       <div>
                         <h4 className="font-medium">
                           Frequently Asked Questions
@@ -1354,7 +1354,7 @@ export function VolunteerRecruiterDashboard({
                   </div>
                   <div className="p-3 border rounded-lg flex items-center justify-between">
                     <div className="flex items-center">
-                      <FileText className="h-5 w-5 mr-3 text-[#0A3C1F]" />
+                      <FileText className="h-5 w-5 mr-3 text-primary" />
                       <div>
                         <h4 className="font-medium">
                           Event Best Practices Guide

@@ -68,7 +68,7 @@ export default function ForgotPasswordClient() {
       <div className="max-w-md mx-auto">
         <Card>
           <CardHeader className="space-y-1">
-            <CardTitle className="text-2xl font-bold text-center text-[#0A3C1F]">
+            <CardTitle className="text-2xl font-bold text-center text-primary">
               Reset your password
             </CardTitle>
             <CardDescription className="text-center">
@@ -114,7 +114,7 @@ export default function ForgotPasswordClient() {
                   </div>
                   <Button
                     type="submit"
-                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                    className="w-full bg-primary hover:bg-primary/90"
                     disabled={isLoading}
                   >
                     {isLoading ? (
@@ -133,7 +133,7 @@ export default function ForgotPasswordClient() {
           <CardFooter className="flex justify-center">
             <Link
               href="/login"
-              className="text-sm text-[#0A3C1F] hover:underline flex items-center"
+              className="text-sm text-primary hover:underline flex items-center"
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to login

@@ -160,7 +160,7 @@ export function ChallengeLeaderboard() {
             {leaderboard.slice(3).map((entry, index) => (
               <div
                 key={entry.userId}
-                className="flex items-center gap-4 p-3 rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-4 p-3 rounded-lg hover:bg-accent/10 transition-colors"
               >
                 <div className="flex-shrink-0 text-center w-6">
                   <span className="font-medium text-gray-600">{index + 4}</span>

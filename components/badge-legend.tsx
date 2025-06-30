@@ -107,8 +107,8 @@ export function BadgeLegend() {
   });
 
   return (
-    <Card className="border border-[#0A3C1F]/20 dark:border-[#FFD700]/20">
-      <CardHeader className="pb-2 bg-[#0A3C1F] text-white dark:bg-[#0A3C1F] dark:text-[#FFD700]">
+    <Card className="border border-primary/20 dark:border-[#FFD700]/20">
+      <CardHeader className="pb-2 bg-primary text-white dark:bg-primary dark:text-[#FFD700]">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <CardTitle className="flex items-center">
             <span className="mr-2">🏅</span> Badge Legend

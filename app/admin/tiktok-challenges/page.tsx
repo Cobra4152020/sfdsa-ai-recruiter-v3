@@ -57,7 +57,7 @@ const getChallengeStatusBadgeStyle = (status: string) => {
     case "active":
       return "bg-green-500 text-white";
     case "completed":
-      return "bg-gray-500 text-white";
+      return "bg-muted0 text-white";
     default:
       return "bg-yellow-500 text-black";
   }

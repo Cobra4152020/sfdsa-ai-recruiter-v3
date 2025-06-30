@@ -301,7 +301,7 @@ export default function TriviaSystemHealthPage() {
                               }`}
                               onClick={() => handleGameSelect(gameId)}
                             >
-                              <CardHeader className="bg-gray-50 p-4">
+                              <CardHeader className="bg-muted p-4">
                                 <CardTitle className="text-lg">
                                   {formatGameName(gameId)}
                                 </CardTitle>
@@ -474,7 +474,7 @@ export default function TriviaSystemHealthPage() {
                             onClick={() =>
                               window.open(`/trivia/${selectedGameId}`, "_blank")
                             }
-                            className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                            className="bg-primary hover:bg-primary/90"
                           >
                             Play Game
                           </Button>
@@ -507,7 +507,7 @@ export default function TriviaSystemHealthPage() {
                             className="overflow-hidden cursor-pointer transition-shadow hover:shadow-md"
                             onClick={() => handleGameSelect(gameId)}
                           >
-                            <CardHeader className="bg-gray-50 p-4">
+                            <CardHeader className="bg-muted p-4">
                               <CardTitle className="text-lg">
                                 {formatGameName(gameId)}
                               </CardTitle>
@@ -623,7 +623,7 @@ export default function TriviaSystemHealthPage() {
                         key={log.id}
                         className="border rounded-lg overflow-hidden"
                       >
-                        <div className="flex items-center justify-between p-3 bg-gray-50 border-b">
+                        <div className="flex items-center justify-between p-3 bg-muted border-b">
                           <div className="flex items-center">
                             <Badge
                               className={getLogLevelColor(log.level, false)}
@@ -641,7 +641,7 @@ export default function TriviaSystemHealthPage() {
                         <div className="p-3">
                           <div className="text-sm">
                             <strong>Context:</strong>
-                            <pre className="mt-1 p-2 bg-gray-50 rounded text-xs overflow-auto">
+                            <pre className="mt-1 p-2 bg-muted rounded text-xs overflow-auto">
                               {JSON.stringify(log.context, null, 2)}
                             </pre>
                           </div>

@@ -198,7 +198,7 @@ export function UnifiedLoginForm({
             <Label htmlFor="password">Password</Label>
             <Link
               href="/forgot-password"
-              className="text-sm text-[#0A3C1F] hover:underline"
+              className="text-sm text-primary hover:underline"
             >
               Forgot password?
             </Link>
@@ -244,7 +244,7 @@ export function UnifiedLoginForm({
 
         <Button
           type="submit"
-          className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+          className="w-full bg-primary hover:bg-primary/90 text-white"
           disabled={isLoading}
         >
           {isLoading ? (
@@ -270,7 +270,7 @@ export function UnifiedLoginForm({
       <Button
         type="button"
         variant="outline"
-        className="w-full border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10"
+        className="w-full border-primary text-primary hover:bg-primary/10"
         onClick={handleMagicLinkLogin}
         disabled={isLoading}
       >
@@ -283,7 +283,7 @@ export function UnifiedLoginForm({
             Don&apos;t have an account?{" "}
             <Link
               href="/register"
-              className="text-[#0A3C1F] hover:underline font-medium"
+              className="text-primary hover:underline font-medium"
             >
               Register as a Recruit
             </Link>
@@ -291,7 +291,7 @@ export function UnifiedLoginForm({
           <p className="text-sm text-gray-600">
             <Link
               href="/volunteer-login"
-              className="text-[#0A3C1F] hover:underline"
+              className="text-primary hover:underline"
             >
               Volunteer Recruiter Login
             </Link>

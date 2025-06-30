@@ -41,10 +41,10 @@ export function TikTokChallengesWrapper({
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-bold text-[#0A3C1F]">
+            <CardTitle className="text-lg font-bold text-primary">
               Active Challenges
             </CardTitle>
-            <Badge variant="outline" className="bg-green-50 text-[#0A3C1F]">
+            <Badge variant="outline" className="bg-green-50 text-primary">
               {activeChallenges.length} Active
             </Badge>
           </div>
@@ -62,7 +62,7 @@ export function TikTokChallengesWrapper({
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <Video className="h-4 w-4 text-[#0A3C1F]" />
+                      <Video className="h-4 w-4 text-primary" />
                       <p className="font-medium">{challenge.title}</p>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -74,11 +74,11 @@ export function TikTokChallengesWrapper({
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-1">
-                      <Users className="h-4 w-4 text-[#0A3C1F]" />
+                      <Users className="h-4 w-4 text-primary" />
                       <span className="text-sm">{challenge.participants}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <TrendingUp className="h-4 w-4 text-[#0A3C1F]" />
+                      <TrendingUp className="h-4 w-4 text-primary" />
                       <span className="text-sm">{challenge.views}</span>
                     </div>
                   </div>
@@ -93,10 +93,10 @@ export function TikTokChallengesWrapper({
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
-            <CardTitle className="text-lg font-bold text-[#0A3C1F]">
+            <CardTitle className="text-lg font-bold text-primary">
               Completed Challenges
             </CardTitle>
-            <Badge variant="outline" className="bg-gray-50">
+            <Badge variant="outline" className="bg-muted">
               {completedChallenges.length} Completed
             </Badge>
           </div>

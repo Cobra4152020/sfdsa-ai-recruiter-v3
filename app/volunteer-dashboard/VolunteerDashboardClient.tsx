@@ -96,7 +96,7 @@ export default function VolunteerDashboardClient() {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </div>
     );
@@ -127,7 +127,7 @@ export default function VolunteerDashboardClient() {
         <TabsContent value="contacts">
           {/* Contact form component would go here */}
           <div className="p-8 text-center">
-            <h2 className="text-2xl font-bold text-[#0A3C1F] mb-4">
+            <h2 className="text-2xl font-bold text-primary mb-4">
               Contact Potential Recruits
             </h2>
             <p className="text-gray-600 mb-4">

@@ -24,13 +24,20 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/components/ui/use-toast";
-import { ArrowLeft, Save } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ArrowLeft, Save, Upload, Camera, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { getClientSideSupabase } from "@/lib/supabase";
 import { useUser } from "@/context/user-context";
 
 export default function EditProfilePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploadingPhoto, setIsUploadingPhoto] = useState(false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(null);
+  const [avatarApprovalStatus, setAvatarApprovalStatus] = useState<string>('none');
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -134,6 +141,106 @@ export default function EditProfilePage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handlePhotoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast({
+          title: "Invalid file type",
+          description: "Please select an image file.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast({
+          title: "File too large",
+          description: "Please select an image smaller than 5MB.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      setPhotoFile(file);
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setPhotoPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePhotoUpload = async () => {
+    if (!photoFile || !currentUser) return;
+
+    setIsUploadingPhoto(true);
+
+    try {
+      const supabase = getClientSideSupabase();
+      
+      // Create unique filename
+      const fileExt = photoFile.name.split('.').pop();
+      const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+      
+      // Upload to Supabase Storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('profile-photos')
+        .upload(fileName, photoFile);
+
+      if (uploadError) {
+        throw new Error(`Upload failed: ${uploadError.message}`);
+      }
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-photos')
+        .getPublicUrl(fileName);
+
+      // Submit for approval
+      const response = await fetch('/api/admin/photo-approval', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: currentUser.id,
+          photoUrl: publicUrl,
+          originalFilename: photoFile.name,
+          fileSize: photoFile.size,
+          mimeType: photoFile.type,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit photo for approval');
+      }
+
+      // Update UI state
+      setAvatarApprovalStatus('pending');
+      setPhotoFile(null);
+      setPhotoPreview(null);
+
+      toast({
+        title: "Photo uploaded successfully!",
+        description: "Your profile photo has been submitted for admin approval. You'll be notified once it's reviewed.",
+        duration: 7000,
+      });
+
+    } catch (error) {
+      console.error('Photo upload error:', error);
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to upload photo. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUploadingPhoto(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -186,7 +293,7 @@ export default function EditProfilePage() {
           body: JSON.stringify({
             userId: currentUser.id,
             action: 'profile_completion',
-            points: 50,
+            points: 250,
             description: 'Completed profile information'
           }),
         });
@@ -196,7 +303,7 @@ export default function EditProfilePage() {
           if (result.success && result.awarded) {
             toast({
               title: "🎉 Points Earned!",
-              description: "You earned 50 points for completing your profile!",
+              description: "You earned 250 points for completing your profile!",
               duration: 5000,
             });
           }
@@ -221,6 +328,34 @@ export default function EditProfilePage() {
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const getAvatarStatusBadge = () => {
+    switch (avatarApprovalStatus) {
+      case 'pending':
+        return (
+          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+            <Clock className="h-3 w-3 mr-1" />
+            Pending Approval
+          </Badge>
+        );
+      case 'approved':
+        return (
+          <Badge variant="secondary" className="bg-green-100 text-green-800">
+            <CheckCircle className="h-3 w-3 mr-1" />
+            Approved
+          </Badge>
+        );
+      case 'rejected':
+        return (
+          <Badge variant="secondary" className="bg-red-100 text-red-800">
+            <AlertCircle className="h-3 w-3 mr-1" />
+            Rejected
+          </Badge>
+        );
+      default:
+        return null;
     }
   };
 
@@ -259,7 +394,7 @@ export default function EditProfilePage() {
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
-        <h1 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+        <h1 className="text-2xl font-bold text-primary dark:text-[#FFD700]">
           Edit Profile
         </h1>
       </div>
@@ -268,7 +403,7 @@ export default function EditProfilePage() {
         <CardHeader>
           <CardTitle>Personal Information</CardTitle>
           <CardDescription>
-            Complete your profile to help us better serve you. Earn 50 points for completion!
+            Complete your profile to help us better serve you. Earn 250 points for completion!
           </CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
@@ -310,6 +445,90 @@ export default function EditProfilePage() {
                 required
                 disabled
               />
+            </div>
+
+            {/* Profile Photo Upload Section */}
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="profile_photo">Profile Photo</Label>
+                {getAvatarStatusBadge()}
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <Avatar className="h-20 w-20">
+                  <AvatarImage 
+                    src={photoPreview || currentAvatarUrl || undefined} 
+                    alt="Profile photo"
+                  />
+                  <AvatarFallback className="text-lg">
+                    {formData.first_name ? formData.first_name.charAt(0).toUpperCase() : 
+                     formData.last_name ? formData.last_name.charAt(0).toUpperCase() : 
+                     <Camera className="h-8 w-8" />}
+                  </AvatarFallback>
+                </Avatar>
+                
+                <div className="flex-1 space-y-2">
+                  <div className="text-sm text-gray-600">
+                    Upload a professional headshot for your profile. Photos must be approved by an administrator before being displayed.
+                  </div>
+                  
+                  {avatarApprovalStatus === 'pending' && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3">
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 text-yellow-600 mr-2" />
+                        <span className="text-sm text-yellow-800">
+                          Your profile photo is pending approval by an administrator. You'll be notified once it's reviewed.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {avatarApprovalStatus === 'rejected' && (
+                    <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                      <div className="flex items-center">
+                        <AlertCircle className="h-4 w-4 text-red-600 mr-2" />
+                        <span className="text-sm text-red-800">
+                          Your profile photo was rejected. Please upload a different professional headshot.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center space-x-2">
+                    <Input
+                      id="profile_photo"
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoSelect}
+                      className="file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-primary file:text-white hover:file:bg-primary/90"
+                    />
+                    {photoFile && (
+                      <Button
+                        type="button"
+                        onClick={handlePhotoUpload}
+                        disabled={isUploadingPhoto}
+                        size="sm"
+                      >
+                        {isUploadingPhoto ? (
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                            Uploading...
+                          </>
+                        ) : (
+                          <>
+                            <Upload className="h-4 w-4 mr-2" />
+                            Upload
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                  
+                  <div className="text-xs text-gray-500">
+                    Accepted formats: JPG, PNG, GIF. Maximum size: 5MB.
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

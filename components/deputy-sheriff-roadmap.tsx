@@ -13,7 +13,6 @@ import {
   FileText,
   Users,
   Share2,
-  Lock,
   CheckCircle,
   Star,
   Target,
@@ -29,6 +28,7 @@ import {
   Map,
   Compass,
 } from "lucide-react";
+import { CustomLockIcon } from "@/components/ui/custom-lock-icon";
 import Link from "next/link";
 import { useUser } from "@/context/user-context";
 import { useUserPoints } from "@/hooks/use-user-points";
@@ -354,7 +354,7 @@ export function DeputySheriffRoadmap() {
               <div className="mx-auto mb-4 p-4 bg-white rounded-full shadow-sm">
                 <Map className="h-6 w-6 text-blue-600" />
               </div>
-              <CardTitle className="text-2xl text-[#0A3C1F]">
+              <CardTitle className="text-2xl text-primary">
                 Deputy Sheriff Roadmap
               </CardTitle>
               <p className="text-gray-600 mt-2">
@@ -400,7 +400,7 @@ export function DeputySheriffRoadmap() {
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <Button 
                   onClick={() => openModal("signup", "recruit", "")}
-                  className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white px-8 py-3"
+                  className="bg-primary hover:bg-primary/90 text-white px-8 py-3"
                   size="lg"
                 >
                   <Trophy className="h-5 w-5 mr-2" />
@@ -409,7 +409,7 @@ export function DeputySheriffRoadmap() {
                 <Button 
                   onClick={() => openModal("signin", "recruit", "")}
                   variant="outline"
-                  className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/5 px-8 py-3"
+                  className="border-primary text-primary hover:bg-primary/5 px-8 py-3"
                   size="lg"
                 >
                   Already have an account? Sign In
@@ -577,7 +577,7 @@ export function DeputySheriffRoadmap() {
                               ? 'bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg' 
                               : 'bg-gray-100 text-gray-400'
                           }`}>
-                            {step.unlocked ? step.icon : <Lock className="h-6 w-6" />}
+                            {step.unlocked ? step.icon : <CustomLockIcon size="lg" />}
                           </div>
                           <div className="flex-1">
                             <CardTitle className="text-xl mb-3 flex items-center gap-3">
@@ -605,7 +605,7 @@ export function DeputySheriffRoadmap() {
                             </p>
                             {!step.unlocked && (
                               <div className="inline-flex items-center gap-2 px-3 py-2 bg-orange-50 border border-orange-200 rounded-lg">
-                                <Lock className="h-4 w-4 text-orange-600" />
+                                <CustomLockIcon size="sm" className="text-orange-600" />
                                 <span className="text-sm text-orange-700 font-medium">
                                   Requires {step.requiredPoints} points to unlock
                                 </span>
@@ -650,7 +650,7 @@ export function DeputySheriffRoadmap() {
                           </h4>
                           <div className="space-y-3">
                             {step.subSteps.map((subStep, subIndex) => (
-                              <div key={subIndex} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                              <div key={subIndex} className="flex items-center justify-between p-3 bg-muted rounded-lg border border-gray-100">
                                 <div className="flex items-center gap-3">
                                   {subStep.completed ? (
                                     <CheckCircle className="h-5 w-5 text-green-600" />
@@ -668,7 +668,7 @@ export function DeputySheriffRoadmap() {
                                   className={`px-3 py-1 font-semibold ${
                                     subStep.completed 
                                       ? 'bg-green-100 text-green-700 border-green-200' 
-                                      : 'border-[#FFD700] text-[#0A3C1F]'
+                                      : 'border-[#FFD700] text-primary'
                                   }`}
                                 >
                                   +{subStep.points} pts

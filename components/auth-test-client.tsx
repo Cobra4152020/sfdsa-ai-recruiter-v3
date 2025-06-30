@@ -59,7 +59,7 @@ export function AuthTestClient() {
       {loading ? (
         <div className="text-center py-4">
           <div
-            className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-[#0A3C1F] rounded-full"
+            className="animate-spin inline-block w-6 h-6 border-2 border-current border-t-transparent text-primary rounded-full"
             aria-hidden="true"
           ></div>
           <p className="mt-2">Checking authentication status...</p>
@@ -73,7 +73,7 @@ export function AuthTestClient() {
             </div>
           )}
 
-          <div className="bg-gray-50 p-4 rounded-md">
+          <div className="bg-muted p-4 rounded-md">
             <h3 className="font-medium mb-2">Session Status</h3>
             <p className="mb-2">
               {sessionData ? (
@@ -98,7 +98,7 @@ export function AuthTestClient() {
           </div>
 
           {userInfo && (
-            <div className="bg-gray-50 p-4 rounded-md">
+            <div className="bg-muted p-4 rounded-md">
               <h3 className="font-medium mb-2">User Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
@@ -139,7 +139,7 @@ export function AuthTestClient() {
             {!sessionData && (
               <Button
                 onClick={() => (window.location.href = "/login")}
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                className="bg-primary hover:bg-primary/90"
               >
                 Go to Login
               </Button>

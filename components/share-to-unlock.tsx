@@ -19,7 +19,6 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  Lock,
   Unlock,
   Share2,
   Trophy,
@@ -28,6 +27,7 @@ import {
   Linkedin,
   Mail,
 } from "lucide-react";
+import { CustomLockIcon } from "@/components/ui/custom-lock-icon";
 import { AchievementBadge } from "./achievement-badge";
 import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/context/user-context";
@@ -191,11 +191,11 @@ export function ShareToUnlock({
     <>
       <Card className={`overflow-hidden ${className}`}>
         <CardHeader
-          className={`bg-gradient-to-r ${isLocked ? "from-gray-700 to-gray-900" : "from-[#0A3C1F] to-[#0A3C1F]/80"} text-white`}
+          className={`bg-gradient-to-r ${isLocked ? "from-gray-700 to-gray-900" : "from-primary to-primary/80"} text-white`}
         >
           <CardTitle className="flex items-center">
             {isLocked ? (
-              <Lock className="mr-2 h-5 w-5" />
+              <CustomLockIcon size="md" className="mr-2" />
             ) : (
               <Unlock className="mr-2 h-5 w-5" />
             )}
@@ -219,7 +219,7 @@ export function ShareToUnlock({
             {isLocked && (
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="bg-black/60 rounded-full p-2">
-                  <Lock className="h-8 w-8 text-white" />
+                  <CustomLockIcon size="xl" className="text-white" />
                 </div>
               </div>
             )}
@@ -232,7 +232,7 @@ export function ShareToUnlock({
           {isLocked && (
             <div className="mt-4 w-full bg-gray-200 rounded-full h-2.5">
               <div
-                className="bg-[#0A3C1F] h-2.5 rounded-full"
+                className="bg-primary h-2.5 rounded-full"
                 style={{
                   width: `${(sharesCompleted / requiredShares) * 100}%`,
                 }}
@@ -244,7 +244,7 @@ export function ShareToUnlock({
           {isLocked ? (
             <Button
               onClick={handleShareClick}
-              className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+              className="w-full bg-primary hover:bg-primary/90 text-white"
             >
               <Share2 className="mr-2 h-4 w-4" />
               Share to Unlock
@@ -253,7 +253,7 @@ export function ShareToUnlock({
             <Button
               onClick={handleShareClick}
               variant="outline"
-              className="w-full border-[#0A3C1F] text-[#0A3C1F]"
+              className="w-full border-primary text-primary"
             >
               <Trophy className="mr-2 h-4 w-4" />
               Share Your Achievement

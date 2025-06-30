@@ -70,10 +70,25 @@ export function badgeEarned({
     </head>
     <body>
       <div class="container">
-        <div class="header">
-          <h1>Congratulations, ${recipientName}!</h1>
+        <div style="
+          background-color: #2dd4bf;
+          color: white;
+          padding: 30px 20px;
+          text-align: center;
+        ">
+          <h1 style="margin: 0; font-size: 28px; font-weight: 700;">
+            🏆 Badge Earned!
+          </h1>
         </div>
         <div class="content">
+          <h2 style="
+            color: #2dd4bf;
+            font-size: 24px;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+          ">
+            Congratulations, ${recipientName}!
+          </h2>
           <p>You've earned the <strong>${badgeName}</strong> badge in your journey to become a San Francisco Deputy Sheriff!</p>
           
           <div class="badge-info">

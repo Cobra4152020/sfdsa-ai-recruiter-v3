@@ -4,17 +4,17 @@
  */
 
 export const isStaticBuild = () => {
-  return process.env.NEXT_PUBLIC_STATIC_BUILD === "true";
+  return process.env.NEXT_PUBLIC_STATIC_BUILD === "true" && process.env.NODE_ENV === "production";
 };
 
 export const safeApiFetch = async (url: string, options?: RequestInit) => {
-  // If we're in a static build, don't make API calls
+  // If we're in a static build AND in production, don't make API calls
   if (isStaticBuild()) {
     console.log(`Static build detected - skipping API call to: ${url}`);
     throw new Error('API routes disabled in static builds');
   }
 
-  // Normal fetch in non-static builds
+  // Normal fetch in non-static builds or in development
   return fetch(url, options);
 };
 

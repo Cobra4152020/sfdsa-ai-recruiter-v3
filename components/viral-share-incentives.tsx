@@ -29,7 +29,7 @@ import {
   Heart,
   Award
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import { useUser } from "@/context/user-context";
 import { useAuthModal } from "@/context/auth-modal-context";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -556,7 +556,7 @@ export function ViralShareIncentives({ className }: ViralChallengeProps) {
                   { rank: 3, name: "Jessica L.", shares: 28, points: 1120, avatar: "JL" },
                   { rank: 4, name: "You", shares: shareStats.weeklyShares, points: shareStats.pointsEarned, avatar: "YOU", isCurrentUser: true }
                 ].map(user => (
-                  <div key={user.rank} className={`flex items-center justify-between p-3 rounded-lg ${user.isCurrentUser ? 'bg-blue-50 border-blue-200 border' : 'bg-gray-50'}`}>
+                  <div key={user.rank} className={`flex items-center justify-between p-3 rounded-lg ${user.isCurrentUser ? 'bg-blue-50 border-blue-200 border' : 'bg-muted'}`}>
                     <div className="flex items-center gap-3">
                       <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${
                         user.rank === 1 ? 'bg-yellow-100 text-yellow-800' :

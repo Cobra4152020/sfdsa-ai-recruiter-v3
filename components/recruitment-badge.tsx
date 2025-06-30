@@ -46,8 +46,8 @@ export function RecruitmentBadge({
     <div className={`flex flex-col items-center ${className}`}>
       <div className={`relative ${sizeClasses[size].badge}`}>
         <div className="absolute inset-0 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFD700]/60 opacity-50 blur-md"></div>
-        <div className="relative h-full w-full rounded-full bg-gradient-to-br from-[#0A3C1F] to-[#0A3C1F]/80 p-1">
-          <div className="h-full w-full rounded-full bg-[#0A3C1F] flex flex-col items-center justify-center text-white p-4">
+        <div className="relative h-full w-full rounded-full bg-gradient-to-br from-primary to-primary/80 p-1">
+          <div className="h-full w-full rounded-full bg-primary flex flex-col items-center justify-center text-white p-4">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className={`${sizeClasses[size].icon} text-[#FFD700] mb-2`}

@@ -221,7 +221,7 @@ export function RecruiterPerformanceChart({
 
         {showDetailed && (
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="p-4 bg-gray-50 border rounded-lg">
+            <div className="p-4 bg-muted border rounded-lg">
               <h3 className="font-medium text-gray-800">Current Month</h3>
               <div className="mt-2 grid grid-cols-2 gap-2">
                 <div>
@@ -256,7 +256,7 @@ export function RecruiterPerformanceChart({
               </div>
             </div>
 
-            <div className="p-4 bg-gray-50 border rounded-lg">
+            <div className="p-4 bg-muted border rounded-lg">
               <h3 className="font-medium text-gray-800">Trend Analysis</h3>
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
@@ -290,7 +290,7 @@ export function RecruiterPerformanceChart({
               </div>
             </div>
 
-            <div className="p-4 bg-gray-50 border rounded-lg">
+            <div className="p-4 bg-muted border rounded-lg">
               <h3 className="font-medium text-gray-800">Performance Summary</h3>
               <div className="mt-2">
                 <p className="text-sm text-gray-600">

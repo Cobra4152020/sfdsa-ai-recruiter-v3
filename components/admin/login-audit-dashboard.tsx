@@ -56,7 +56,7 @@ export function LoginAuditDashboard({
         );
       case "logout":
         return (
-          <Badge variant="outline" className="bg-gray-50 text-gray-700">
+          <Badge variant="outline" className="bg-muted text-gray-700">
             Logout
           </Badge>
         );
@@ -85,7 +85,7 @@ export function LoginAuditDashboard({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-lg font-bold text-[#0A3C1F]">
+            <CardTitle className="text-lg font-bold text-primary">
               Login Activity
             </CardTitle>
             <CardDescription>

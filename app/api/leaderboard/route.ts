@@ -101,7 +101,7 @@ export async function GET(request: Request) {
 
     const supabase = getServiceSupabase();
     
-    // Fetch real users from the database with badge integration
+    // Fetch real users from the database with badge integration and profile photos
     let query = supabase
       .from("users")
       .select(`
@@ -112,7 +112,10 @@ export async function GET(request: Request) {
         has_applied,
         created_at,
         updated_at,
-        total_points
+        total_points,
+        user_profiles (
+          avatar_url
+        )
       `)
       .not("participation_count", "is", null)
       .gte("participation_count", 1); // Only users with at least 1 point
@@ -199,6 +202,9 @@ export async function GET(request: Request) {
         // Calculate total points: participation + badge points
         const totalPoints = (user.total_points || user.participation_count || 0) + totalBadgePoints;
 
+        // Get avatar URL from user_profiles junction
+        const avatarUrl = user.user_profiles?.[0]?.avatar_url || null;
+
         return {
           id: user.id,
           name: user.name || user.email?.split('@')[0] || 'Anonymous User',
@@ -207,7 +213,7 @@ export async function GET(request: Request) {
           badge_count: realBadgeCount,
           nft_count: Math.floor(totalPoints / 500), // Estimated NFTs based on total points
           has_applied: user.has_applied || false,
-          avatar_url: null, // Real users don't have avatars set yet
+          avatar_url: avatarUrl, // Use approved profile photo if available
           badges: realBadgeCount,
           last_active: user.updated_at || user.created_at || new Date().toISOString(),
           rank: index + 1,

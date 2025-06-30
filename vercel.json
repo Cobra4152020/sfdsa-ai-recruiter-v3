@@ -4,7 +4,6 @@
   "installCommand": "npm install",
   "outputDirectory": ".next",
   "env": {
-    "NEXT_PUBLIC_DISABLE_DATABASE_CHECKS": "true",
     "NEXT_PUBLIC_STATIC_BUILD": "false",
     "SKIP_DATABASE_VALIDATION": "true",
     "DISABLE_DB_DURING_BUILD": "true",

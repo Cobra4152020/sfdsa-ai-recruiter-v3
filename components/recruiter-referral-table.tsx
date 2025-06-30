@@ -173,7 +173,7 @@ export function RecruiterReferralTable({
         return (
           <Badge
             variant="outline"
-            className="bg-gray-50 text-gray-800 border-gray-300"
+            className="bg-muted text-gray-800 border-gray-300"
           >
             {status}
           </Badge>
@@ -361,7 +361,7 @@ export function RecruiterReferralTable({
                     </TableRow>
                     {expandedReferral === referral.id && (
                       <TableRow>
-                        <TableCell colSpan={5} className="p-4 bg-gray-50">
+                        <TableCell colSpan={5} className="p-4 bg-muted">
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                               <h4 className="font-medium mb-2">

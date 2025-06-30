@@ -38,7 +38,7 @@ export default function LeaderboardPage() {
           </Card>
           <Card className="text-center hover:shadow-lg transition-shadow border-gray-200 bg-gradient-to-br from-gray-50 to-slate-50">
             <CardContent className="p-6">
-              <div className="bg-gray-500 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="bg-muted0 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
                 <Medal className="h-6 w-6 text-white" />
               </div>
               <h3 className="font-semibold text-lg text-gray-800">Badge Champions</h3>

@@ -119,12 +119,12 @@ export function DonationForm({
           <PaymentElement id="payment-element" />
 
           {pointsEstimate !== null && (
-            <div className="bg-gray-50 p-3 rounded-md border border-gray-200">
+            <div className="bg-muted p-3 rounded-md border border-gray-200">
               <div className="flex justify-between items-center">
                 <span className="text-sm font-medium">
                   Points you&apos;ll earn:
                 </span>
-                <Badge variant="secondary" className="text-[#0A3C1F]">
+                <Badge variant="secondary" className="text-primary">
                   {pointsEstimate.toLocaleString()} points
                 </Badge>
               </div>
@@ -140,7 +140,7 @@ export function DonationForm({
             <input
               type="checkbox"
               id="recognition"
-              className="h-4 w-4 rounded border-gray-300 text-[#0A3C1F] focus:ring-[#0A3C1F]"
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
               checked={allowRecognition}
               onChange={(e) => setAllowRecognition(e.target.checked)}
             />

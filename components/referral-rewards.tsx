@@ -102,7 +102,7 @@ export function ReferralRewards() {
   return (
     <>
       <Card className="w-full shadow-md">
-        <CardHeader className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 text-white">
+        <CardHeader className="bg-gradient-to-r from-primary to-primary/80 text-white">
           <CardTitle className="flex items-center">
             <Users className="mr-2 h-5 w-5" />
             Referral Rewards Program
@@ -121,7 +121,7 @@ export function ReferralRewards() {
                 </p>
               </div>
               <Button
-                className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                className="bg-primary hover:bg-primary/90 text-white"
                 onClick={handleShare}
               >
                 <Share2 className="mr-2 h-4 w-4" />
@@ -150,7 +150,7 @@ export function ReferralRewards() {
             <div className="flex justify-between items-center">
               <h3 className="font-medium">Referral Reward Tiers</h3>
               <Link href="/gamification">
-                <Button variant="link" className="text-[#0A3C1F] p-0">
+                <Button variant="link" className="text-primary p-0">
                   Learn more about referrals
                 </Button>
               </Link>
@@ -162,13 +162,13 @@ export function ReferralRewards() {
                   key={tier.count}
                   className={`p-4 border rounded-lg transition-all ${
                     tier.achieved
-                      ? "bg-[#0A3C1F]/5 border-[#0A3C1F]/20"
+                      ? "bg-primary/5 border-primary/20"
                       : "border-gray-200"
                   }`}
                 >
                   <div className="flex items-center mb-2">
                     <div
-                      className={`p-2 rounded-full ${tier.achieved ? "bg-[#0A3C1F]/10" : "bg-gray-100"}`}
+                      className={`p-2 rounded-full ${tier.achieved ? "bg-primary/10" : "bg-gray-100"}`}
                     >
                       {tier.icon}
                     </div>
@@ -185,7 +185,7 @@ export function ReferralRewards() {
                       {tier.count} Referrals
                     </span>
                     {tier.achieved ? (
-                      <Badge className="bg-[#0A3C1F] text-white">
+                      <Badge className="bg-primary text-white">
                         Unlocked
                       </Badge>
                     ) : (
@@ -242,9 +242,9 @@ export function ReferralRewards() {
             </Button>
           </div>
 
-          <div className="bg-[#0A3C1F]/10 border border-[#0A3C1F]/20 rounded-lg p-4 mt-4">
-            <h4 className="font-medium text-[#0A3C1F] flex items-center">
-              <Award className="mr-2 h-4 w-4 text-[#0A3C1F]" />
+          <div className="bg-primary/10 border border-primary/20 rounded-lg p-4 mt-4">
+            <h4 className="font-medium text-primary flex items-center">
+              <Award className="mr-2 h-4 w-4 text-primary" />
               Referral Tip
             </h4>
             <p className="text-sm mt-1">

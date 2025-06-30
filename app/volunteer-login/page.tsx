@@ -34,7 +34,7 @@ export default function VolunteerLoginPage() {
               initialTab: "signin",
             })
           }
-          className="bg-[#0A3C1F] text-white py-2 px-4 rounded hover:bg-[#0A3C1F]/90"
+          className="bg-primary text-white py-2 px-4 rounded hover:bg-primary/90"
         >
           Open Login Form
         </button>

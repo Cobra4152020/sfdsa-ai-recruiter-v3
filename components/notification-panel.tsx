@@ -184,7 +184,7 @@ export function NotificationPanel({ userId, onClose }: NotificationPanelProps) {
             {notifications.map((notification) => (
               <li
                 key={notification.id}
-                className={`p-4 border-b last:border-b-0 hover:bg-gray-50 ${
+                className={`p-4 border-b last:border-b-0 hover:bg-accent/10 ${
                   isUnread(notification) ? "bg-blue-50" : ""
                 }`}
               >

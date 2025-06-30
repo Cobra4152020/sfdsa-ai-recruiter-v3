@@ -63,11 +63,36 @@ export function welcome({
       </style>
     </head>
     <body>
-      <div class="container">
-        <div class="header">
-          <h1>Welcome, ${recipientName}!</h1>
+      <div style="
+        max-width: 600px;
+        margin: 0 auto;
+        background-color: #ffffff;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      ">
+        <!-- Header -->
+        <div style="
+          background-color: #2dd4bf;
+          color: white;
+          padding: 30px 20px;
+          text-align: center;
+        ">
+          <h1 style="margin: 0; font-size: 28px; font-weight: 700;">
+            Welcome to SF Deputy Sheriff Recruitment!
+          </h1>
         </div>
-        <div class="content">
+        
+        <!-- Content -->
+        <div style="padding: 30px 20px;">
+          <h2 style="
+            color: #2dd4bf;
+            font-size: 24px;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+          ">
+            Hello ${recipientName}!
+          </h2>
           <p>Thank you for your interest in becoming a San Francisco Deputy Sheriff. We're excited to have you begin this journey!</p>
           
           <div class="steps">

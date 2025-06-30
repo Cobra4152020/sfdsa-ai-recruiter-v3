@@ -97,7 +97,7 @@ export function PointsLog({ userId }: PointsLogProps) {
       case 'chat_participation':
         return 'bg-teal-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-muted0';
     }
   };
 
@@ -215,7 +215,7 @@ export function PointsLog({ userId }: PointsLogProps) {
               {pointsLog.map((entry, index) => (
                 <div
                   key={entry.id || index}
-                  className="flex items-start space-x-3 p-3 rounded-lg bg-gray-50 dark:bg-gray-800/50"
+                  className="flex items-start space-x-3 p-3 rounded-lg bg-muted/50"
                 >
                   <div
                     className={`p-2 rounded-full text-white ${getActionColor(entry.action)}`}

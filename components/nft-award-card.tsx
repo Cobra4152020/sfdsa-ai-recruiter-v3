@@ -62,7 +62,7 @@ export function NFTAwardCard({
       <Card
         className={`overflow-hidden ${className} ${!isAwarded ? "opacity-50" : ""}`}
       >
-        <CardHeader className="p-4 bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 text-white">
+        <CardHeader className="p-4 bg-gradient-to-r from-primary to-primary/80 text-white">
           <CardTitle className="text-lg">{name}</CardTitle>
         </CardHeader>
         <CardContent className="p-4 flex flex-col items-center">

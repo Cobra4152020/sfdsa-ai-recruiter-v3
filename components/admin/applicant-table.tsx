@@ -153,7 +153,7 @@ export function ApplicantTable({
 
   if (applicants.length === 0) {
     return (
-      <div className="text-center py-10 border rounded-lg bg-gray-50">
+      <div className="text-center py-10 border rounded-lg bg-muted">
         <p className="text-gray-500">
           No applicants found matching your criteria.
         </p>

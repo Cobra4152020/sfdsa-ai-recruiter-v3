@@ -366,7 +366,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
     return (
       <div className={className}>
         <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#0A3C1F]"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
         </div>
       </div>
     );
@@ -392,7 +392,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
     <div className={className}>
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+          <h2 className="text-2xl font-bold text-primary dark:text-[#FFD700]">
             Recruit Dashboard
           </h2>
           <TabsList>
@@ -522,8 +522,8 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                         key={notification.id}
                         className="flex items-start space-x-4"
                       >
-                        <div className="bg-[#0A3C1F]/10 rounded-full p-2">
-                          <Bell className="h-4 w-4 text-[#0A3C1F]" />
+                        <div className="bg-primary/10 rounded-full p-2">
+                          <Bell className="h-4 w-4 text-primary" />
                         </div>
                         <div>
                           <h4 className="font-medium">
@@ -727,9 +727,9 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Trivia Stats Card */}
             <Card>
-              <CardHeader className="bg-[#0A3C1F]/5">
+              <CardHeader className="bg-primary/5">
                 <CardTitle className="flex items-center">
-                  <GamepadIcon className="h-5 w-5 mr-2 text-[#0A3C1F]" />
+                  <GamepadIcon className="h-5 w-5 mr-2 text-primary" />
                   Your Trivia Statistics
                 </CardTitle>
                 <CardDescription>
@@ -739,15 +739,15 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
               <CardContent className="pt-6">
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-[#0A3C1F]/10 p-4 rounded-lg text-center">
+                    <div className="bg-primary/10 p-4 rounded-lg text-center">
                       <p className="text-sm text-gray-500">Games Played</p>
-                      <p className="text-3xl font-bold text-[#0A3C1F]">
+                      <p className="text-3xl font-bold text-primary">
                         {triviaStats.gamesPlayed}
                       </p>
                     </div>
                     <div className="bg-[#FFD700]/10 p-4 rounded-lg text-center">
                       <p className="text-sm text-gray-500">Best Score</p>
-                      <p className="text-3xl font-bold text-[#0A3C1F]">
+                      <p className="text-3xl font-bold text-primary">
                         {triviaStats.bestScore}
                       </p>
                     </div>
@@ -781,7 +781,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                               <Award className="h-5 w-5 text-[#FFD700]" />
                             </div>
                             <div>
-                              <p className="font-medium text-[#0A3C1F]">
+                              <p className="font-medium text-primary">
                                 {badge.name}
                               </p>
                               <p className="text-xs text-gray-500">
@@ -808,7 +808,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
 
             {/* Play Now Card */}
             <Card>
-              <CardHeader className="bg-gradient-to-r from-[#0A3C1F]/10 to-[#FFD700]/10">
+              <CardHeader className="bg-gradient-to-r from-primary/10 to-[#FFD700]/10">
                 <CardTitle>Play SF Trivia with Sgt. Ken</CardTitle>
                 <CardDescription>
                   Test your knowledge and earn rewards
@@ -816,11 +816,11 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
               </CardHeader>
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center text-center space-y-4">
-                  <div className="h-32 w-32 bg-[#0A3C1F]/10 rounded-full flex items-center justify-center">
-                    <GamepadIcon className="h-16 w-16 text-[#0A3C1F]" />
+                  <div className="h-32 w-32 bg-primary/10 rounded-full flex items-center justify-center">
+                    <GamepadIcon className="h-16 w-16 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-[#0A3C1F] mb-2">
+                    <h3 className="text-xl font-bold text-primary mb-2">
                       Ready to Test Your Knowledge?
                     </h3>
                     <p className="text-gray-600 mb-4">
@@ -829,7 +829,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                       Earn points and unlock special badges!
                     </p>
 
-                    <div className="bg-[#0A3C1F]/5 p-4 rounded-lg text-left mb-6">
+                    <div className="bg-primary/5 p-4 rounded-lg text-left mb-6">
                       <div className="flex items-center mb-2">
                         <Trophy className="h-5 w-5 text-[#FFD700] mr-2" />
                         <h4 className="font-semibold">Rewards for Playing:</h4>
@@ -846,7 +846,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                     </div>
 
                     <Link href="/trivia">
-                      <Button className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 w-full">
+                      <Button className="bg-primary hover:bg-primary/90 w-full">
                         <GamepadIcon className="h-4 w-4 mr-2" />
                         Play Trivia Now
                       </Button>
@@ -890,7 +890,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                       <td className="py-3">1,350</td>
                       <td className="py-3">5</td>
                     </tr>
-                    <tr className="border-b bg-gray-50">
+                    <tr className="border-b bg-muted">
                       <td className="py-3 font-medium">2</td>
                       <td className="py-3 font-medium">Sarah Williams</td>
                       <td className="py-3">23</td>
@@ -906,7 +906,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                       <td className="py-3">950</td>
                       <td className="py-3">3</td>
                     </tr>
-                    <tr className="border-b bg-[#0A3C1F]/10">
+                    <tr className="border-b bg-primary/10">
                       <td className="py-3 font-medium">8</td>
                       <td className="py-3 font-medium">You</td>
                       <td className="py-3">{triviaStats.gamesPlayed}</td>
@@ -947,8 +947,8 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                         className="p-4 border rounded-lg bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
                       >
                         <div className="flex items-start space-x-3">
-                          <div className="bg-[#0A3C1F]/10 rounded-full p-2">
-                            <CalendarIcon className="h-4 w-4 text-[#0A3C1F]" />
+                          <div className="bg-primary/10 rounded-full p-2">
+                            <CalendarIcon className="h-4 w-4 text-primary" />
                           </div>
                           <div>
                             <h4 className="font-medium">{appointment.title}</h4>
@@ -1085,7 +1085,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                   </div>
 
                   <Button
-                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
                     onClick={handleScheduleAppointment}
                   >
                     Request Appointment
@@ -1150,7 +1150,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                   <div className="flex gap-2">
                     <Link href="/trivia" className="flex-1">
                       <Button 
-                        className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                        className="w-full bg-primary hover:bg-primary/90 text-white"
                       >
                         <GamepadIcon className="h-4 w-4 mr-2" />
                         Play Trivia to Earn Points
@@ -1159,7 +1159,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                     <Link href="/daily-briefing">
                       <Button 
                         variant="outline" 
-                        className="border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10"
+                        className="border-primary text-primary hover:bg-primary/10"
                       >
                         <MessageSquare className="h-4 w-4 mr-2" />
                         Daily Briefing
@@ -1185,7 +1185,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                 <CardContent>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <Link href="/background-preparation" className="flex-1">
-                      <Button className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                      <Button className="w-full bg-primary hover:bg-primary/90 text-white">
                         <ExternalLink className="h-4 w-4 mr-2" />
                         Access Complete Background Prep Guide
                       </Button>
@@ -1212,7 +1212,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-[#0A3C1F]" />
+                      <FileText className="h-5 w-5 text-primary" />
                       Complete Document Checklist
                     </CardTitle>
                     <CardDescription>
@@ -1255,7 +1255,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                     </div>
                     
                     <Link href="/background-preparation">
-                      <Button variant="outline" className="w-full mt-4 border-[#0A3C1F] text-[#0A3C1F] hover:bg-[#0A3C1F]/10">
+                      <Button variant="outline" className="w-full mt-4 border-primary text-primary hover:bg-primary/10">
                         View Complete Checklist
                       </Button>
                     </Link>
@@ -1316,7 +1316,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                     </div>
                     
                     <Link href="/background-preparation">
-                      <Button className="w-full mt-4 bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white">
+                      <Button className="w-full mt-4 bg-primary hover:bg-primary/90 text-white">
                         <ExternalLink className="h-4 w-4 mr-2" />
                         Start Background Preparation
                       </Button>
@@ -1351,8 +1351,8 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                       }`}
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="bg-[#0A3C1F]/10 rounded-full p-2">
-                          <MessageSquare className="h-4 w-4 text-[#0A3C1F]" />
+                        <div className="bg-primary/10 rounded-full p-2">
+                          <MessageSquare className="h-4 w-4 text-primary" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between">
@@ -1462,7 +1462,7 @@ export function RecruitDashboard({ className }: RecruitDashboardProps) {
                   </div>
 
                   <Button
-                    className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+                    className="w-full bg-primary hover:bg-primary/90 text-white"
                     onClick={handleSendMessage}
                   >
                     Send Message

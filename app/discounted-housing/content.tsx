@@ -119,7 +119,7 @@ export default function DiscountedHousingContent() {
         <div className="max-w-6xl mx-auto">
           {/* Header */}
           <div className="text-center mb-10">
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6">
               🏠 Discounted Housing Programs
             </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto mb-8">
@@ -128,22 +128,22 @@ export default function DiscountedHousingContent() {
             </p>
 
             {/* Quick Stats */}
-            <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-6 mb-8">
+            <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-6 mb-8">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">$100K</div>
+                  <div className="text-3xl font-bold text-primary">$100K</div>
                   <div className="text-sm text-gray-600 font-medium">Max Down Payment Assistance</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">20%</div>
+                  <div className="text-3xl font-bold text-primary">20%</div>
                   <div className="text-sm text-gray-600 font-medium">Average Rent Savings</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">50+</div>
+                  <div className="text-3xl font-bold text-primary">50+</div>
                   <div className="text-sm text-gray-600 font-medium">Participating Properties</div>
                 </div>
                 <div>
-                  <div className="text-3xl font-bold text-[#0A3C1F]">24/7</div>
+                  <div className="text-3xl font-bold text-primary">24/7</div>
                   <div className="text-sm text-gray-600 font-medium">Housing Support</div>
                 </div>
               </div>
@@ -172,7 +172,7 @@ export default function DiscountedHousingContent() {
                       <p className="text-white/80">
                         Special housing options for San Francisco's finest
                       </p>
-                      <Badge className="mt-2 bg-[#FFD700] text-[#0A3C1F]">
+                      <Badge className="mt-2 bg-[#FFD700] text-primary">
                         Law Enforcement Priority
                       </Badge>
                     </div>
@@ -377,7 +377,7 @@ export default function DiscountedHousingContent() {
               </Tabs>
 
               {/* Call to Action */}
-              <Card className="bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/90 text-white shadow-lg">
+              <Card className="bg-gradient-to-r from-primary to-primary/90 text-white shadow-lg">
                 <CardContent className="p-8 text-center">
                   <h2 className="text-3xl font-bold mb-3">
                     Ready to Find Your New Home?
@@ -388,7 +388,7 @@ export default function DiscountedHousingContent() {
                   </p>
                   <div className="flex flex-col sm:flex-row justify-center gap-4">
                     <Link href="/contact">
-                      <Button size="lg" className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-[#0A3C1F] font-semibold">
+                      <Button size="lg" className="bg-[#FFD700] hover:bg-[#FFD700]/90 text-primary font-semibold">
                         View Available Properties
                       </Button>
                     </Link>

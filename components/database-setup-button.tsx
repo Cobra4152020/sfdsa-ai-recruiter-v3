@@ -45,7 +45,7 @@ export function DatabaseSetupButton() {
     <Button
       onClick={handleSetup}
       disabled={isLoading}
-      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+      className="bg-primary hover:bg-primary/90"
     >
       {isLoading ? "Setting up database..." : "Setup Database"}
     </Button>

@@ -92,7 +92,7 @@ const triviaGames = [
     name: "SF Football Trivia",
     description:
       "Test your knowledge about San Francisco football history and the 49ers.",
-    icon: <Football className="h-6 w-6 text-[#0A3C1F]" />,
+    icon: <Football className="h-6 w-6 text-primary" />,
     image: "/levis-stadium-49ers.png",
     color: "bg-red-50 border-red-200",
     textColor: "text-red-800",
@@ -104,7 +104,7 @@ const triviaGames = [
     name: "SF Baseball Trivia",
     description:
       "How much do you know about the San Francisco Giants and baseball in the Bay Area?",
-    icon: <Baseball className="h-6 w-6 text-[#0A3C1F]" />,
+    icon: <Baseball className="h-6 w-6 text-primary" />,
     image: "/oracle-park-giants.png",
     color: "bg-orange-50 border-orange-200",
     textColor: "text-orange-800",
@@ -116,7 +116,7 @@ const triviaGames = [
     name: "SF Basketball Trivia",
     description:
       "Challenge yourself with questions about the Golden State Warriors and basketball in San Francisco.",
-    icon: <Basketball className="h-6 w-6 text-[#0A3C1F]" />,
+    icon: <Basketball className="h-6 w-6 text-primary" />,
     image: "/chase-center-gsw.png",
     color: "bg-blue-50 border-blue-200",
     textColor: "text-blue-800",
@@ -128,7 +128,7 @@ const triviaGames = [
     name: "SF District Trivia",
     description:
       "Test your knowledge of San Francisco&apos;s unique and diverse neighborhoods and districts.",
-    icon: <MapPin className="h-6 w-6 text-[#0A3C1F]" />,
+    icon: <MapPin className="h-6 w-6 text-primary" />,
     image: "/mission-district-sf.png",
     color: "bg-purple-50 border-purple-200",
     textColor: "text-purple-800",
@@ -140,7 +140,7 @@ const triviaGames = [
     name: "SF Most Popular Tourist Spots",
     description:
       "How well do you know San Francisco&apos;s famous landmarks and tourist attractions?",
-    icon: <Landmark className="h-6 w-6 text-[#0A3C1F]" />,
+    icon: <Landmark className="h-6 w-6 text-primary" />,
     image: "/golden-gate-bridge.png",
     color: "bg-green-50 border-green-200",
     textColor: "text-green-800",
@@ -152,7 +152,7 @@ const triviaGames = [
     name: "SF Best Places to Visit",
     description:
       "Test your knowledge about the best day trips and places to visit around San Francisco.",
-    icon: <Compass className="h-6 w-6 text-[#0A3C1F]" />,
+    icon: <Compass className="h-6 w-6 text-primary" />,
     image: "/muir-woods-day-trip.png",
     color: "bg-amber-50 border-amber-200",
     textColor: "text-amber-800",
@@ -189,7 +189,7 @@ export default function TriviaHubPage() {
         <main className="container mx-auto px-4 py-8">
         <div className="mb-8">
           <div className="flex flex-col md:flex-row justify-between items-center mb-4">
-            <h1 className="text-3xl font-bold text-[#0A3C1F] mb-2 md:mb-0">
+            <h1 className="text-3xl font-bold text-primary mb-2 md:mb-0">
               San Francisco Trivia Games
             </h1>
             <div className="flex items-center gap-2">
@@ -240,7 +240,7 @@ export default function TriviaHubPage() {
                         </p>
                         <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-[#0A3C1F]"
+                            className="h-full bg-primary"
                             style={{
                               width: `${(Object.keys(gameHistory).length / triviaGames.length) * 100}%`,
                             }}
@@ -255,24 +255,24 @@ export default function TriviaHubPage() {
           </div>
           
           {/* Quick Stats */}
-          <div className="bg-gradient-to-r from-[#0A3C1F]/10 to-transparent border border-[#0A3C1F]/20 rounded-lg p-4 mb-4">
+          <div className="bg-gradient-to-r from-primary/10 to-transparent border border-primary/20 rounded-lg p-4 mb-4">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
               <div>
-                <div className="text-2xl font-bold text-[#0A3C1F]">{triviaGames.length}</div>
+                <div className="text-2xl font-bold text-primary">{triviaGames.length}</div>
                 <div className="text-sm text-gray-600">Games Available</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-[#0A3C1F]">
+                <div className="text-2xl font-bold text-primary">
                   {triviaGames.reduce((total, game) => total + 8, 0)}
                 </div>
                 <div className="text-sm text-gray-600">Total Questions</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-[#0A3C1F]">60-120</div>
+                <div className="text-2xl font-bold text-primary">60-120</div>
                 <div className="text-sm text-gray-600">Points Per Game</div>
               </div>
               <div>
-                <div className="text-2xl font-bold text-[#0A3C1F]">🏆</div>
+                <div className="text-2xl font-bold text-primary">🏆</div>
                 <div className="text-sm text-gray-600">Badges Available</div>
               </div>
             </div>
@@ -399,7 +399,7 @@ export default function TriviaHubPage() {
                 <CardFooter className="pt-2">
                   <Link href={`/trivia/${game.id}`} className="w-full">
                     <Button
-                      className={`w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 transition-all duration-300
+                      className={`w-full bg-primary hover:bg-primary/90 transition-all duration-300
                         ${hoveredCard === game.id ? "shadow-md" : ""}`}
                     >
                       <Trophy

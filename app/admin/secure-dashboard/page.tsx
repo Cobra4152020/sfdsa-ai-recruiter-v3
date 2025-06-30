@@ -51,7 +51,7 @@ export default function SecureDashboardPage() {
   return (
     <PageWrapper>
       <div className="container mx-auto py-10">
-        <h1 className="text-3xl font-bold mb-8 text-[#0A3C1F]">
+        <h1 className="text-3xl font-bold mb-8 text-primary">
           Secure Admin Dashboard
         </h1>
 

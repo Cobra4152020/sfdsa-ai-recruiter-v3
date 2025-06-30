@@ -226,7 +226,7 @@ export function UserProfileCard({
       <Card className={className}>
         <CardContent className="p-4">
           <div className="flex items-center space-x-4">
-            <Avatar className="h-12 w-12 border-2 border-[#0A3C1F]">
+            <Avatar className="h-12 w-12 border-2 border-primary">
               <AvatarImage
                 src={avatarUrlToUse || "/placeholder.svg"}
                 alt={profile.name}
@@ -294,7 +294,7 @@ export function UserProfileCard({
       <CardHeader className="pb-2">
         <div className="flex justify-between items-start">
           <div className="flex items-center">
-            <Avatar className="h-16 w-16 mr-4 border-2 border-[#0A3C1F]">
+            <Avatar className="h-16 w-16 mr-4 border-2 border-primary">
               <AvatarImage
                 src={avatarUrlToUse || "/placeholder.svg"}
                 alt={profile.name}
@@ -344,7 +344,7 @@ export function UserProfileCard({
       <CardContent>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
-            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+            <div className="bg-muted p-3 rounded-lg">
               <div className="text-sm text-muted-foreground mb-1 flex items-center">
                 <Trophy className="h-4 w-4 mr-1" />
                 Points
@@ -353,21 +353,21 @@ export function UserProfileCard({
                 {profile.participation_count.toLocaleString()}
               </div>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+            <div className="bg-muted p-3 rounded-lg">
               <div className="text-sm text-muted-foreground mb-1 flex items-center">
                 <Medal className="h-4 w-4 mr-1" />
                 Badges
               </div>
               <div className="text-2xl font-bold">{profile.badge_count}</div>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+            <div className="bg-muted p-3 rounded-lg">
               <div className="text-sm text-muted-foreground mb-1 flex items-center">
                 <Award className="h-4 w-4 mr-1" />
                 NFT Awards
               </div>
               <div className="text-2xl font-bold">{profile.nft_count}</div>
             </div>
-            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-lg">
+            <div className="bg-muted p-3 rounded-lg">
               <div className="text-sm text-muted-foreground mb-1 flex items-center">
                 <Calendar className="h-4 w-4 mr-1" />
                 Joined

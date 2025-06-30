@@ -1,23 +1,14 @@
 export const emailTheme = {
-  colors: {
-    primary: "#0A3C1F",
-    accent: "#FFD700",
-    background: "#f9f9f9",
-    backgroundAlt: "#f0f0f0",
-    text: {
-      primary: "#333",
-      secondary: "#666",
-    },
-    border: {
-      light: "#eee",
-      medium: "#ddd",
-    },
-  },
-  spacing: {
-    padding: "20px",
-    margin: "20px",
-  },
-  borderRadius: "4px",
+  primary: "#2dd4bf",
+  primaryDark: "#0891b2",
+  text: "#1f2937",
+  textLight: "#6b7280",
+  background: "#ffffff",
+  backgroundLight: "#f9fafb",
+  border: "#e5e7eb",
+  success: "#10b981",
+  warning: "#f59e0b",
+  danger: "#ef4444",
 };
 
 export type EmailTheme = typeof emailTheme;

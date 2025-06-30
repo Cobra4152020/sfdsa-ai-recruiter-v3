@@ -82,7 +82,7 @@ export default function ResendConfirmationPage() {
         <div className="max-w-md mx-auto">
           <Link
             href="/volunteer-login"
-            className="inline-flex items-center text-[#0A3C1F] hover:text-[#0A3C1F]/80 mb-6"
+            className="inline-flex items-center text-primary hover:text-primary/80 mb-6"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to login
@@ -149,7 +149,7 @@ export default function ResendConfirmationPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90"
+                  className="w-full bg-primary hover:bg-primary/90"
                   disabled={isSubmitting || !email}
                 >
                   {isSubmitting ? (
@@ -167,7 +167,7 @@ export default function ResendConfirmationPage() {
                 <div className="mt-6 text-center">
                   <Button
                     variant="outline"
-                    className="border-[#0A3C1F] text-[#0A3C1F]"
+                    className="border-primary text-primary"
                     onClick={() => router.push("/volunteer-login")}
                   >
                     Return to Login

@@ -126,7 +126,7 @@ export default function JoinClient() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-green-50 py-12">
         <div className="max-w-3xl mx-auto px-4">
           <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+            <h1 className="text-4xl font-bold text-primary mb-4">
               You're Already Part of the Team!
             </h1>
             <p className="text-lg text-gray-600">
@@ -139,7 +139,7 @@ export default function JoinClient() {
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardContent className="p-6 text-center">
                   <Trophy className="h-12 w-12 text-[#FFD700] mx-auto mb-4" />
-                  <h3 className="font-semibold text-[#0A3C1F] mb-2">Dashboard</h3>
+                  <h3 className="font-semibold text-primary mb-2">Dashboard</h3>
                   <p className="text-sm text-gray-600">View your progress and achievements</p>
                 </CardContent>
               </Card>
@@ -148,8 +148,8 @@ export default function JoinClient() {
             <Link href="/awards">
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardContent className="p-6 text-center">
-                  <Award className="h-12 w-12 text-[#0A3C1F] mx-auto mb-4" />
-                  <h3 className="font-semibold text-[#0A3C1F] mb-2">Awards</h3>
+                  <Award className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold text-primary mb-2">Awards</h3>
                   <p className="text-sm text-gray-600">Check out the leaderboard</p>
                 </CardContent>
               </Card>
@@ -158,8 +158,8 @@ export default function JoinClient() {
             <Link href="/could-you-make-the-cut">
               <Card className="hover:shadow-lg transition-shadow cursor-pointer">
                 <CardContent className="p-6 text-center">
-                  <Shield className="h-12 w-12 text-[#0A3C1F] mx-auto mb-4" />
-                  <h3 className="font-semibold text-[#0A3C1F] mb-2">Challenges</h3>
+                  <Shield className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <h3 className="font-semibold text-primary mb-2">Challenges</h3>
                   <p className="text-sm text-gray-600">Test your skills</p>
                 </CardContent>
               </Card>
@@ -167,9 +167,9 @@ export default function JoinClient() {
           </div>
 
           {referrerInfo && (
-            <Card className="border-[#0A3C1F]/20">
+            <Card className="border-primary/20">
               <CardHeader>
-                <CardTitle className="text-center text-[#0A3C1F]">
+                <CardTitle className="text-center text-primary">
                   Thanks for using {referrerInfo.name}'s referral link!
                 </CardTitle>
               </CardHeader>
@@ -196,7 +196,7 @@ export default function JoinClient() {
       <div className="max-w-3xl mx-auto px-4">
         {/* Hero Section */}
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-[#0A3C1F] mb-6">
+          <h1 className="text-5xl font-bold text-primary mb-6">
             Join the San Francisco Deputy Sheriff's Association
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
@@ -205,10 +205,10 @@ export default function JoinClient() {
           </p>
           
           {referrerInfo && !isLoading && (
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8 max-w-md mx-auto border-l-4 border-[#0A3C1F]">
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8 max-w-md mx-auto border-l-4 border-primary">
               <div className="flex items-center mb-4">
-                <UserPlus className="h-6 w-6 text-[#0A3C1F] mr-2" />
-                <span className="font-semibold text-[#0A3C1F]">Referred by</span>
+                <UserPlus className="h-6 w-6 text-primary mr-2" />
+                <span className="font-semibold text-primary">Referred by</span>
               </div>
               <div className="flex items-center">
                 <Avatar className="h-12 w-12 mr-4">
@@ -234,8 +234,8 @@ export default function JoinClient() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           <Card className="text-center">
             <CardContent className="p-6">
-              <Shield className="h-16 w-16 text-[#0A3C1F] mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-[#0A3C1F] mb-3">Serve & Protect</h3>
+              <Shield className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-primary mb-3">Serve & Protect</h3>
               <p className="text-gray-600">
                 Make a real difference in your community while building a rewarding career in law enforcement.
               </p>
@@ -244,8 +244,8 @@ export default function JoinClient() {
 
           <Card className="text-center">
             <CardContent className="p-6">
-              <Users className="h-16 w-16 text-[#0A3C1F] mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-[#0A3C1F] mb-3">Elite Team</h3>
+              <Users className="h-16 w-16 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-primary mb-3">Elite Team</h3>
               <p className="text-gray-600">
                 Join a brotherhood/sisterhood of dedicated professionals committed to excellence and integrity.
               </p>
@@ -255,7 +255,7 @@ export default function JoinClient() {
           <Card className="text-center">
             <CardContent className="p-6">
               <Trophy className="h-16 w-16 text-[#FFD700] mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-[#0A3C1F] mb-3">Career Growth</h3>
+              <h3 className="text-xl font-semibold text-primary mb-3">Career Growth</h3>
               <p className="text-gray-600">
                 Advance through ranks with comprehensive training, competitive benefits, and leadership opportunities.
               </p>
@@ -266,7 +266,7 @@ export default function JoinClient() {
         {/* Sign Up Form */}
         <Card className="max-w-md mx-auto">
           <CardHeader>
-            <CardTitle className="text-center text-[#0A3C1F]">
+            <CardTitle className="text-center text-primary">
               {referrerInfo ? "Complete Your Registration" : "Get Started Today"}
             </CardTitle>
             {referrerInfo && (
@@ -300,7 +300,7 @@ export default function JoinClient() {
             Ready to start your law enforcement career?
           </p>
           <Link href="/application-process">
-            <Button size="lg" className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+            <Button size="lg" className="bg-primary hover:bg-primary/90">
               Learn About the Application Process
               <ArrowRight className="h-5 w-5 ml-2" />
             </Button>

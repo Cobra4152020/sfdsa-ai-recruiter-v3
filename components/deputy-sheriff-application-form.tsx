@@ -363,62 +363,55 @@ export function DeputySheriffApplicationForm() {
     formData.hasPOSTCertification,
   ].filter(Boolean).length;
 
-  // Auto-redirect countdown effect
+  // Auto-focus on first preparation action after submission
   useEffect(() => {
-    if (isSubmitted && redirectUrl) {
-      let countdown = 10;
-      const timer = setInterval(() => {
-        const countdownElement = document.getElementById('countdown');
-        if (countdownElement) {
-          countdownElement.textContent = countdown.toString();
+    if (isSubmitted) {
+      // Scroll to the preparation section after a brief delay
+      setTimeout(() => {
+        const preparationSection = document.getElementById('preparation-section');
+        if (preparationSection) {
+          preparationSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
-        countdown--;
-        if (countdown < 0) {
-          clearInterval(timer);
-          window.location.href = redirectUrl;
-        }
-      }, 1000);
-
-      return () => clearInterval(timer);
+      }, 2000);
     }
-  }, [isSubmitted, redirectUrl]);
+  }, [isSubmitted]);
 
   if (isSubmitted) {
     return (
       <Card className="max-w-3xl mx-auto">
         <CardHeader>
-          <CardTitle className="flex items-center text-green-700">
+          <CardTitle className="flex items-center text-primary dark:text-primary">
             <CheckCircle className="h-6 w-6 mr-2" />
             Application Submitted Successfully
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert className="bg-green-50 border-green-200">
-            <CheckCircle className="h-4 w-4 text-green-600" />
-            <AlertTitle className="text-green-800">Thank you for your interest!</AlertTitle>
-            <AlertDescription className="text-green-700">
+          <Alert className="bg-primary/5 dark:bg-primary/10 border-primary/20 dark:border-primary/30">
+            <CheckCircle className="h-4 w-4 text-primary dark:text-primary" />
+            <AlertTitle className="text-primary dark:text-primary">Thank you for your interest!</AlertTitle>
+            <AlertDescription className="text-primary/80 dark:text-primary/90">
               Your deputy sheriff application interest form has been submitted and our recruitment team will contact you soon.
             </AlertDescription>
           </Alert>
           
           {applicationId && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h4 className="font-medium text-blue-900 mb-2">Application Reference</h4>
-              <p className="text-blue-800 font-mono text-sm">{applicationId}</p>
-              <p className="text-blue-700 text-xs mt-1">
+            <div className="bg-muted dark:bg-muted border border-border rounded-lg p-4">
+              <h4 className="font-medium text-foreground mb-2">Application Reference</h4>
+              <p className="text-foreground font-mono text-sm">{applicationId}</p>
+              <p className="text-muted-foreground text-xs mt-1">
                 Please save this reference number for your records.
               </p>
             </div>
           )}
 
           <div className="space-y-2">
-            <h4 className="font-medium">What happens next?</h4>
-            <ul className="list-disc pl-6 space-y-1 text-sm text-gray-600">
-              <li>Our recruitment team will review your application and qualifications</li>
-              <li>You'll receive a call during one of your selected availability windows</li>
-              <li>We'll discuss the next steps in the deputy sheriff application process</li>
-              <li>If qualified, you'll be guided through the official application process</li>
-              <li>Continue engaging with our platform to earn points and prepare for assessments</li>
+            <h4 className="font-medium">🎯 What happens next?</h4>
+            <ul className="list-disc pl-6 space-y-1 text-sm text-gray-600 dark:text-gray-300">
+              <li><strong>We'll contact you directly</strong> - Our recruitment team will review your application and call you during your selected availability window</li>
+              <li><strong>Personal guidance</strong> - We'll discuss your background, answer questions, and explain the next steps</li>
+              <li><strong>Official application support</strong> - We'll help you navigate the official SFSO application process</li>
+              <li><strong>Preparation resources</strong> - Access our training materials, practice tests, and study guides</li>
+              <li><strong>Community support</strong> - Join our candidate community and earn points while you prepare</li>
             </ul>
           </div>
 
@@ -431,34 +424,78 @@ export function DeputySheriffApplicationForm() {
             />
           </div>
 
-          <div className="space-y-4">
-            {redirectUrl && (
-              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <h4 className="font-medium text-yellow-900 mb-2">🎯 Next Step: Official Application</h4>
-                <p className="text-yellow-800 text-sm mb-3">
-                  You'll be redirected to the official SF careers page to complete your {formData.position === "8302" ? "Entry-Level Deputy Sheriff" : "Academy Graduate/Lateral Officer"} application in <span id="countdown">10</span> seconds.
-                </p>
+          <div className="space-y-6">
+            {/* Preparation Resources */}
+            <div id="preparation-section" className="bg-primary/5 dark:bg-primary/10 border border-primary/20 dark:border-primary/30 rounded-lg p-6">
+              <h4 className="font-medium text-primary dark:text-primary mb-3">📚 Start Preparing Now - Earn Points While You Wait!</h4>
+              <p className="text-primary/80 dark:text-primary/90 text-sm mb-4">
+                Don't just wait for our call! Get ahead of other candidates by using our preparation resources and earning points on our platform.
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <Button 
-                  onClick={() => window.location.href = redirectUrl}
-                  className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                  onClick={() => window.location.href = "/practice-tests"}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
                 >
-                  Go to Official Application Now →
+                  🎯 Take Practice Tests (20 pts)
+                </Button>
+                <Button 
+                  onClick={() => window.location.href = "/trivia"}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
+                  🧠 Play Trivia Games (60-120 pts)
+                </Button>
+                <Button 
+                  onClick={() => window.location.href = "/deputy-launchpad"}
+                  className="bg-primary hover:bg-primary/90 text-primary-foreground"
+                >
+                  🚀 Visit Deputy Launchpad
+                </Button>
+                <Button 
+                  onClick={() => window.location.href = "/roadmap"}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground"
+                >
+                  🗺️ View Career Roadmap
                 </Button>
               </div>
-            )}
+            </div>
             
-            <div className="flex gap-4">
+            {/* Community Engagement */}
+            <div className="bg-accent/5 dark:bg-accent/10 border border-accent/20 dark:border-accent/30 rounded-lg p-6">
+              <h4 className="font-medium text-accent dark:text-accent mb-3">🤝 Join Our Candidate Community</h4>
+              <p className="text-accent/80 dark:text-accent/90 text-sm mb-4">
+                Connect with other candidates, share your journey, and stay engaged while you wait for our recruitment team to contact you.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Button 
+                  onClick={() => window.location.href = "/chat-with-sgt-ken"}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground flex-1"
+                >
+                  💬 Chat with Sgt. Ken (5 pts per chat)
+                </Button>
+                <Button 
+                  onClick={() => window.location.href = "/leaderboard"}
+                  variant="outline"
+                  className="border-accent dark:border-accent text-accent dark:text-accent hover:bg-accent/5 dark:hover:bg-accent/10 flex-1"
+                >
+                  🏆 View Leaderboard
+                </Button>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4">
               <Button 
-                onClick={() => window.location.href = "/roadmap"}
+                onClick={() => window.location.href = "/profile"}
                 variant="outline"
+                className="flex-1"
               >
-                View Roadmap
+                👤 View Your Profile
               </Button>
               <Button 
                 onClick={() => window.location.href = "/"}
                 variant="outline"
+                className="flex-1"
               >
-                Return to Home
+                🏠 Return to Home
               </Button>
             </div>
           </div>
@@ -471,10 +508,10 @@ export function DeputySheriffApplicationForm() {
     <Card className="max-w-3xl mx-auto">
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Shield className="h-6 w-6 mr-2 text-[#0A3C1F]" />
+          <Shield className="h-6 w-6 mr-2 text-primary" />
           Deputy Sheriff Application Interest
         </CardTitle>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-300">
           Express your interest in becoming a San Francisco Deputy Sheriff. Our recruitment team will contact you 
           to discuss opportunities and guide you through the application process.
         </p>
@@ -482,10 +519,10 @@ export function DeputySheriffApplicationForm() {
       
       <CardContent>
         {errorMessage && (
-          <Alert className="mb-6 bg-red-50 border-red-200" variant="destructive">
-            <AlertCircle className="h-4 w-4 text-red-600" />
-            <AlertTitle className="text-red-800">Application Error</AlertTitle>
-            <AlertDescription className="text-red-700">
+          <Alert className="mb-6 bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800" variant="destructive">
+            <AlertCircle className="h-4 w-4 text-red-600 dark:text-red-400" />
+            <AlertTitle className="text-red-800 dark:text-red-200">Application Error</AlertTitle>
+            <AlertDescription className="text-red-700 dark:text-red-300">
               {errorMessage}
             </AlertDescription>
           </Alert>
@@ -494,7 +531,7 @@ export function DeputySheriffApplicationForm() {
         <form onSubmit={handleSubmit} className="space-y-8">
           {/* Personal Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               <User className="h-5 w-5 inline mr-2" />
               Personal Information
             </h3>
@@ -562,7 +599,7 @@ export function DeputySheriffApplicationForm() {
             <div className="space-y-2">
               <Label htmlFor="dateOfBirth">
                 Date of Birth <span className="text-red-500">*</span>
-                <span className="text-sm text-gray-500 ml-2">(Must be 18+ years old)</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">(Must be 18+ years old)</span>
               </Label>
               <Input
                 id="dateOfBirth"
@@ -577,7 +614,7 @@ export function DeputySheriffApplicationForm() {
 
           {/* Position Selection */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               <Shield className="h-5 w-5 inline mr-2" />
               Position Selection
             </h3>
@@ -594,13 +631,13 @@ export function DeputySheriffApplicationForm() {
                   <SelectItem value="8302">
                     <div className="space-y-1">
                       <div className="font-medium">8302 - Entry-Level Deputy Sheriff</div>
-                      <div className="text-sm text-gray-600">No prior law enforcement experience required • $118,768</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">No prior law enforcement experience required • $118,768</div>
                     </div>
                   </SelectItem>
                   <SelectItem value="8504">
                     <div className="space-y-1">
                       <div className="font-medium">8504 - Academy Graduate/Lateral Officer</div>
-                      <div className="text-sm text-gray-600">Requires POST certification • $118,768 - $184,362 (with incentives)</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-300">Requires POST certification • $118,768 - $184,362 (with incentives)</div>
                     </div>
                   </SelectItem>
                 </SelectContent>
@@ -632,7 +669,7 @@ export function DeputySheriffApplicationForm() {
 
           {/* Address Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               <MapPin className="h-5 w-5 inline mr-2" />
               Address Information
             </h3>
@@ -691,16 +728,16 @@ export function DeputySheriffApplicationForm() {
           {/* Qualifications */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+              <h3 className="text-lg font-medium text-primary border-b pb-2">
                 <GraduationCap className="h-5 w-5 inline mr-2" />
                 Qualifications & Experience
               </h3>
-              <Badge variant="outline" className="text-[#0A3C1F]">
+              <Badge variant="outline" className="text-primary">
                 {qualificationCount === 0 ? "None selected" : `${qualificationCount} selected`}
               </Badge>
             </div>
             
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
               Please check all that apply to you (optional). This helps us understand your background and qualifications.
             </p>
 
@@ -792,7 +829,7 @@ export function DeputySheriffApplicationForm() {
 
           {/* Motivation */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               Motivation & Interest
             </h3>
             
@@ -813,18 +850,18 @@ export function DeputySheriffApplicationForm() {
 
           {/* Availability Calendar */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               <Calendar className="h-5 w-5 inline mr-2" />
               Availability for Recruiter Contact
             </h3>
             
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-300">
               Please provide 3 dates and time ranges when our recruiter can contact you. We'll call during one of these windows.
             </p>
 
             <div className="space-y-4">
               {formData.availabilitySlots.map((slot, index) => (
-                <div key={index} className="border rounded-lg p-4 bg-gray-50">
+                <div key={index} className="border rounded-lg p-4 bg-muted">
                   <h4 className="font-medium mb-3">
                     Option {index + 1} {index === 0 && <span className="text-red-500">*</span>}
                   </h4>
@@ -870,7 +907,7 @@ export function DeputySheriffApplicationForm() {
 
           {/* Resume Upload */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               <FileText className="h-5 w-5 inline mr-2" />
               Resume Upload (Optional)
             </h3>
@@ -882,7 +919,7 @@ export function DeputySheriffApplicationForm() {
                     <FileText className="h-8 w-8 text-green-600 mr-3" />
                     <div>
                       <p className="font-medium">{resumeFile.name}</p>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
                         {(resumeFile.size / (1024 * 1024)).toFixed(1)} MB
                       </p>
                     </div>
@@ -903,7 +940,7 @@ export function DeputySheriffApplicationForm() {
                   <div className="mt-4">
                     <Label
                       htmlFor="resume-upload"
-                      className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-gray-50 h-10 px-4 py-2"
+                      className="cursor-pointer inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent/10 h-10 px-4 py-2"
                     >
                       <Paperclip className="h-4 w-4 mr-2" />
                       Choose Resume File
@@ -916,7 +953,7 @@ export function DeputySheriffApplicationForm() {
                       className="hidden"
                     />
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                     PDF, DOC, or DOCX files up to 5MB. Optional but recommended.
                   </p>
                 </div>
@@ -926,7 +963,7 @@ export function DeputySheriffApplicationForm() {
 
           {/* Consent and Agreement */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-[#0A3C1F] border-b pb-2">
+            <h3 className="text-lg font-medium text-primary border-b pb-2">
               <AlertTriangle className="h-5 w-5 inline mr-2" />
               Consent and Agreement
             </h3>
@@ -967,11 +1004,11 @@ export function DeputySheriffApplicationForm() {
                   </Label>
                   <p className="text-xs text-gray-600">
                     I agree to the{" "}
-                    <a href="/terms-of-service" className="text-[#0A3C1F] hover:underline">
+                    <a href="/terms-of-service" className="text-primary hover:underline">
                       terms and conditions
                     </a>{" "}
                     and{" "}
-                    <a href="/privacy-policy" className="text-[#0A3C1F] hover:underline">
+                    <a href="/privacy-policy" className="text-primary hover:underline">
                       privacy policy
                     </a>
                   </p>
@@ -985,7 +1022,7 @@ export function DeputySheriffApplicationForm() {
             <Button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 h-12"
+              className="w-full bg-primary hover:bg-primary/90 h-12"
             >
               {isSubmitting ? (
                 <>
@@ -1001,7 +1038,7 @@ export function DeputySheriffApplicationForm() {
             </Button>
           </div>
 
-          <div className="text-center text-sm text-gray-600">
+          <div className="text-center text-sm text-gray-600 dark:text-gray-300">
             <p>
               Our recruitment team will contact you within 2-3 business days during your selected availability window.
               Continue engaging with our platform to earn points and prepare for your law enforcement career!

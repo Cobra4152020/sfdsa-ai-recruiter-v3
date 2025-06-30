@@ -135,7 +135,7 @@ export function BadgeShareDialog({
             </TabsContent>
 
             <TabsContent value="embed" className="space-y-4 mt-4">
-              <div className="bg-gray-50 p-4 rounded-lg">
+              <div className="bg-muted p-4 rounded-lg">
                 <pre className="text-sm overflow-x-auto">
                   {`<a href="${shareUrl}" target="_blank">
                     <img 

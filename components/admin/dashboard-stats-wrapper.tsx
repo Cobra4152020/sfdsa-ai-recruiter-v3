@@ -31,7 +31,7 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
             </CardTitle>
             <CardDescription>All time applications</CardDescription>
           </div>
-          <Users className="h-4 w-4 text-[#0A3C1F]" />
+          <Users className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.totalApplicants}</div>
@@ -46,7 +46,7 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
             </CardTitle>
             <CardDescription>Meeting requirements</CardDescription>
           </div>
-          <Award className="h-4 w-4 text-[#0A3C1F]" />
+          <Award className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.qualifiedCandidates}</div>
@@ -61,7 +61,7 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
             </CardTitle>
             <CardDescription>Application to decision</CardDescription>
           </div>
-          <Clock className="h-4 w-4 text-[#0A3C1F]" />
+          <Clock className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.processingTime}</div>
@@ -76,7 +76,7 @@ export function DashboardStatsWrapper({ stats }: DashboardStatsWrapperProps) {
             </CardTitle>
             <CardDescription>Qualified to hired</CardDescription>
           </div>
-          <TrendingUp className="h-4 w-4 text-[#0A3C1F]" />
+          <TrendingUp className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.conversionRate}</div>

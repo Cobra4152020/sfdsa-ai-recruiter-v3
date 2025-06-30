@@ -32,7 +32,7 @@ import {
 } from "lucide-react";
 import { useAuthModal } from "@/context/auth-modal-context";
 import { useUser } from "@/context/user-context";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
 import Link from "next/link";
 
 const REQUIRED_POINTS = 75;
@@ -664,7 +664,7 @@ export default function BackgroundPreparationPage() {
                 <Lock className="h-12 w-12 text-amber-500 mr-3" />
                 <Trophy className="h-12 w-12 text-amber-500" />
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-amber-600 bg-clip-text text-transparent mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-amber-600 bg-clip-text text-transparent mb-4">
                 Premium Background Preparation
               </h1>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
@@ -683,7 +683,7 @@ export default function BackgroundPreparationPage() {
                     <p className="text-amber-800 mb-4">Get 50 points instantly when you register, then earn 25 more to unlock this premium content.</p>
                     <Button 
                       onClick={() => openModal("signup", "recruit")}
-                      className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white px-8 py-3"
+                      className="bg-primary hover:bg-primary/90 text-white px-8 py-3"
                     >
                       <Star className="h-4 w-4 mr-2" />
                       Sign Up & Get 50 Points
@@ -765,19 +765,19 @@ export default function BackgroundPreparationPage() {
                     <div className="space-y-3">
                       <h4 className="font-semibold text-gray-900">Quick Point Opportunities:</h4>
                       <div className="space-y-2">
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div className="flex items-center justify-between p-2 bg-muted rounded">
                           <span className="text-sm">Complete application interest</span>
                           <Badge>+500 points</Badge>
                         </div>
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div className="flex items-center justify-between p-2 bg-muted rounded">
                           <span className="text-sm">Social media share</span>
                           <Badge>+25 points</Badge>
                         </div>
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div className="flex items-center justify-between p-2 bg-muted rounded">
                           <span className="text-sm">Chat with Sgt. Ken</span>
                           <Badge>+5-7 points</Badge>
                         </div>
-                        <div className="flex items-center justify-between p-2 bg-gray-50 rounded">
+                        <div className="flex items-center justify-between p-2 bg-muted rounded">
                           <span className="text-sm">Practice tests</span>
                           <Badge>+20 points</Badge>
                         </div>
@@ -849,7 +849,7 @@ export default function BackgroundPreparationPage() {
               <Trophy className="h-8 w-8 text-green-600 mr-2" />
               <span className="text-green-600 font-semibold">Premium Access Unlocked</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-[#0A3C1F] to-[#0A3C1F]/80 bg-clip-text text-transparent mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-4">
               Background Investigation Preparation
             </h1>
             <p className="text-xl text-gray-600 max-w-4xl mx-auto mb-6">

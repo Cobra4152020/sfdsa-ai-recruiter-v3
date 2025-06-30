@@ -67,7 +67,7 @@ export function URLConfigClient() {
 
           {configData && (
             <>
-              <div className="bg-gray-50 p-4 rounded-md mb-4">
+              <div className="bg-muted p-4 rounded-md mb-4">
                 <h3 className="font-medium mb-2">Configuration Status</h3>
                 <p
                   className={
@@ -88,14 +88,14 @@ export function URLConfigClient() {
                 </p>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-md mb-4">
+              <div className="bg-muted p-4 rounded-md mb-4">
                 <h3 className="font-medium mb-2">Environment Variables</h3>
                 <pre className="bg-gray-100 p-3 rounded text-xs overflow-auto">
                   {JSON.stringify(configData.envVars, null, 2)}
                 </pre>
               </div>
 
-              <div className="bg-gray-50 p-4 rounded-md mb-4">
+              <div className="bg-muted p-4 rounded-md mb-4">
                 <h3 className="font-medium mb-2">Computed URLs</h3>
                 <pre className="bg-gray-100 p-3 rounded text-xs overflow-auto">
                   {JSON.stringify(configData.computedUrls, null, 2)}

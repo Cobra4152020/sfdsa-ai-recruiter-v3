@@ -126,12 +126,12 @@ export default function ProfilePage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-3xl mx-auto">
           <div className="flex justify-between items-center mb-6">
-            <h1 className="text-3xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+            <h1 className="text-3xl font-bold text-primary dark:text-[#FFD700]">
               Profile
             </h1>
             <Button 
               onClick={() => router.push("/profile/edit")}
-              className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90 text-white"
+              className="bg-primary hover:bg-primary/90 text-white"
             >
               <Edit className="h-4 w-4 mr-2" />
               Edit Profile
@@ -243,21 +243,21 @@ export default function ProfilePage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+                    <div className="text-3xl font-bold text-primary dark:text-[#FFD700]">
                       {userStats.totalPoints}
                     </div>
                     <p className="text-sm text-gray-500">Total Points</p>
                   </div>
                   
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+                    <div className="text-3xl font-bold text-primary dark:text-[#FFD700]">
                       {userStats.achievements}
                     </div>
                     <p className="text-sm text-gray-500">Achievements</p>
                   </div>
 
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-[#0A3C1F] dark:text-[#FFD700]">
+                    <div className="text-3xl font-bold text-primary dark:text-[#FFD700]">
                       {userProfile?.participation_count || 0}
                     </div>
                     <p className="text-sm text-gray-500">Events Attended</p>

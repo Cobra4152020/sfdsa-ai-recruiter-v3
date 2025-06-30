@@ -32,7 +32,7 @@ export default function GamificationPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h1 className="text-4xl font-bold text-[#0A3C1F] mb-4">
+            <h1 className="text-4xl font-bold text-primary mb-4">
               Gamification
             </h1>
             <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -66,7 +66,7 @@ export default function GamificationPage() {
 
             <TabsContent value="points">
               <Card>
-                <CardHeader className="bg-[#0A3C1F] text-white">
+                <CardHeader className="bg-primary text-white">
                   <CardTitle>Points System</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -77,7 +77,7 @@ export default function GamificationPage() {
                       </h3>
                       <ul className="space-y-4">
                         <li className="flex items-start">
-                          <MessageSquare className="h-5 w-5 text-[#0A3C1F] mr-2 mt-0.5" />
+                          <MessageSquare className="h-5 w-5 text-primary mr-2 mt-0.5" />
                           <div>
                             <p className="font-medium">Chat with Sgt. Ken</p>
                             <p className="text-sm text-gray-600">
@@ -86,7 +86,7 @@ export default function GamificationPage() {
                           </div>
                         </li>
                         <li className="flex items-start">
-                          <FileText className="h-5 w-5 text-[#0A3C1F] mr-2 mt-0.5" />
+                          <FileText className="h-5 w-5 text-primary mr-2 mt-0.5" />
                           <div>
                             <p className="font-medium">
                               Complete Practice Tests
@@ -97,7 +97,7 @@ export default function GamificationPage() {
                           </div>
                         </li>
                         <li className="flex items-start">
-                          <Download className="h-5 w-5 text-[#0A3C1F] mr-2 mt-0.5" />
+                          <Download className="h-5 w-5 text-primary mr-2 mt-0.5" />
                           <div>
                             <p className="font-medium">Review Materials</p>
                             <p className="text-sm text-gray-600">
@@ -148,7 +148,7 @@ export default function GamificationPage() {
 
             <TabsContent value="badges">
               <Card>
-                <CardHeader className="bg-[#0A3C1F] text-white">
+                <CardHeader className="bg-primary text-white">
                   <CardTitle>Badge System</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -167,7 +167,7 @@ export default function GamificationPage() {
 
             <TabsContent value="referrals">
               <Card>
-                <CardHeader className="bg-[#0A3C1F] text-white">
+                <CardHeader className="bg-primary text-white">
                   <CardTitle>Referral Program</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -182,7 +182,7 @@ export default function GamificationPage() {
                       </h3>
                       <ul className="space-y-4">
                         <li className="flex items-start">
-                          <Share2 className="h-5 w-5 text-[#0A3C1F] mr-2 mt-0.5" />
+                          <Share2 className="h-5 w-5 text-primary mr-2 mt-0.5" />
                           <div>
                             <p className="font-medium">
                               Share Your Referral Link
@@ -193,7 +193,7 @@ export default function GamificationPage() {
                           </div>
                         </li>
                         <li className="flex items-start">
-                          <Users className="h-5 w-5 text-[#0A3C1F] mr-2 mt-0.5" />
+                          <Users className="h-5 w-5 text-primary mr-2 mt-0.5" />
                           <div>
                             <p className="font-medium">Track Referrals</p>
                             <p className="text-sm text-gray-600">
@@ -202,7 +202,7 @@ export default function GamificationPage() {
                           </div>
                         </li>
                         <li className="flex items-start">
-                          <Gift className="h-5 w-5 text-[#0A3C1F] mr-2 mt-0.5" />
+                          <Gift className="h-5 w-5 text-primary mr-2 mt-0.5" />
                           <div>
                             <p className="font-medium">Earn Rewards</p>
                             <p className="text-sm text-gray-600">
@@ -220,7 +220,7 @@ export default function GamificationPage() {
 
             <TabsContent value="unlockables">
               <Card>
-                <CardHeader className="bg-[#0A3C1F] text-white">
+                <CardHeader className="bg-primary text-white">
                   <CardTitle>Unlockable Content</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -237,7 +237,7 @@ export default function GamificationPage() {
 
             <TabsContent value="nfts">
               <Card>
-                <CardHeader className="bg-[#0A3C1F] text-white">
+                <CardHeader className="bg-primary text-white">
                   <CardTitle>NFT Rewards</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">
@@ -254,7 +254,7 @@ export default function GamificationPage() {
 
             <TabsContent value="trivia">
               <Card>
-                <CardHeader className="bg-[#0A3C1F] text-white">
+                <CardHeader className="bg-primary text-white">
                   <CardTitle>SF Trivia</CardTitle>
                 </CardHeader>
                 <CardContent className="p-6">

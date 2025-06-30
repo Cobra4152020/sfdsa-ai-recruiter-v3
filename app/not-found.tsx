@@ -10,14 +10,14 @@ export default function NotFound() {
         <div className="text-center max-w-md">
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <Shield className="h-24 w-24 text-[#0A3C1F] opacity-20" />
+              <Shield className="h-24 w-24 text-primary opacity-20" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-4xl font-bold text-[#0A3C1F]">404</span>
+                <span className="text-4xl font-bold text-primary">404</span>
               </div>
             </div>
           </div>
 
-          <h1 className="text-3xl font-bold text-[#0A3C1F] mb-4">
+          <h1 className="text-3xl font-bold text-primary mb-4">
             Page Not Found
           </h1>
 
@@ -27,7 +27,7 @@ export default function NotFound() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button asChild className="bg-[#0A3C1F] hover:bg-[#0A3C1F]/90">
+            <Button asChild className="bg-primary hover:bg-primary/90">
               <Link href="/">
                 <Home className="h-4 w-4 mr-2" />
                 Back to Home
@@ -43,7 +43,7 @@ export default function NotFound() {
           </div>
 
           <div className="mt-12">
-            <Button asChild variant="link" className="text-[#0A3C1F]">
+            <Button asChild variant="link" className="text-primary">
               <Link href="javascript:history.back()">
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Go Back

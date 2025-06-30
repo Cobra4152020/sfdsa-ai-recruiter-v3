@@ -7,7 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useUser } from "@/context/user-context";
 import { useAuthModal } from "@/context/auth-modal-context";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/components/ui/use-toast";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function FloatingShareWidget() {
   const [isVisible, setIsVisible] = useState(false);

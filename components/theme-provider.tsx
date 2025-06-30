@@ -45,7 +45,7 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       <Button
         variant="ghost"
         size="icon"
-        className={`${className} bg-white/10 hover:bg-white/20 border-white/20`}
+        className={`${className} border border-gray-300 dark:border-[#FFD700]/30`}
         aria-label="Toggle theme"
         disabled
       >
@@ -60,13 +60,13 @@ export function ThemeToggle({ className }: ThemeToggleProps) {
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
       variant="ghost"
       size="icon"
-      className={`${className} bg-white/10 hover:bg-white/20 border-white/20 transition-all duration-200`}
+      className={`${className} border border-gray-300 dark:border-[#FFD700]/30 hover:bg-gray-100 dark:hover:bg-[#FFD700]/10 transition-all duration-200`}
       aria-label="Toggle theme"
     >
       {theme === "dark" ? (
         <Sun className="h-4 w-4 text-[#FFD700]" />
       ) : (
-        <Moon className="h-4 w-4 text-white" />
+        <Moon className="h-4 w-4 text-gray-600" />
       )}
       <span className="sr-only">Toggle theme</span>
     </Button>
